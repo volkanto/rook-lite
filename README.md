@@ -16,6 +16,34 @@ npm run build
 npm run preview
 ```
 
+## GitHub Pages deployment
+
+### Enable GitHub Pages
+
+In the GitHub repository, open:
+
+```text
+Settings → Pages → Build and deployment → Source → GitHub Actions
+```
+
+### Deployment
+
+The `Deploy to GitHub Pages` workflow builds and deploys the site automatically whenever code is pushed to `main`.
+
+It can also be started manually from:
+
+```text
+Actions → Deploy to GitHub Pages → Run workflow
+```
+
+The deployed URL normally uses this format:
+
+```text
+https://<username>.github.io/<repository-name>/
+```
+
+The workflow configures Vite's base path from GitHub Pages, so project Pages deployments work below the repository subdirectory. GitHub Pages only hosts the frontend; notes and settings remain in that browser origin's IndexedDB.
+
 ## Docker
 
 ```bash

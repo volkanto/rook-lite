@@ -2,13 +2,14 @@
   "name": "Rook Lite",
   "short_name": "Rook Lite",
   "description": "A private, local-first notebook.",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#071426",
-  "theme_color": "#071426",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "./logo.png",
       "sizes": "any",
       "type": "image/png",
       "purpose": "any maskable"

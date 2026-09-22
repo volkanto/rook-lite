@@ -1,12 +1,15 @@
-const CACHE_NAME = "rook-lite-shell-v2";
-const APP_SHELL = ["/", "/logo.png", "/empty-notes.png", "/manifest.webmanifest"];
+const CACHE_NAME = "rook-lite-shell-v3";
+const BASE_URL = new URL("./", self.registration.scope);
+const appUrl = (path) => new URL(path, BASE_URL).toString();
+const APP_SHELL = ["./", "logo.png", "empty-notes.png", "manifest.webmanifest"].map(appUrl);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then(async (cache) => {
     await cache.addAll(APP_SHELL);
-    const response = await fetch("/");
+    const response = await fetch(appUrl("./"));
     const html = await response.text();
-    const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((match) => match[1]);
+    const assets = [...html.matchAll(/(?:src|href)="([^"]*assets\/[^"]+)"/g)]
+      .map((match) => new URL(match[1], BASE_URL).toString());
     if (assets.length) await cache.addAll(assets);
   }));
   self.skipWaiting();
@@ -28,10 +31,10 @@ self.addEventListener("fetch", (event) => {
       fetch(event.request)
         .then((response) => {
           const copy = response.clone();
-          void caches.open(CACHE_NAME).then((cache) => cache.put("/", copy));
+          void caches.open(CACHE_NAME).then((cache) => cache.put(appUrl("./"), copy));
           return response;
         })
-        .catch(() => caches.match("/"))
+        .catch(() => caches.match(appUrl("./")))
     );
     return;
   }
