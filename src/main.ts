@@ -30,7 +30,9 @@ const icons = {
   lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/>',
   moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>',
-  monitor: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>'
+  monitor: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  note: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'
 } as const;
 
 const navItems: readonly NavigationItem[] = [
@@ -46,7 +48,7 @@ function svg(content: string, className = "nav-svg"): string {
 async function renderShell(): Promise<void> {
   document.documentElement.classList.add("sidebar-collapsed");
   app.innerHTML = `<header class="global-header"><div class="header-left"><button type="button" class="mobile-sidebar-open" data-action="toggle-sidebar" aria-label="Toggle sidebar" aria-controls="app-sidebar" aria-expanded="true"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div><div class="header-middle"><button type="button" class="topsearch-trigger" data-action="open-search"><span class="search-placeholder">Type / to search notes</span><kbd class="search-hotkey">⌘ K</kbd></button></div><div class="header-right"></div></header>
-    <div id="search-modal" class="modal-backdrop" aria-hidden="true"><div class="modal-content search-palette" role="dialog" aria-modal="true" aria-labelledby="search-dialog-title"><div class="palette-search-bar">${svg(icons.search, "modal-search-icon")}<label id="search-dialog-title" class="visually-hidden" for="modal-search-input">Search notes</label><input type="search" id="modal-search-input" placeholder="Search notes…" autocomplete="off"><span class="modal-close-hint">esc</span></div><div class="palette-filters"><select id="modal-search-tag" aria-label="Filter by tag"><option value="">All tags</option></select><select id="modal-search-period" aria-label="Filter by period"><option value="">Any time</option><option value="week">This week</option><option value="month">This month</option></select><label><input id="modal-search-todo" type="checkbox"> Open tasks</label><a href="${appUrl("/search")}" data-link>More filters</a></div><div id="modal-search-results" class="modal-body"><p class="muted modal-placeholder">Recent notes and commands appear here.</p></div></div></div>
+    <div id="search-modal" class="modal-backdrop" aria-hidden="true"><div class="modal-content search-palette" role="dialog" aria-modal="true" aria-labelledby="search-dialog-title"><div class="palette-search-bar">${svg(icons.search, "modal-search-icon")}<label id="search-dialog-title" class="visually-hidden" for="modal-search-input">Search notes</label><input type="search" id="modal-search-input" placeholder="Search notes, tags, or commands…" autocomplete="off"><span class="modal-close-hint">esc</span></div><div class="palette-filters"><select id="modal-search-tag" aria-label="Filter by tag"><option value="">All tags</option></select><select id="modal-search-period" aria-label="Filter by period"><option value="">Any time</option><option value="week">This week</option><option value="month">This month</option></select><label class="filter-todo-chip"><input id="modal-search-todo" type="checkbox"> <span>Open tasks</span></label><a href="${appUrl("/search")}" data-link class="filter-more-link">More filters &rarr;</a></div><div id="modal-search-results" class="modal-body"></div><div class="palette-footer"><div class="palette-footer-hints"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span><span><kbd>&crarr;</kbd> open</span><span><kbd>esc</kbd> close</span></div></div></div></div>
     <div id="dialog-host"></div><button type="button" class="scrim" data-action="close-sidebar" aria-label="Close navigation"></button>
     <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="Rook Notes Lite" data-sidebar-tooltip="Rook Notes Lite"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.75" y="2.25" width="12.5" height="11.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="M5.5 2.75v10.5M9.75 5.5 7.5 8l2.25 2.5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sidebar-toggle-tooltip">Close sidebar</span></button></div><div class="sidebar-mobile-head"><span>Navigation</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="Close navigation">&times;</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="Switch color theme" data-sidebar-tooltip="Switch to dark theme">${svg(icons.moon, "theme-dark-icon")}${svg(icons.sun, "theme-light-icon")}</button><span class="local-only-icon" role="img" tabindex="0" aria-label="Local only: stored in this browser" data-sidebar-tooltip="Local only · stored in this browser">${svg(icons.lock, "")}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"></main></div></div>`;
   bindShellEvents(); applyTheme(); updateSidebarButton(); await renderRoute();
@@ -170,13 +172,13 @@ async function renderSearchPageResults(host: HTMLElement, countHost: HTMLElement
 async function renderSearchResults(host: HTMLElement, query: string, year: string, categoryId: string, allCategories: Category[], from = "", to = ""): Promise<void> {
   const categoryMap = new Map(allCategories.map((category) => [category.id, category.name])); const parsed = parseSearch(query); const wanted = normalize(parsed.text.replace(/^#/, ""));
   const matching = (await notes.listAll()).filter((note) => !note.archived && (!year || note.noteDate.startsWith(year)) && (!from || note.noteDate >= from) && (!to || note.noteDate <= to) && (!categoryId || note.categoryIds.includes(categoryId)) && (!parsed.tag || note.tags.includes(parsed.tag)) && (!parsed.category || note.categoryIds.some((id) => normalize(categoryMap.get(id) ?? "") === parsed.category)) && (!parsed.hasTodo || /^\s*[-*+]\s+\[ \]\s+/m.test(note.content))).filter((note) => !wanted || notes.searchableText(note, note.categoryIds.map((id) => categoryMap.get(id) ?? "")).includes(wanted)).sort((a, b) => b.noteDate.localeCompare(a.noteDate) || b.updatedAt.localeCompare(a.updatedAt));
-  const commands = query ? "" : `<div class="search-commands"><p class="muted">Quick actions</p><a href="/" data-link>New note <kbd>N</kbd></a><a href="/summaries" data-link>Generate weekly summary</a><a href="/settings" data-link>Export notes or open settings</a></div>`;
+  const commands = query ? "" : `<div class="search-commands"><div class="palette-section-label">Quick actions</div><a href="${appUrl("/")}" data-link data-command="new-note" class="command-item"><div class="command-item-left">${svg(icons.plus, "command-icon")}<span>New note</span></div><kbd>N</kbd></a><a href="${appUrl("/summaries")}" data-link class="command-item"><div class="command-item-left">${svg(icons.summary, "command-icon")}<span>Generate weekly summary</span></div></a><a href="${appUrl("/settings")}" data-link class="command-item"><div class="command-item-left">${svg(icons.settings, "command-icon")}<span>Export notes or open settings</span></div></a></div>`;
   host.innerHTML = !query && !year && !categoryId ? `${commands}<div class="palette-results-heading"><span>Recent notes</span><span>${matching.slice(0, 5).length}</span></div>${matching.slice(0, 5).length ? searchHits(matching.slice(0, 5)) : '<div class="palette-empty"><p>No notes yet</p><span>Create a note and it will appear here.</span></div>'}` : !matching.length ? `<div class="palette-empty"><p>No matching notes</p><span>Try fewer words or remove a filter.</span></div>` : `<div class="palette-results-heading"><span>Matching notes</span><span>${matching.length}</span></div>${searchHits(matching)}`;
   normalizeAppLinks(host);
 }
 
 function parseSearch(query: string): { text: string; tag: string; category: string; hasTodo: boolean } { let text = query; const read = (pattern: RegExp) => { const match = text.match(pattern); if (match) text = text.replace(match[0], " "); return normalize(match?.[1] ?? ""); }; const tag = read(/(?:^|\s)tag:([^\s]+)/i); const category = read(/(?:^|\s)category:([^\s]+)/i); const hasTodo = /(?:^|\s)has:todo(?:\s|$)/i.test(text); text = text.replace(/(?:^|\s)has:todo(?:\s|$)/i, " "); return { text, tag, category, hasTodo }; }
-function searchHits(items: Note[]): string { return `<ol class="palette-result-list">${items.map((note) => { const preview = note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim(); return `<li><a href="/?date=${note.noteDate}#note-${note.id}" data-link><div class="palette-result-copy"><p>${escapeHtml(preview.slice(0, 180))}</p>${note.tags.length ? `<div class="palette-result-tags">${note.tags.slice(0, 3).map((tag) => `<span>#${escapeHtml(tag)}</span>`).join("")}</div>` : ""}</div><time datetime="${note.noteDate}">${new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(`${note.noteDate}T12:00:00`))}</time></a></li>`; }).join("")}</ol>`; }
+function searchHits(items: Note[]): string { return `<ol class="palette-result-list">${items.map((note) => { const preview = note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim() || "Untitled note"; return `<li><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="palette-result-item"><div class="palette-result-icon">${svg(icons.note, "palette-icon")}</div><div class="palette-result-copy"><p class="palette-result-text">${escapeHtml(preview.slice(0, 180))}</p>${note.tags.length ? `<div class="palette-result-tags">${note.tags.slice(0, 3).map((tag) => `<span>#${escapeHtml(tag)}</span>`).join("")}</div>` : ""}</div><time datetime="${note.noteDate}">${new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(`${note.noteDate}T12:00:00`))}</time></a></li>`; }).join("")}</ol>`; }
 
 async function renderTodos(content: HTMLElement): Promise<void> {
   const tasks = (await notes.listAll()).flatMap((note) => note.content.split(/\r?\n/).map((line, lineIndex) => ({ note, line, lineIndex })).filter(({ line }) => /^\s*[-*+]\s+\[ \]\s+/.test(line)));
@@ -247,12 +249,52 @@ function showConfirm(title: string, message: string, actionLabel: string, action
 function closeDialog(): void { const host = document.querySelector<HTMLElement>("#dialog-host"); if (host) host.replaceChildren(); document.body.style.overflow = ""; }
 function renderNotFound(content: HTMLElement): void { document.title = "Not found · Rook Lite"; content.innerHTML = '<div class="page-head"><div><p class="eyebrow">404</p><h1>That page does not exist.</h1><p class="lede"><a href="/" data-link>Return to today\'s notes.</a></p></div></div>'; }
 
+async function updateModalSearch(): Promise<void> {
+  const query = requireElement<HTMLInputElement>("#modal-search-input").value;
+  const tag = requireElement<HTMLSelectElement>("#modal-search-tag").value;
+  const period = requireElement<HTMLSelectElement>("#modal-search-period").value;
+  const todo = requireElement<HTMLInputElement>("#modal-search-todo").checked;
+  const terms = [query, tag ? `tag:${tag}` : "", todo ? "has:todo" : ""].filter(Boolean).join(" ");
+  const range = period === "week" ? summaryPeriod("weekly", isoDate(new Date())) : period === "month" ? summaryPeriod("monthly", isoDate(new Date())) : null;
+  await renderSearchResults(requireElement("#modal-search-results"), terms, "", "", await categories.list(), range?.start, range?.end);
+}
+
 function bindShellEvents(): void {
-  document.addEventListener("click", (event) => { const target = event.target as Element; document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); }); const link = target.closest<HTMLAnchorElement>("a[data-link]"); if (link && link.origin === location.origin && !event.metaKey && !event.ctrlKey) { event.preventDefault(); const rawHref = link.getAttribute("href"); const targetUrl = rawHref ? appUrl(rawHref) : link.href; history.pushState({}, "", targetUrl); closeSearch(); void renderRoute(); return; } const action = target.closest<HTMLElement>("[data-action]")?.dataset.action; if (action === "toggle-sidebar") toggleSidebar(); if (action === "close-sidebar") closeSidebar(); if (action === "open-search") openSearch(); if (action === "toggle-theme") setTheme(document.documentElement.dataset.theme === "dark" ? "LIGHT" : "DARK"); if (target.closest("[data-close-dialog]")) closeDialog(); if (target.id === "search-modal") closeSearch(); });
-  window.addEventListener("popstate", () => void renderRoute()); window.addEventListener("resize", closeSidebar); document.addEventListener("keydown", handleKeyboard); window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
-  window.addEventListener("online", updateNetworkStatus); window.addEventListener("offline", updateNetworkStatus);
-  const updateModalSearch = async () => { const query = requireElement<HTMLInputElement>("#modal-search-input").value; const tag = requireElement<HTMLSelectElement>("#modal-search-tag").value; const period = requireElement<HTMLSelectElement>("#modal-search-period").value; const todo = requireElement<HTMLInputElement>("#modal-search-todo").checked; const terms = [query, tag ? `tag:${tag}` : "", todo ? "has:todo" : ""].filter(Boolean).join(" "); const range = period === "week" ? summaryPeriod("weekly", isoDate(new Date())) : period === "month" ? summaryPeriod("monthly", isoDate(new Date())) : null; await renderSearchResults(requireElement("#modal-search-results"), terms, "", "", await categories.list(), range?.start, range?.end); };
-  requireElement<HTMLInputElement>("#modal-search-input").addEventListener("input", updateModalSearch); requireElement<HTMLSelectElement>("#modal-search-tag").addEventListener("change", updateModalSearch); requireElement<HTMLSelectElement>("#modal-search-period").addEventListener("change", updateModalSearch); requireElement<HTMLInputElement>("#modal-search-todo").addEventListener("change", updateModalSearch);
+  document.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
+    const link = target.closest<HTMLAnchorElement>("a[data-link]");
+    if (link && link.origin === location.origin && !event.metaKey && !event.ctrlKey) {
+      event.preventDefault();
+      const rawHref = link.getAttribute("href");
+      const targetUrl = rawHref ? appUrl(rawHref) : link.href;
+      history.pushState({}, "", targetUrl);
+      closeSearch();
+      void renderRoute().then(() => {
+        if (link.dataset.command === "new-note") {
+          document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
+        }
+      });
+      return;
+    }
+    const action = target.closest<HTMLElement>("[data-action]")?.dataset.action;
+    if (action === "toggle-sidebar") toggleSidebar();
+    if (action === "close-sidebar") closeSidebar();
+    if (action === "open-search") openSearch();
+    if (action === "toggle-theme") setTheme(document.documentElement.dataset.theme === "dark" ? "LIGHT" : "DARK");
+    if (target.closest("[data-close-dialog]")) closeDialog();
+    if (target.id === "search-modal") closeSearch();
+  });
+  window.addEventListener("popstate", () => void renderRoute());
+  window.addEventListener("resize", closeSidebar);
+  document.addEventListener("keydown", handleKeyboard);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+  window.addEventListener("online", updateNetworkStatus);
+  window.addEventListener("offline", updateNetworkStatus);
+  requireElement<HTMLInputElement>("#modal-search-input").addEventListener("input", updateModalSearch);
+  requireElement<HTMLSelectElement>("#modal-search-tag").addEventListener("change", updateModalSearch);
+  requireElement<HTMLSelectElement>("#modal-search-period").addEventListener("change", updateModalSearch);
+  requireElement<HTMLInputElement>("#modal-search-todo").addEventListener("change", updateModalSearch);
 }
 
 function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): void { form.querySelectorAll<HTMLButtonElement>("[data-format]").forEach((button) => button.addEventListener("click", () => formatNote(textarea, button.dataset.format ?? ""))); }
@@ -261,13 +303,72 @@ function resizeEditor(textarea: HTMLTextAreaElement): void { textarea.style.heig
 function selectedCategories(form: HTMLFormElement): string[] { return [...form.querySelectorAll<HTMLInputElement>('input[name="categoryIds"]:checked')].map((input) => input.value); }
 function status(form: HTMLFormElement, message: string, error = false): void { const element = form.querySelector<HTMLElement>("[data-save-status]"); if (element) { element.textContent = message; element.classList.toggle("text-danger", error); } }
 function setBusy(form: HTMLFormElement, busy: boolean): void { form.querySelectorAll<HTMLButtonElement>("button").forEach((button) => { button.disabled = busy; }); }
-function handleKeyboard(event: KeyboardEvent): void { const active = document.activeElement?.tagName; const editing = active === "INPUT" || active === "TEXTAREA" || active === "SELECT"; if (event.key === "/" && !editing) { event.preventDefault(); openSearch(); } if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openSearch(); } if (event.key.toLowerCase() === "n" && !editing) { event.preventDefault(); if (appPath() !== "/") { history.pushState({}, "", appUrl("/")); void renderRoute().then(() => document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus()); } else document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus(); } if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && !editing && appPath() === "/") { const date = new URLSearchParams(location.search).get("date") ?? isoDate(new Date()); history.pushState({}, "", appUrl(`/?date=${shiftDate(date, event.key === "ArrowLeft" ? -1 : 1)}`)); void renderRoute(); } if (event.key === "Escape") { closeSearch(); closeDialog(); document.querySelector<HTMLDetailsElement>(".date-picker[open]")?.removeAttribute("open"); } }
+function handleKeyboard(event: KeyboardEvent): void {
+  const modal = document.querySelector<HTMLElement>("#search-modal");
+  if (modal?.classList.contains("is-open")) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeSearch();
+      return;
+    }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      const items = modal.querySelectorAll<HTMLAnchorElement>("#modal-search-results a[data-link]");
+      if (items.length) {
+        event.preventDefault();
+        const active = document.activeElement as HTMLElement | null;
+        const index = Array.from(items).indexOf(active as HTMLAnchorElement);
+        if (event.key === "ArrowDown") {
+          const next = index >= 0 && index < items.length - 1 ? index + 1 : 0;
+          items[next]?.focus();
+        } else {
+          const prev = index > 0 ? index - 1 : items.length - 1;
+          items[prev]?.focus();
+        }
+      }
+      return;
+    }
+  }
+  const active = document.activeElement?.tagName;
+  const editing = active === "INPUT" || active === "TEXTAREA" || active === "SELECT";
+  if (event.key === "/" && !editing) { event.preventDefault(); openSearch(); }
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openSearch(); }
+  if (event.key.toLowerCase() === "n" && !editing) {
+    event.preventDefault();
+    if (appPath() !== "/") {
+      history.pushState({}, "", appUrl("/"));
+      void renderRoute().then(() => document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus());
+    } else document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
+  }
+  if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && !editing && appPath() === "/") {
+    const date = new URLSearchParams(location.search).get("date") ?? isoDate(new Date());
+    history.pushState({}, "", appUrl(`/?date=${shiftDate(date, event.key === "ArrowLeft" ? -1 : 1)}`));
+    void renderRoute();
+  }
+  if (event.key === "Escape") {
+    closeSearch();
+    closeDialog();
+    document.querySelector<HTMLDetailsElement>(".date-picker[open]")?.removeAttribute("open");
+  }
+}
 function toggleSidebar(): void { if (innerWidth <= 960) document.body.classList.toggle("sidebar-drawer-open"); else document.documentElement.classList.add("sidebar-collapsed"); updateSidebarButton(); }
 function closeSidebar(): void { document.body.classList.remove("sidebar-drawer-open"); updateSidebarButton(); }
 function updateSidebarButton(): void { const visible = innerWidth <= 960 ? document.body.classList.contains("sidebar-drawer-open") : !document.documentElement.classList.contains("sidebar-collapsed"); document.querySelectorAll(".sidebar-collapse-button, .mobile-sidebar-open").forEach((button) => button.setAttribute("aria-expanded", String(visible))); }
 function setTheme(theme: ThemePreference): void { localStorage.setItem("theme-preference", theme); applyTheme(); }
 function applyTheme(): void { const theme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference; const resolved = theme === "SYSTEM" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme.toLowerCase(); document.documentElement.dataset.theme = resolved; document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0d1117" : "#f6f8fa"); const toggle = document.querySelector<HTMLElement>(".sidebar-theme-toggle"); if (toggle) { const next = resolved === "dark" ? "light" : "dark"; toggle.setAttribute("aria-label", `Switch to ${next} theme`); toggle.dataset.sidebarTooltip = `Switch to ${next} theme`; } }
-function openSearch(): void { const modal = requireElement<HTMLElement>("#search-modal"); void notes.listAll().then((items) => { const tags = [...new Set(items.flatMap((note) => note.tags))].sort(); requireElement<HTMLSelectElement>("#modal-search-tag").innerHTML = `<option value="">All tags</option>${tags.map((tag) => `<option value="${escapeHtml(tag)}">#${escapeHtml(tag)}</option>`).join("")}`; }); modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; setTimeout(() => requireElement<HTMLInputElement>("#modal-search-input").focus(), 50); }
+function openSearch(): void {
+  const modal = requireElement<HTMLElement>("#search-modal");
+  const input = requireElement<HTMLInputElement>("#modal-search-input");
+  input.value = "";
+  void notes.listAll().then((items) => {
+    const tags = [...new Set(items.flatMap((note) => note.tags))].sort();
+    requireElement<HTMLSelectElement>("#modal-search-tag").innerHTML = `<option value="">All tags</option>${tags.map((tag) => `<option value="${escapeHtml(tag)}">#${escapeHtml(tag)}</option>`).join("")}`;
+  });
+  void updateModalSearch();
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => input.focus(), 50);
+}
 function closeSearch(): void { const modal = document.querySelector<HTMLElement>("#search-modal"); if (!modal?.classList.contains("is-open")) return; modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
 function updateNetworkStatus(): void { const status = document.querySelector<HTMLElement>("#network-status"); if (status) status.textContent = navigator.onLine ? "Online" : "Offline"; }
 function isoDate(date: Date): string { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
