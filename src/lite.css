@@ -74,75 +74,129 @@
 }
 
 @media (min-width: 60.001rem) {
+  body.app .sidebar,
   :root.sidebar-collapsed body.app .sidebar {
-    overflow: visible;
+    overflow: visible !important;
   }
 
+  body.app .sidebar-brand,
   :root.sidebar-collapsed body.app .sidebar-brand {
     display: flex;
     visibility: visible;
     pointer-events: auto;
   }
 
+  body.app .sidebar-brand-logo,
+  body.app .sidebar-brand-row:hover .sidebar-brand-logo,
   :root.sidebar-collapsed body.app .sidebar-brand-logo,
   :root.sidebar-collapsed body.app .sidebar-brand-row:hover .sidebar-brand-logo {
     display: block;
     opacity: 1;
   }
 
+  body.app .sidebar-collapse-button,
   :root.sidebar-collapsed body.app .sidebar-collapse-button {
     display: none;
   }
 
-  :root.sidebar-collapsed body.app .sidebar [data-sidebar-tooltip]::after {
+  body.app .sidebar [data-sidebar-tooltip]::after,
+  :root.sidebar-collapsed body.app .sidebar [data-sidebar-tooltip]::after,
+  body.app .sidebar nav a[data-sidebar-tooltip]::after,
+  :root.sidebar-collapsed body.app .sidebar nav a[data-sidebar-tooltip]::after,
+  body.app .sidebar nav a.is-active[data-sidebar-tooltip]::after,
+  :root.sidebar-collapsed body.app .sidebar nav a.is-active[data-sidebar-tooltip]::after,
+  body.app .sidebar nav > a[data-sidebar-tooltip]::after,
+  :root.sidebar-collapsed body.app .sidebar nav > a[data-sidebar-tooltip]::after,
+  body.app .sidebar nav > a.is-active[data-sidebar-tooltip]::after,
+  :root.sidebar-collapsed body.app .sidebar nav > a.is-active[data-sidebar-tooltip]::after {
     position: absolute !important;
     top: 50% !important;
     bottom: auto !important;
     left: calc(100% + 10px) !important;
-    z-index: 200;
-    width: max-content;
-    max-width: 15rem;
-    padding: 0.4rem 0.55rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: 6px;
-    background: var(--color-bg-raised);
-    box-shadow: var(--shadow-md);
-    color: var(--color-text-primary);
+    z-index: 1000 !important;
+    display: block !important;
+    width: max-content !important;
+    max-width: 15rem !important;
+    padding: 0.4rem 0.55rem !important;
+    border: 1px solid var(--color-border-default) !important;
+    border-radius: 6px !important;
+    background: var(--color-bg-raised) !important;
+    box-shadow: var(--shadow-md) !important;
+    color: var(--color-text-primary) !important;
     content: attr(data-sidebar-tooltip) !important;
-    font-size: 0.7rem;
-    font-weight: 600;
-    line-height: 1.3;
-    opacity: 0;
-    pointer-events: none;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
     transform: translate(4px, -50%) !important;
-    white-space: nowrap;
+    transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+    white-space: nowrap !important;
   }
 
+  body.app .sidebar [data-sidebar-tooltip]:hover::after,
+  body.app .sidebar [data-sidebar-tooltip]:focus-visible::after,
   :root.sidebar-collapsed body.app .sidebar [data-sidebar-tooltip]:hover::after,
-  :root.sidebar-collapsed body.app .sidebar [data-sidebar-tooltip]:focus-visible::after {
-    opacity: 1;
+  :root.sidebar-collapsed body.app .sidebar [data-sidebar-tooltip]:focus-visible::after,
+  body.app .sidebar nav a[data-sidebar-tooltip]:hover::after,
+  body.app .sidebar nav a[data-sidebar-tooltip]:focus-visible::after,
+  :root.sidebar-collapsed body.app .sidebar nav a[data-sidebar-tooltip]:hover::after,
+  :root.sidebar-collapsed body.app .sidebar nav a[data-sidebar-tooltip]:focus-visible::after,
+  body.app .sidebar nav a.is-active[data-sidebar-tooltip]:hover::after,
+  body.app .sidebar nav a.is-active[data-sidebar-tooltip]:focus-visible::after,
+  :root.sidebar-collapsed body.app .sidebar nav a.is-active[data-sidebar-tooltip]:hover::after,
+  :root.sidebar-collapsed body.app .sidebar nav a.is-active[data-sidebar-tooltip]:focus-visible::after,
+  body.app .sidebar nav > a[data-sidebar-tooltip]:hover::after,
+  body.app .sidebar nav > a[data-sidebar-tooltip]:focus-visible::after,
+  :root.sidebar-collapsed body.app .sidebar nav > a[data-sidebar-tooltip]:hover::after,
+  :root.sidebar-collapsed body.app .sidebar nav > a[data-sidebar-tooltip]:focus-visible::after,
+  body.app .sidebar nav > a.is-active[data-sidebar-tooltip]:hover::after,
+  body.app .sidebar nav > a.is-active[data-sidebar-tooltip]:focus-visible::after,
+  :root.sidebar-collapsed body.app .sidebar nav > a.is-active[data-sidebar-tooltip]:hover::after,
+  :root.sidebar-collapsed body.app .sidebar nav > a.is-active[data-sidebar-tooltip]:focus-visible::after {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     transform: translate(0, -50%) !important;
   }
 
+  body.app .sidebar-brand,
   :root.sidebar-collapsed body.app .sidebar-brand,
+  body.app .sidebar nav a,
   :root.sidebar-collapsed body.app .sidebar nav a,
+  body.app .sidebar nav > a,
+  :root.sidebar-collapsed body.app .sidebar nav > a,
+  body.app .local-only-icon,
   :root.sidebar-collapsed body.app .local-only-icon,
+  body.app .sidebar-theme-toggle,
   :root.sidebar-collapsed body.app .sidebar-theme-toggle {
-    position: relative;
+    position: relative !important;
   }
 
+  body.app .sidebar nav,
   :root.sidebar-collapsed body.app .sidebar nav,
+  body.app .sidebar nav a,
   :root.sidebar-collapsed body.app .sidebar nav a,
-  :root.sidebar-collapsed body.app .sidebar nav a.is-active {
-    overflow: visible;
+  body.app .sidebar nav a.is-active,
+  :root.sidebar-collapsed body.app .sidebar nav a.is-active,
+  body.app .sidebar nav > a,
+  :root.sidebar-collapsed body.app .sidebar nav > a,
+  body.app .sidebar nav > a.is-active,
+  :root.sidebar-collapsed body.app .sidebar nav > a.is-active {
+    overflow: visible !important;
   }
 
-  :root.sidebar-collapsed body.app .sidebar nav a::after {
+  body.app .sidebar nav a::after,
+  body.app .sidebar nav > a::after,
+  :root.sidebar-collapsed body.app .sidebar nav a::after,
+  :root.sidebar-collapsed body.app .sidebar nav > a::after {
     display: block !important;
-    visibility: visible;
   }
 
+  body.app .sidebar-footer,
   :root.sidebar-collapsed body.app .sidebar-footer {
+    overflow: visible !important;
     visibility: visible;
     pointer-events: auto;
   }
