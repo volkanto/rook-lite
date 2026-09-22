@@ -30,6 +30,9 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
+          if (!response.ok) {
+            return caches.match(appUrl("./")).then((cached) => cached ?? response);
+          }
           const copy = response.clone();
           void caches.open(CACHE_NAME).then((cache) => cache.put(appUrl("./"), copy));
           return response;
