@@ -2,7 +2,7 @@ import { strToU8, zipSync } from "fflate";
 import { dataSnapshot, restoreSnapshot, SettingsRepository } from "./db";
 import type { Category, Note, OllamaSettings, RookBackupV1, Setting, Summary } from "./models";
 
-export const DEFAULT_OLLAMA_SETTINGS: OllamaSettings = { enabled: false, endpoint: "http://localhost:11434", model: "llama3.1", temperature: 0.2, timeoutMs: 60000 };
+export const DEFAULT_OLLAMA_SETTINGS: OllamaSettings = { enabled: false, endpoint: "http://localhost:11434", model: "llama3.2", temperature: 0.2, timeoutMs: 60000 };
 export const settingsRepository = new SettingsRepository();
 
 export async function createBackup(): Promise<RookBackupV1> {
