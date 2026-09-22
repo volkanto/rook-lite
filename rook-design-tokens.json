@@ -1,0 +1,646 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "Rook Design Tokens",
+  "version": "1.0.0",
+  "description": "Complete light and dark design-token system for the Rook web application.",
+  "primitives": {
+    "color": {
+      "rook": {
+        "navy": {
+          "950": "#071426",
+          "900": "#101D35",
+          "800": "#182943",
+          "700": "#21344B",
+          "600": "#38505E"
+        },
+        "slate": {
+          "700": "#3F4D5A",
+          "600": "#52606D",
+          "500": "#64748B",
+          "400": "#82918D",
+          "300": "#B7C4C0",
+          "200": "#C8D4CF",
+          "100": "#DEE6E2",
+          "50": "#F1F5F3"
+        },
+        "mint": {
+          "900": "#0D523C",
+          "800": "#106347",
+          "700": "#188864",
+          "600": "#20A878",
+          "500": "#36D99A",
+          "400": "#60F0B0",
+          "300": "#9AF7CD",
+          "200": "#BDF9DB",
+          "100": "#D9FBEA",
+          "50": "#EDFFF6"
+        },
+        "purple": {
+          "500": "#8B5CF6",
+          "400": "#A78BFA",
+          "300": "#C4B5FD",
+          "100": "#F1EBFF"
+        },
+        "blue": {
+          "500": "#3B82F6",
+          "400": "#60A5FA",
+          "300": "#93C5FD"
+        },
+        "green": {
+          "500": "#22C55E",
+          "300": "#86EFAC"
+        },
+        "amber": {
+          "500": "#F59E0B",
+          "400": "#FBBF24",
+          "300": "#FCD66D"
+        },
+        "red": {
+          "500": "#EF4444",
+          "400": "#F87171",
+          "300": "#FCA5A5"
+        },
+        "pink": {
+          "500": "#EC4899",
+          "400": "#F472B6"
+        },
+        "teal": {
+          "500": "#14B8A6",
+          "400": "#2DD4BF"
+        },
+        "indigo": {
+          "500": "#6366F1",
+          "400": "#818CF8"
+        },
+        "orange": {
+          "500": "#F97316",
+          "400": "#FB923C"
+        },
+        "neutral": {
+          "white": "#FFFFFF",
+          "ivory": "#FAFAF7",
+          "black": "#111827"
+        }
+      }
+    },
+    "spacing": {
+      "0": "0px",
+      "1": "4px",
+      "2": "8px",
+      "3": "12px",
+      "4": "16px",
+      "5": "20px",
+      "6": "24px",
+      "8": "32px",
+      "10": "40px",
+      "12": "48px",
+      "16": "64px",
+      "20": "80px",
+      "24": "96px"
+    },
+    "radius": {
+      "xs": "4px",
+      "sm": "6px",
+      "md": "8px",
+      "lg": "12px",
+      "xl": "16px",
+      "2xl": "24px",
+      "full": "9999px"
+    },
+    "borderWidth": {
+      "none": "0px",
+      "thin": "1px",
+      "medium": "2px"
+    },
+    "shadow": {
+      "light": {
+        "sm": "0 1px 2px rgba(7, 20, 38, 0.05)",
+        "md": "0 4px 12px rgba(7, 20, 38, 0.08)",
+        "lg": "0 12px 32px rgba(7, 20, 38, 0.12)"
+      },
+      "dark": {
+        "sm": "0 1px 2px rgba(0, 0, 0, 0.18)",
+        "md": "0 6px 18px rgba(0, 0, 0, 0.24)",
+        "lg": "0 16px 40px rgba(0, 0, 0, 0.32)"
+      }
+    }
+  },
+  "themes": {
+    "light": {
+      "semantic": {
+        "background": {
+          "app": "#F8FAF9",
+          "page": "#F8FAF9",
+          "surface": "#FFFFFF",
+          "surfaceRaised": "#FFFFFF",
+          "surfaceSunken": "#F1F5F3",
+          "subtle": "#F1F5F3",
+          "muted": "#E9F0ED",
+          "hover": "#EDF3F0",
+          "active": "#E4ECE8",
+          "selected": "#D9FBEA",
+          "overlay": "rgba(7, 20, 38, 0.48)",
+          "disabled": "#EDF1EF"
+        },
+        "text": {
+          "primary": "#111827",
+          "secondary": "#52606D",
+          "tertiary": "#64748B",
+          "muted": "#7B8794",
+          "disabled": "#9DA8A3",
+          "inverse": "#F8FAF9",
+          "brand": "#106347",
+          "link": "#188864",
+          "linkHover": "#106347"
+        },
+        "icon": {
+          "primary": "#334155",
+          "secondary": "#64748B",
+          "muted": "#94A3B8",
+          "brand": "#20A878",
+          "inverse": "#F8FAF9",
+          "disabled": "#AAB4AF"
+        },
+        "border": {
+          "subtle": "#E8EEEB",
+          "default": "#DEE6E2",
+          "strong": "#C8D4CF",
+          "hover": "#AABAB3",
+          "focus": "#20A878",
+          "selected": "#20A878",
+          "disabled": "#E3E8E6"
+        },
+        "focus": {
+          "ring": "#60F0B0",
+          "ringOffset": "#FFFFFF"
+        },
+        "brand": {
+          "primary": "#20A878",
+          "primaryHover": "#188864",
+          "primaryActive": "#106347",
+          "accent": "#60F0B0",
+          "soft": "#D9FBEA",
+          "softer": "#EDFFF6",
+          "onPrimary": "#FFFFFF"
+        }
+      },
+      "component": {
+        "button": {
+          "primary": {
+            "background": "#20A878",
+            "backgroundHover": "#188864",
+            "backgroundActive": "#106347",
+            "text": "#FFFFFF",
+            "border": "#20A878"
+          },
+          "secondary": {
+            "background": "#FFFFFF",
+            "backgroundHover": "#EDF3F0",
+            "backgroundActive": "#E4ECE8",
+            "text": "#111827",
+            "border": "#DEE6E2",
+            "borderHover": "#C8D4CF"
+          },
+          "ghost": {
+            "background": "transparent",
+            "backgroundHover": "#EDF3F0",
+            "backgroundActive": "#E4ECE8",
+            "text": "#52606D"
+          },
+          "danger": {
+            "background": "#EF4444",
+            "backgroundHover": "#DC2626",
+            "text": "#FFFFFF"
+          },
+          "disabled": {
+            "background": "#EDF1EF",
+            "text": "#9DA8A3",
+            "border": "#E3E8E6"
+          }
+        },
+        "input": {
+          "background": "#FFFFFF",
+          "backgroundHover": "#FFFFFF",
+          "backgroundDisabled": "#EDF1EF",
+          "text": "#111827",
+          "placeholder": "#7B8794",
+          "label": "#52606D",
+          "border": "#DEE6E2",
+          "borderHover": "#C8D4CF",
+          "borderFocus": "#20A878",
+          "focusRing": "#60F0B0",
+          "disabledText": "#9DA8A3",
+          "errorBorder": "#F6B8B8",
+          "errorRing": "#FCA5A5"
+        },
+        "tag": {
+          "neutral": {
+            "background": "#F1F5F3",
+            "text": "#52606D",
+            "border": "#DEE6E2"
+          },
+          "brand": {
+            "background": "#D9FBEA",
+            "text": "#106347",
+            "border": "transparent"
+          },
+          "evidence": {
+            "background": "#F1EBFF",
+            "text": "#6D3FD1",
+            "border": "#D9C8FF"
+          },
+          "success": {
+            "background": "#E8F9EE",
+            "text": "#16733A"
+          },
+          "warning": {
+            "background": "#FFF7DD",
+            "text": "#8A5A00"
+          },
+          "danger": {
+            "background": "#FDECEC",
+            "text": "#B42323"
+          }
+        },
+        "navigation": {
+          "background": "#FFFFFF",
+          "border": "#E8EEEB",
+          "itemText": "#52606D",
+          "itemIcon": "#64748B",
+          "itemHoverBackground": "#EDF3F0",
+          "itemHoverText": "#111827",
+          "itemActiveBackground": "#D9FBEA",
+          "itemActiveText": "#106347",
+          "itemActiveIcon": "#20A878",
+          "sectionLabel": "#7B8794"
+        },
+        "note": {
+          "background": "#FFFFFF",
+          "backgroundHover": "#EDF3F0",
+          "title": "#111827",
+          "body": "#52606D",
+          "meta": "#7B8794",
+          "border": "#E8EEEB",
+          "pinnedIndicator": "#F59E0B",
+          "selectedBackground": "#EDFFF6",
+          "selectedBorder": "#20A878"
+        },
+        "ai": {
+          "background": "#F1EBFF",
+          "text": "#6D3FD1",
+          "border": "#D9C8FF",
+          "icon": "#8B5CF6",
+          "thinkingBackground": "#F7F4FF"
+        }
+      },
+      "state": {
+        "success": {
+          "solid": "#22C55E",
+          "background": "#E8F9EE",
+          "text": "#16733A",
+          "border": "#B6EBC9"
+        },
+        "info": {
+          "solid": "#3B82F6",
+          "background": "#EAF2FF",
+          "text": "#245EBC",
+          "border": "#BDD4FF"
+        },
+        "warning": {
+          "solid": "#F59E0B",
+          "background": "#FFF7DD",
+          "text": "#8A5A00",
+          "border": "#F6DA91"
+        },
+        "danger": {
+          "solid": "#EF4444",
+          "solidHover": "#DC2626",
+          "background": "#FDECEC",
+          "text": "#B42323",
+          "border": "#F6B8B8",
+          "focus": "#FCA5A5"
+        },
+        "evidence": {
+          "solid": "#8B5CF6",
+          "background": "#F1EBFF",
+          "text": "#6D3FD1",
+          "border": "#D9C8FF"
+        },
+        "careerFramework": {
+          "background": "#EEF2FF",
+          "text": "#4F46E5"
+        },
+        "achievement": {
+          "background": "#FFF7DA",
+          "text": "#9A6700"
+        },
+        "summary": {
+          "background": "#E9F8FF",
+          "text": "#176B87"
+        }
+      },
+      "chart": {
+        "series": {
+          "1": "#20A878",
+          "2": "#8B5CF6",
+          "3": "#3B82F6",
+          "4": "#F59E0B",
+          "5": "#EC4899",
+          "6": "#14B8A6",
+          "7": "#6366F1",
+          "8": "#F97316"
+        },
+        "semanticSeries": {
+          "notes": "#20A878",
+          "evidence": "#8B5CF6",
+          "summaries": "#3B82F6",
+          "achievements": "#F59E0B",
+          "careerCompetencies": "#6366F1"
+        },
+        "grid": "#E5EBE8",
+        "axis": "#9CA9A4",
+        "label": "#52606D",
+        "tooltip": {
+          "background": "#FFFFFF",
+          "text": "#111827",
+          "border": "#DEE6E2"
+        }
+      },
+      "shadow": {
+        "sm": "0 1px 2px rgba(7, 20, 38, 0.05)",
+        "md": "0 4px 12px rgba(7, 20, 38, 0.08)",
+        "lg": "0 12px 32px rgba(7, 20, 38, 0.12)"
+      }
+    },
+    "dark": {
+      "semantic": {
+        "background": {
+          "app": "#071426",
+          "page": "#071426",
+          "surface": "#101D35",
+          "surfaceRaised": "#182943",
+          "surfaceSunken": "#0C192B",
+          "subtle": "#16253A",
+          "muted": "#1B2D43",
+          "hover": "#21344B",
+          "active": "#293D52",
+          "selected": "#123B34",
+          "overlay": "rgba(0, 0, 0, 0.64)",
+          "disabled": "#162236"
+        },
+        "text": {
+          "primary": "#F4F7F6",
+          "secondary": "#B7C4C0",
+          "tertiary": "#95A49F",
+          "muted": "#82918D",
+          "disabled": "#5F706B",
+          "inverse": "#111827",
+          "brand": "#9AF7CD",
+          "link": "#60F0B0",
+          "linkHover": "#9AF7CD"
+        },
+        "icon": {
+          "primary": "#D9E2DF",
+          "secondary": "#9DACA7",
+          "muted": "#70817B",
+          "brand": "#60F0B0",
+          "inverse": "#071426",
+          "disabled": "#52635E"
+        },
+        "border": {
+          "subtle": "#1C2D41",
+          "default": "#293B50",
+          "strong": "#38505E",
+          "hover": "#496273",
+          "focus": "#60F0B0",
+          "selected": "#60F0B0",
+          "disabled": "#253447"
+        },
+        "focus": {
+          "ring": "#60F0B0",
+          "ringOffset": "#071426"
+        },
+        "brand": {
+          "primary": "#60F0B0",
+          "primaryHover": "#78F0BB",
+          "primaryActive": "#36D99A",
+          "accent": "#60F0B0",
+          "soft": "#123B34",
+          "softer": "#0F2B28",
+          "onPrimary": "#071426"
+        }
+      },
+      "component": {
+        "button": {
+          "primary": {
+            "background": "#60F0B0",
+            "backgroundHover": "#78F0BB",
+            "backgroundActive": "#36D99A",
+            "text": "#071426",
+            "border": "#60F0B0"
+          },
+          "secondary": {
+            "background": "#101D35",
+            "backgroundHover": "#21344B",
+            "backgroundActive": "#293D52",
+            "text": "#F4F7F6",
+            "border": "#293B50",
+            "borderHover": "#38505E"
+          },
+          "ghost": {
+            "background": "transparent",
+            "backgroundHover": "#21344B",
+            "backgroundActive": "#293D52",
+            "text": "#B7C4C0"
+          },
+          "danger": {
+            "background": "#F87171",
+            "backgroundHover": "#EF4444",
+            "text": "#071426"
+          },
+          "disabled": {
+            "background": "#162236",
+            "text": "#5F706B",
+            "border": "#253447"
+          }
+        },
+        "input": {
+          "background": "#101D35",
+          "backgroundHover": "#101D35",
+          "backgroundDisabled": "#162236",
+          "text": "#F4F7F6",
+          "placeholder": "#82918D",
+          "label": "#B7C4C0",
+          "border": "#293B50",
+          "borderHover": "#38505E",
+          "borderFocus": "#60F0B0",
+          "focusRing": "#60F0B0",
+          "disabledText": "#5F706B",
+          "errorBorder": "#713237",
+          "errorRing": "#F87171"
+        },
+        "tag": {
+          "neutral": {
+            "background": "#16253A",
+            "text": "#B7C4C0",
+            "border": "#293B50"
+          },
+          "brand": {
+            "background": "#123B34",
+            "text": "#9AF7CD",
+            "border": "transparent"
+          },
+          "evidence": {
+            "background": "#281D46",
+            "text": "#C4B5FD",
+            "border": "#493875"
+          },
+          "success": {
+            "background": "#122F20",
+            "text": "#86EFAC"
+          },
+          "warning": {
+            "background": "#332A12",
+            "text": "#FCD66D"
+          },
+          "danger": {
+            "background": "#391A1D",
+            "text": "#FCA5A5"
+          }
+        },
+        "navigation": {
+          "background": "#101D35",
+          "border": "#1C2D41",
+          "itemText": "#B7C4C0",
+          "itemIcon": "#9DACA7",
+          "itemHoverBackground": "#21344B",
+          "itemHoverText": "#F4F7F6",
+          "itemActiveBackground": "#123B34",
+          "itemActiveText": "#9AF7CD",
+          "itemActiveIcon": "#60F0B0",
+          "sectionLabel": "#82918D"
+        },
+        "note": {
+          "background": "#101D35",
+          "backgroundHover": "#21344B",
+          "title": "#F4F7F6",
+          "body": "#B7C4C0",
+          "meta": "#82918D",
+          "border": "#1C2D41",
+          "pinnedIndicator": "#FBBF24",
+          "selectedBackground": "#0F2B28",
+          "selectedBorder": "#60F0B0"
+        },
+        "ai": {
+          "background": "#281D46",
+          "text": "#C4B5FD",
+          "border": "#493875",
+          "icon": "#A78BFA",
+          "thinkingBackground": "#211A38"
+        }
+      },
+      "state": {
+        "success": {
+          "solid": "#22C55E",
+          "background": "#122F20",
+          "text": "#86EFAC",
+          "border": "#245B39"
+        },
+        "info": {
+          "solid": "#60A5FA",
+          "background": "#142A46",
+          "text": "#93C5FD",
+          "border": "#294E78"
+        },
+        "warning": {
+          "solid": "#FBBF24",
+          "background": "#332A12",
+          "text": "#FCD66D",
+          "border": "#635025"
+        },
+        "danger": {
+          "solid": "#F87171",
+          "solidHover": "#EF4444",
+          "background": "#391A1D",
+          "text": "#FCA5A5",
+          "border": "#713237",
+          "focus": "#F87171"
+        },
+        "evidence": {
+          "solid": "#A78BFA",
+          "background": "#281D46",
+          "text": "#C4B5FD",
+          "border": "#493875"
+        },
+        "careerFramework": {
+          "background": "#202548",
+          "text": "#A5B4FC"
+        },
+        "achievement": {
+          "background": "#332A12",
+          "text": "#FCD66D"
+        },
+        "summary": {
+          "background": "#102D3A",
+          "text": "#7DD3FC"
+        }
+      },
+      "chart": {
+        "series": {
+          "1": "#60F0B0",
+          "2": "#A78BFA",
+          "3": "#60A5FA",
+          "4": "#FBBF24",
+          "5": "#F472B6",
+          "6": "#2DD4BF",
+          "7": "#818CF8",
+          "8": "#FB923C"
+        },
+        "semanticSeries": {
+          "notes": "#60F0B0",
+          "evidence": "#A78BFA",
+          "summaries": "#60A5FA",
+          "achievements": "#FBBF24",
+          "careerCompetencies": "#818CF8"
+        },
+        "grid": "#223447",
+        "axis": "#526B73",
+        "label": "#9DACA7",
+        "tooltip": {
+          "background": "#182943",
+          "text": "#F4F7F6",
+          "border": "#38505E"
+        }
+      },
+      "shadow": {
+        "sm": "0 1px 2px rgba(0, 0, 0, 0.18)",
+        "md": "0 6px 18px rgba(0, 0, 0, 0.24)",
+        "lg": "0 16px 40px rgba(0, 0, 0, 0.32)"
+      }
+    }
+  },
+  "layout": {
+    "spacing": {
+      "pageXSmall": "16px",
+      "pageXMedium": "24px",
+      "pageXLarge": "32px",
+      "pageY": "24px",
+      "sectionGap": "32px",
+      "cardPadding": "20px",
+      "cardGap": "16px",
+      "formGap": "16px",
+      "fieldGap": "8px",
+      "inlineGap": "8px",
+      "stackGapSmall": "8px",
+      "stackGapMedium": "16px",
+      "stackGapLarge": "24px"
+    },
+    "size": {
+      "controlSmall": "32px",
+      "controlMedium": "40px",
+      "controlLarge": "48px",
+      "sidebarWidth": "264px",
+      "contentMax": "1200px"
+    }
+  }
+}

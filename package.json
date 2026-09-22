@@ -1,0 +1,26 @@
+{
+  "name": "rook-lite",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "dompurify": "^3.2.6",
+    "fflate": "^0.8.2",
+    "idb": "^8.0.3",
+    "marked": "^16.2.1"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.2",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.5",
+    "vitest": "^5.0.1"
+  }
+}

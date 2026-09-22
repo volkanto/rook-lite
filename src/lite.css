@@ -1,0 +1,190 @@
+.lite-wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.lite-badge {
+  color: var(--color-text-tertiary, var(--muted));
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lite-header-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-secondary, var(--text-soft));
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.lite-header-status::before {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--color-brand, var(--accent));
+  content: "";
+}
+
+.lite-nav-settings {
+  margin-top: auto;
+}
+
+.lite-shell-main:focus {
+  outline: none;
+}
+
+.lite-page-placeholder {
+  min-height: 16rem;
+}
+
+.lite-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.lite-search-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.lite-search-empty svg {
+  width: 2rem;
+  color: var(--color-icon-muted, var(--muted));
+}
+
+.lite-about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.lite-about-stat {
+  padding: 1rem;
+  border: 1px solid var(--color-border-default, var(--border));
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+}
+
+.lite-about-stat strong,
+.lite-about-stat span {
+  display: block;
+}
+
+.lite-about-stat span {
+  margin-top: 0.25rem;
+  color: var(--color-text-secondary, var(--text-soft));
+  font-size: 0.75rem;
+}
+
+.lite-local-avatar {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--color-bg-selected, var(--surface-sunk));
+}
+
+.lite-local-avatar img {
+  width: 1.8rem;
+  height: 1.8rem;
+  object-fit: contain;
+}
+
+.lite-confirm-dialog {
+  max-width: 31rem;
+}
+
+.lite-confirm-dialog .note-edit-dialog-actions {
+  padding: 1.25rem;
+}
+
+.category-archive-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.todo-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border-default, var(--border));
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface, var(--surface));
+}
+
+.todo-item a {
+  color: var(--color-text-primary, var(--text));
+}
+
+.lite-task-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.lite-task-check input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--color-brand, var(--accent));
+}
+
+.lite-summary-controls {
+  margin-bottom: 1.25rem;
+}
+
+.lite-summary-controls > button {
+  margin-top: 0.75rem;
+}
+
+.lite-file-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#ollama-status,
+#data-message {
+  margin-top: 1rem;
+}
+
+@media (max-width: 48rem) {
+  .lite-header-status span {
+    display: none;
+  }
+
+  .lite-about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
