@@ -8,6 +8,7 @@
           ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
           : theme.toLowerCase();
         document.documentElement.setAttribute('data-theme', resolved);
+        document.documentElement.style.colorScheme = resolved;
         if (window.matchMedia('(min-width: 60.001rem)').matches &&
             localStorage.getItem('sidebar-collapsed') === 'true') {
           document.documentElement.classList.add('sidebar-collapsed');
@@ -16,7 +17,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#071426">
+    <meta name="theme-color" content="#f6f8fa">
     <meta name="description" content="Rook Lite, a private local notebook.">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/logo.png">
