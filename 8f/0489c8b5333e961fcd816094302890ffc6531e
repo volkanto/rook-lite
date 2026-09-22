@@ -1,0 +1,23 @@
+package-lock.json
+  s_3beb0a3400d75e::t_2ef4b2e1403576 1-2064
+rook-design-tokens.json
+  s_3beb0a3400d75e::t_0ca90728664acb 1-646
+src/app.css
+  s_3beb0a3400d75e::t_d6da9e8abca3d8 1-10763
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "8f0489c8b5333e961fcd816094302890ffc6531e",
+  "prompts": {},
+  "sessions": {
+    "s_3beb0a3400d75e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f44dd368fffeF9EmiVg8jrF1Qx",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
