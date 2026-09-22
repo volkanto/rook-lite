@@ -203,9 +203,9 @@ async function renderSummariesV2(content: HTMLElement): Promise<void> {
   let period; try { period = summaryPeriod(type, anchor, end); } catch { period = summaryPeriod("weekly", isoDate(new Date())); }
   const stored = await summaries.list(); const allNotes = await notes.listAll(); const allCategories = await categories.list(); const source = allNotes.filter((note) => note.noteDate >= period.start && note.noteDate <= period.end && !note.archived); const current = stored.find((summary) => summary.id === `${period.type}:${period.start}:${period.end}`); const range = `${formatShortDate(period.start)} – ${formatShortDate(period.end)}`; const rawMarkdown = rawNotesMarkdown(source); const shownMarkdown = mode === "raw" ? rawMarkdown : current?.editedMarkdown ?? current?.generatedMarkdown;
   document.title = "Summaries · Rook Lite";
-  content.innerHTML = `<div class="summaries-page"><header class="page-head"><div><h1>Summaries</h1><p class="lede">Review a period, summarize it locally, and export clean Markdown.</p></div></header><form id="summary-period-form" class="summary-control-panel"><div class="summary-period-tabs" aria-label="Summary period">${[["weekly", "This Week"], ["monthly", "This Month"], ["custom", "Custom"]].map(([value, label]) => `<button type="button" data-summary-type="${value}" class="${type === value ? "is-active" : ""}" aria-pressed="${type === value}">${label}</button>`).join("")}</div><input type="hidden" name="type" value="${type}"><div class="summary-date-fields"><label class="summary-date-label"><span>${type === "custom" ? "Start" : "Date in period"}</span><input name="start" type="date" value="${type === "custom" ? period.start : anchor}"></label><label class="summary-date-label summary-end-field" ${type === "custom" ? "" : "hidden"}><span>End</span><input name="end" type="date" value="${period.end}"></label><div class="summary-date-action"><span class="summary-field-ghost" aria-hidden="true">&nbsp;</span><button type="submit" class="summary-apply-btn">Apply</button></div></div><fieldset class="summary-mode-picker"><legend>Summary mode</legend>${[["rule-based", "Rule based", "Offline and deterministic"], ["ollama", "Ollama", "Uses your local model"], ["raw", "Raw notes", "Chronological Markdown"]].map(([value, label, help]) => `<label><input type="radio" name="mode" value="${value}" ${mode === value ? "checked" : ""}><span><strong>${label}</strong><small>${help}</small></span></label>`).join("")}</fieldset></form><section class="summary-document" aria-labelledby="summary-document-title"><header><div><p>${source.length} ${source.length === 1 ? "note" : "notes"} · ${range}</p><h2 id="summary-document-title">${type === "weekly" ? `Week ${isoWeek(new Date(`${period.start}T12:00:00`))}` : type === "monthly" ? new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(new Date(`${period.start}T12:00:00`)) : "Custom range"}</h2></div><div class="summary-document-actions">${shownMarkdown ? '<button type="button" class="secondary-button" id="copy-summary">Copy Markdown</button><button type="button" class="secondary-button" id="export-summary">Export Markdown</button>' : ""}${mode !== "raw" ? `<button type="button" id="generate-summary">${current ? "Regenerate" : "Generate summary"}</button>` : ""}</div></header><p id="summary-error" class="notice error" hidden aria-live="polite"></p>${shownMarkdown ? `<div class="summary-prose prose">${renderMarkdown(shownMarkdown)}</div>${mode !== "raw" && current ? `<details class="summary-edit"><summary>Edit Markdown</summary><form id="summary-edit-form"><textarea name="text" rows="12">${escapeHtml(current.editedMarkdown ?? current.generatedMarkdown)}</textarea><button type="submit">Save changes</button></form></details>` : ""}` : `<div class="summary-empty"><img src="/logo.png" alt="" width="48" height="48"><h3>No summary yet</h3><p>${source.length ? "Generate a concise summary from the notes in this period." : "There are no notes in this period."}</p></div>`}</section></div>`;
+  content.innerHTML = `<div class="summaries-page"><header class="page-head"><div><h1>Summaries</h1><p class="lede">Review a period, summarize it locally, and export clean Markdown.</p></div></header><form id="summary-period-form" class="summary-control-panel"><div class="summary-period-tabs" aria-label="Summary period">${[["weekly", "This Week"], ["monthly", "This Month"], ["custom", "Custom"]].map(([value, label]) => `<button type="button" data-summary-type="${value}" class="${type === value ? "is-active" : ""}" aria-pressed="${type === value}">${label}</button>`).join("")}</div><input type="hidden" name="type" value="${type}"><div class="summary-date-fields"><label class="summary-date-label"><span>${type === "custom" ? "Start date" : "Date in period"}</span><input name="start" type="date" value="${type === "custom" ? period.start : anchor}"></label><label class="summary-date-label summary-end-field" ${type === "custom" ? "" : "hidden"}><span>End date</span><input name="end" type="date" value="${period.end}"></label></div><fieldset class="summary-mode-picker"><legend>Summary mode</legend>${[["rule-based", "Rule based", "Offline and deterministic"], ["ollama", "Ollama", "Uses your local model"], ["raw", "Raw notes", "Chronological Markdown"]].map(([value, label, help]) => `<label><input type="radio" name="mode" value="${value}" ${mode === value ? "checked" : ""}><span><strong>${label}</strong><small>${help}</small></span></label>`).join("")}</fieldset></form><section class="summary-document" aria-labelledby="summary-document-title"><header><div><p>${source.length} ${source.length === 1 ? "note" : "notes"} · ${range}</p><h2 id="summary-document-title">${type === "weekly" ? `Week ${isoWeek(new Date(`${period.start}T12:00:00`))}` : type === "monthly" ? new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(new Date(`${period.start}T12:00:00`)) : "Custom range"}</h2></div><div class="summary-document-actions">${shownMarkdown ? '<button type="button" class="secondary-button" id="copy-summary">Copy Markdown</button><button type="button" class="secondary-button" id="export-summary">Export Markdown</button>' : ""}${mode !== "raw" ? `<button type="button" id="generate-summary">${current ? "Regenerate" : "Generate summary"}</button>` : ""}</div></header><p id="summary-error" class="notice error" hidden aria-live="polite"></p>${shownMarkdown ? `<div class="summary-prose prose">${renderMarkdown(shownMarkdown)}</div>${mode !== "raw" && current ? `<details class="summary-edit"><summary>Edit Markdown</summary><form id="summary-edit-form"><textarea name="text" rows="12">${escapeHtml(current.editedMarkdown ?? current.generatedMarkdown)}</textarea><button type="submit">Save changes</button></form></details>` : ""}` : `<div class="summary-empty"><img src="/logo.png" alt="" width="48" height="48"><h3>No summary yet</h3><p>${source.length ? "Generate a concise summary from the notes in this period." : "There are no notes in this period."}</p></div>`}</section></div>`;
   const form = requireElement<HTMLFormElement>("#summary-period-form"); form.querySelectorAll<HTMLButtonElement>("[data-summary-type]").forEach((button) => button.addEventListener("click", () => { const nextType = button.dataset.summaryType ?? "weekly"; const next = new URLSearchParams({ type: nextType, start: isoDate(new Date()), mode }); if (nextType === "custom") next.set("end", isoDate(new Date())); history.replaceState({}, "", appUrl(`/summaries?${next}`)); void renderRoute(); }));
-  const navigate = () => { const data = new FormData(form); const next = new URLSearchParams({ type: data.get("type")?.toString() ?? "weekly", start: data.get("start")?.toString() ?? isoDate(new Date()), mode: data.get("mode")?.toString() ?? "rule-based" }); if (data.get("type") === "custom") next.set("end", data.get("end")?.toString() ?? ""); history.replaceState({}, "", appUrl(`/summaries?${next}`)); void renderRoute(); }; form.addEventListener("submit", (event) => { event.preventDefault(); navigate(); }); form.querySelectorAll<HTMLInputElement>('input[name="mode"]').forEach((input) => input.addEventListener("change", navigate));
+  const navigate = () => { const data = new FormData(form); const next = new URLSearchParams({ type: data.get("type")?.toString() ?? "weekly", start: data.get("start")?.toString() ?? isoDate(new Date()), mode: data.get("mode")?.toString() ?? "rule-based" }); if (data.get("type") === "custom") next.set("end", data.get("end")?.toString() ?? ""); history.replaceState({}, "", appUrl(`/summaries?${next}`)); void renderRoute(); }; form.addEventListener("submit", (event) => { event.preventDefault(); navigate(); }); form.querySelectorAll<HTMLInputElement>('input[type="date"], input[name="mode"]').forEach((input) => input.addEventListener("change", navigate));
   document.querySelector<HTMLButtonElement>("#generate-summary")?.addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; button.textContent = "Generating…"; const settings = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS; const engine = mode === "ollama" ? new OllamaSummaryEngine(settings) : new RuleBasedSummaryEngine(); try { const result = await summaries.generate(source, allCategories, period, engine); if (result.fallbackError) sessionStorage.setItem("summary-fallback", result.fallbackError); await renderRoute(); } catch (error) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = errorMessage(error); button.disabled = false; button.textContent = "Generate summary"; } });
   const fallback = sessionStorage.getItem("summary-fallback"); if (fallback) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = `Ollama was unavailable. Rook used the offline summary instead: ${fallback}`; sessionStorage.removeItem("summary-fallback"); }
   document.querySelector<HTMLButtonElement>("#copy-summary")?.addEventListener("click", async () => { if (shownMarkdown) await navigator.clipboard.writeText(shownMarkdown); }); document.querySelector<HTMLButtonElement>("#export-summary")?.addEventListener("click", () => { if (shownMarkdown) downloadBlob(new Blob([shownMarkdown], { type: "text/markdown" }), `rook-summary-${period.start}-${period.end}.md`); });
@@ -225,16 +225,297 @@ async function renderData(content: HTMLElement): Promise<void> {
 }
 
 async function renderSettings(content: HTMLElement): Promise<void> {
-  const counts = await storageCounts(); const ollama = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS; const estimate = await navigator.storage?.estimate?.(); const persisted = await navigator.storage?.persisted?.(); document.title = "Settings · Rook Lite";
-  content.innerHTML = `<div class="dashboard-welcome"><div class="welcome-left"><h1 class="welcome-title">Settings</h1><p class="welcome-banner-subtitle">Configure appearance, local AI, export, and browser data.</p></div></div><div class="settings-stack"><section class="data-panel panel-row"><h2 class="panel-title">General</h2><p class="panel-subtitle">Choose how Rook Lite looks on this device.</p><div class="theme-selector-pills">${["SYSTEM", "LIGHT", "DARK"].map((theme) => `<label class="theme-pill-choice"><input type="radio" name="settings-theme" value="${theme}"><span class="theme-pill-label">${theme === "SYSTEM" ? "Follow the system" : `Always ${theme.toLowerCase()}`}</span></label>`).join("")}</div></section><section class="data-panel panel-row"><h2 class="panel-title">Local AI</h2><p class="panel-subtitle">Use an Ollama model running on this machine. Failures fall back to the offline summary.</p><form id="ollama-form" class="settings-form stack"><label class="choices-checkbox-row"><input type="checkbox" name="enabled" ${ollama.enabled ? "checked" : ""}><div class="choice-meta"><strong>Use Ollama for summaries</strong><span class="hint choice-hint">Note content is sent only to the local endpoint below.</span></div></label><div class="form-group"><label class="form-label" for="ollama-endpoint">Ollama endpoint</label><input class="form-input" id="ollama-endpoint" name="endpoint" value="${escapeHtml(ollama.endpoint)}" required></div><div class="form-group"><label class="form-label" for="ollama-model">Model</label><input class="form-input" id="ollama-model" name="model" list="ollama-models" value="${escapeHtml(ollama.model)}" required><datalist id="ollama-models"></datalist></div><div class="form-group"><label class="form-label" for="ollama-temperature">Temperature</label><input class="form-input" id="ollama-temperature" name="temperature" type="number" min="0" max="2" step="0.1" value="${ollama.temperature}"></div><p class="hint">Only localhost, 127.0.0.1, and ::1 endpoints are allowed.</p><p id="ollama-status" class="notice" hidden></p><div class="lite-panel-actions"><button type="button" id="test-ollama">Test connection</button><button type="submit">Save AI settings</button></div></form></section><section class="data-panel panel-row"><h2 class="panel-title">About</h2><div class="lite-about-grid"><div class="lite-about-stat"><strong>${counts.notes}</strong><span>Local notes</span></div><div class="lite-about-stat"><strong>${formatBytes(estimate?.usage ?? 0)}</strong><span>Browser storage used</span></div><div class="lite-about-stat"><strong id="network-status">${navigator.onLine ? "Online" : "Offline"}</strong><span>Network status</span></div><div class="lite-about-stat"><strong>${persisted === undefined ? "Unknown" : persisted ? "Protected" : "Best effort"}</strong><span>Storage persistence</span></div></div>${persisted === false ? '<div class="lite-panel-actions"><button type="button" id="request-persistence">Protect local storage</button></div>' : ""}</section><section class="data-panel panel-row"><h2 class="panel-title text-danger">Delete local data</h2><p class="panel-subtitle">Permanently remove notes, categories, summaries, settings, and drafts from this browser.</p><button type="button" class="danger-save-btn" id="delete-local-data">Delete all local data</button></section></div>`;
-  const modelInput = requireElement<HTMLInputElement>("#ollama-model"); const modelSelect = document.createElement("select"); modelSelect.id = "ollama-model"; modelSelect.name = "model"; modelSelect.className = "form-input"; modelSelect.required = true; modelSelect.innerHTML = `<option value="${escapeHtml(ollama.model)}">${escapeHtml(ollama.model)}</option>`; modelInput.replaceWith(modelSelect); document.querySelector("#ollama-models")?.remove();
-  content.querySelector(".theme-selector-pills")?.closest<HTMLElement>(".data-panel")?.remove();
-  const form = requireElement<HTMLFormElement>("#ollama-form"); const readOllama = (): OllamaSettings => { const data = new FormData(form); return { enabled: data.get("enabled") === "on", endpoint: data.get("endpoint")?.toString().trim() ?? "", model: data.get("model")?.toString().trim() ?? "", temperature: Number(data.get("temperature") ?? 0.2), timeoutMs: 60000 }; };
-  const loadModels = async (announce = false) => { try { const models = await testOllama(readOllama()); const select = requireElement<HTMLSelectElement>("#ollama-model"); const selected = select.value; select.innerHTML = models.length ? models.map((model) => `<option value="${escapeHtml(model)}" ${model === selected ? "selected" : ""}>${escapeHtml(model)}</option>`).join("") : `<option value="${escapeHtml(selected)}">${escapeHtml(selected)}</option>`; if (announce) ollamaMessage(models.length ? `Connected. Found ${models.length} local models.` : "Connected, but no models are installed.", false); } catch (error) { if (announce) ollamaMessage(errorMessage(error), true); } };
-  requireElement<HTMLButtonElement>("#test-ollama").addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; ollamaMessage("Testing local connection…", false); await loadModels(true); button.disabled = false; }); void loadModels();
-  form.addEventListener("submit", async (event) => { event.preventDefault(); try { const settings = readOllama(); if (settings.enabled) await testOllama(settings); await settingsRepository.set("ollama", settings); ollamaMessage("AI settings saved.", false); } catch (error) { ollamaMessage(errorMessage(error), true); } });
-  const persistenceButton = document.querySelector<HTMLButtonElement>("#request-persistence"); if (persistenceButton) { persistenceButton.textContent = "Request persistent storage"; persistenceButton.insertAdjacentHTML("beforebegin", '<p class="persistence-explanation">Ask the browser not to automatically evict Rook data when device storage is low. This does not sync, upload, or back up your notes.</p>'); persistenceButton.addEventListener("click", async () => { const granted = await navigator.storage.persist(); if (!granted) { persistenceButton.insertAdjacentHTML("afterend", '<p class="hint persistence-result">The browser did not grant persistent storage. Your notes remain available, but can still be cleared by browser storage cleanup.</p>'); return; } await renderRoute(); }); }
-  requireElement("#delete-local-data").addEventListener("click", () => showConfirm("Delete all local data?", "This permanently removes every note and cannot be undone. Create a backup first if you need one.", "Delete all data", async () => { await clearAllData(); await categories.seedDefaults(); await refreshCalendar(); await renderRoute(); }));
+  const counts = await storageCounts();
+  const ollama = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS;
+  const estimate = await navigator.storage?.estimate?.();
+  const persisted = await navigator.storage?.persisted?.();
+  const currentTheme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
+  document.title = "Settings · Rook Lite";
+
+  content.innerHTML = `<div class="settings-page">
+    <header class="page-head">
+      <div>
+        <h1>Settings</h1>
+        <p class="lede">Configure appearance, local AI, storage persistence, and local data.</p>
+      </div>
+    </header>
+
+    <div class="settings-cards-stack">
+      <section class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title-group">
+            <h2>Appearance</h2>
+            <p>Choose your preferred interface theme for this device.</p>
+          </div>
+        </div>
+        <div class="theme-selector-grid">
+          ${([
+            ["SYSTEM", "System", "Match device setting", icons.monitor],
+            ["LIGHT", "Light", "Clean & crisp light mode", icons.sun],
+            ["DARK", "Dark", "High contrast dark mode", icons.moon]
+          ] as const).map(([val, label, desc, iconSvg]) => `
+            <label class="theme-option-card ${currentTheme === val ? "is-selected" : ""}">
+              <input type="radio" name="settings-theme" value="${val}" ${currentTheme === val ? "checked" : ""}>
+              <div class="theme-card-icon">${svg(iconSvg, "")}</div>
+              <div class="theme-card-info">
+                <strong>${label}</strong>
+                <span>${desc}</span>
+              </div>
+            </label>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="settings-card local-ai-card ${ollama.enabled ? "is-enabled" : "is-collapsed"}">
+        <div class="settings-card-header">
+          <div class="settings-card-title-group">
+            <div class="title-with-badge">
+              <h2>Local AI</h2>
+              <span class="ai-privacy-pill">100% Private · Local only</span>
+            </div>
+            <p>Summarize notes using an Ollama model running on your machine. No data is sent to external servers.</p>
+          </div>
+          <div class="ai-toggle-wrapper">
+            <label class="toggle-switch" for="ollama-enabled-toggle">
+              <input type="checkbox" id="ollama-enabled-toggle" ${ollama.enabled ? "checked" : ""}>
+              <span class="toggle-slider"></span>
+              <span class="visually-hidden">Enable local AI</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="ollama-disabled-banner" class="ai-disabled-banner" ${ollama.enabled ? "hidden" : ""}>
+          <div class="disabled-banner-content">
+            <span class="disabled-banner-icon">${svg(icons.lock, "")}</span>
+            <div>
+              <strong>Local AI is turned off</strong>
+              <p>Rook Lite will generate summaries using the built-in, fast and deterministic offline rule-based engine. Toggle the switch above if you want to connect to a local Ollama model.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="ollama-config-panel" class="ai-config-panel" ${ollama.enabled ? "" : "hidden"}>
+          <form id="ollama-form" class="settings-form">
+            <div class="form-row">
+              <div class="form-field flex-2">
+                <label for="ollama-endpoint">Ollama Endpoint URL</label>
+                <input class="form-input" id="ollama-endpoint" name="endpoint" value="${escapeHtml(ollama.endpoint)}" placeholder="http://localhost:11434" required>
+                <span class="field-hint">Only local endpoints allowed (localhost, 127.0.0.1, [::1]).</span>
+              </div>
+              <div class="form-field flex-2">
+                <label for="ollama-model">Model</label>
+                <div class="model-select-wrapper">
+                  <select class="form-input" id="ollama-model" name="model" required>
+                    <option value="${escapeHtml(ollama.model)}">${escapeHtml(ollama.model)}</option>
+                  </select>
+                </div>
+                <span class="field-hint">Models detected from your running Ollama server.</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field flex-1">
+                <div class="field-label-row">
+                  <label for="ollama-temperature">Temperature (Creativity)</label>
+                  <span id="temp-val-display" class="temp-badge">${Number(ollama.temperature).toFixed(2)}</span>
+                </div>
+                <input type="range" id="ollama-temperature" name="temperature" min="0" max="1" step="0.05" value="${ollama.temperature}" class="range-slider">
+                <div class="range-labels">
+                  <span>Precise (0.0)</span>
+                  <span>Balanced (0.5)</span>
+                  <span>Creative (1.0)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-actions-row">
+              <button type="button" id="test-ollama" class="secondary-button">Test connection & refresh models</button>
+              <button type="submit" class="save-btn-rect">Save AI settings</button>
+              <span id="ollama-status" class="status-badge" hidden aria-live="polite"></span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title-group">
+            <h2>Storage & Persistence</h2>
+            <p>Your notes, categories, and summaries live directly inside your browser storage.</p>
+          </div>
+        </div>
+        <div class="storage-metrics-grid">
+          <div class="storage-metric-box">
+            <span class="metric-num">${counts.notes}</span>
+            <span class="metric-label">Notes</span>
+          </div>
+          <div class="storage-metric-box">
+            <span class="metric-num">${counts.categories}</span>
+            <span class="metric-label">Categories</span>
+          </div>
+          <div class="storage-metric-box">
+            <span class="metric-num">${counts.summaries}</span>
+            <span class="metric-label">Summaries</span>
+          </div>
+          <div class="storage-metric-box">
+            <span class="metric-num">${estimate?.usage ? formatBytes(estimate.usage) : "Local DB"}</span>
+            <span class="metric-label">Estimated Usage</span>
+          </div>
+        </div>
+        <div class="persistence-row">
+          <div class="persistence-text">
+            <strong>${persisted ? "✓ Persistent storage active" : "Standard browser storage"}</strong>
+            <p>${persisted ? "Your browser is configured not to clear Rook Lite storage automatically when disk space is constrained." : "Ask the browser not to automatically clear your local notes if device storage runs low."}</p>
+          </div>
+          ${persisted ? "" : '<button type="button" id="request-persistence" class="secondary-button">Request persistence</button>'}
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title-group">
+            <h2>Export & Backup Hub</h2>
+            <p>Download full Markdown archives or JSON snapshots of your notes to your computer.</p>
+          </div>
+          <a href="${appUrl("/data")}" data-link class="secondary-button action-link-btn">Open Export Hub &rarr;</a>
+        </div>
+      </section>
+
+      <section class="settings-card danger-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title-group">
+            <h2 class="danger-title">Danger Zone</h2>
+            <p>Permanently remove every note, category, and summary from this browser. This cannot be undone.</p>
+          </div>
+          <button type="button" id="delete-local-data" class="danger-save-btn">Delete all data</button>
+        </div>
+      </section>
+    </div>
+  </div>`;
+  bindSettingsEvents(content, ollama);
+}
+
+function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void {
+  content.querySelectorAll<HTMLInputElement>('input[name="settings-theme"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      setTheme(input.value as ThemePreference);
+      content.querySelectorAll(".theme-option-card").forEach((card) => {
+        const isMatch = (card.querySelector("input") as HTMLInputElement)?.value === input.value;
+        card.classList.toggle("is-selected", isMatch);
+      });
+    });
+  });
+
+  const tempSlider = content.querySelector<HTMLInputElement>("#ollama-temperature");
+  const tempDisplay = content.querySelector<HTMLElement>("#temp-val-display");
+  tempSlider?.addEventListener("input", () => {
+    if (tempDisplay && tempSlider) tempDisplay.textContent = Number(tempSlider.value).toFixed(2);
+  });
+
+  const form = requireElement<HTMLFormElement>("#ollama-form");
+  const toggle = requireElement<HTMLInputElement>("#ollama-enabled-toggle");
+
+  const readOllama = (): OllamaSettings => {
+    const data = new FormData(form);
+    return {
+      enabled: toggle.checked,
+      endpoint: data.get("endpoint")?.toString().trim() ?? "",
+      model: data.get("model")?.toString().trim() ?? "",
+      temperature: Number(data.get("temperature") ?? 0.2),
+      timeoutMs: 60000
+    };
+  };
+
+  const loadModels = async (announce = false) => {
+    try {
+      const models = await testOllama(readOllama());
+      const select = requireElement<HTMLSelectElement>("#ollama-model");
+      const selected = select.value;
+      select.innerHTML = models.length
+        ? models.map((model) => `<option value="${escapeHtml(model)}" ${model === selected ? "selected" : ""}>${escapeHtml(model)}</option>`).join("")
+        : `<option value="${escapeHtml(selected)}">${escapeHtml(selected)}</option>`;
+      if (announce) ollamaMessage(models.length ? `Connected. Found ${models.length} local models.` : "Connected, but no models are installed.", false);
+    } catch (error) {
+      if (announce) ollamaMessage(errorMessage(error), true);
+    }
+  };
+
+  toggle.addEventListener("change", async () => {
+    const isEnabled = toggle.checked;
+    const card = toggle.closest<HTMLElement>(".local-ai-card");
+    const banner = requireElement<HTMLElement>("#ollama-disabled-banner");
+    const panel = requireElement<HTMLElement>("#ollama-config-panel");
+
+    card?.classList.toggle("is-enabled", isEnabled);
+    card?.classList.toggle("is-collapsed", !isEnabled);
+    banner.hidden = isEnabled;
+    panel.hidden = !isEnabled;
+
+    const current = readOllama();
+    current.enabled = isEnabled;
+    await settingsRepository.set("ollama", current);
+
+    if (isEnabled) {
+      void loadModels(false);
+      ollamaMessage("Local AI enabled.", false);
+    } else {
+      ollamaMessage("Local AI disabled. Offline summaries active.", false);
+    }
+  });
+
+  requireElement<HTMLButtonElement>("#test-ollama").addEventListener("click", async (event) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    button.disabled = true;
+    ollamaMessage("Testing local connection…", false);
+    await loadModels(true);
+    button.disabled = false;
+  });
+
+  if (ollama.enabled) {
+    void loadModels(false);
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (btn) btn.disabled = true;
+    try {
+      const settings = readOllama();
+      if (settings.enabled) await testOllama(settings);
+      await settingsRepository.set("ollama", settings);
+      ollamaMessage("AI settings saved successfully.", false);
+    } catch (error) {
+      ollamaMessage(errorMessage(error), true);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  });
+
+  const persistenceButton = document.querySelector<HTMLButtonElement>("#request-persistence");
+  if (persistenceButton) {
+    persistenceButton.addEventListener("click", async () => {
+      const granted = await navigator.storage.persist();
+      if (!granted) {
+        alert("The browser did not grant persistent storage.");
+        return;
+      }
+      await renderRoute();
+    });
+  }
+
+  requireElement("#delete-local-data").addEventListener("click", () =>
+    showConfirm(
+      "Delete all local data?",
+      "This permanently removes every note, category, and summary and cannot be undone. Create a backup first if you need one.",
+      "Delete all data",
+      async () => {
+        await clearAllData();
+        await categories.seedDefaults();
+        await refreshCalendar();
+        await renderRoute();
+      }
+    )
+  );
 }
 
 function ollamaMessage(message: string, error: boolean): void { const element = requireElement<HTMLElement>("#ollama-status"); element.hidden = false; element.textContent = message; element.classList.toggle("error", error); }
