@@ -962,65 +962,157 @@
 }
 
 .summary-control-panel {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 1.25rem;
-  margin: 0 0 1.25rem;
+  margin: 0 0 1.5rem;
   padding: 1.25rem;
-}
-
-.summary-control-panel > .summary-period-tabs {
-  justify-self: start;
-}
-
-.summary-date-fields {
-  padding: 1rem;
-  border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: var(--radius-md, 8px);
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
-}
-
-.summary-date-fields button {
-  min-height: 2.6rem;
 }
 
 .summary-period-tabs {
   display: inline-flex;
   width: fit-content;
-  padding: 0.2rem;
+  padding: 0.25rem;
   border: 1px solid var(--color-border-default, var(--border));
-  border-radius: var(--radius-md, 8px);
+  border-radius: 8px;
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  gap: 2px;
 }
 
 .summary-period-tabs button {
-  min-height: 2.35rem;
-  padding: 0.4rem 0.8rem;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.85rem;
   border: 0;
+  border-radius: 6px;
   background: transparent;
   color: var(--color-text-secondary, var(--text-soft));
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.summary-period-tabs button:hover {
+  color: var(--color-text-primary, var(--text));
 }
 
 .summary-period-tabs button.is-active {
   background: var(--color-bg-surface, var(--surface));
   color: var(--color-text-primary, var(--text));
+  font-weight: 600;
   box-shadow: var(--shadow-sm, 0 1px 2px rgba(7, 20, 38, 0.08));
 }
 
 .summary-date-fields {
-  display: flex;
-  align-items: end;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  display: flex !important;
+  align-items: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+  padding: 1rem 1.25rem !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-radius: var(--radius-md, 8px) !important;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  box-sizing: border-box !important;
 }
 
+.summary-date-fields .summary-date-label,
 .summary-date-fields label {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 12rem;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.4rem !important;
+  flex: 0 1 14rem !important;
+  min-width: 11rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
 }
 
+.summary-date-fields label[hidden],
+.summary-date-fields label.summary-end-field[hidden] {
+  display: none !important;
+}
+
+.summary-date-fields label span,
+.summary-date-action .summary-field-ghost {
+  display: block !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.summary-date-action .summary-field-ghost {
+  visibility: hidden !important;
+  user-select: none !important;
+}
+
+.summary-date-action {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.4rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.summary-date-fields input[type="date"],
 .summary-date-fields input {
-  margin: 0;
+  width: 100% !important;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-height: 2.5rem !important;
+  margin: 0 !important;
+  padding: 0 0.75rem !important;
+  border: 1px solid var(--color-border-default, var(--border)) !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.85rem !important;
+  line-height: 2.5rem !important;
+  box-sizing: border-box !important;
+  outline: none !important;
+}
+
+.summary-date-fields input:focus {
+  border-color: var(--color-text-brand, var(--accent)) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--color-border-selected, rgba(9, 105, 218, 0.2)) !important;
+}
+
+.summary-date-action button.summary-apply-btn,
+.summary-date-fields button[type="submit"],
+.summary-date-fields button {
+  align-self: auto !important;
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+  max-height: 2.5rem !important;
+  margin: 0 !important;
+  padding: 0 1.5rem !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--color-btn-primary-bg, var(--accent)) !important;
+  color: var(--color-btn-primary-text, #ffffff) !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  line-height: 2.5rem !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: opacity 100ms ease !important;
+}
+
+.summary-date-action button.summary-apply-btn:hover,
+.summary-date-fields button:hover {
+  opacity: 0.92 !important;
 }
 
 .summary-mode-picker {
