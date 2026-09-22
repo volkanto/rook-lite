@@ -1,0 +1,31 @@
+index.html
+  s_579a21b1ebb2e5::t_5c164c1e67645f 11,20
+src/lite.css
+  s_579a21b1ebb2e5::t_5c164c1e67645f 161,457,1620-1766
+  s_579a21b1ebb2e5::t_ee4ce1fd7a0c4d 45-46,51,53,55,59-61,64-73,98-101,103-124,129-130,151-160
+  s_579a21b1ebb2e5::t_ebff66556b2a56 134-144
+  s_579a21b1ebb2e5::t_6069f1b823d8d5 456,461-478,1614,1617-1619
+  s_579a21b1ebb2e5::t_ae855094c3f795 459-460,1615-1616
+  s_579a21b1ebb2e5::t_ec137624f94830 163-168
+  s_579a21b1ebb2e5::t_9cb79f6c458d91 162
+  s_579a21b1ebb2e5::t_ac9a49c4d4f02a 458
+src/main.ts
+  s_579a21b1ebb2e5::t_ee4ce1fd7a0c4d 50,227,232,249,267
+  s_579a21b1ebb2e5::t_ae855094c3f795 80-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "228feb5fa6370fd434b04a805ed036e70837b190",
+  "prompts": {},
+  "sessions": {
+    "s_579a21b1ebb2e5": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f36e18b34ffe5mcqR2PjpO0NeB",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
