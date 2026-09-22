@@ -1,0 +1,33 @@
+vite.config.ts
+  s_579a21b1ebb2e5::t_6a6effb6f6a1ed 1-5
+index.html
+  s_579a21b1ebb2e5::t_6a6effb6f6a1ed 22-23,28
+src/main.ts
+  s_579a21b1ebb2e5::t_7fa30adc4f02f8 19,75,81,84-88,268,289
+  s_579a21b1ebb2e5::t_301f6bddf1506a 197
+  s_579a21b1ebb2e5::t_a73f303865a0b7 166,209-210
+public/manifest.webmanifest
+  s_579a21b1ebb2e5::t_6a6effb6f6a1ed 5-6,8-9,12
+.github/workflows/pages.yml
+  s_579a21b1ebb2e5::t_159327cc7358c3 1-57
+README.md
+  s_579a21b1ebb2e5::t_159327cc7358c3 19-46
+public/sw.js
+  s_579a21b1ebb2e5::t_159327cc7358c3 1-4,9,11-12,34,37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "66c142522d627e93513a2583ac0bb1622a6be504",
+  "prompts": {},
+  "sessions": {
+    "s_579a21b1ebb2e5": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f36e18b34ffe5mcqR2PjpO0NeB",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
