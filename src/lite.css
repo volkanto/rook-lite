@@ -2058,19 +2058,115 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.75rem;
-  padding-top: 0.5rem;
+  padding-top: 0.85rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid var(--color-border-subtle, var(--border));
 }
 
-.status-badge {
-  display: inline-flex;
+.ai-actions-row .secondary-button,
+.ai-actions-row .save-btn-rect {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+  height: 2.25rem !important;
+  min-height: 2.25rem !important;
+  padding: 0 1rem !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  text-decoration: none !important;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease !important;
+}
+
+.ai-actions-row .secondary-button {
+  background: var(--color-bg-surface, var(--surface)) !important;
+  border: 1px solid var(--color-border-default, var(--border)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.ai-actions-row .secondary-button:hover {
+  background: var(--color-bg-hover, var(--surface-sunk)) !important;
+  border-color: var(--color-border-strong, var(--border-strong)) !important;
+}
+
+.ai-actions-row .save-btn-rect {
+  background: var(--color-btn-primary-bg, var(--accent, #0969da)) !important;
+  border: 1px solid transparent !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+}
+
+.ai-actions-row .save-btn-rect:hover {
+  background: var(--color-btn-primary-hover, color-mix(in srgb, var(--accent, #0969da) 85%, black)) !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+.ai-actions-row .btn-action-icon {
+  display: block;
+  flex: 0 0 1rem;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+#ollama-status.notice {
+  display: flex !important;
   align-items: center;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--color-text-secondary, var(--text-soft));
+  gap: 0.65rem;
+  margin: 0.85rem 0 0 !important;
+  padding: 0.7rem 0.95rem !important;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  box-sizing: border-box;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-left: 3px solid var(--color-success, #1a7f37);
+  color: var(--color-text-primary, var(--text));
 }
 
-.status-badge.error {
-  color: var(--danger, #f85149);
+#ollama-status[hidden] {
+  display: none !important;
+}
+
+#ollama-status .notice-status-icon {
+  flex: 0 0 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  display: block;
+}
+
+#ollama-status span {
+  flex: 1 1 auto;
+}
+
+#ollama-status:not(.error) {
+  border-left-color: var(--color-success, #1a7f37) !important;
+  background: color-mix(in srgb, var(--color-success, #1a7f37) 8%, var(--color-bg-surface)) !important;
+}
+
+#ollama-status:not(.error) .notice-status-icon {
+  color: var(--color-success, #1a7f37);
+}
+
+#ollama-status.error {
+  border-left-color: var(--color-danger, #cf222e) !important;
+  border-color: color-mix(in srgb, var(--color-danger, #cf222e) 25%, transparent) !important;
+  background: color-mix(in srgb, var(--color-danger, #cf222e) 8%, var(--color-bg-surface)) !important;
+  color: var(--color-danger, #cf222e) !important;
+}
+
+#ollama-status.error .notice-status-icon {
+  color: var(--color-danger, #cf222e);
 }
 
 .storage-metrics-grid {
@@ -2159,6 +2255,19 @@
   }
   .settings-card-header .ai-toggle-wrapper {
     align-self: flex-start;
+  }
+  .ai-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ai-actions-row .secondary-button,
+  .ai-actions-row .save-btn-rect {
+    width: 100%;
+    justify-content: center;
+  }
+  .ai-actions-row .status-badge {
+    justify-content: center;
+    text-align: center;
   }
 }
 
@@ -3137,7 +3246,6 @@
   cursor: pointer;
 }
 
-#ollama-status,
 #data-message {
   margin-top: 1rem;
 }

@@ -20,6 +20,11 @@ Object.defineProperty(window, "matchMedia", {
   })
 });
 
+function localTodayIso(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 describe("Left menu bar icons and navigation", () => {
   it("exports navItems using consistent Lucide/Feather icon family", async () => {
     const { navItems, icons, svg } = await import("./main");
@@ -113,7 +118,7 @@ describe("Left menu bar icons and navigation", () => {
 
   it("renders complete edit and delete buttons in single item note action popup", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const today = new Date().toISOString().slice(0, 10);
+    const today = localTodayIso();
     const createdNote = await noteService.create("Single note item for action menu test", today, []);
 
     const { renderShell } = await import("./main");
@@ -145,7 +150,7 @@ describe("Left menu bar icons and navigation", () => {
 
   it("opens redesigned edit note popup dialog with editor tools inside card and working categories", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const today = new Date().toISOString().slice(0, 10);
+    const today = localTodayIso();
     const createdNote = await noteService.create("Testing edit modal redesign", today, []);
     const testCategory = { id: "cat-1", name: "Engineering", slug: "engineering", color: "#3b82f6", sortOrder: 0, archived: false, createdAt: today, updatedAt: today };
 
@@ -209,5 +214,30 @@ describe("Left menu bar icons and navigation", () => {
 
     // Clean up
     await noteService.delete(createdNote.id);
+  });
+
+  it("renders aligned Local AI settings buttons and status notice banner", async () => {
+    const { renderSettings } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSettings(container);
+
+    const actionsRow = container.querySelector(".ai-actions-row");
+    expect(actionsRow).not.toBeNull();
+
+    const testBtn = actionsRow?.querySelector<HTMLButtonElement>("#test-ollama.secondary-button");
+    const saveBtn = actionsRow?.querySelector<HTMLButtonElement>("button[type='submit'].save-btn-rect");
+    const statusBanner = container.querySelector("#ollama-status.notice");
+
+    expect(testBtn).not.toBeNull();
+    expect(saveBtn).not.toBeNull();
+    expect(statusBanner).not.toBeNull();
+
+    // Both buttons contain action icons
+    expect(testBtn?.querySelector(".btn-action-icon")).not.toBeNull();
+    expect(saveBtn?.querySelector(".btn-action-icon")).not.toBeNull();
+
+    expect(testBtn?.textContent).toContain("Test connection & refresh models");
+    expect(saveBtn?.textContent).toContain("Save AI settings");
   });
 });

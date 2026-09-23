@@ -38,6 +38,9 @@ export const icons = {
   edit: '<path d="M11 4H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
   trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
   more: '<circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/>',
+  refresh: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
   plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'
 } as const;
 
@@ -258,7 +261,7 @@ async function renderData(content: HTMLElement): Promise<void> {
   requireElement<HTMLInputElement>("#restore-backup").addEventListener("change", async (event) => { const file = (event.currentTarget as HTMLInputElement).files?.[0]; if (!file) return; try { const backup = parseBackup(await file.text()); showConfirm("Replace local data?", `Restore ${backup.notes.length} notes, ${backup.categories.length} categories, and ${backup.summaries.length} summaries? Current local data will be replaced.`, "Restore backup", async () => { await restoreBackup(backup); await refreshCalendar(); await renderRoute(); }); } catch (error) { dataMessage(errorMessage(error), true); } });
 }
 
-async function renderSettings(content: HTMLElement): Promise<void> {
+export async function renderSettings(content: HTMLElement): Promise<void> {
   const counts = await storageCounts();
   const ollama = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS;
   const estimate = await navigator.storage?.estimate?.();
@@ -374,10 +377,10 @@ async function renderSettings(content: HTMLElement): Promise<void> {
             </div>
 
             <div class="ai-actions-row">
-              <button type="button" id="test-ollama" class="secondary-button">Test connection & refresh models</button>
-              <button type="submit" class="save-btn-rect">Save AI settings</button>
-              <span id="ollama-status" class="status-badge" hidden aria-live="polite"></span>
+              <button type="button" id="test-ollama" class="secondary-button">${svg(icons.refresh, "btn-action-icon")}<span>Test connection & refresh models</span></button>
+              <button type="submit" class="save-btn-rect">${svg(icons.check, "btn-action-icon")}<span>Save AI settings</span></button>
             </div>
+            <div id="ollama-status" class="notice" hidden aria-live="polite"></div>
           </form>
         </div>
       </section>
@@ -511,7 +514,8 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
       void loadModels(false);
       ollamaMessage("Local AI enabled.", false);
     } else {
-      ollamaMessage("Local AI disabled. Offline summaries active.", false);
+      const statusEl = document.querySelector<HTMLElement>("#ollama-status");
+      if (statusEl) statusEl.hidden = true;
     }
   });
 
@@ -570,7 +574,12 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
   );
 }
 
-function ollamaMessage(message: string, error: boolean): void { const element = requireElement<HTMLElement>("#ollama-status"); element.hidden = false; element.textContent = message; element.classList.toggle("error", error); }
+function ollamaMessage(message: string, error: boolean): void {
+  const element = requireElement<HTMLElement>("#ollama-status");
+  element.hidden = false;
+  element.innerHTML = `${svg(error ? icons.alert : icons.check, "notice-status-icon")}<span>${escapeHtml(message)}</span>`;
+  element.classList.toggle("error", error);
+}
 function dataMessage(message: string, error: boolean): void { const element = requireElement<HTMLElement>("#data-message"); element.hidden = false; element.textContent = message; element.classList.toggle("error", error); }
 function formatBytes(bytes: number): string { if (bytes < 1024) return `${bytes} B`; if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`; return `${(bytes / 1024 / 1024).toFixed(1)} MB`; }
 
