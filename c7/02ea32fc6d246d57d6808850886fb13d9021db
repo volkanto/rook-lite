@@ -1,0 +1,26 @@
+src/lite.css
+  s_bbf4fca5ba9f87::t_f388fdf1014aed 698-704,712-713
+  s_bbf4fca5ba9f87::t_48656a5a4ce87e 633-634,648
+  s_bbf4fca5ba9f87::t_d776f37d58a9d0 714,785-798,805-810,813-814,818-870
+  s_bbf4fca5ba9f87::t_ec223dd0ae4478 715
+  s_bbf4fca5ba9f87::t_fb5797bf849a7f 871
+src/navigation.test.ts
+  s_bbf4fca5ba9f87::t_e5937c9d15737c 2,4-5,113-143
+  s_bbf4fca5ba9f87::t_dc0b72d7a8ba03 144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "c702ea32fc6d246d57d6808850886fb13d9021db",
+  "prompts": {},
+  "sessions": {
+    "s_bbf4fca5ba9f87": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ac5177b8-6bd0-4b20-a4d8-d679a782fe32",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
