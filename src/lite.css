@@ -621,15 +621,20 @@
 }
 
 .empty-notes .empty-notes-illustration {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: clamp(7.5rem, 20vw, 10rem);
+  max-width: 160px;
+  height: auto;
+  aspect-ratio: 1 / 1;
   object-fit: contain;
-  opacity: 0.72;
+  opacity: 1;
+  margin-bottom: 0.85rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
 }
 
 .notes-panel .empty-notes {
-  min-height: 15rem;
+  min-height: 16rem;
   justify-content: center;
+  padding: 2.5rem 1rem 3rem;
 }
 
 .editor-card .simple-editor-toolbar {
