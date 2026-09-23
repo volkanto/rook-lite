@@ -137,6 +137,9 @@ describe("normalizeAppLinks", () => {
       <main id="content">
         <a href="/?date=2026-09-22" data-link>Date link</a>
         <img src="/empty-notes.png" alt="Empty">
+        <div class="empty-notes search-results-empty">
+          <img src="/empty-notes.png" alt="Search Empty" class="empty-notes-illustration">
+        </div>
       </main>
     `;
 
@@ -149,6 +152,7 @@ describe("normalizeAppLinks", () => {
     expect(container.querySelectorAll<HTMLAnchorElement>('a[data-link]')[3].getAttribute("href")).toBe("https://external.com");
     expect(container.querySelector<HTMLImageElement>('img[alt="Logo"]')?.getAttribute("src")).toBe("/rook-lite/logo.png");
     expect(container.querySelector<HTMLImageElement>('img[alt="Empty"]')?.getAttribute("src")).toBe("/rook-lite/empty-notes.png");
+    expect(container.querySelector<HTMLImageElement>('img[alt="Search Empty"]')?.getAttribute("src")).toBe("/rook-lite/empty-notes.png");
     expect(container.querySelector<HTMLImageElement>('img[alt="Data"]')?.getAttribute("src")).toBe("data:image/png;base64,123");
 
     // Second pass (e.g. user navigates to Summaries, renderRoute runs again on same container)
