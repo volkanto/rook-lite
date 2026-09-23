@@ -87,7 +87,7 @@ function highlightLinkedNote(): void {
   if (!location.hash.startsWith("#note-")) return;
   const note = document.querySelector<HTMLElement>(location.hash); if (!note) return;
   note.classList.remove("is-search-target");
-  requestAnimationFrame(() => requestAnimationFrame(() => { note.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); note.classList.add("is-search-target"); window.setTimeout(() => note.classList.remove("is-search-target"), 1800); }));
+  requestAnimationFrame(() => requestAnimationFrame(() => { note.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); note.classList.add("is-search-target"); window.setTimeout(() => note.classList.remove("is-search-target"), 3200); }));
 }
 
 async function renderToday(content: HTMLElement): Promise<void> {
