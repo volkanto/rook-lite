@@ -1,5 +1,8 @@
 // @vitest-environment jsdom
+import "fake-indexeddb/auto";
 import { describe, expect, it } from "vitest";
+import { NoteRepository } from "./db";
+import { NoteService } from "./services";
 
 // Ensure JSDOM environment has required globals before importing main.ts
 document.body.innerHTML = '<div id="app"></div>';
@@ -106,5 +109,37 @@ describe("Left menu bar icons and navigation", () => {
     allSidebarSvgs?.forEach((svgEl) => {
       expect(svgEl.getAttribute("viewBox")).toBe("0 0 24 24");
     });
+  });
+
+  it("renders complete edit and delete buttons in single item note action popup", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = new Date().toISOString().slice(0, 10);
+    const createdNote = await noteService.create("Single note item for action menu test", today, []);
+
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const notesList = document.querySelector(".notes-list");
+    expect(notesList).not.toBeNull();
+
+    const noteItems = notesList?.querySelectorAll(".note-list-item");
+    expect(noteItems?.length).toBe(1);
+
+    const menu = noteItems?.[0]?.querySelector(".note-action-menu");
+    expect(menu).not.toBeNull();
+
+    const popover = menu?.querySelector(".note-action-popover");
+    expect(popover).not.toBeNull();
+
+    const editBtn = popover?.querySelector<HTMLButtonElement>(`[data-edit-note="${createdNote.id}"]`);
+    const deleteBtn = popover?.querySelector<HTMLButtonElement>(`[data-delete-note="${createdNote.id}"]`);
+
+    expect(editBtn).not.toBeNull();
+    expect(editBtn?.textContent).toBe("Edit note");
+    expect(deleteBtn).not.toBeNull();
+    expect(deleteBtn?.textContent).toBe("Delete note");
+
+    // Clean up created note
+    await noteService.delete(createdNote.id);
   });
 });
