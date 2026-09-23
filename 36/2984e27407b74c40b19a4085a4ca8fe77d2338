@@ -1,0 +1,24 @@
+README.md
+  s_bbf4fca5ba9f87::t_61970d88b88742 209
+  s_bbf4fca5ba9f87::t_bf66d88c328389 1-2,5,7,9-29,32-78,81-82,85,87,89-94,97,99-103,105,107,109-119,122-142,145-147,149,152,154-155,159-201,203,205,207
+package.json
+  s_bbf4fca5ba9f87::t_7ca365daafc22e 6
+LICENSE
+  s_bbf4fca5ba9f87::t_77dd9910578c34 1-201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "362984e27407b74c40b19a4085a4ca8fe77d2338",
+  "prompts": {},
+  "sessions": {
+    "s_bbf4fca5ba9f87": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ac5177b8-6bd0-4b20-a4d8-d679a782fe32",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
