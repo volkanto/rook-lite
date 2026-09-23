@@ -35,6 +35,9 @@ export const icons = {
   sidebarCollapse: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9-3 3 3 3"/>',
   close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
   menu: '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  edit: '<path d="M11 4H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  more: '<circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/>',
   plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'
 } as const;
 
@@ -102,14 +105,14 @@ async function renderToday(content: HTMLElement): Promise<void> {
   bindCreateEditor(date); bindNoteActions(allCategories);
 }
 
-function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string): string {
+function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string, isModal = false): string {
   const active = allCategories.filter((category) => !category.archived);
-  return `<form class="editor-card" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><button type="button" data-format="bold" aria-label="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic"><em>I</em></button><button type="button" data-format="list" aria-label="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code">&lt;&gt;</button></div><textarea id="${id}-body" name="bodyMarkdown" rows="1" required aria-label="Note content" placeholder="What’s worth remembering from today?" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="simple-editor-footer"><details class="footer-category-picker"><summary aria-label="Add tags" title="Add tags">${svg(icons.category, "")}</summary><div class="footer-category-menu">${active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("")}</div></details><span class="simple-editor-hint" data-save-status aria-live="polite">${value ? "Draft restored" : "Markdown supported · add #tags inline"}</span><button type="submit" class="save-btn-rect">${label}</button></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><button type="button" data-format="bold" aria-label="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic"><em>I</em></button><button type="button" data-format="list" aria-label="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code">&lt;&gt;</button></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="Note content" placeholder="What’s worth remembering from today?" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="simple-editor-footer"><details class="footer-category-picker"><summary aria-label="Add tags" title="Add tags">${svg(icons.category, "")}</summary><div class="footer-category-menu">${active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("")}</div></details><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? "" : (value ? "Draft restored" : "Markdown supported · add #tags inline")}</span><div class="editor-modal-actions">${isModal ? '<button type="button" class="btn-secondary" data-close-dialog>Cancel</button>' : ""}<button type="submit" class="save-btn-rect">${label}</button></div></div></form>`;
 }
 
 function noteMarkup(note: Note, allCategories: Category[], selectedDate = note.noteDate): string {
   const assigned = allCategories.filter((category) => note.categoryIds.includes(category.id));
-  return `<div class="note-list-item"><article class="note" id="note-${note.id}"><header class="note-header"><time datetime="${note.createdAt}">${formatTime(note.createdAt, note.noteDate)}</time><div class="note-header-actions"><details class="note-action-menu"><summary aria-label="Actions for ${escapeHtml(note.title ?? "note")}"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="3" cy="8" r="1.15" fill="currentColor"/><circle cx="8" cy="8" r="1.15" fill="currentColor"/><circle cx="13" cy="8" r="1.15" fill="currentColor"/></svg></summary><div class="note-action-popover"><button type="button" data-edit-note="${note.id}">Edit note</button><div class="note-action-divider"></div><button type="button" class="delete-note-action" data-delete-note="${note.id}">Delete note</button></div></details></div></header><div class="prose">${renderMarkdown(note.content)}</div>${assigned.length || note.tags.length ? `<div class="note-tags">${assigned.map((category) => `<span class="tag-pill">${escapeHtml(category.name)}</span>`).join("")}${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  return `<div class="note-list-item"><article class="note" id="note-${note.id}"><header class="note-header"><time datetime="${note.createdAt}">${formatTime(note.createdAt, note.noteDate)}</time><div class="note-header-actions"><details class="note-action-menu"><summary aria-label="Actions for ${escapeHtml(note.title ?? "note")}">${svg(icons.more, "action-menu-svg")}</summary><div class="note-action-popover"><button type="button" data-edit-note="${note.id}">${svg(icons.edit, "action-popover-svg")}<span>Edit note</span></button><div class="note-action-divider"></div><button type="button" class="delete-note-action" data-delete-note="${note.id}">${svg(icons.trash, "action-popover-svg")}<span>Delete note</span></button></div></details></div></header><div class="prose">${renderMarkdown(note.content)}</div>${assigned.length || note.tags.length ? `<div class="note-tags">${assigned.map((category) => `<span class="tag-pill">${escapeHtml(category.name)}</span>`).join("")}${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string, allNotes: Note[]): void {
@@ -138,10 +141,38 @@ function bindNoteActions(allCategories: Category[]): void {
   document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note, allCategories); }));
 }
 
-function showEditDialog(note: Note, allCategories: Category[]): void {
-  const host = requireElement<HTMLElement>("#dialog-host"); host.innerHTML = `<div class="note-edit-backdrop"><section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div><h2 id="note-edit-title">Edit note</h2><p>${note.noteDate}</p></div><button type="button" class="note-edit-close" data-close-dialog aria-label="Close editor">&times;</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, note.categoryIds, allCategories, "Save changes")}</div></section></div>`;
-  document.body.style.overflow = "hidden"; const form = requireElement<HTMLFormElement>("#edit-note-form"); const textarea = requireElement<HTMLTextAreaElement>("#edit-note-form textarea"); bindFormatting(form, textarea); resizeEditor(textarea); textarea.focus();
-  form.addEventListener("submit", async (event) => { event.preventDefault(); setBusy(form, true); try { await notes.update(note.id, textarea.value, selectedCategories(form)); closeDialog(); await renderRoute(); } catch (error) { status(form, errorMessage(error), true); setBusy(form, false); } });
+export function showEditDialog(note: Note, allCategories: Category[]): void {
+  const host = requireElement<HTMLElement>("#dialog-host");
+  const formattedDate = new Intl.DateTimeFormat("en", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(`${note.noteDate}T12:00:00`));
+  host.innerHTML = `<div class="note-edit-backdrop" id="edit-note-backdrop"><section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><h2 id="note-edit-title">Edit note</h2><span class="note-edit-date-badge">${formattedDate}</span></div><button type="button" class="note-edit-close" data-close-dialog aria-label="Close editor">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, note.categoryIds, allCategories, "Save changes", true)}</div></section></div>`;
+  document.body.style.overflow = "hidden";
+  const backdrop = requireElement<HTMLElement>("#edit-note-backdrop");
+  backdrop.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target === backdrop || target.closest("[data-close-dialog]")) closeDialog();
+  });
+  const form = requireElement<HTMLFormElement>("#edit-note-form");
+  const textarea = requireElement<HTMLTextAreaElement>("#edit-note-form textarea");
+  bindFormatting(form, textarea);
+  resizeEditor(textarea);
+  textarea.focus();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    setBusy(form, true);
+    try {
+      await notes.update(note.id, textarea.value, selectedCategories(form));
+      closeDialog();
+      await renderRoute();
+    } catch (error) {
+      status(form, errorMessage(error), true);
+      setBusy(form, false);
+    }
+  });
 }
 
 async function renderCategories(content: HTMLElement): Promise<void> {
@@ -548,7 +579,7 @@ function showConfirm(title: string, message: string, actionLabel: string, action
   requireElement<HTMLButtonElement>("#confirm-action").addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; try { await action(); closeDialog(); } catch (error) { button.disabled = false; alert(errorMessage(error)); } });
 }
 
-function closeDialog(): void { const host = document.querySelector<HTMLElement>("#dialog-host"); if (host) host.replaceChildren(); document.body.style.overflow = ""; }
+export function closeDialog(): void { const host = document.querySelector<HTMLElement>("#dialog-host"); if (host) host.replaceChildren(); document.body.style.overflow = ""; }
 function renderNotFound(content: HTMLElement): void { document.title = "Not found · Rook Lite"; content.innerHTML = '<div class="page-head"><div><p class="eyebrow">404</p><h1>That page does not exist.</h1><p class="lede"><a href="/" data-link>Return to today\'s notes.</a></p></div></div>'; }
 
 async function updateModalSearch(): Promise<void> {

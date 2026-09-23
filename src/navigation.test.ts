@@ -135,11 +135,79 @@ describe("Left menu bar icons and navigation", () => {
     const deleteBtn = popover?.querySelector<HTMLButtonElement>(`[data-delete-note="${createdNote.id}"]`);
 
     expect(editBtn).not.toBeNull();
-    expect(editBtn?.textContent).toBe("Edit note");
+    expect(editBtn?.textContent).toContain("Edit note");
     expect(deleteBtn).not.toBeNull();
-    expect(deleteBtn?.textContent).toBe("Delete note");
+    expect(deleteBtn?.textContent).toContain("Delete note");
 
     // Clean up created note
+    await noteService.delete(createdNote.id);
+  });
+
+  it("opens redesigned edit note popup dialog with editor tools inside card and working categories", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = new Date().toISOString().slice(0, 10);
+    const createdNote = await noteService.create("Testing edit modal redesign", today, []);
+    const testCategory = { id: "cat-1", name: "Engineering", slug: "engineering", color: "#3b82f6", sortOrder: 0, archived: false, createdAt: today, updatedAt: today };
+
+    const { renderShell, showEditDialog } = await import("./main");
+    await renderShell();
+
+    // Open edit dialog with category
+    showEditDialog(createdNote, [testCategory]);
+
+    // Dialog is mounted in #dialog-host
+    const dialog = document.querySelector(".note-edit-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Header has title, formatted date badge, and close button with Lucide SVG
+    const title = dialog?.querySelector("#note-edit-title");
+    expect(title?.textContent).toBe("Edit note");
+
+    const dateBadge = dialog?.querySelector(".note-edit-date-badge");
+    expect(dateBadge).not.toBeNull();
+
+    const closeBtn = dialog?.querySelector(".note-edit-close");
+    expect(closeBtn).not.toBeNull();
+    const closeSvg = closeBtn?.querySelector("svg.dialog-close-svg");
+    expect(closeSvg?.getAttribute("viewBox")).toBe("0 0 24 24");
+
+    // Modal form uses editor-card-modal class with tools INSIDE the card
+    const editorCard = dialog?.querySelector(".editor-card");
+    expect(editorCard).not.toBeNull();
+
+    // Editor formatting tools are inside the card at the top
+    const toolbar = editorCard?.querySelector(".simple-editor-toolbar");
+    expect(toolbar).not.toBeNull();
+    expect(toolbar?.querySelectorAll("button[data-format]").length).toBe(5);
+
+    // Textarea is inside the card
+    const textarea = editorCard?.querySelector("textarea.simple-editor-textarea");
+    expect(textarea).not.toBeNull();
+
+    // Categories section inside the editor card
+    const categoryPicker = editorCard?.querySelector(".footer-category-picker");
+    expect(categoryPicker).not.toBeNull();
+
+    const categoryMenu = categoryPicker?.querySelector(".footer-category-menu");
+    expect(categoryMenu).not.toBeNull();
+
+    const categoryPill = categoryMenu?.querySelector(".category-pill");
+    expect(categoryPill).not.toBeNull();
+    expect(categoryPill?.textContent).toBe("#Engineering");
+
+    // Footer actions include both Cancel and Save changes buttons
+    const cancelBtn = editorCard?.querySelector<HTMLButtonElement>(".editor-modal-actions .btn-secondary");
+    const saveBtn = editorCard?.querySelector<HTMLButtonElement>(".editor-modal-actions .save-btn-rect");
+    expect(cancelBtn).not.toBeNull();
+    expect(cancelBtn?.textContent).toBe("Cancel");
+    expect(saveBtn).not.toBeNull();
+    expect(saveBtn?.textContent).toBe("Save changes");
+
+    // Clicking cancel closes the dialog
+    cancelBtn?.click();
+    expect(document.querySelector(".note-edit-dialog")).toBeNull();
+
+    // Clean up
     await noteService.delete(createdNote.id);
   });
 });
