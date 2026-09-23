@@ -1231,6 +1231,43 @@
   box-shadow: 0 0 0 2px var(--color-border-selected, rgba(9, 105, 218, 0.2));
 }
 
+.form-textarea {
+  min-height: 5.5rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border-default, var(--border));
+  border-radius: 6px;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  color: var(--color-text-primary, var(--text));
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  box-sizing: border-box;
+  resize: vertical;
+  outline: none;
+}
+
+.form-textarea:focus {
+  border-color: var(--color-text-brand, var(--accent));
+  box-shadow: 0 0 0 2px var(--color-border-selected, rgba(9, 105, 218, 0.2));
+}
+
+.text-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-text-brand, var(--accent));
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 100ms ease;
+}
+
+.text-link-btn:hover {
+  opacity: 0.8;
+}
+
 .model-select-wrapper select {
   width: 100%;
 }

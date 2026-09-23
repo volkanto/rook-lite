@@ -59,6 +59,7 @@ export interface OllamaSettings {
   model: string;
   temperature: number;
   timeoutMs: number;
+  systemPrompt?: string;
 }
 
 export interface RookBackupV1 {

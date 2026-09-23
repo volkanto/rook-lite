@@ -6,7 +6,7 @@ import { escapeHtml, renderMarkdown } from "./markdown";
 import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
 import { CategoryService, initializeLocalData, normalize, NoteService } from "./services";
-import { OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
+import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
 
 type ThemePreference = "SYSTEM" | "LIGHT" | "DARK";
 
@@ -328,6 +328,17 @@ async function renderSettings(content: HTMLElement): Promise<void> {
               </div>
             </div>
 
+            <div class="form-row">
+              <div class="form-field flex-1">
+                <div class="field-label-row">
+                  <label for="ollama-system-prompt">System Prompt</label>
+                  <button type="button" id="reset-ollama-prompt" class="text-link-btn" title="Reset system prompt to default">Reset to default</button>
+                </div>
+                <textarea class="form-textarea" id="ollama-system-prompt" name="systemPrompt" rows="4" placeholder="Instructions passed to Ollama for structuring summaries…">${escapeHtml(ollama.systemPrompt ?? DEFAULT_OLLAMA_PROMPT)}</textarea>
+                <span class="field-hint">Instructions passed as the system role to the model for structuring summaries.</span>
+              </div>
+            </div>
+
             <div class="ai-actions-row">
               <button type="button" id="test-ollama" class="secondary-button">Test connection & refresh models</button>
               <button type="submit" class="save-btn-rect">Save AI settings</button>
@@ -417,14 +428,21 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
 
   const readOllama = (): OllamaSettings => {
     const data = new FormData(form);
+    const customPrompt = data.get("systemPrompt")?.toString().trim();
     return {
       enabled: toggle.checked,
       endpoint: data.get("endpoint")?.toString().trim() ?? "",
       model: data.get("model")?.toString().trim() ?? "",
       temperature: Number(data.get("temperature") ?? 0.2),
-      timeoutMs: 60000
+      timeoutMs: 60000,
+      systemPrompt: customPrompt || DEFAULT_OLLAMA_PROMPT
     };
   };
+
+  content.querySelector<HTMLButtonElement>("#reset-ollama-prompt")?.addEventListener("click", () => {
+    const textarea = content.querySelector<HTMLTextAreaElement>("#ollama-system-prompt");
+    if (textarea) textarea.value = DEFAULT_OLLAMA_PROMPT;
+  });
 
   const loadModels = async (announce = false) => {
     try {
