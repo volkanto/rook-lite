@@ -95,9 +95,33 @@ describe("Left menu bar icons and navigation", () => {
       expect(link.hasAttribute("data-sidebar-tooltip")).toBe(true);
     });
 
-    // Footer contains theme toggle and local-only icon, both with nav-svg
-    const themeToggle = sidebar?.querySelector(".sidebar-theme-toggle");
+    // Footer contains theme toggle, divider, GitHub link, and local-only icon
+    const footer = sidebar?.querySelector(".sidebar-footer");
+    expect(footer).not.toBeNull();
+
+    const themeToggle = footer?.querySelector(".sidebar-theme-toggle");
+    const divider = footer?.querySelector(".sidebar-footer-divider");
+    const githubLink = footer?.querySelector<HTMLAnchorElement>(".sidebar-github-link");
+    const localOnly = footer?.querySelector(".local-only-icon");
+
     expect(themeToggle).not.toBeNull();
+    expect(divider).not.toBeNull();
+    expect(githubLink).not.toBeNull();
+    expect(localOnly).not.toBeNull();
+
+    // Verify ordering: theme toggle -> divider -> github link -> local-only
+    const footerChildren = Array.from(footer?.children ?? []);
+    const themeIdx = footerChildren.indexOf(themeToggle!);
+    const dividerIdx = footerChildren.indexOf(divider!);
+    const githubIdx = footerChildren.indexOf(githubLink!);
+    const localIdx = footerChildren.indexOf(localOnly!);
+
+    expect(themeIdx).toBeLessThan(dividerIdx);
+    expect(dividerIdx).toBeLessThan(githubIdx);
+    expect(githubIdx).toBeLessThan(localIdx);
+
+    expect(githubLink?.href).toBe("https://github.com/volkanto/rook-lite");
+    expect(githubLink?.querySelector("svg.nav-svg")).not.toBeNull();
     expect(themeToggle?.querySelectorAll("svg.nav-svg").length).toBe(2);
 
     const darkIcon = themeToggle?.querySelector(".theme-dark-icon");
@@ -105,8 +129,6 @@ describe("Left menu bar icons and navigation", () => {
     expect(darkIcon).not.toBeNull();
     expect(lightIcon).not.toBeNull();
 
-    const localOnly = sidebar?.querySelector(".local-only-icon");
-    expect(localOnly).not.toBeNull();
     expect(localOnly?.querySelector("svg.nav-svg")).not.toBeNull();
 
     // All SVGs in sidebar navigation, footer, and collapse button have viewBox 0 0 24 24

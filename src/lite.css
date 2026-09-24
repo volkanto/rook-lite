@@ -61,7 +61,18 @@
   padding: 0;
 }
 
+.sidebar-footer-divider {
+  display: block !important;
+  width: 24px;
+  height: 1px;
+  background: var(--color-border-subtle, var(--border));
+  margin: 4px auto;
+  flex: 0 0 1px;
+  border: 0;
+}
+
 .local-only-icon,
+.sidebar-github-link,
 .sidebar-theme-toggle {
   position: relative;
   display: flex;
@@ -76,6 +87,7 @@
   border-radius: 10px;
   background: transparent;
   color: var(--color-icon-secondary, var(--text-soft));
+  text-decoration: none;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease;
 }
@@ -88,6 +100,7 @@
   color: var(--color-text-primary);
 }
 
+.sidebar-github-link:hover,
 .sidebar-theme-toggle:hover {
   background: var(--color-bg-hover);
   color: var(--color-text-primary);
@@ -112,6 +125,7 @@
 }
 
 .sidebar .nav-svg,
+.sidebar-github-link .nav-svg,
 .sidebar-theme-toggle .nav-svg,
 .local-only-icon .nav-svg,
 .local-only-icon svg {
@@ -264,6 +278,8 @@
   :root.sidebar-collapsed body.app .sidebar nav > a,
   body.app .local-only-icon,
   :root.sidebar-collapsed body.app .local-only-icon,
+  body.app .sidebar-github-link,
+  :root.sidebar-collapsed body.app .sidebar-github-link,
   body.app .sidebar-theme-toggle,
   :root.sidebar-collapsed body.app .sidebar-theme-toggle {
     position: relative !important;
@@ -322,6 +338,8 @@
 
   body.app .local-only-icon,
   :root.sidebar-collapsed body.app .local-only-icon,
+  body.app .sidebar-github-link,
+  :root.sidebar-collapsed body.app .sidebar-github-link,
   body.app .sidebar-theme-toggle,
   :root.sidebar-collapsed body.app .sidebar-theme-toggle {
     display: flex !important;
@@ -400,10 +418,22 @@
   }
 
   body.app .sidebar-footer .sidebar-theme-toggle,
+  body.app .sidebar-footer .sidebar-github-link,
   body.app .sidebar-footer .local-only-icon,
   body.sidebar-drawer-open .sidebar-footer .sidebar-theme-toggle,
+  body.sidebar-drawer-open .sidebar-footer .sidebar-github-link,
   body.sidebar-drawer-open .sidebar-footer .local-only-icon {
     margin: 0;
+  }
+
+  body.app .sidebar-footer .sidebar-footer-divider,
+  body.sidebar-drawer-open .sidebar-footer .sidebar-footer-divider {
+    display: block !important;
+    width: 1px;
+    height: 24px;
+    margin: 0 4px;
+    flex: 0 0 1px;
+    border: 0;
   }
 }
 

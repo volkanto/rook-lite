@@ -29,6 +29,7 @@ export const locale: LocaleDefinition = {
     themeToggleAria: "Renk temasını değiştir",
     localOnlyTooltip: "Yalnızca yerel · bu tarayıcıda saklanır",
     languageSelectTooltip: "Dili değiştir / Switch language",
+    githubTooltip: "GitHub kaynak kodu",
 
     today: "Bugün",
     previousDay: "Önceki gün",
@@ -242,6 +243,8 @@ export const locale: LocaleDefinition = {
     deleteCategoryConfirmMessage: "Bu kategori tüm notlardan ayrılacaktır.",
     noCategoriesInPicker: "Aktif kategori yok.",
 
+    aboutTitle: "Hakkında ve Kaynak Kodu",
+    aboutSubtitle: "Rook Lite, Apache 2.0 lisanslı, açık kaynaklı ve yerel öncelikli bir günlük not uygulamasıdır.",
     notFoundTitle: "Bu sayfa mevcut değil.",
     notFoundDesc: "404",
     notFoundReturnHome: "Bugünün notlarına dönün."

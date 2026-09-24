@@ -22,6 +22,7 @@ export interface TranslationStrings {
   themeToggleAria: string;
   localOnlyTooltip: string;
   languageSelectTooltip: string;
+  githubTooltip: string;
 
   // Today / Notes View
   today: string;
@@ -246,6 +247,8 @@ export interface TranslationStrings {
   noCategoriesInPicker: string;
 
   // General & Not Found
+  aboutTitle: string;
+  aboutSubtitle: string;
   notFoundTitle: string;
   notFoundDesc: string;
   notFoundReturnHome: string;

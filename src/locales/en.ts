@@ -29,6 +29,7 @@ export const locale: LocaleDefinition = {
     themeToggleAria: "Switch color theme",
     localOnlyTooltip: "Local only · stored in this browser",
     languageSelectTooltip: "Switch language / Dili değiştir",
+    githubTooltip: "Source code on GitHub",
 
     today: "Today",
     previousDay: "Previous day",
@@ -242,6 +243,8 @@ export const locale: LocaleDefinition = {
     deleteCategoryConfirmMessage: "This category will be detached from all notes.",
     noCategoriesInPicker: "No active categories.",
 
+    aboutTitle: "About & Source Code",
+    aboutSubtitle: "Rook Lite is an open-source, local-first daily notes app licensed under Apache 2.0.",
     notFoundTitle: "That page does not exist.",
     notFoundDesc: "404",
     notFoundReturnHome: "Return to today's notes."
