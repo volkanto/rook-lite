@@ -59,6 +59,10 @@ export const locale: LocaleDefinition = {
     editNote: "Notu düzenle",
     deleteNote: "Notu sil",
     actionsForNote: (title: string) => `${title} için işlemler`,
+    backToTop: "Yukarı dön",
+    endOfNotes: (count: number) => `Notların sonu · ${count} kayıt`,
+    copyNote: "Not metnini kopyala",
+    noteCopied: "Panoya kopyalandı ✓",
 
     editNoteTitle: "Notu düzenle",
     saveChanges: "Değişiklikleri kaydet",

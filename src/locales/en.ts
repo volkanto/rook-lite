@@ -59,6 +59,10 @@ export const locale: LocaleDefinition = {
     editNote: "Edit note",
     deleteNote: "Delete note",
     actionsForNote: (title: string) => `Actions for ${title}`,
+    backToTop: "Back to top",
+    endOfNotes: (count: number) => `End of notes · ${count} ${count === 1 ? "entry" : "entries"} recorded`,
+    copyNote: "Copy note text",
+    noteCopied: "Copied to clipboard ✓",
 
     editNoteTitle: "Edit note",
     saveChanges: "Save changes",

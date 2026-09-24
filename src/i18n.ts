@@ -129,14 +129,37 @@ export function formatMonthYear(date: Date, code = getLocale()): string {
   }).format(date);
 }
 
+export function format24HourTime(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
 export function formatTimeLocale(createdAt: string, noteDate: string, todayIso: string, code = getLocale()): string {
+  const timeFormatted = format24HourTime(createdAt);
+  const s = translations[code] ?? translations.en;
+
+  let dateLabel: string;
   if (noteDate === todayIso) {
-    return new Intl.DateTimeFormat(getDateTimeLocale(code), {
-      hour: "numeric",
-      minute: "2-digit"
-    }).format(new Date(createdAt));
+    dateLabel = s.today;
+  } else {
+    const yesterday = new Date(`${todayIso}T12:00:00`);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayIso = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
+
+    if (noteDate === yesterdayIso) {
+      dateLabel = s.yesterday;
+    } else {
+      const noteDateObj = new Date(`${noteDate}T12:00:00`);
+      dateLabel = new Intl.DateTimeFormat(getDateTimeLocale(code), {
+        month: "short",
+        day: "numeric"
+      }).format(noteDateObj);
+    }
   }
-  return noteDate;
+
+  return `${dateLabel} · ${timeFormatted}`;
 }
 
 export function formatLiveTime(date = new Date(), code = getLocale()): string {

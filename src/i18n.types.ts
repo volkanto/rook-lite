@@ -53,6 +53,10 @@ export interface TranslationStrings {
   editNote: string;
   deleteNote: string;
   actionsForNote: (title: string) => string;
+  backToTop: string;
+  endOfNotes: (count: number) => string;
+  copyNote: string;
+  noteCopied: string;
 
   // Edit Dialog
   editNoteTitle: string;

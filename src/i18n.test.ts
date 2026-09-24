@@ -100,7 +100,7 @@ describe("i18n internationalization and language support", () => {
     expect(monthYearTr).toContain("Eylül 2026");
 
     const timeEn = formatTimeLocale("2026-09-24T14:30:00", testDate, testDate, "en");
-    expect(timeEn).toBeDefined();
+    expect(timeEn).toBe("Today · 14:30");
 
     expect(translations.en.notesTitle).toBe("Notes");
     expect(translations.tr.notesTitle).toBe("Notlar");

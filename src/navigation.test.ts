@@ -152,19 +152,20 @@ describe("Left menu bar icons and navigation", () => {
     const noteItems = notesList?.querySelectorAll(".note-list-item");
     expect(noteItems?.length).toBe(1);
 
-    const menu = noteItems?.[0]?.querySelector(".note-action-menu");
-    expect(menu).not.toBeNull();
+    const actions = noteItems?.[0]?.querySelector(".note-header-actions");
+    expect(actions).not.toBeNull();
 
-    const popover = menu?.querySelector(".note-action-popover");
-    expect(popover).not.toBeNull();
+    const copyBtn = actions?.querySelector<HTMLButtonElement>(`[data-copy-note="${createdNote.id}"]`);
+    const editBtn = actions?.querySelector<HTMLButtonElement>(`[data-edit-note="${createdNote.id}"]`);
+    const deleteBtn = actions?.querySelector<HTMLButtonElement>(`[data-delete-note="${createdNote.id}"]`);
 
-    const editBtn = popover?.querySelector<HTMLButtonElement>(`[data-edit-note="${createdNote.id}"]`);
-    const deleteBtn = popover?.querySelector<HTMLButtonElement>(`[data-delete-note="${createdNote.id}"]`);
-
+    expect(copyBtn).not.toBeNull();
     expect(editBtn).not.toBeNull();
-    expect(editBtn?.textContent).toContain("Edit note");
     expect(deleteBtn).not.toBeNull();
-    expect(deleteBtn?.textContent).toContain("Delete note");
+
+    const streamFooter = document.querySelector(".notes-stream-footer");
+    expect(streamFooter).not.toBeNull();
+    expect(streamFooter?.querySelector(".back-to-top-btn")).not.toBeNull();
 
     // Clean up created note
     await noteService.delete(createdNote.id);
@@ -300,10 +301,10 @@ describe("Left menu bar icons and navigation", () => {
     expect(dateNav?.querySelector(".next-btn")).not.toBeNull();
     expect(dateNav?.querySelector(".minimal-calendar-btn")).not.toBeNull();
 
-    // Note item has time badge with clock icon
-    const noteTime = container.querySelector(".note-time-badge");
+    // Note item has plain text time in 24h format with relative label
+    const noteTime = container.querySelector(".note-time-text");
     expect(noteTime).not.toBeNull();
-    expect(noteTime?.querySelector("svg.note-time-icon")).not.toBeNull();
+    expect(noteTime?.textContent).toMatch(/^(Today|Bugün) · \d{2}:\d{2}$/);
 
     await noteService.delete(createdNote.id);
   });
