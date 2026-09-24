@@ -138,3 +138,30 @@ export function formatTimeLocale(createdAt: string, noteDate: string, todayIso: 
   }
   return noteDate;
 }
+
+export function formatLiveTime(date = new Date(), code = getLocale()): string {
+  return new Intl.DateTimeFormat(getDateTimeLocale(code), {
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+}
+
+export function getRelativeDateInfo(dateIso: string, todayIso: string, code = getLocale()): { label: string; status: "today" | "past" | "future" } {
+  const s = translations[code];
+  if (dateIso === todayIso) {
+    return { label: s.today, status: "today" };
+  }
+  const dateObj = new Date(`${dateIso}T12:00:00`);
+  const todayObj = new Date(`${todayIso}T12:00:00`);
+  const diffDays = Math.round((dateObj.getTime() - todayObj.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays === -1) {
+    return { label: s.yesterday, status: "past" };
+  }
+  if (diffDays === 1) {
+    return { label: s.tomorrow, status: "future" };
+  }
+  if (diffDays < 0) {
+    return { label: s.daysAgo(Math.abs(diffDays)), status: "past" };
+  }
+  return { label: s.daysLater(diffDays), status: "future" };
+}

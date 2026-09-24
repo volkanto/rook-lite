@@ -451,14 +451,194 @@
   background: var(--color-bg-app);
 }
 
-.notes-day-header {
-  margin: 0 auto 1.75rem;
-  text-align: center;
+/* Hero Date & Time Header */
+/* Minimal Daily Notes Header */
+.notes-day-header.minimal-date-header {
+  margin: 0 0 1rem;
+  text-align: left;
 }
 
-.notes-day-header > p {
-  margin: 0.5rem 0 0;
+.minimal-date-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0;
+  min-height: 2.5rem;
+}
+
+.minimal-date-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.minimal-date-title {
+  margin: 0 !important;
+  font-size: clamp(1.15rem, 2.5vw, 1.4rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  letter-spacing: -0.015em !important;
+}
+
+.minimal-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 1.4rem;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border: 1px solid var(--color-border-subtle, var(--border));
   color: var(--color-text-secondary, var(--text-soft));
+}
+
+.minimal-date-badge.is-today {
+  background: color-mix(in srgb, var(--color-success, #1a7f37) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-success, #1a7f37) 35%, transparent);
+  color: var(--color-success, #1a7f37);
+}
+
+.minimal-date-badge .live-pulse-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--color-success, #1a7f37);
+}
+
+.minimal-week-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 1.4rem;
+  padding: 0 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, var(--text-soft));
+}
+
+.minimal-date-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+}
+
+.minimal-nav-btn,
+.minimal-calendar-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  list-style: none !important;
+  transition: all 120ms ease !important;
+  padding: 0 !important;
+}
+
+.minimal-calendar-btn::-webkit-details-marker {
+  display: none !important;
+}
+
+.minimal-nav-btn:hover,
+.minimal-calendar-btn:hover {
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  border-color: var(--color-border-subtle, var(--border)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+}
+
+.minimal-nav-svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.minimal-today-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  padding: 0 0.65rem;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, var(--text-soft));
+  background: transparent;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: all 120ms ease;
+}
+
+.minimal-today-link:hover {
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border-color: var(--color-border-subtle, var(--border));
+  color: var(--color-text-primary, var(--text));
+}
+
+.minimal-today-link.is-active {
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border-color: var(--color-border-subtle, var(--border));
+  color: var(--color-text-primary, var(--text));
+  pointer-events: none;
+}
+
+.minimal-picker {
+  position: relative;
+}
+
+.minimal-picker .date-picker-popover {
+  right: 0;
+  left: auto;
+  top: calc(100% + 0.5rem);
+}
+
+.note-time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-text-secondary, var(--text-soft));
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border: 1px solid var(--color-border-subtle, var(--border));
+}
+
+.note-time-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  flex: 0 0 0.8rem;
+  color: var(--color-icon-secondary, var(--text-soft));
+}
+
+@media (max-width: 48rem) {
+  .minimal-date-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .minimal-date-nav {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 
 .date-navigation {
@@ -476,7 +656,7 @@
 }
 
 .date-navigation > a,
-.date-picker > summary {
+.date-navigation .date-picker > summary {
   display: grid;
   width: 2.75rem;
   height: 2.75rem;
@@ -488,7 +668,7 @@
 }
 
 .date-navigation > a:hover,
-.date-picker > summary:hover {
+.date-navigation .date-picker > summary:hover {
   background: var(--color-bg-hover, var(--surface-sunk));
   color: var(--color-text-primary, var(--text));
 }

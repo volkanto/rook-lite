@@ -26,8 +26,15 @@ export interface TranslationStrings {
 
   // Today / Notes View
   today: string;
+  yesterday: string;
+  tomorrow: string;
+  daysAgo: (count: number) => string;
+  daysLater: (count: number) => string;
   previousDay: string;
   nextDay: string;
+  liveTimeTooltip: string;
+  viewingArchivedDate: string;
+  viewingFutureDate: string;
   recordSubtitle: string;
   finishNote: string;
   composerPlaceholder: string;

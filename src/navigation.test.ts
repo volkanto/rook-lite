@@ -262,4 +262,49 @@ describe("Left menu bar icons and navigation", () => {
     expect(testBtn?.textContent).toContain("Test connection & refresh models");
     expect(saveBtn?.textContent).toContain("Save AI settings");
   });
+
+  it("renders minimal date header with date title, badges, navigation, and note items with clock icon time", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Checking note time badge icon", today, []);
+
+    const { renderToday } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderToday(container);
+
+    const header = container.querySelector(".notes-day-header.minimal-date-header");
+    expect(header).not.toBeNull();
+
+    // Minimal date title
+    const dateTitle = header?.querySelector(".minimal-date-title");
+    expect(dateTitle).not.toBeNull();
+    expect(dateTitle?.textContent).toContain("2026");
+
+    // Relative badge & week badge
+    const relativeBadge = header?.querySelector(".minimal-date-badge");
+    expect(relativeBadge).not.toBeNull();
+    expect(relativeBadge?.classList.contains("is-today")).toBe(true);
+    expect(relativeBadge?.textContent).toContain("Today");
+    expect(relativeBadge?.querySelector(".live-pulse-dot")).not.toBeNull();
+
+    const weekBadge = header?.querySelector(".minimal-week-badge");
+    expect(weekBadge).not.toBeNull();
+    expect(weekBadge?.textContent).toContain("Week");
+
+    // Date navigation
+    const dateNav = header?.querySelector(".minimal-date-nav");
+    expect(dateNav).not.toBeNull();
+    expect(dateNav?.querySelector(".prev-btn")).not.toBeNull();
+    expect(dateNav?.querySelector(".minimal-today-link")).not.toBeNull();
+    expect(dateNav?.querySelector(".next-btn")).not.toBeNull();
+    expect(dateNav?.querySelector(".minimal-calendar-btn")).not.toBeNull();
+
+    // Note item has time badge with clock icon
+    const noteTime = container.querySelector(".note-time-badge");
+    expect(noteTime).not.toBeNull();
+    expect(noteTime?.querySelector("svg.note-time-icon")).not.toBeNull();
+
+    await noteService.delete(createdNote.id);
+  });
 });
