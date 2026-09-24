@@ -1,0 +1,26 @@
+presentation/style.css
+  s_361a53ef377c49::t_8e88ebb4e970b8 1-1753
+presentation/script.js
+  s_361a53ef377c49::t_6479817d79450b 1-11,28,30-33,38-66,77-82,84-92,94-318
+  s_361a53ef377c49::t_ccfd28dd6dd9a9 12-27,29,34-37,67-76,83,93
+presentation/index.html
+  s_361a53ef377c49::t_9deafb0ef03b96 1-833
+presentation/README.md
+  s_361a53ef377c49::t_952e916df11196 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "9764fbdee89b3f49b0c675e4f49cfe46986d1282",
+  "prompts": {},
+  "sessions": {
+    "s_361a53ef377c49": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "87cd9202-cb4b-4889-9275-26eae7caca03",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
