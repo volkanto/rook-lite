@@ -854,10 +854,11 @@
 }
 
 .notes-panel {
+  --panel-radius: var(--radius-lg, 12px);
   margin-top: 2.25rem;
   overflow: visible;
   border: 1px solid var(--color-border-default, var(--border));
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--panel-radius);
   background: var(--color-bg-surface, var(--surface));
   box-shadow: var(--shadow-sm, 0 1px 2px rgba(7, 20, 38, 0.05));
 }
@@ -899,24 +900,21 @@
   color: var(--color-text-brand, var(--accent));
 }
 
+.notes-panel .notes-list {
+  gap: 0;
+  margin: 0;
+  border-bottom-left-radius: calc(var(--panel-radius, 12px) - 1px);
+  border-bottom-right-radius: calc(var(--panel-radius, 12px) - 1px);
+}
+
 .notes-list .note-list-item {
   border-bottom: 1px solid var(--color-border-subtle, var(--border));
 }
 
 .notes-list .note-list-item:last-child {
   border-bottom: 0;
-  border-bottom-left-radius: inherit;
-  border-bottom-right-radius: inherit;
-}
-
-.notes-list .note-list-item:last-child .note {
-  border-bottom-left-radius: inherit;
-  border-bottom-right-radius: inherit;
-}
-
-.notes-panel .notes-list {
-  gap: 0;
-  margin: 0;
+  border-bottom-left-radius: calc(var(--panel-radius, 12px) - 1px);
+  border-bottom-right-radius: calc(var(--panel-radius, 12px) - 1px);
 }
 
 .notes-panel .notes-list:has(.note-list-item:only-child) {
@@ -932,6 +930,12 @@
   transition: background-color 150ms ease;
   border-radius: 0;
   scroll-margin-top: 5rem;
+}
+
+.notes-list .note-list-item:last-child .note {
+  border-bottom-left-radius: calc(var(--panel-radius, 12px) - 1px) !important;
+  border-bottom-right-radius: calc(var(--panel-radius, 12px) - 1px) !important;
+  background-clip: padding-box;
 }
 
 .notes-list .note:target,
@@ -3524,9 +3528,10 @@
   }
 
   .notes-panel {
+    --panel-radius: var(--radius-md, 8px);
     margin-right: -0.25rem;
     margin-left: -0.25rem;
-    border-radius: var(--radius-md, 8px);
+    border-radius: var(--panel-radius);
   }
 
   .simple-editor-footer {
