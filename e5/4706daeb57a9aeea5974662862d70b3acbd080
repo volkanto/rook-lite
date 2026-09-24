@@ -1,0 +1,85 @@
+src/i18n.test.ts
+  s_bbf4fca5ba9f87::t_27a54b928324a9 103
+src/navigation.test.ts
+  s_bbf4fca5ba9f87::t_7f91a0c1a063d1 155-156,158-160,162,165-168
+  s_bbf4fca5ba9f87::t_b9d96cff09d7fb 304,307
+  s_bbf4fca5ba9f87::t_5742e80c0335c8 305
+src/lite.css
+  s_bbf4fca5ba9f87::t_9ca51b3a8d2ca3 861,884,1243,1355,1359,1715,1717-1718,1724-1727,1730-1732,1739
+  s_bbf4fca5ba9f87::t_1709055d98ab7b 1319
+  s_bbf4fca5ba9f87::t_5779d02644dd33 1209-1211,1213-1216,1223-1224,1230,1232-1234,1237-1240,1280-1284,1291,1303-1308
+  s_bbf4fca5ba9f87::t_196c30bd245276 959-963,965-968
+  s_bbf4fca5ba9f87::t_206d7c061a4a77 954-955
+  s_bbf4fca5ba9f87::t_54814af19db9ab 855,863-867,874,878-879,881-882,886-888,891-893,895-896,904,910,920,958,1249
+  s_bbf4fca5ba9f87::t_c39fdd2b1fdb89 1212,1217-1222,1225-1229,1231,1235-1236,1259-1262,1265,1268-1270,1272-1274,1276,1278-1279,1285-1290,1292-1295,1309-1310,1312-1315,1321-1327,1330-1332,1335-1336,1339-1353
+  s_bbf4fca5ba9f87::t_17bed707bd2209 1042,1054,1067-1068,1078,1097-1098
+  s_bbf4fca5ba9f87::t_6341d87b16537e 608-609,611,615-621,624-625
+  s_bbf4fca5ba9f87::t_2374c92cbffb94 1021-1023,1031-1032
+  s_bbf4fca5ba9f87::t_1c37f8e0b6d258 949,952,964
+  s_bbf4fca5ba9f87::t_dc8134a0bde24f 1244,1263-1264,1296-1302
+  s_bbf4fca5ba9f87::t_c96286f4eaa799 853-854
+  s_bbf4fca5ba9f87::t_18db4e35e936b1 858-860
+  s_bbf4fca5ba9f87::t_cedac10e8c31a9 862
+  s_bbf4fca5ba9f87::t_1467fb9690ebee 868-869
+  s_bbf4fca5ba9f87::t_314a05f125086d 880
+  s_bbf4fca5ba9f87::t_172978adb1cb63 883
+  s_bbf4fca5ba9f87::t_38aeffff1a9d4f 885
+  s_bbf4fca5ba9f87::t_b8c1dacee1ba08 889-890
+  s_bbf4fca5ba9f87::t_4c466166c9b6d6 911
+  s_bbf4fca5ba9f87::t_13034edb8c5bf2 946-948
+  s_bbf4fca5ba9f87::t_549fbbd574d313 950-951
+  s_bbf4fca5ba9f87::t_bdd8a3211db99c 1241-1242
+  s_bbf4fca5ba9f87::t_e3b2760ae420a1 1245-1248
+  s_bbf4fca5ba9f87::t_226ad9516cedc3 1250-1251
+  s_bbf4fca5ba9f87::t_561c884f53597a 1266-1267
+  s_bbf4fca5ba9f87::t_65e9bf870e804f 1271
+  s_bbf4fca5ba9f87::t_b1f78e82705276 1275
+  s_bbf4fca5ba9f87::t_75b51e2da64cac 1277
+  s_bbf4fca5ba9f87::t_4c78faf67c67e5 1311
+  s_bbf4fca5ba9f87::t_1b7f877e7bb343 1316-1318
+  s_bbf4fca5ba9f87::t_e64d20ea9cd487 1320
+  s_bbf4fca5ba9f87::t_fdc13e3cc16259 1328-1329
+  s_bbf4fca5ba9f87::t_626e3ad3dcda3a 1333-1334
+  s_bbf4fca5ba9f87::t_38e4ab2afd4cfe 1337-1338
+  s_bbf4fca5ba9f87::t_2344941aea24db 1354
+  s_bbf4fca5ba9f87::t_f728d2219d7ad9 1356-1358
+  s_bbf4fca5ba9f87::t_d5246106a3debe 1360
+  s_bbf4fca5ba9f87::t_4be15ac7f10b85 1714
+  s_bbf4fca5ba9f87::t_4a92efa322431c 1716
+  s_bbf4fca5ba9f87::t_00688eb9832f42 1740-1741
+src/locales/en.ts
+  s_bbf4fca5ba9f87::t_92af25b5e893bf 62-65
+src/locales/tr.ts
+  s_bbf4fca5ba9f87::t_b656c0f8fde76a 62-65
+src/i18n.types.ts
+  s_bbf4fca5ba9f87::t_7d821784d87317 56-59
+src/main.ts
+  s_bbf4fca5ba9f87::t_15af1e5cd0891e 131
+  s_bbf4fca5ba9f87::t_82d1c1f178cfe2 178-192
+  s_bbf4fca5ba9f87::t_2cd1aa42c68510 52
+  s_bbf4fca5ba9f87::t_4eb12e6e47f87e 41-42,53
+  s_bbf4fca5ba9f87::t_eea0c093b3ed78 74
+  s_bbf4fca5ba9f87::t_d1f74bb645ff04 34
+  s_bbf4fca5ba9f87::t_a941440943f563 765-776
+  s_bbf4fca5ba9f87::t_82e597355b1661 145
+src/i18n.ts
+  s_bbf4fca5ba9f87::t_5b8d9a17e29ae1 143,145-149,151-159
+  s_bbf4fca5ba9f87::t_a602ce6124403c 161-162
+  s_bbf4fca5ba9f87::t_4bac654ceb1a72 132-138,140-142,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e54706daeb57a9aeea5974662862d70b3acbd080",
+  "prompts": {},
+  "sessions": {
+    "s_bbf4fca5ba9f87": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ac5177b8-6bd0-4b20-a4d8-d679a782fe32",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
