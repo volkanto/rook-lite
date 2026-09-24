@@ -116,6 +116,7 @@ export const locale: LocaleDefinition = {
     modeRuleBasedDesc: "Çevrimdışı ve deterministik",
     modeOllama: "Ollama",
     modeOllamaDesc: "Yerel modelinizi kullanır",
+    modeOllamaDisabledDesc: "Ayarlarda kapalı",
     modeRaw: "Ham notlar",
     modeRawDesc: "Kronolojik Markdown",
     generateSummary: "Özet oluştur",

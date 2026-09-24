@@ -1,7 +1,24 @@
 // @vitest-environment jsdom
+import "fake-indexeddb/auto";
 import { describe, expect, it, vi } from "vitest";
 import type { Category, Note } from "./models";
 import { assertLocalEndpoint, DEFAULT_OLLAMA_PROMPT, generateRuleBasedSummary, OllamaSummaryEngine, summaryPeriod } from "./summaries";
+
+// Ensure JSDOM environment has required globals before importing main.ts
+document.body.innerHTML = '<div id="app"></div>';
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false
+  })
+});
 
 const category: Category = { id: "engineering", name: "Engineering", slug: "engineering", color: "#000", sortOrder: 0, archived: false, createdAt: "2026-09-19T00:00:00Z", updatedAt: "2026-09-19T00:00:00Z" };
 const note: Note = { id: "note-1", title: "Retry improvements", content: "## Retry improvements\n- Implemented retry handling improvements.\n- Investigated latency.", categoryIds: [category.id], tags: ["retry"], noteDate: "2026-09-19", language: "en", createdAt: "2026-09-19T00:00:00Z", updatedAt: "2026-09-19T00:00:00Z", archived: false };
@@ -80,5 +97,64 @@ describe("OllamaSummaryEngine system prompt", () => {
     const period = { type: "weekly" as const, start: "2026-09-14", end: "2026-09-20" };
     await engine.generate([note], [category], period);
     expect(capturedBody.messages[0]).toEqual({ role: "system", content: DEFAULT_OLLAMA_PROMPT });
+  });
+});
+
+describe("summary mode picker and local AI setting", () => {
+  it("disables ollama option when local AI is disabled in settings", async () => {
+    const { settingsRepository } = await import("./data");
+    const { renderSummariesV2 } = await import("./main");
+
+    // Disable Ollama in settings
+    await settingsRepository.set("ollama", {
+      enabled: false,
+      endpoint: "http://localhost:11434",
+      model: "llama3.2",
+      temperature: 0.2,
+      timeoutMs: 5000
+    });
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSummariesV2(container);
+
+    const ollamaRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="ollama"]');
+    expect(ollamaRadio).not.toBeNull();
+    expect(ollamaRadio?.disabled).toBe(true);
+
+    const ollamaLabel = ollamaRadio?.closest("label");
+    expect(ollamaLabel?.classList.contains("is-disabled")).toBe(true);
+
+    // Rule-based and raw modes remain enabled
+    const ruleBasedRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="rule-based"]');
+    const rawRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="raw"]');
+    expect(ruleBasedRadio?.disabled).toBe(false);
+    expect(rawRadio?.disabled).toBe(false);
+    expect(ruleBasedRadio?.checked).toBe(true);
+  });
+
+  it("enables ollama option when local AI is enabled in settings", async () => {
+    const { settingsRepository } = await import("./data");
+    const { renderSummariesV2 } = await import("./main");
+
+    // Enable Ollama in settings
+    await settingsRepository.set("ollama", {
+      enabled: true,
+      endpoint: "http://localhost:11434",
+      model: "llama3.2",
+      temperature: 0.2,
+      timeoutMs: 5000
+    });
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSummariesV2(container);
+
+    const ollamaRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="ollama"]');
+    expect(ollamaRadio).not.toBeNull();
+    expect(ollamaRadio?.disabled).toBe(false);
+
+    const ollamaLabel = ollamaRadio?.closest("label");
+    expect(ollamaLabel?.classList.contains("is-disabled")).toBe(false);
   });
 });

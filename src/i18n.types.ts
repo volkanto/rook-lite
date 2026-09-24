@@ -113,6 +113,7 @@ export interface TranslationStrings {
   modeRuleBasedDesc: string;
   modeOllama: string;
   modeOllamaDesc: string;
+  modeOllamaDisabledDesc: string;
   modeRaw: string;
   modeRawDesc: string;
   generateSummary: string;

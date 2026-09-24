@@ -116,6 +116,7 @@ export const locale: LocaleDefinition = {
     modeRuleBasedDesc: "Offline and deterministic",
     modeOllama: "Ollama",
     modeOllamaDesc: "Uses your local model",
+    modeOllamaDisabledDesc: "Disabled in Settings",
     modeRaw: "Raw notes",
     modeRawDesc: "Chronological Markdown",
     generateSummary: "Generate summary",

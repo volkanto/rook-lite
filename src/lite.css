@@ -2433,6 +2433,24 @@
   background: var(--color-bg-selected, var(--accent-soft));
 }
 
+.summary-mode-picker label.is-disabled,
+.summary-mode-picker label:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  border-color: var(--color-border-subtle, var(--border)) !important;
+}
+
+.summary-mode-picker label.is-disabled input,
+.summary-mode-picker label:has(input:disabled) input {
+  cursor: not-allowed;
+}
+
+.summary-mode-picker label.is-disabled strong,
+.summary-mode-picker label:has(input:disabled) strong {
+  color: var(--color-text-secondary, var(--text-soft));
+}
+
 .summary-mode-picker span,
 .summary-mode-picker strong,
 .summary-mode-picker small {
