@@ -106,19 +106,23 @@ describe("i18n internationalization and language support", () => {
     expect(translations.tr.notesTitle).toBe("Notlar");
   });
 
-  it("renders the language selector in the header and in the settings page", async () => {
+  it("renders the language selector in the sidebar footer and in the settings page", async () => {
     const { renderShell, renderSettings } = await import("./main");
 
     setLocale("en");
     await renderShell();
 
-    // Check header language button
-    const headerLangBtn = document.querySelector<HTMLButtonElement>(".header-lang-btn");
-    expect(headerLangBtn).not.toBeNull();
-    expect(headerLangBtn?.textContent).toContain("EN");
+    // Check sidebar language picker
+    const langPicker = document.querySelector(".sidebar-lang-picker");
+    expect(langPicker).not.toBeNull();
+    const langToggle = langPicker?.querySelector(".sidebar-lang-toggle");
+    expect(langToggle).not.toBeNull();
 
-    // Click language button to toggle to TR
-    headerLangBtn?.click();
+    // Select TR in popover
+    const trOption = langPicker?.querySelector<HTMLButtonElement>('[data-select-lang="tr"]');
+    expect(trOption).not.toBeNull();
+    trOption?.click();
+
     expect(getLocale()).toBe("tr");
     expect(document.documentElement.lang).toBe("tr");
 
@@ -152,29 +156,27 @@ describe("i18n internationalization and language support", () => {
     setLocale("en");
     await renderShell();
 
-    const getBtn = () => document.querySelector<HTMLButtonElement>(".header-lang-btn");
-    expect(getBtn()).not.toBeNull();
-    expect(getBtn()?.textContent).toContain("EN");
+    const getLangOption = (code: string) => document.querySelector<HTMLButtonElement>(`[data-select-lang="${code}"]`);
 
-    // Toggle 1: EN -> TR
-    getBtn()?.click();
-    expect(getLocale()).toBe("tr");
-    expect(getBtn()?.textContent).toContain("TR");
-
-    // Toggle 2: TR -> EN
-    getBtn()?.click();
     expect(getLocale()).toBe("en");
-    expect(getBtn()?.textContent).toContain("EN");
 
-    // Toggle 3: EN -> TR
-    getBtn()?.click();
+    // Select TR
+    getLangOption("tr")?.click();
     expect(getLocale()).toBe("tr");
-    expect(getBtn()?.textContent).toContain("TR");
+    expect(document.documentElement.lang).toBe("tr");
 
-    // Toggle 4: TR -> EN
-    getBtn()?.click();
+    // Select EN
+    getLangOption("en")?.click();
     expect(getLocale()).toBe("en");
-    expect(getBtn()?.textContent).toContain("EN");
+    expect(document.documentElement.lang).toBe("en");
+
+    // Select TR again
+    getLangOption("tr")?.click();
+    expect(getLocale()).toBe("tr");
+
+    // Select EN again
+    getLangOption("en")?.click();
+    expect(getLocale()).toBe("en");
   });
 
   it("renders views with complete Turkish translations when tr locale is active", async () => {

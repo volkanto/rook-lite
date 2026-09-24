@@ -95,28 +95,32 @@ describe("Left menu bar icons and navigation", () => {
       expect(link.hasAttribute("data-sidebar-tooltip")).toBe(true);
     });
 
-    // Footer contains theme toggle, divider, GitHub link, and local-only icon
+    // Footer contains theme toggle, language picker, divider, GitHub link, and local-only icon
     const footer = sidebar?.querySelector(".sidebar-footer");
     expect(footer).not.toBeNull();
 
     const themeToggle = footer?.querySelector(".sidebar-theme-toggle");
+    const langPicker = footer?.querySelector(".sidebar-lang-picker");
     const divider = footer?.querySelector(".sidebar-footer-divider");
     const githubLink = footer?.querySelector<HTMLAnchorElement>(".sidebar-github-link");
     const localOnly = footer?.querySelector(".local-only-icon");
 
     expect(themeToggle).not.toBeNull();
+    expect(langPicker).not.toBeNull();
     expect(divider).not.toBeNull();
     expect(githubLink).not.toBeNull();
     expect(localOnly).not.toBeNull();
 
-    // Verify ordering: theme toggle -> divider -> github link -> local-only
+    // Verify ordering: theme toggle -> lang picker -> divider -> github link -> local-only
     const footerChildren = Array.from(footer?.children ?? []);
     const themeIdx = footerChildren.indexOf(themeToggle!);
+    const langIdx = footerChildren.indexOf(langPicker!);
     const dividerIdx = footerChildren.indexOf(divider!);
     const githubIdx = footerChildren.indexOf(githubLink!);
     const localIdx = footerChildren.indexOf(localOnly!);
 
-    expect(themeIdx).toBeLessThan(dividerIdx);
+    expect(themeIdx).toBeLessThan(langIdx);
+    expect(langIdx).toBeLessThan(dividerIdx);
     expect(dividerIdx).toBeLessThan(githubIdx);
     expect(githubIdx).toBeLessThan(localIdx);
 
