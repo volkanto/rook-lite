@@ -3,7 +3,8 @@ import "./lite.css";
 import { clearAllData, storageCounts } from "./db";
 import { createBackup, DEFAULT_OLLAMA_SETTINGS, downloadBlob, downloadJson, downloadMarkdownZip, exportToDirectory, parseBackup, restoreBackup, settingsRepository } from "./data";
 import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, getRelativeDateInfo, setLocale, type SupportedLocale } from "./i18n";
-import { escapeHtml, renderMarkdown } from "./markdown";
+import { escapeHtml, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
+import { attachTagAutocomplete } from "./tag-autocomplete";
 import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
 import { CategoryService, initializeLocalData, normalize, NoteService } from "./services";
@@ -138,7 +139,7 @@ function editorMarkup(id: string, value: string, selected: string[], allCategori
 function noteMarkup(note: Note, allCategories: Category[], selectedDate = note.noteDate): string {
   const s = currentStrings();
   const assigned = allCategories.filter((category) => note.categoryIds.includes(category.id));
-  return `<div class="note-list-item"><article class="note" id="note-${note.id}"><header class="note-header"><time datetime="${note.createdAt}" class="note-time-badge">${svg(icons.clock, "note-time-icon")}<span>${formatTime(note.createdAt, note.noteDate)}</span></time><div class="note-header-actions"><details class="note-action-menu"><summary aria-label="${s.actionsForNote(note.title ?? s.notesTitle)}">${svg(icons.more, "action-menu-svg")}</summary><div class="note-action-popover"><button type="button" data-edit-note="${note.id}">${svg(icons.edit, "action-popover-svg")}<span>${s.editNote}</span></button><div class="note-action-divider"></div><button type="button" class="delete-note-action" data-delete-note="${note.id}">${svg(icons.trash, "action-popover-svg")}<span>${s.deleteNote}</span></button></div></details></div></header><div class="prose">${renderMarkdown(note.content)}</div>${assigned.length || note.tags.length ? `<div class="note-tags">${assigned.map((category) => `<span class="tag-pill">${escapeHtml(category.name)}</span>`).join("")}${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  return `<div class="note-list-item"><article class="note" id="note-${note.id}"><header class="note-header"><time datetime="${note.createdAt}" class="note-time-badge">${svg(icons.clock, "note-time-icon")}<span>${formatTime(note.createdAt, note.noteDate)}</span></time><div class="note-header-actions"><details class="note-action-menu"><summary aria-label="${s.actionsForNote(note.title ?? s.notesTitle)}">${svg(icons.more, "action-menu-svg")}</summary><div class="note-action-popover"><button type="button" data-edit-note="${note.id}">${svg(icons.edit, "action-popover-svg")}<span>${s.editNote}</span></button><div class="note-action-divider"></div><button type="button" class="delete-note-action" data-delete-note="${note.id}">${svg(icons.trash, "action-popover-svg")}<span>${s.deleteNote}</span></button></div></details></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${assigned.length || note.tags.length ? `<div class="note-tags">${assigned.map((category) => `<span class="tag-pill">${escapeHtml(category.name)}</span>`).join("")}${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string, allNotes: Note[]): void {
@@ -164,12 +165,33 @@ function bindCreateEditor(date: string): void {
   textarea.addEventListener("input", () => { resizeEditor(textarea); updateComposer(); saveDraft(); }); form.addEventListener("change", saveDraft);
   form.addEventListener("submit", async (event) => { event.preventDefault(); if (!textarea.value.trim()) return; window.clearTimeout(draftTimer); setBusy(form, true); try { const content = textarea.value; const categoryIds = selectedCategories(form); textarea.value = ""; updateComposer(); await notes.create(content, date, categoryIds); await renderRoute(); } catch (error) { status(form, errorMessage(error), true); setBusy(form, false); } });
   textarea.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key === "Enter") { event.preventDefault(); form.requestSubmit(); } });
+  attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
 }
 
 function bindNoteActions(allCategories: Category[]): void {
   const s = currentStrings();
   document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => { await notes.delete(button.dataset.deleteNote ?? ""); await refreshCalendar(); await renderRoute(); })));
   document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note, allCategories); }));
+
+  document.querySelectorAll<HTMLElement>(".note").forEach((noteEl) => {
+    const noteId = noteEl.id.replace("note-", "");
+    noteEl.querySelectorAll<HTMLInputElement>(".interactive-task-checkbox").forEach((cb) => {
+      cb.addEventListener("change", async (event) => {
+        event.stopPropagation();
+        const taskIndex = Number(cb.dataset.taskIndex);
+        if (Number.isNaN(taskIndex)) return;
+        const all = await notes.listAll();
+        const note = all.find((item) => item.id === noteId);
+        if (!note) return;
+        const updatedContent = toggleTaskInMarkdown(note.content, taskIndex);
+        await notes.update(note.id, updatedContent, note.categoryIds);
+        const listItem = cb.closest("li");
+        if (listItem) {
+          listItem.classList.toggle("is-task-completed", cb.checked);
+        }
+      });
+    });
+  });
 }
 
 export function showEditDialog(note: Note, allCategories: Category[]): void {
@@ -183,11 +205,25 @@ export function showEditDialog(note: Note, allCategories: Category[]): void {
     const target = event.target as Element;
     if (target === backdrop || target.closest("[data-close-dialog]")) closeDialog();
   });
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      window.removeEventListener("keydown", onKeydown);
+      closeDialog();
+    }
+  };
+  window.addEventListener("keydown", onKeydown);
   const form = requireElement<HTMLFormElement>("#edit-note-form");
   const textarea = requireElement<HTMLTextAreaElement>("#edit-note-form textarea");
   bindFormatting(form, textarea);
   resizeEditor(textarea);
   textarea.focus();
+  textarea.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+  attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     setBusy(form, true);

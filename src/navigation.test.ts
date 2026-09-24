@@ -307,4 +307,30 @@ describe("Left menu bar icons and navigation", () => {
 
     await noteService.delete(createdNote.id);
   });
+
+  it("toggles task checkbox directly in note card and updates content", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Task checklist:\n- [ ] Initial task", today, []);
+
+    const { renderToday } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderToday(container);
+
+    const checkbox = container.querySelector<HTMLInputElement>(".interactive-task-checkbox");
+    expect(checkbox).not.toBeNull();
+    expect(checkbox?.checked).toBe(false);
+
+    // Simulate clicking checkbox to toggle it
+    checkbox!.checked = true;
+    checkbox!.dispatchEvent(new Event("change", { bubbles: true }));
+
+    // Verify database was updated with checked task
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const updated = (await noteService.listByDate(today)).find((n) => n.id === createdNote.id);
+    expect(updated?.content).toContain("- [x] Initial task");
+
+    await noteService.delete(createdNote.id);
+  });
 });
