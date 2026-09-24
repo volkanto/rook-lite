@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rook Lite · Private, Local-First Daily Notes &amp; Summaries</title>
+  <meta name="description" content="A private, local-first personal daily notes and summary application. Runs entirely in your browser with IndexedDB. Zero cloud telemetry, optional local Ollama AI summarization.">
+  <link rel="icon" type="image/png" href="./assets/logo.png">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Site Navigation Header -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#" class="brand-wrapper" aria-label="Rook Lite Homepage">
+        <img src="./assets/logo.png" alt="Rook Lite Logo" class="brand-logo-img">
+        <span>Rook Lite</span>
+        <span class="brand-version-badge">v0.1.0</span>
+      </a>
+
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#preview" class="nav-link">Live Preview</a></li>
+          <li><a href="#philosophy" class="nav-link">Philosophy</a></li>
+          <li><a href="#architecture" class="nav-link">Architecture</a></li>
+          <li><a href="#local-ai" class="nav-link">Local AI</a></li>
+          <li><a href="#deploy" class="nav-link">Deployment</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/volkanto/rook-lite" target="_blank" rel="noopener noreferrer" class="github-star-btn" aria-label="Star Rook Lite on GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+          </svg>
+          <span>Star</span>
+          <span class="star-count" id="github-star-count">GitHub</span>
+        </a>
+
+        <button class="theme-toggle-btn" type="button" aria-label="Toggle theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <a href="../index.html" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          <span>Launch App</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </a>
+
+        <button class="mobile-menu-btn" type="button" aria-label="Open mobile navigation menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-pill-badge">
+        <span class="pulse-dot"></span>
+        <span>100% Client-Side • Local-First • Zero Cloud Tracking</span>
+      </div>
+
+      <h1 class="hero-title">
+        Catch daily thoughts.<br>
+        <span class="gradient-text">Keep them strictly yours.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Rook Lite is a private, lightweight daily notes and task companion that lives in your browser's IndexedDB. No remote servers, no cloud sync lock-in, and fully offline.
+      </p>
+
+      <div class="hero-pills">
+        <span class="hero-feature-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          IndexedDB Only
+        </span>
+        <span class="hero-feature-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Local Ollama AI
+        </span>
+        <span class="hero-feature-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Markdown &amp; Live Tasks
+        </span>
+        <span class="hero-feature-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Sub-millisecond SPA
+        </span>
+        <span class="hero-feature-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Instant Zip &amp; JSON Export
+        </span>
+      </div>
+
+      <div class="hero-actions">
+        <a href="../index.html" class="btn btn-primary btn-lg" target="_blank" rel="noopener noreferrer">
+          <span>Launch Web App</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
+        <a href="https://github.com/volkanto/rook-lite" class="btn btn-secondary btn-lg" target="_blank" rel="noopener noreferrer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+          </svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+
+      <!-- Quick Run Command -->
+      <div class="hero-command-box">
+        <div class="hero-command-text">
+          <span class="cmd-prompt">$</span>docker run --rm -p 8080:8080 rook-lite
+        </div>
+        <button class="copy-btn" type="button" aria-label="Copy Docker command" data-clipboard="docker run --rm -p 8080:8080 rook-lite">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Product Showcase Mockup (usememos-style app frame) -->
+  <section class="showcase-section" id="preview">
+    <div class="container">
+      
+      <!-- Mockup Switcher Tabs -->
+      <div class="mockup-tabs" role="tablist">
+        <button class="mockup-tab-btn active" type="button" role="tab" aria-selected="true" data-tab="notes">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Daily Notes &amp; Tasks
+        </button>
+        <button class="mockup-tab-btn" type="button" role="tab" aria-selected="false" data-tab="summaries">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Local Ollama AI Summaries
+        </button>
+        <button class="mockup-tab-btn" type="button" role="tab" aria-selected="false" data-tab="backups">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Zero Lock-in Backups
+        </button>
+      </div>
+
+      <!-- Mockup Browser Window Frame -->
+      <div class="mockup-window">
+        <div class="mockup-titlebar">
+          <div class="mockup-dots">
+            <span class="mockup-dot dot-red"></span>
+            <span class="mockup-dot dot-yellow"></span>
+            <span class="mockup-dot dot-green"></span>
+          </div>
+          <div class="mockup-addressbar">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="address-secure"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>https://rook-lite.local<span id="mockup-addressbar-path">/notes</span></span>
+          </div>
+          <div class="mockup-status-badge">
+            <span>●</span> IndexedDB Active
+          </div>
+        </div>
+
+        <div class="mockup-body">
+          <!-- Left Navigation Rail -->
+          <div class="mockup-rail">
+            <button class="mockup-rail-btn active" type="button" data-tab="notes" title="Daily Notes">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </button>
+            <button class="mockup-rail-btn" type="button" data-tab="summaries" title="Summaries">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </button>
+            <button class="mockup-rail-btn" type="button" data-tab="backups" title="Export &amp; Backups">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+            <div class="rail-spacer"></div>
+            <div class="mockup-rail-btn" title="Offline Protected" style="color: var(--brand-primary); cursor: default;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+          </div>
+
+          <!-- Main Pane 1: Daily Notes View -->
+          <div class="mockup-view-pane active" id="pane-notes">
+            <div class="mockup-composer">
+              <textarea class="mockup-composer-input" placeholder="What did you build or learn today? Write Markdown... #engineering #release" readonly>Architected Rook Lite client router &amp; offline IndexedDB sync schema. Zero external tracking or telemetry.</textarea>
+              <div class="mockup-composer-footer">
+                <div class="composer-tags">
+                  <span class="composer-tag">#architecture</span>
+                  <span class="composer-tag">#indexeddb</span>
+                  <span class="composer-tag">#local-first</span>
+                </div>
+                <button class="btn btn-primary btn-sm" type="button">Save Note (Ctrl+Enter)</button>
+              </div>
+            </div>
+
+            <div class="mockup-feed">
+              <div class="mockup-note-card">
+                <div class="note-header">
+                  <span class="note-date">Today · 14:32</span>
+                  <span class="note-category-pill pill-engineering">Engineering</span>
+                </div>
+                <h3 class="note-title">Subpath Routing &amp; DOMPurify Integration</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px;">
+                  Normalized dynamic routing links across root domains and GitHub Pages subpath deployment. Integrated sanitized markdown parser.
+                </p>
+                <ul class="note-tasks-list">
+                  <li class="interactive-task-item completed">
+                    <input type="checkbox" checked aria-label="Toggle task">
+                    <span>Configure Marked.js parser with sanitization</span>
+                  </li>
+                  <li class="interactive-task-item completed">
+                    <input type="checkbox" checked aria-label="Toggle task">
+                    <span>Support subpath base routing for static pages</span>
+                  </li>
+                  <li class="interactive-task-item">
+                    <input type="checkbox" aria-label="Toggle task">
+                    <span>Validate local loopback Ollama endpoint security</span>
+                  </li>
+                </ul>
+                <div class="note-footer-tags">
+                  <span class="note-tag">#router</span>
+                  <span class="note-tag">#security</span>
+                  <span class="note-tag">#typescript</span>
+                </div>
+              </div>
+
+              <div class="mockup-note-card">
+                <div class="note-header">
+                  <span class="note-date">Yesterday · 18:45</span>
+                  <span class="note-category-pill pill-architecture">Architecture</span>
+                </div>
+                <h3 class="note-title">IndexedDB v1 Storage Schema Implemented</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                  Structured stores for <code>notes</code>, <code>categories</code>, <code>summaries</code>, and <code>settings</code>. Zero network queries; sub-1ms read/write roundtrip.
+                </p>
+                <div class="note-footer-tags">
+                  <span class="note-tag">#database</span>
+                  <span class="note-tag">#idb</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Pane 2: Local Ollama AI Summary View -->
+          <div class="mockup-view-pane" id="pane-summaries">
+            <div class="mockup-ai-card">
+              <div class="ai-header-bar">
+                <div>
+                  <h4 style="font-size: 1.05rem; font-weight: 700;">Weekly Summary (ISO Week 38)</h4>
+                  <span style="font-size: 0.78rem; color: var(--text-tertiary);">Generated locally on your device via Ollama</span>
+                </div>
+                <div class="ai-model-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <span>llama3.2:latest (Loopback 127.0.0.1)</span>
+                </div>
+              </div>
+
+              <div class="ai-section-title">Executive Summary</div>
+              <p class="ai-summary-text">
+                Heavy focus on storage reliability and security hardening. You delivered the complete subpath router, integrated DOMPurify sanitization, and structured the IndexedDB repository with automated schema upgrades. Zero cloud dependencies were introduced.
+              </p>
+
+              <div class="ai-section-title">Accomplishments &amp; Key Milestones</div>
+              <ul class="note-tasks-list" style="margin-bottom: 16px;">
+                <li class="interactive-task-item completed">
+                  <input type="checkbox" checked disabled>
+                  <span>14 engineering notes logged across 5 distinct categories</span>
+                </li>
+                <li class="interactive-task-item completed">
+                  <input type="checkbox" checked disabled>
+                  <span>Implemented strict loopback validation for local Ollama instances</span>
+                </li>
+                <li class="interactive-task-item completed">
+                  <input type="checkbox" checked disabled>
+                  <span>Full Markdown ZIP export via fflate and File System Access API</span>
+                </li>
+              </ul>
+
+              <div class="ai-stats-row">
+                <div class="ai-stat-box">
+                  <div class="ai-stat-number"><span id="mockup-completed-task-count">2</span>/3</div>
+                  <div class="ai-stat-label">Tasks Completed</div>
+                </div>
+                <div class="ai-stat-box">
+                  <div class="ai-stat-number">0ms</div>
+                  <div class="ai-stat-label">Network Sync Latency</div>
+                </div>
+                <div class="ai-stat-box">
+                  <div class="ai-stat-number">0 B</div>
+                  <div class="ai-stat-label">Telemetry Transferred</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Pane 3: Backups & Data Portability View -->
+          <div class="mockup-view-pane" id="pane-backups">
+            <div style="margin-bottom: var(--space-4);">
+              <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">Zero Lock-in Data Portability</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary);">Your notes belong strictly to you. Export anytime into open formats with zero friction.</p>
+            </div>
+
+            <div class="mockup-backup-grid">
+              <div class="backup-card">
+                <div class="backup-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <h4>JSON v1 Full Snapshot</h4>
+                <p>Complete export of all notes, categories, summaries, drafts, and preferences into a structured JSON v1 backup file.</p>
+                <button class="btn btn-secondary btn-sm" type="button" style="margin-top: 8px;">Download JSON</button>
+              </div>
+
+              <div class="backup-card">
+                <div class="backup-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                </div>
+                <h4>Markdown ZIP Archive</h4>
+                <p>Export notes organized into directories by date and category as standard <code>.md</code> files using client-side <code>fflate</code>.</p>
+                <button class="btn btn-secondary btn-sm" type="button" style="margin-top: 8px;">Download ZIP</button>
+              </div>
+
+              <div class="backup-card">
+                <div class="backup-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <h4>Direct Folder Sync</h4>
+                <p>Utilize the modern File System Access API to write Markdown files directly to an arbitrary folder on your machine.</p>
+                <button class="btn btn-secondary btn-sm" type="button" style="margin-top: 8px;">Select Directory</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Philosophy Section: "The Rook Lite Idea" (like usememos.com) -->
+  <section class="philosophy-section" id="philosophy">
+    <div class="container">
+      <div style="text-align: center;">
+        <span class="section-label">The Philosophy</span>
+        <h2 class="section-title">The Rook Lite Idea</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          Not a bloated $15/month SaaS workspace. Not another cloud database holding your private thoughts hostage. Just a fast, quiet personal journal that lives locally on your device.
+        </p>
+      </div>
+
+      <div class="philosophy-grid">
+        <!-- SaaS Dilemma -->
+        <div class="compare-card">
+          <div>
+            <span class="compare-badge badge-cloud">Cloud SaaS Note Tools</span>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">The Cloud Trap</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+              Centralized servers, mandatory logins, monthly subscriptions, and terms of service that allow cloud AI model training on your private writing.
+            </p>
+          </div>
+          <ul class="compare-list">
+            <li class="compare-item bad">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span>Personal notes stored on remote third-party databases</span>
+            </li>
+            <li class="compare-item bad">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span>Network latency on every keypress and search query</span>
+            </li>
+            <li class="compare-item bad">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span>Telemetry beacons and tracking cookies on every page load</span>
+            </li>
+            <li class="compare-item bad">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span>Proprietary formats creating agonizing export friction</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Rook Lite Promise -->
+        <div class="compare-card highlight">
+          <div>
+            <span class="compare-badge badge-rook">Rook Lite Guarantee</span>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Private &amp; Local-First</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+              Rook Lite runs entirely in your browser using IndexedDB. No cloud accounts, no sync conflicts, no tracking, and fully operable in air-gapped environments.
+            </p>
+          </div>
+          <ul class="compare-list">
+            <li class="compare-item good">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>100% Client-Side Storage:</strong> Notes stay in IndexedDB on your machine</span>
+            </li>
+            <li class="compare-item good">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Sub-millisecond Speed:</strong> Zero network hops, instant search &amp; filter</span>
+            </li>
+            <li class="compare-item good">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Zero Telemetry:</strong> No analytics, no Google Fonts, no remote tracking</span>
+            </li>
+            <li class="compare-item good">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Local Ollama AI:</strong> Connect to loopback LLMs without cloud leakage</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Bento Grid -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div style="text-align: center;">
+        <span class="section-label">Core Pillars</span>
+        <h2 class="section-title">Built for Speed, Privacy &amp; Simplicity</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          Every feature in Rook Lite was crafted to respect your attention and preserve your digital ownership.
+        </p>
+      </div>
+
+      <div class="bento-grid">
+        <!-- Bento 1: IndexedDB -->
+        <div class="bento-card span-2">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <h3 class="bento-title">True Local-First Storage with IndexedDB</h3>
+          <p class="bento-desc">
+            Powered by <code>idb</code> with strict schema versioning and transactional guarantees. Notes, categories, summaries, and drafts live in structured stores in your browser. Reads and writes are instantaneous and survive reboots and network loss.
+          </p>
+          <div class="bento-snippet">
+            <span style="color: #64748b;">// Direct IndexedDB object store access (0ms network latency)</span><br>
+            <span style="color: #38bdf8;">const</span> db = <span style="color: #f59e0b;">await</span> openDB(<span style="color: #34d399;">'rook-lite-db'</span>, 1);<br>
+            <span style="color: #f59e0b;">await</span> db.put(<span style="color: #34d399;">'notes'</span>, { id, title, content, date, tags, categoryId });
+          </div>
+        </div>
+
+        <!-- Bento 2: Dual Engine AI -->
+        <div class="bento-card">
+          <div class="bento-icon-wrapper purple">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3 class="bento-title">Dual-Engine Summaries</h3>
+          <p class="bento-desc">
+            Choose deterministic rule-based category digests, or plug directly into your local Ollama instance (Llama 3.2, Mistral, Qwen) with zero third-party cloud data transmission.
+          </p>
+        </div>
+
+        <!-- Bento 3: Markdown & Live Tasks -->
+        <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <h3 class="bento-title">Markdown-Native &amp; Tasks</h3>
+          <p class="bento-desc">
+            GitHub-Flavored Markdown parsed with Marked and sanitized through DOMPurify. Interactive checklists allow instant task completion right from the reading view.
+          </p>
+        </div>
+
+        <!-- Bento 4: Zero Lock-in Export -->
+        <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <h3 class="bento-title">Zero Lock-in Data Portability</h3>
+          <p class="bento-desc">
+            Complete JSON v1 backup/restore, directory exports via the browser File System Access API, and zipped Markdown packages via lightweight <code>fflate</code>.
+          </p>
+        </div>
+
+        <!-- Bento 5: Strict Security -->
+        <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3 class="bento-title">Loopback-Restricted Security</h3>
+          <p class="bento-desc">
+            Ollama AI endpoints are hard-validated against loopback interfaces (<code>127.0.0.1</code>, <code>localhost</code>, <code>[::1]</code>). The app refuses arbitrary outbound network calls.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture & Local AI Deep-Dive -->
+  <section class="architecture-section" id="architecture">
+    <div class="container">
+      <div style="text-align: center;">
+        <span class="section-label">Architecture</span>
+        <h2 class="section-title">Designed for Privacy from the Core</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          How Rook Lite keeps every byte of your daily log strictly confined to your hardware.
+        </p>
+      </div>
+
+      <div class="arch-layout">
+        <!-- Diagram Card -->
+        <div class="arch-diagram-card">
+          <div class="arch-node">
+            <div style="width: 32px; height: 32px; border-radius: 6px; background: var(--brand-softer); color: var(--brand-active); display: flex; align-items: center; justify-content: center; font-weight: 700;">UI</div>
+            <div>
+              <div class="arch-node-title">Rook Lite Client Application</div>
+              <div class="arch-node-desc">Vite 7 + Strict TypeScript + Vanilla CSS Design Tokens</div>
+            </div>
+          </div>
+          <div class="arch-arrow">▼ Local In-Memory Router &amp; Storage Bus</div>
+          <div class="arch-node">
+            <div style="width: 32px; height: 32px; border-radius: 6px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700;">DB</div>
+            <div>
+              <div class="arch-node-title">IndexedDB (idb v8)</div>
+              <div class="arch-node-desc">Notes, Categories, Summaries, Drafts &amp; Settings</div>
+            </div>
+          </div>
+          <div class="arch-arrow">▼ Dual Summarization &amp; Portability Pipelines</div>
+          <div class="arch-branches">
+            <div class="arch-branch-box ai">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--ai-purple-text); margin-bottom: 4px;">Local Ollama LLM</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Direct HTTP to <code>http://localhost:11434</code> with strict loopback origin checks.</div>
+            </div>
+            <div class="arch-branch-box">
+              <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 4px;">Zero Lock-in Export</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Native File System Access API &amp; client-side fflate zip archives.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanatory Text & Local AI Setup -->
+        <div id="local-ai">
+          <span class="section-label" style="color: var(--ai-purple-text);">Private Local AI</span>
+          <h3 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; line-height: 1.3;">
+            Summarize your days without leaking a single word to the cloud.
+          </h3>
+          <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+            Rook Lite connects directly to your machine's Ollama daemon over local loopback. Model discovery and generation happen completely offline.
+          </p>
+
+          <div style="background-color: var(--code-bg); border: 1px solid var(--code-border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px;">
+            <div style="font-size: 0.75rem; color: #94a3b8; font-family: var(--font-mono); margin-bottom: 8px;">// Step 1: Start Ollama with browser origin support</div>
+            <code style="font-size: 0.82rem; color: #34d399; font-family: var(--font-mono); display: block; overflow-x: auto; white-space: pre;">OLLAMA_ORIGINS="http://localhost:5173,http://localhost:8080" ollama serve</code>
+          </div>
+
+          <div style="background-color: var(--code-bg); border: 1px solid var(--code-border); border-radius: var(--radius-lg); padding: 16px;">
+            <div style="font-size: 0.75rem; color: #94a3b8; font-family: var(--font-mono); margin-bottom: 8px;">// Step 2: Pull recommended lightweight models</div>
+            <code style="font-size: 0.82rem; color: #34d399; font-family: var(--font-mono); display: block; overflow-x: auto; white-space: pre;">ollama pull llama3.2:latest   # Fast &amp; efficient (3B)
+ollama pull qwen2.5:latest    # Exceptional structured summaries</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deployment & Run Anywhere (Split layout like usememos) -->
+  <section class="deployment-section" id="deploy">
+    <div class="container">
+      <div class="deploy-split">
+        <div>
+          <span class="section-label">Deployment</span>
+          <h2 class="section-title">Run anywhere in seconds. Zero dependencies.</h2>
+          <p class="section-desc" style="margin-bottom: 24px;">
+            Rook Lite is completely stateless. You can run it via Docker, clone and build it with Node, or deploy the static assets to GitHub Pages or any CDN.
+          </p>
+
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px;">
+            <li style="display: flex; align-items: center; gap: 10px; font-size: 0.95rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Lightweight Multi-Stage Docker:</strong> Alpine Nginx image with healthchecks</span>
+            </li>
+            <li style="display: flex; align-items: center; gap: 10px; font-size: 0.95rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Subpath Aware:</strong> Deploy to any subpath or root domain without broken links</span>
+            </li>
+            <li style="display: flex; align-items: center; gap: 10px; font-size: 0.95rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>PWA Ready:</strong> Install directly on desktop or mobile with offline worker</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Terminal Tabs Snippet -->
+        <div class="deploy-terminal-box">
+          <div class="terminal-header">
+            <div class="terminal-tabs">
+              <button class="terminal-tab-btn active" type="button" data-target="tab-docker">Docker</button>
+              <button class="terminal-tab-btn" type="button" data-target="tab-node">Node / npm</button>
+              <button class="terminal-tab-btn" type="button" data-target="tab-static">Static Build</button>
+            </div>
+            <button class="copy-btn" type="button" aria-label="Copy terminal snippet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+          </div>
+
+          <!-- Tab Pane 1: Docker -->
+          <div class="terminal-pane active" id="tab-docker">
+            <span class="terminal-comment"># 1. Build the lightweight production container</span><br>
+            <code>docker build -t rook-lite .</code><br><br>
+            <span class="terminal-comment"># 2. Run container (stateless Nginx server on port 8080)</span><br>
+            <code>docker run --rm -p 8080:8080 rook-lite</code><br><br>
+            <span class="terminal-comment"># 3. Open browser at:</span><br>
+            <span class="terminal-cmd">http://localhost:8080</span>
+          </div>
+
+          <!-- Tab Pane 2: Node / npm -->
+          <div class="terminal-pane" id="tab-node">
+            <span class="terminal-comment"># 1. Clone repository</span><br>
+            <code>git clone https://github.com/volkanto/rook-lite.git &amp;&amp; cd rook-lite</code><br><br>
+            <span class="terminal-comment"># 2. Install dependencies &amp; start dev server</span><br>
+            <code>npm install &amp;&amp; npm run dev</code><br><br>
+            <span class="terminal-comment"># 3. Open local development server at:</span><br>
+            <span class="terminal-cmd">http://localhost:5173</span>
+          </div>
+
+          <!-- Tab Pane 3: Static Build -->
+          <div class="terminal-pane" id="tab-static">
+            <span class="terminal-comment"># Compile TypeScript &amp; bundle assets for production</span><br>
+            <code>npm run build</code><br><br>
+            <span class="terminal-comment"># For subpath deployments (e.g. GitHub Pages):</span><br>
+            <code>VITE_BASE_PATH="/rook-lite/" npm run build</code><br><br>
+            <span class="terminal-comment"># Production static bundle ready in:</span><br>
+            <span class="terminal-cmd">dist/</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases Grid -->
+  <section class="usecases-section">
+    <div class="container">
+      <div style="text-align: center;">
+        <span class="section-label">Target Audiences</span>
+        <h2 class="section-title">Tailored for Focus &amp; Privacy</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          Whether you need a reliable work log or a confidential thoughts vault, Rook Lite fits seamlessly.
+        </p>
+      </div>
+
+      <div class="usecases-grid">
+        <div class="usecase-card">
+          <div class="usecase-icon">⚡</div>
+          <h3>Software Engineers</h3>
+          <p>Track daily progress, git commits, bug investigations, and standup notes. Search instantly without sluggish cloud sync friction.</p>
+        </div>
+
+        <div class="usecase-card">
+          <div class="usecase-icon">🛡️</div>
+          <h3>Privacy Advocates</h3>
+          <p>Zero telemetry beacons, no Google Fonts tracking, no cookies, and no cloud leaks. Your thoughts stay solely inside your browser.</p>
+        </div>
+
+        <div class="usecase-card">
+          <div class="usecase-icon">✈️</div>
+          <h3>Travelers &amp; Commuters</h3>
+          <p>Works completely offline on flights, subways, and remote cabins with zero network connectivity required. PWA installs anywhere.</p>
+        </div>
+
+        <div class="usecase-card">
+          <div class="usecase-icon">🧠</div>
+          <h3>Local LLM Enthusiasts</h3>
+          <p>Leverage your local GPU or Apple Silicon hardware with Ollama to summarize your daily notes without paying cloud AI subscription fees.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Accordion -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div style="text-align: center;">
+        <span class="section-label">Questions &amp; Answers</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          Everything you need to know about Rook Lite's local-first architecture and security.
+        </p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button" aria-expanded="false">
+            <span>Where are my notes and summaries stored?</span>
+            <svg class="faq-icon-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Your data is stored 100% locally on your machine inside your browser's <strong>IndexedDB</strong> database (<code>rook-lite-db</code>). There are no remote sync databases, telemetry servers, or third-party cloud mirrors. If your internet connection goes down, Rook Lite continues to work without interruption.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button" aria-expanded="false">
+            <span>Can Rook Lite leak my notes to external AI providers?</span>
+            <svg class="faq-icon-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            No. Rook Lite strictly prohibits remote AI endpoints. The Ollama integration is cryptographically and logically restricted to verified loopback addresses (<code>localhost</code>, <code>127.0.0.1</code>, and <code>[::1]</code>). Your notes are sent only to your own locally running Ollama process over local IPC/loopback.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button" aria-expanded="false">
+            <span>What happens if I clear my browser history or cache?</span>
+            <svg class="faq-icon-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Clearing temporary cache does not delete IndexedDB, but clearing "site cookies and data" for the origin will wipe browser storage. Because of this, Rook Lite includes one-click export features: full JSON v1 snapshots, zipped Markdown packages via <code>fflate</code>, and native folder synchronization via the File System Access API.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button" aria-expanded="false">
+            <span>Can I self-host Rook Lite on my home server or Raspberry Pi?</span>
+            <svg class="faq-icon-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Yes! Rook Lite includes a production-ready, multi-stage <code>Dockerfile</code> and <code>nginx.conf</code>. Because the container only serves static client assets, it uses less than 15MB of RAM and has virtually zero CPU overhead. All state is held in whichever browser accesses the site.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question-btn" type="button" aria-expanded="false">
+            <span>Is Rook Lite open source and free to use?</span>
+            <svg class="faq-icon-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">
+            Yes. Rook Lite is 100% free software licensed under the permissive <strong>Apache License 2.0</strong>. You are completely free to inspect the code, modify it, self-host it, or contribute back.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- High-Impact Bottom Call to Action Banner -->
+  <section class="cta-banner-section">
+    <div class="container">
+      <div class="cta-banner-card">
+        <h2 class="cta-title">Start capturing your thoughts in total privacy.</h2>
+        <p class="cta-desc">
+          No credit cards, no logins, no cloud lock-in. Open Rook Lite in your browser and start writing your daily logs right now.
+        </p>
+        <div class="cta-buttons">
+          <a href="../index.html" class="btn btn-primary btn-lg" target="_blank" rel="noopener noreferrer">
+            <span>Launch Rook Lite</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="https://github.com/volkanto/rook-lite" class="btn btn-secondary btn-lg" target="_blank" rel="noopener noreferrer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
+            </svg>
+            <span>Star on GitHub</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complete 4-Column Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand-wrapper">
+            <img src="./assets/logo.png" alt="Rook Lite" class="brand-logo-img">
+            <span>Rook Lite</span>
+          </div>
+          <p>
+            A local-first personal daily note-taking and summarization system built with Vite, TypeScript, and IndexedDB. 100% private and open source under Apache 2.0.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="../index.html" class="footer-link">Web App</a></li>
+            <li><a href="#features" class="footer-link">Features</a></li>
+            <li><a href="#preview" class="footer-link">Live Mockup</a></li>
+            <li><a href="#philosophy" class="footer-link">Philosophy</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Resources</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/volkanto/rook-lite#architecture-overview" target="_blank" rel="noopener noreferrer" class="footer-link">Architecture Docs</a></li>
+            <li><a href="https://github.com/volkanto/rook-lite#local-ai-with-ollama" target="_blank" rel="noopener noreferrer" class="footer-link">Ollama Setup</a></li>
+            <li><a href="#deploy" class="footer-link">Docker Guide</a></li>
+            <li><a href="#faq" class="footer-link">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Open Source</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/volkanto/rook-lite" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub Repository</a></li>
+            <li><a href="https://github.com/volkanto/rook-lite/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="footer-link">Apache 2.0 License</a></li>
+            <li><a href="https://github.com/volkanto/rook-lite/issues" target="_blank" rel="noopener noreferrer" class="footer-link">Issue Tracker</a></li>
+            <li><a href="https://github.com/volkanto/rook-lite/releases" target="_blank" rel="noopener noreferrer" class="footer-link">Releases</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 Rook Lite. Released under the Apache-2.0 License.
+        </div>
+        <div class="footer-theme-selector">
+          <label for="footer-theme-select" style="color: var(--text-tertiary); font-size: 0.82rem;">Theme:</label>
+          <select id="footer-theme-select" style="background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-default); border-radius: 4px; padding: 2px 8px; font-size: 0.8rem;">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
