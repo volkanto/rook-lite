@@ -334,4 +334,46 @@ describe("Left menu bar icons and navigation", () => {
 
     await noteService.delete(createdNote.id);
   });
+
+  it("opens redesigned delete confirmation popup dialog with alert badge, message, and buttons", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Note to test delete confirm modal", today, []);
+
+    const { renderToday } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderToday(container);
+
+    const deleteBtn = container.querySelector<HTMLButtonElement>(`[data-delete-note="${createdNote.id}"]`);
+    expect(deleteBtn).not.toBeNull();
+    deleteBtn?.click();
+
+    const dialog = document.querySelector(".lite-confirm-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Check title, alert badge, message body, cancel and confirm buttons
+    const title = dialog?.querySelector("#confirm-title");
+    expect(title).not.toBeNull();
+    expect(title?.textContent).toBe("Delete note?");
+
+    const alertBadge = dialog?.querySelector(".confirm-alert-icon-wrap");
+    expect(alertBadge).not.toBeNull();
+
+    const message = dialog?.querySelector(".confirm-dialog-message");
+    expect(message).not.toBeNull();
+
+    const cancelBtn = dialog?.querySelector(".btn-secondary");
+    expect(cancelBtn).not.toBeNull();
+
+    const confirmBtn = dialog?.querySelector("#confirm-action.btn-danger-confirm");
+    expect(confirmBtn).not.toBeNull();
+    expect(confirmBtn?.textContent).toBe("Delete note");
+
+    // Click cancel button closes the dialog
+    cancelBtn?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(document.querySelector(".lite-confirm-dialog")).toBeNull();
+
+    await noteService.delete(createdNote.id);
+  });
 });

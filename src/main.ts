@@ -725,8 +725,35 @@ function formatBytes(bytes: number): string { if (bytes < 1024) return `${bytes}
 
 function showConfirm(title: string, message: string, actionLabel: string, action: () => Promise<void>): void {
   const s = currentStrings();
-  const host = requireElement<HTMLElement>("#dialog-host"); host.innerHTML = `<div class="note-edit-backdrop"><section class="note-edit-dialog lite-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"><header class="note-edit-dialog-head"><div><h2 id="confirm-title">${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p></div></header><footer class="note-edit-dialog-actions"><button type="button" class="note-modal-cancel" data-close-dialog>${s.cancel}</button><button type="button" class="danger-save-btn" id="confirm-action">${escapeHtml(actionLabel)}</button></footer></section></div>`; document.body.style.overflow = "hidden";
-  requireElement<HTMLButtonElement>("#confirm-action").addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; try { await action(); closeDialog(); } catch (error) { button.disabled = false; alert(errorMessage(error)); } });
+  const host = requireElement<HTMLElement>("#dialog-host");
+  host.innerHTML = `<div class="note-edit-backdrop" id="confirm-backdrop"><section class="note-edit-dialog lite-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"><header class="note-edit-dialog-head"><div class="confirm-title-group"><span class="confirm-alert-icon-wrap" aria-hidden="true">${svg(icons.alert, "confirm-alert-svg")}</span><h2 id="confirm-title">${escapeHtml(title)}</h2></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}">${svg(icons.close, "dialog-close-svg")}</button></header><div class="confirm-dialog-body"><p class="confirm-dialog-message">${escapeHtml(message)}</p></div><footer class="confirm-dialog-footer"><button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button><button type="button" class="btn-danger-confirm" id="confirm-action">${escapeHtml(actionLabel)}</button></footer></section></div>`;
+  document.body.style.overflow = "hidden";
+
+  const backdrop = requireElement<HTMLElement>("#confirm-backdrop");
+  backdrop.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target === backdrop || target.closest("[data-close-dialog]")) closeDialog();
+  });
+
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      window.removeEventListener("keydown", onKeydown);
+      closeDialog();
+    }
+  };
+  window.addEventListener("keydown", onKeydown);
+
+  requireElement<HTMLButtonElement>("#confirm-action").addEventListener("click", async (event) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    button.disabled = true;
+    try {
+      await action();
+      closeDialog();
+    } catch (error) {
+      button.disabled = false;
+      alert(errorMessage(error));
+    }
+  });
 }
 
 export function closeDialog(): void { const host = document.querySelector<HTMLElement>("#dialog-host"); if (host) host.replaceChildren(); document.body.style.overflow = ""; }

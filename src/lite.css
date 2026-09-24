@@ -1260,16 +1260,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.85rem;
-  height: 1.85rem;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm, 6px);
+  border-radius: 6px;
   background: transparent;
   color: var(--color-icon-secondary, var(--text-soft));
   cursor: pointer;
   box-shadow: none;
-  transition: all 120ms ease;
+  box-sizing: border-box;
+  transition: background-color 110ms ease, border-color 110ms ease, color 110ms ease, box-shadow 110ms ease;
 }
 
 /* Individual button style is visible ONLY when hovering that specific button */
@@ -1278,12 +1281,11 @@
   border-color: var(--color-border-default, var(--border));
   color: var(--color-text-primary, var(--text));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
 }
 
 .note-quick-action-btn.copy-btn:hover,
 .note-quick-action-btn.edit-btn:hover {
-  border-color: color-mix(in srgb, var(--color-brand, #0969da) 35%, transparent);
+  border-color: color-mix(in srgb, var(--color-brand, #0969da) 40%, transparent);
   color: var(--color-brand, #0969da);
 }
 
@@ -1301,12 +1303,16 @@
 
 .action-icon-svg {
   display: block;
-  width: 1rem;
-  height: 1rem;
-  overflow: visible !important;
-  flex: 0 0 1rem;
-  stroke-width: 2.1;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  flex: 0 0 16px;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   shape-rendering: geometricPrecision;
+  overflow: visible !important;
 }
 
 @media (max-width: 48rem) {
@@ -3782,12 +3788,108 @@
   object-fit: contain;
 }
 
+/* Confirmation Dialog Styling matching Edit Note modal */
 .lite-confirm-dialog {
-  max-width: 31rem;
+  max-width: 29rem !important;
+  width: min(29rem, calc(100vw - 2rem));
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-bg-surface, var(--surface));
+  border: 1px solid var(--color-border-default, var(--border));
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.28), 0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-.lite-confirm-dialog .note-edit-dialog-actions {
-  padding: 1.25rem;
+.confirm-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.confirm-alert-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  border-radius: var(--radius-sm, 6px);
+  background: color-mix(in srgb, var(--color-danger, #cf222e) 12%, transparent);
+  color: var(--color-danger, #cf222e);
+}
+
+.confirm-alert-svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.lite-confirm-dialog .note-edit-dialog-head {
+  padding: 1.1rem 1.35rem;
+  background: var(--color-bg-surface, var(--surface));
+  border-bottom: 1px solid var(--color-border-subtle, var(--border));
+}
+
+.lite-confirm-dialog .note-edit-dialog-head h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary, var(--text));
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.confirm-dialog-body {
+  padding: 1.25rem 1.4rem;
+  background: var(--color-bg-surface, var(--surface));
+}
+
+.confirm-dialog-message {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary, var(--text-soft));
+}
+
+.confirm-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 1rem 1.4rem 1.25rem;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border-top: 1px solid var(--color-border-subtle, var(--border));
+}
+
+.btn-danger-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.2rem;
+  padding: 0.45rem 1.15rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-danger, #cf222e);
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(207, 34, 46, 0.2);
+  transition: all 120ms ease;
+}
+
+.btn-danger-confirm:hover {
+  background: color-mix(in srgb, var(--color-danger, #cf222e) 88%, #000000);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(207, 34, 46, 0.3);
+}
+
+.btn-danger-confirm:active {
+  transform: scale(0.98);
+}
+
+.btn-danger-confirm:disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .category-archive-form {
