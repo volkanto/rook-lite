@@ -1,4 +1,5 @@
 import { SummaryRepository } from "./db";
+import { getLocale } from "./i18n";
 import { plainText } from "./markdown";
 import type { Category, Note, OllamaSettings, Summary } from "./models";
 
@@ -34,15 +35,20 @@ export class RuleBasedSummaryEngine implements SummaryEngine {
 }
 
 export function generateRuleBasedSummary(notes: Note[], categories: Category[], period: SummaryPeriod): string {
-  const label = period.type[0].toUpperCase() + period.type.slice(1);
-  if (!notes.length) return `# ${label} Summary\n\nNo notes were written in this period.\n`;
+  const isTr = getLocale() === "tr";
+  const typeLabel = isTr
+    ? (period.type === "weekly" ? "Haftalık" : period.type === "monthly" ? "Aylık" : period.type === "yearly" ? "Yıllık" : "Özel")
+    : (period.type[0].toUpperCase() + period.type.slice(1));
+  const title = isTr ? `# ${typeLabel} Özeti` : `# ${typeLabel} Summary`;
+  if (!notes.length) return `${title}\n\n${isTr ? "Bu dönemde hiç not yazılmadı." : "No notes were written in this period."}\n`;
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
   const groups = new Map<string, Note[]>();
+  const defaultCategory = isTr ? "Diğer" : "Other";
   for (const note of notes) {
     const names = note.categoryIds.map((id) => categoryMap.get(id)).filter((name): name is string => Boolean(name));
-    for (const name of names.length ? names : ["Other"]) groups.set(name, [...(groups.get(name) ?? []), note]);
+    for (const name of names.length ? names : [defaultCategory]) groups.set(name, [...(groups.get(name) ?? []), note]);
   }
-  const out = [`# ${label} Summary`, ""];
+  const out = [title, ""];
   for (const [name, grouped] of [...groups].sort(([a], [b]) => a.localeCompare(b))) {
     out.push(`## ${name}`, "");
     for (const note of grouped.sort((a, b) => a.noteDate.localeCompare(b.noteDate))) {
@@ -51,9 +57,12 @@ export function generateRuleBasedSummary(notes: Note[], categories: Category[], 
     out.push("");
   }
   const terms = recurringTerms(notes).slice(0, 5);
-  out.push("## Highlights", "", `- ${notes.length} ${notes.length === 1 ? "note" : "notes"} across ${new Set(notes.map((note) => note.noteDate)).size} days`);
+  const daysCount = new Set(notes.map((note) => note.noteDate)).size;
+  const highlightHead = isTr ? "## Öne Çıkanlar" : "## Highlights";
+  const noteCountText = isTr ? `${notes.length} not, ${daysCount} günde` : `${notes.length} ${notes.length === 1 ? "note" : "notes"} across ${daysCount} days`;
+  out.push(highlightHead, "", `- ${noteCountText}`);
   for (const [name, grouped] of [...groups].sort(([a], [b]) => a.localeCompare(b))) out.push(`- ${grouped.length} ${name}`);
-  if (terms.length) out.push(`- Frequent topics: ${terms.join(", ")}`);
+  if (terms.length) out.push(`- ${isTr ? "Sık geçen konular" : "Frequent topics"}: ${terms.join(", ")}`);
   return `${out.join("\n").trim()}\n`;
 }
 

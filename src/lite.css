@@ -3513,3 +3513,52 @@
 :root[data-theme="dark"] .sidebar nav a.is-active .nav-svg {
   color: var(--color-text-primary);
 }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.header-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-bg-surface, var(--surface));
+  color: var(--color-text-primary, var(--text));
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 120ms ease;
+}
+
+.header-lang-btn:hover {
+  background: var(--color-bg-hover, var(--surface-sunk));
+  border-color: var(--color-border-strong, var(--border-strong));
+  color: var(--color-text-primary, var(--text));
+}
+
+.header-lang-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 0.95rem;
+  color: var(--color-text-secondary, var(--text-soft));
+}
+
+.language-selector-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 48rem) {
+  .language-selector-grid {
+    grid-template-columns: 1fr;
+  }
+}

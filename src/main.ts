@@ -2,6 +2,7 @@ import "./app.css";
 import "./lite.css";
 import { clearAllData, storageCounts } from "./db";
 import { createBackup, DEFAULT_OLLAMA_SETTINGS, downloadBlob, downloadJson, downloadMarkdownZip, exportToDirectory, parseBackup, restoreBackup, settingsRepository } from "./data";
+import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, setLocale, type SupportedLocale } from "./i18n";
 import { escapeHtml, renderMarkdown } from "./markdown";
 import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
@@ -41,6 +42,7 @@ export const icons = {
   refresh: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
   check: '<polyline points="20 6 9 17 4 12"/>',
   alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
   plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'
 } as const;
 
@@ -55,31 +57,42 @@ export function svg(content: string, className = "nav-svg"): string {
 }
 
 export async function renderShell(): Promise<void> {
+  const s = currentStrings();
   document.documentElement.classList.add("sidebar-collapsed");
-  app.innerHTML = `<header class="global-header"><div class="header-left"><button type="button" class="mobile-sidebar-open" data-action="toggle-sidebar" aria-label="Toggle sidebar" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.menu, "mobile-nav-svg")}</button></div><div class="header-middle"><button type="button" class="topsearch-trigger" data-action="open-search"><span class="search-placeholder">Type / to search notes</span><kbd class="search-hotkey">⌘ K</kbd></button></div><div class="header-right"></div></header>
-    <div id="search-modal" class="modal-backdrop" aria-hidden="true"><div class="modal-content search-palette" role="dialog" aria-modal="true" aria-labelledby="search-dialog-title"><div class="palette-search-bar">${svg(icons.search, "modal-search-icon")}<label id="search-dialog-title" class="visually-hidden" for="modal-search-input">Search notes</label><input type="search" id="modal-search-input" placeholder="Search notes, tags, or commands…" autocomplete="off"><span class="modal-close-hint">esc</span></div><div class="palette-filters"><div class="palette-select-wrap"><span class="palette-filter-icon">${svg(icons.category, "palette-icon-svg")}</span><select id="modal-search-tag" aria-label="Filter by tag"><option value="">All tags</option></select><span class="palette-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div><div class="palette-select-wrap"><span class="palette-filter-icon">${svg(icons.calendar, "palette-icon-svg")}</span><select id="modal-search-period" aria-label="Filter by period"><option value="">Any time</option><option value="week">This week</option><option value="month">This month</option></select><span class="palette-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div><label class="filter-todo-chip"><input id="modal-search-todo" type="checkbox"> <span>Open tasks</span></label><a href="${appUrl("/search")}" data-link class="filter-more-link">More filters &rarr;</a></div><div id="modal-search-results" class="modal-body"></div><div class="palette-footer"><div class="palette-footer-hints"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span><span><kbd>&crarr;</kbd> open</span><span><kbd>esc</kbd> close</span></div></div></div></div>
-    <div id="dialog-host"></div><button type="button" class="scrim" data-action="close-sidebar" aria-label="Close navigation"></button>
-    <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="Rook Notes Lite" data-sidebar-tooltip="Rook Notes Lite"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.sidebarCollapse, "collapse-svg")}<span class="sidebar-toggle-tooltip">Close sidebar</span></button></div><div class="sidebar-mobile-head"><span>Navigation</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="Close navigation">${svg(icons.close, "sidebar-close-svg")}</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="Switch color theme" data-sidebar-tooltip="Switch to dark theme">${svg(icons.moon, "theme-dark-icon nav-svg")}${svg(icons.sun, "theme-light-icon nav-svg")}</button><span class="local-only-icon" role="img" tabindex="0" aria-label="Local only: stored in this browser" data-sidebar-tooltip="Local only · stored in this browser">${svg(icons.lock, "nav-svg")}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"></main></div></div>`;
+  document.documentElement.lang = getLocale();
+  app.innerHTML = `<header class="global-header"><div class="header-left"><button type="button" class="mobile-sidebar-open" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.menu, "mobile-nav-svg")}</button></div><div class="header-middle"><button type="button" class="topsearch-trigger" data-action="open-search"><span class="search-placeholder">${s.searchPlaceholder}</span><kbd class="search-hotkey">⌘ K</kbd></button></div><div class="header-right"><button type="button" class="header-lang-btn" data-action="toggle-language" title="${s.languageSelectTooltip}" aria-label="${s.languageSelectTooltip}">${svg(icons.globe, "header-lang-icon")}<span class="header-lang-text">${getLocale().toUpperCase()}</span></button></div></header>
+    <div id="search-modal" class="modal-backdrop" aria-hidden="true"><div class="modal-content search-palette" role="dialog" aria-modal="true" aria-labelledby="search-dialog-title"><div class="palette-search-bar">${svg(icons.search, "modal-search-icon")}<label id="search-dialog-title" class="visually-hidden" for="modal-search-input">${s.searchDialogTitle}</label><input type="search" id="modal-search-input" placeholder="${s.searchInputPlaceholder}" autocomplete="off"><span class="modal-close-hint">esc</span></div><div class="palette-filters"><div class="palette-select-wrap"><span class="palette-filter-icon">${svg(icons.category, "palette-icon-svg")}</span><select id="modal-search-tag" aria-label="${s.filterByTag}"><option value="">${s.searchPaletteAllTags}</option></select><span class="palette-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div><div class="palette-select-wrap"><span class="palette-filter-icon">${svg(icons.calendar, "palette-icon-svg")}</span><select id="modal-search-period" aria-label="${s.searchCategoryLabel}"><option value="">${s.searchPeriodAny}</option><option value="week">${s.searchPeriodWeek}</option><option value="month">${s.searchPeriodMonth}</option></select><span class="palette-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div><label class="filter-todo-chip"><input id="modal-search-todo" type="checkbox"> <span>${s.searchOpenTasks}</span></label><a href="${appUrl("/search")}" data-link class="filter-more-link">${s.searchMoreFilters}</a></div><div id="modal-search-results" class="modal-body"></div><div class="palette-footer"><div class="palette-footer-hints"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> ${s.searchHintNavigate}</span><span><kbd>&crarr;</kbd> ${s.searchHintOpen}</span><span><kbd>esc</kbd> ${s.searchHintClose}</span></div></div></div></div>
+    <div id="dialog-host"></div><button type="button" class="scrim" data-action="close-sidebar" aria-label="${s.closeSidebar}"></button>
+    <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="${s.brandTooltip}" data-sidebar-tooltip="${s.brandTooltip}"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.sidebarCollapse, "collapse-svg")}<span class="sidebar-toggle-tooltip">${s.collapseSidebar}</span></button></div><div class="sidebar-mobile-head"><span>${s.navNotes}</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="${s.closeSidebar}">${svg(icons.close, "sidebar-close-svg")}</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="${s.themeToggleAria}" data-sidebar-tooltip="${document.documentElement.dataset.theme === "dark" ? s.themeToggleLight : s.themeToggleDark}">${svg(icons.moon, "theme-dark-icon nav-svg")}${svg(icons.sun, "theme-light-icon nav-svg")}</button><span class="local-only-icon" role="img" tabindex="0" aria-label="${s.localOnlyTooltip}" data-sidebar-tooltip="${s.localOnlyTooltip}">${svg(icons.lock, "nav-svg")}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"></main></div></div>`;
   bindShellEvents(); applyTheme(); updateSidebarButton(); await renderRoute();
 }
 
 export function renderNavigation(): string {
-  return navItems.map((item) => `${item.divider ? '<div class="sidebar-nav-divider"></div>' : ""}<a href="${appUrl(item.path)}" data-link data-path="${item.path}" data-sidebar-tooltip="${item.label}">${svg(item.icon)}<span class="nav-label">${item.label}</span></a>`).join("");
+  const s = currentStrings();
+  const items: readonly NavigationItem[] = [
+    { path: "/", label: s.navNotes, icon: icons.note },
+    { path: "/summaries", label: s.navSummaries, icon: icons.summary },
+    { path: "/settings", label: s.navSettings, icon: icons.settings, divider: true }
+  ];
+  return items.map((item) => `${item.divider ? '<div class="sidebar-nav-divider"></div>' : ""}<a href="${appUrl(item.path)}" data-link data-path="${item.path}" data-sidebar-tooltip="${item.label}">${svg(item.icon)}<span class="nav-label">${item.label}</span></a>`).join("");
 }
 
 async function refreshCalendar(): Promise<void> {
   const host = document.querySelector<HTMLElement>("#sidebar-calendar"); if (!host) return;
+  const s = currentStrings();
   const allNotes = await notes.listAll(); const counts = new Map<string, number>();
   allNotes.forEach((note) => counts.set(note.noteDate, (counts.get(note.noteDate) ?? 0) + 1));
-  const now = new Date(); const month = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(now);
+  const now = new Date(); const month = formatMonthYear(now);
   const first = new Date(now.getFullYear(), now.getMonth(), 1); const startOffset = (first.getDay() + 6) % 7; const cells: string[] = [];
   for (let index = 0; index < 42; index += 1) {
     const date = new Date(now.getFullYear(), now.getMonth(), index - startOffset + 1); const key = isoDate(date); const count = counts.get(key) ?? 0;
     const level = count === 0 ? "empty" : count < 2 ? "fill-low" : count < 4 ? "fill-medium" : "fill-high";
-    cells.push(`<a href="/?date=${key}" data-link class="cal-cell ${date.getMonth() === now.getMonth() ? level : "out-of-month"}" title="${count ? `${count} notes` : "no notes"} on ${key}">${date.getDate()}</a>`);
+    const noteText = count ? `${count} ${count === 1 ? s.entrySingle : s.entryPlural}` : s.noNotesOnDay;
+    cells.push(`<a href="/?date=${key}" data-link class="cal-cell ${date.getMonth() === now.getMonth() ? level : "out-of-month"}" title="${noteText} on ${key}">${date.getDate()}</a>`);
   }
   const weeks = Array.from({ length: 6 }, (_, index) => `<div class="calendar-week-row"><span class="cal-week-label">W${isoWeek(new Date(now.getFullYear(), now.getMonth(), index * 7 - startOffset + 1))}</span>${cells.slice(index * 7, index * 7 + 7).join("")}</div>`).join("");
-  host.innerHTML = `<div class="sidebar-calendar"><div class="calendar-header"><span class="calendar-title">${month}</span></div><div class="calendar-grid"><div class="calendar-days-row"><span class="cal-day-header empty-cell">wk</span>${["m", "t", "w", "t", "f", "s", "s"].map((day) => `<span class="cal-day-header">${day}</span>`).join("")}</div>${weeks}</div></div>`;
+  const dayInitials = getLocale() === "tr" ? ["p", "s", "ç", "p", "c", "c", "p"] : ["m", "t", "w", "t", "f", "s", "s"];
+  host.innerHTML = `<div class="sidebar-calendar"><div class="calendar-header"><span class="calendar-title">${month}</span></div><div class="calendar-grid"><div class="calendar-days-row"><span class="cal-day-header empty-cell">wk</span>${dayInitials.map((day) => `<span class="cal-day-header">${day}</span>`).join("")}</div>${weeks}</div></div>`;
 }
 
 async function renderRoute(): Promise<void> {
@@ -100,59 +113,63 @@ function highlightLinkedNote(): void {
 }
 
 async function renderToday(content: HTMLElement): Promise<void> {
+  const s = currentStrings();
   const requested = new URLSearchParams(location.search).get("date"); const today = isoDate(new Date()); const date = validIsoDate(requested) ? requested as string : today; const isToday = date === today;
   const value = new Date(`${date}T12:00:00`); const allCategories = await categories.list(); const allNotes = await notes.listAll(); const dayNotes = await notes.listByDate(date); const draft = await notes.getDraft(date);
-  const heading = new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(value); const previous = shiftDate(date, -1); const next = shiftDate(date, 1); const selectedTag = new URLSearchParams(location.search).get("tag") ?? ""; const visibleNotes = selectedTag ? dayNotes.filter((note) => note.tags.includes(selectedTag)) : dayNotes; const frequentTags = tagCounts(dayNotes).slice(0, 6); document.title = `${heading} · Rook Lite`;
-  content.innerHTML = `<header class="notes-day-header"><div class="date-navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="date-nav-arrow" aria-label="Previous day">‹</a><h1>${heading}</h1><a href="${appUrl(`/?date=${next}`)}" data-link class="date-nav-arrow" aria-label="Next day">›</a><a href="${appUrl("/")}" data-link class="date-today-btn ${isToday ? "is-disabled" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : 'title="Jump to today (T)"'}>Today</a><details class="date-picker"><summary aria-label="Open calendar">${svg(icons.calendar, "")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div><p>Record something worth remembering.</p></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", draft?.categoryIds ?? [], allCategories, "Finish note")}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">Notes</h2><span>${visibleNotes.length} ${visibleNotes.length === 1 ? "entry" : "entries"}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="Filter notes by tag"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>All</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allCategories, date)).join("")}</div>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? `No #${escapeHtml(selectedTag)} notes today` : "No notes today"}</p><span>Write something above when there’s something worth remembering.</span></div>`}</section>`;
+  const heading = formatDateHeading(date); const previous = shiftDate(date, -1); const next = shiftDate(date, 1); const selectedTag = new URLSearchParams(location.search).get("tag") ?? ""; const visibleNotes = selectedTag ? dayNotes.filter((note) => note.tags.includes(selectedTag)) : dayNotes; const frequentTags = tagCounts(dayNotes).slice(0, 6); document.title = `${heading} · Rook Lite`;
+  content.innerHTML = `<header class="notes-day-header"><div class="date-navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="date-nav-arrow" aria-label="${s.previousDay}">‹</a><h1>${heading}</h1><a href="${appUrl(`/?date=${next}`)}" data-link class="date-nav-arrow" aria-label="${s.nextDay}">›</a><a href="${appUrl("/")}" data-link class="date-today-btn ${isToday ? "is-disabled" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><details class="date-picker"><summary aria-label="${s.openCalendar}">${svg(icons.calendar, "")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div><p>${s.recordSubtitle}</p></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", draft?.categoryIds ?? [], allCategories, s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span>${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allCategories, date)).join("")}</div>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
   bindCreateEditor(date); bindNoteActions(allCategories);
 }
 
 function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string, isModal = false): string {
+  const s = currentStrings();
   const active = allCategories.filter((category) => !category.archived);
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><button type="button" data-format="bold" aria-label="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic"><em>I</em></button><button type="button" data-format="list" aria-label="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code">&lt;&gt;</button></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="Note content" placeholder="What’s worth remembering from today?" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="simple-editor-footer"><details class="footer-category-picker"><summary aria-label="Add tags" title="Add tags">${svg(icons.category, "")}</summary><div class="footer-category-menu">${active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("")}</div></details><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? "" : (value ? "Draft restored" : "Markdown supported · add #tags inline")}</span><div class="editor-modal-actions">${isModal ? '<button type="button" class="btn-secondary" data-close-dialog>Cancel</button>' : ""}<button type="submit" class="save-btn-rect">${label}</button></div></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><button type="button" data-format="bold" aria-label="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic"><em>I</em></button><button type="button" data-format="list" aria-label="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code">&lt;&gt;</button></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="simple-editor-footer"><details class="footer-category-picker"><summary aria-label="${s.navCategories}" title="${s.navCategories}">${svg(icons.category, "")}</summary><div class="footer-category-menu">${active.length ? active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("") : `<span class="footer-category-empty">${s.noCategoriesInPicker}</span>`}</div></details><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? "" : (value ? s.draftRestored : s.markdownSupported)}</span><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${label}</button></div></div></form>`;
 }
 
 function noteMarkup(note: Note, allCategories: Category[], selectedDate = note.noteDate): string {
+  const s = currentStrings();
   const assigned = allCategories.filter((category) => note.categoryIds.includes(category.id));
-  return `<div class="note-list-item"><article class="note" id="note-${note.id}"><header class="note-header"><time datetime="${note.createdAt}">${formatTime(note.createdAt, note.noteDate)}</time><div class="note-header-actions"><details class="note-action-menu"><summary aria-label="Actions for ${escapeHtml(note.title ?? "note")}">${svg(icons.more, "action-menu-svg")}</summary><div class="note-action-popover"><button type="button" data-edit-note="${note.id}">${svg(icons.edit, "action-popover-svg")}<span>Edit note</span></button><div class="note-action-divider"></div><button type="button" class="delete-note-action" data-delete-note="${note.id}">${svg(icons.trash, "action-popover-svg")}<span>Delete note</span></button></div></details></div></header><div class="prose">${renderMarkdown(note.content)}</div>${assigned.length || note.tags.length ? `<div class="note-tags">${assigned.map((category) => `<span class="tag-pill">${escapeHtml(category.name)}</span>`).join("")}${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  return `<div class="note-list-item"><article class="note" id="note-${note.id}"><header class="note-header"><time datetime="${note.createdAt}">${formatTime(note.createdAt, note.noteDate)}</time><div class="note-header-actions"><details class="note-action-menu"><summary aria-label="${s.actionsForNote(note.title ?? s.notesTitle)}">${svg(icons.more, "action-menu-svg")}</summary><div class="note-action-popover"><button type="button" data-edit-note="${note.id}">${svg(icons.edit, "action-popover-svg")}<span>${s.editNote}</span></button><div class="note-action-divider"></div><button type="button" class="delete-note-action" data-delete-note="${note.id}">${svg(icons.trash, "action-popover-svg")}<span>${s.deleteNote}</span></button></div></details></div></header><div class="prose">${renderMarkdown(note.content)}</div>${assigned.length || note.tags.length ? `<div class="note-tags">${assigned.map((category) => `<span class="tag-pill">${escapeHtml(category.name)}</span>`).join("")}${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string, allNotes: Note[]): void {
+  const s = currentStrings();
   const counts = new Map<string, number>(); allNotes.forEach((note) => counts.set(note.noteDate, (counts.get(note.noteDate) ?? 0) + 1));
-  const year = monthDate.getFullYear(); const month = monthDate.getMonth(); const first = new Date(year, month, 1); const offset = (first.getDay() + 6) % 7; const monthLabel = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(first); const rows: string[] = [];
+  const year = monthDate.getFullYear(); const month = monthDate.getMonth(); const first = new Date(year, month, 1); const offset = (first.getDay() + 6) % 7; const monthLabel = formatMonthYear(first); const rows: string[] = [];
   for (let week = 0; week < 6; week += 1) {
     const days: string[] = []; let weekCount = 0;
-    for (let day = 0; day < 7; day += 1) { const value = new Date(year, month, week * 7 + day - offset + 1); const key = isoDate(value); const count = counts.get(key) ?? 0; weekCount += count; days.push(`<a href="/?date=${key}" data-link class="calendar-day ${value.getMonth() === month ? "" : "is-outside"} ${key === selectedDate ? "is-selected" : ""} ${count ? "has-notes" : ""}" aria-label="${new Intl.DateTimeFormat("en", { dateStyle: "long" }).format(value)}${count ? `, ${count} ${count === 1 ? "note" : "notes"}` : ""}" ${key === selectedDate ? 'aria-current="date"' : ""}><span>${value.getDate()}</span>${count ? `<i aria-hidden="true"></i>` : ""}</a>`); }
-    const weekDate = new Date(year, month, week * 7 - offset + 1); rows.push(`<div class="calendar-week ${weekCount ? "has-notes" : ""}"><span class="calendar-week-number" title="Week ${isoWeek(weekDate)}">${isoWeek(weekDate)}</span>${days.join("")}<span class="calendar-week-activity" aria-label="${weekCount} notes in this week">${weekCount || ""}</span></div>`);
+    for (let day = 0; day < 7; day += 1) { const value = new Date(year, month, week * 7 + day - offset + 1); const key = isoDate(value); const count = counts.get(key) ?? 0; weekCount += count; days.push(`<a href="/?date=${key}" data-link class="calendar-day ${value.getMonth() === month ? "" : "is-outside"} ${key === selectedDate ? "is-selected" : ""} ${count ? "has-notes" : ""}" aria-label="${formatDateHeading(key)}${count ? `, ${count} ${count === 1 ? s.entrySingle : s.entryPlural}` : ""}" ${key === selectedDate ? 'aria-current="date"' : ""}><span>${value.getDate()}</span>${count ? `<i aria-hidden="true"></i>` : ""}</a>`); }
+    const weekDate = new Date(year, month, week * 7 - offset + 1); rows.push(`<div class="calendar-week ${weekCount ? "has-notes" : ""}"><span class="calendar-week-number" title="${s.weekLabel(isoWeek(weekDate))}">${isoWeek(weekDate)}</span>${days.join("")}<span class="calendar-week-activity" aria-label="${weekCount} ${s.notesTitle.toLowerCase()}">${weekCount || ""}</span></div>`);
   }
-  const previousMonth = new Date(year, month - 1, 1); const nextMonth = new Date(year, month + 1, 1); host.innerHTML = `<div class="calendar-popover-head"><button type="button" data-calendar-month="${isoDate(previousMonth)}" aria-label="Previous month">‹</button><strong>${monthLabel}</strong><button type="button" data-calendar-month="${isoDate(nextMonth)}" aria-label="Next month">›</button></div><div class="calendar-weekdays"><span>Wk</span>${["M", "T", "W", "T", "F", "S", "S"].map((day) => `<span>${day}</span>`).join("")}<span></span></div><div class="calendar-weeks">${rows.join("")}</div><div class="calendar-legend"><span><i></i> Day has notes</span><span>Weekly totals on right</span></div>`;
+  const previousMonth = new Date(year, month - 1, 1); const nextMonth = new Date(year, month + 1, 1);
+  const weekDays = getLocale() === "tr" ? ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"] : ["M", "T", "W", "T", "F", "S", "S"];
+  host.innerHTML = `<div class="calendar-popover-head"><button type="button" data-calendar-month="${isoDate(previousMonth)}" aria-label="${s.previousDay}">‹</button><strong>${monthLabel}</strong><button type="button" data-calendar-month="${isoDate(nextMonth)}" aria-label="${s.nextDay}">›</button></div><div class="calendar-weekdays"><span>Wk</span>${weekDays.map((day) => `<span>${day}</span>`).join("")}<span></span></div><div class="calendar-weeks">${rows.join("")}</div><div class="calendar-legend"><span><i></i> ${getLocale() === "tr" ? "Notu olan gün" : "Day has notes"}</span><span>${getLocale() === "tr" ? "Haftalık toplamlar sağda" : "Weekly totals on right"}</span></div>`;
   host.querySelectorAll<HTMLButtonElement>("[data-calendar-month]").forEach((button) => button.addEventListener("click", () => renderCalendar(host, new Date(`${button.dataset.calendarMonth}T12:00:00`), selectedDate, allNotes)));
 }
 
 function bindCreateEditor(date: string): void {
+  const s = currentStrings();
   const form = requireElement<HTMLFormElement>("#new-note-form"); const textarea = requireElement<HTMLTextAreaElement>("#new-note-form textarea"); bindFormatting(form, textarea); resizeEditor(textarea);
   const updateComposer = () => form.classList.toggle("has-content", Boolean(textarea.value.trim())); updateComposer();
-  const saveDraft = () => { window.clearTimeout(draftTimer); status(form, "Saving…"); draftTimer = window.setTimeout(async () => { await notes.saveDraft(date, textarea.value, selectedCategories(form)); status(form, "Saved locally ✓"); }, 450); };
+  const saveDraft = () => { window.clearTimeout(draftTimer); status(form, s.savingDraft); draftTimer = window.setTimeout(async () => { await notes.saveDraft(date, textarea.value, selectedCategories(form)); status(form, s.draftSaved); }, 450); };
   textarea.addEventListener("input", () => { resizeEditor(textarea); updateComposer(); saveDraft(); }); form.addEventListener("change", saveDraft);
   form.addEventListener("submit", async (event) => { event.preventDefault(); if (!textarea.value.trim()) return; window.clearTimeout(draftTimer); setBusy(form, true); try { const content = textarea.value; const categoryIds = selectedCategories(form); textarea.value = ""; updateComposer(); await notes.create(content, date, categoryIds); await renderRoute(); } catch (error) { status(form, errorMessage(error), true); setBusy(form, false); } });
   textarea.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key === "Enter") { event.preventDefault(); form.requestSubmit(); } });
 }
 
 function bindNoteActions(allCategories: Category[]): void {
-  document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm("Delete note?", "This note will be permanently removed from this browser.", "Delete note", async () => { await notes.delete(button.dataset.deleteNote ?? ""); await refreshCalendar(); await renderRoute(); })));
+  const s = currentStrings();
+  document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => { await notes.delete(button.dataset.deleteNote ?? ""); await refreshCalendar(); await renderRoute(); })));
   document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note, allCategories); }));
 }
 
 export function showEditDialog(note: Note, allCategories: Category[]): void {
+  const s = currentStrings();
   const host = requireElement<HTMLElement>("#dialog-host");
-  const formattedDate = new Intl.DateTimeFormat("en", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  }).format(new Date(`${note.noteDate}T12:00:00`));
-  host.innerHTML = `<div class="note-edit-backdrop" id="edit-note-backdrop"><section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><h2 id="note-edit-title">Edit note</h2><span class="note-edit-date-badge">${formattedDate}</span></div><button type="button" class="note-edit-close" data-close-dialog aria-label="Close editor">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, note.categoryIds, allCategories, "Save changes", true)}</div></section></div>`;
+  const formattedDate = formatDateHeading(note.noteDate);
+  host.innerHTML = `<div class="note-edit-backdrop" id="edit-note-backdrop"><section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><h2 id="note-edit-title">${s.editNoteTitle}</h2><span class="note-edit-date-badge">${formattedDate}</span></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, note.categoryIds, allCategories, s.saveChanges, true)}</div></section></div>`;
   document.body.style.overflow = "hidden";
   const backdrop = requireElement<HTMLElement>("#edit-note-backdrop");
   backdrop.addEventListener("click", (event) => {
@@ -179,47 +196,54 @@ export function showEditDialog(note: Note, allCategories: Category[]): void {
 }
 
 async function renderCategories(content: HTMLElement): Promise<void> {
-  const all = await categories.list(); const active = all.filter((category) => !category.archived); const archived = all.filter((category) => category.archived); document.title = "Categories · Rook Lite";
-  content.innerHTML = `<div class="page-head categories-page-head"><div><h1>Categories</h1><p class="lede">Organize notes by the areas of work you want to revisit later.</p></div><details class="category-create"><summary class="category-create-trigger">New category</summary><div class="category-create-panel"><form id="category-create-form" class="category-create-form"><div class="category-form-heading"><h2>Create category</h2><p>Use a short, reusable name such as Mentorship or Delivery.</p></div><label for="new-category-name">Name</label><input id="new-category-name" name="name" placeholder="Category name" required><p class="hint" data-category-error></p><button type="submit">Create category</button></form></div></details></div><section class="category-section"><div class="category-section-head"><div><h2>Active</h2><p>Available when writing or editing a note.</p></div><span class="category-count">${active.length}</span></div>${active.length ? `<div class="category-list">${active.map(categoryRow).join("")}</div>` : '<div class="category-empty"><p>No active categories.</p><span>Create one to start organizing your notes.</span></div>'}</section>${archived.length ? `<details class="archived-categories"><summary><span>Archived</span><span class="category-count">${archived.length}</span></summary><p>Hidden from the editor but retained on existing notes.</p><ul>${archived.map((category) => `<li><span class="category-marker"></span><span>${escapeHtml(category.name)}</span><code>${escapeHtml(category.slug)}</code><button type="button" class="linklike delete-note-action" data-delete-category="${category.id}">Delete</button></li>`).join("")}</ul></details>` : ""}`;
+  const s = currentStrings();
+  const all = await categories.list(); const active = all.filter((category) => !category.archived); const archived = all.filter((category) => category.archived); document.title = `${s.categoriesTitle} · Rook Lite`;
+  content.innerHTML = `<div class="page-head categories-page-head"><div><h1>${s.categoriesTitle}</h1><p class="lede">${s.categoriesLede}</p></div><details class="category-create"><summary class="category-create-trigger">${s.newCategory}</summary><div class="category-create-panel"><form id="category-create-form" class="category-create-form"><div class="category-form-heading"><h2>${s.createCategoryHeading}</h2><p>${s.createCategoryHelp}</p></div><label for="new-category-name">${s.categoryNameLabel}</label><input id="new-category-name" name="name" placeholder="${s.categoryNamePlaceholder}" required><p class="hint" data-category-error></p><button type="submit">${s.createCategoryBtn}</button></form></div></details></div><section class="category-section"><div class="category-section-head"><div><h2>${s.activeCategories}</h2><p>${s.activeCategoriesHelp}</p></div><span class="category-count">${active.length}</span></div>${active.length ? `<div class="category-list">${active.map(categoryRow).join("")}</div>` : `<div class="category-empty"><p>${s.noActiveCategories}</p><span>${s.createOneToStart}</span></div>`}</section>${archived.length ? `<details class="archived-categories"><summary><span>${s.archivedCategories}</span><span class="category-count">${archived.length}</span></summary><p>${s.archivedCategoriesHelp}</p><ul>${archived.map((category) => `<li><span class="category-marker"></span><span>${escapeHtml(category.name)}</span><code>${escapeHtml(category.slug)}</code><button type="button" class="linklike delete-note-action" data-delete-category="${category.id}">${s.deleteAction}</button></li>`).join("")}</ul></details>` : ""}`;
   const create = requireElement<HTMLFormElement>("#category-create-form"); create.addEventListener("submit", async (event) => { event.preventDefault(); try { await categories.create(new FormData(create).get("name")?.toString() ?? ""); await renderRoute(); } catch (error) { const field = create.querySelector<HTMLElement>("[data-category-error]"); if (field) field.textContent = errorMessage(error); } }); bindCategoryActions();
 }
 
 function categoryRow(category: Category): string {
-  return `<div class="category-item"><input type="checkbox" id="edit-${category.id}" class="edit-row-toggle" hidden><div class="category-summary"><span class="category-marker"></span><div class="category-copy"><strong>${escapeHtml(category.name)}</strong><span><code>${escapeHtml(category.slug)}</code></span></div><label for="edit-${category.id}" class="category-edit-trigger">Edit</label></div><div class="category-editor"><form class="category-rename-form" data-rename-category="${category.id}"><div class="category-edit-field"><label for="name-${category.id}">Category name</label><input id="name-${category.id}" name="name" value="${escapeHtml(category.name)}" required></div><div class="category-edit-actions"><label for="edit-${category.id}" class="category-cancel">Cancel</label><button type="submit">Save changes</button></div></form><div class="category-archive-form"><button type="button" data-archive-category="${category.id}">Archive category</button><button type="button" class="delete-note-action" data-delete-category="${category.id}">Delete category</button></div></div></div>`;
+  const s = currentStrings();
+  return `<div class="category-item"><input type="checkbox" id="edit-${category.id}" class="edit-row-toggle" hidden><div class="category-summary"><span class="category-marker"></span><div class="category-copy"><strong>${escapeHtml(category.name)}</strong><span><code>${escapeHtml(category.slug)}</code></span></div><label for="edit-${category.id}" class="category-edit-trigger">${s.editAction}</label></div><div class="category-editor"><form class="category-rename-form" data-rename-category="${category.id}"><div class="category-edit-field"><label for="name-${category.id}">${s.categoryNameLabel}</label><input id="name-${category.id}" name="name" value="${escapeHtml(category.name)}" required></div><div class="category-edit-actions"><label for="edit-${category.id}" class="category-cancel">${s.cancel}</label><button type="submit">${s.saveChanges}</button></div></form><div class="category-archive-form"><button type="button" data-archive-category="${category.id}">${s.archiveCategoryBtn}</button><button type="button" class="delete-note-action" data-delete-category="${category.id}">${s.deleteCategoryBtn}</button></div></div></div>`;
 }
 
 function bindCategoryActions(): void {
+  const s = currentStrings();
   document.querySelectorAll<HTMLFormElement>("[data-rename-category]").forEach((form) => form.addEventListener("submit", async (event) => { event.preventDefault(); try { await categories.rename(form.dataset.renameCategory ?? "", new FormData(form).get("name")?.toString() ?? ""); await renderRoute(); } catch (error) { alert(errorMessage(error)); } }));
   document.querySelectorAll<HTMLButtonElement>("[data-archive-category]").forEach((button) => button.addEventListener("click", async () => { await categories.archive(button.dataset.archiveCategory ?? ""); await renderRoute(); }));
-  document.querySelectorAll<HTMLButtonElement>("[data-delete-category]").forEach((button) => button.addEventListener("click", () => showConfirm("Delete category?", "The category will be removed from every assigned note. Notes themselves will not be deleted.", "Delete category", async () => { await categories.delete(button.dataset.deleteCategory ?? ""); await renderRoute(); })));
+  document.querySelectorAll<HTMLButtonElement>("[data-delete-category]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteCategoryConfirmTitle, s.categoryRemovedHelp, s.deleteCategoryBtn, async () => { await categories.delete(button.dataset.deleteCategory ?? ""); await renderRoute(); })));
 }
 
 async function renderSearch(content: HTMLElement): Promise<void> {
+  const s = currentStrings();
   const allCategories = await categories.list(); const allNotes = await notes.listAll(); const tags = [...new Set(allNotes.flatMap((note) => note.tags))].sort(); const params = new URLSearchParams(location.search);
-  document.title = "Search · Rook Lite"; content.innerHTML = `<div class="search-page"><header class="page-head"><div><h1>Search</h1><p class="lede">Find notes by text, date, tag, or type.</p></div></header><form id="search-form" class="search-workspace"><div class="search-query-field">${svg(icons.search, "search-field-icon")}<label class="visually-hidden" for="search-query">Search notes</label><input id="search-query" type="search" name="q" value="${escapeHtml(params.get("q") ?? "")}" placeholder="Search notes…" autocomplete="off"><kbd>/</kbd></div><div class="search-filter-grid"><label><span>From</span><input type="date" name="from" value="${escapeHtml(params.get("from") ?? "")}"></label><label><span>To</span><input type="date" name="to" value="${escapeHtml(params.get("to") ?? "")}"></label><label><span>Tag</span><div class="search-select-wrap"><select name="tag"><option value="">All tags</option>${tags.map((tag) => `<option value="${escapeHtml(tag)}" ${params.get("tag") === tag ? "selected" : ""}>#${escapeHtml(tag)}</option>`).join("")}</select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>Category</span><div class="search-select-wrap"><select name="category"><option value="">All categories</option>${allCategories.filter((category) => !category.archived).map((category) => `<option value="${category.id}" ${params.get("category") === category.id ? "selected" : ""}>${escapeHtml(category.name)}</option>`).join("")}</select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>Content</span><div class="search-select-wrap"><select name="content"><option value="">Everything</option><option value="todo" ${params.get("content") === "todo" ? "selected" : ""}>Open tasks</option><option value="tagged" ${params.get("content") === "tagged" ? "selected" : ""}>Tagged notes</option><option value="untagged" ${params.get("content") === "untagged" ? "selected" : ""}>Untagged notes</option></select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>Sort</span><div class="search-select-wrap"><select name="sort"><option value="newest" ${params.get("sort") !== "oldest" ? "selected" : ""}>Newest first</option><option value="oldest" ${params.get("sort") === "oldest" ? "selected" : ""}>Oldest first</option></select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label></div><div class="search-filter-footer"><p>Filters update results immediately.</p><button type="button" class="secondary-button" id="clear-search">Clear filters</button></div></form><section class="search-results-panel" aria-labelledby="search-results-title"><header><h2 id="search-results-title">Results</h2><span id="search-result-count" aria-live="polite"></span></header><div id="results"></div></section></div>`;
+  document.title = `${s.searchTitle} · Rook Lite`; content.innerHTML = `<div class="search-page"><header class="page-head"><div><h1>${s.searchTitle}</h1><p class="lede">${s.searchLede}</p></div></header><form id="search-form" class="search-workspace"><div class="search-query-field">${svg(icons.search, "search-field-icon")}<label class="visually-hidden" for="search-query">${s.searchDialogTitle}</label><input id="search-query" type="search" name="q" value="${escapeHtml(params.get("q") ?? "")}" placeholder="${s.searchInputPlaceholder}" autocomplete="off"><kbd>/</kbd></div><div class="search-filter-grid"><label><span>${s.searchFromLabel}</span><input type="date" name="from" value="${escapeHtml(params.get("from") ?? "")}"></label><label><span>${s.searchToLabel}</span><input type="date" name="to" value="${escapeHtml(params.get("to") ?? "")}"></label><label><span>${s.filterByTag}</span><div class="search-select-wrap"><select name="tag"><option value="">${s.searchPaletteAllTags}</option>${tags.map((tag) => `<option value="${escapeHtml(tag)}" ${params.get("tag") === tag ? "selected" : ""}>#${escapeHtml(tag)}</option>`).join("")}</select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>${s.searchCategoryLabel}</span><div class="search-select-wrap"><select name="category"><option value="">${s.searchAllCategories}</option>${allCategories.filter((category) => !category.archived).map((category) => `<option value="${category.id}" ${params.get("category") === category.id ? "selected" : ""}>${escapeHtml(category.name)}</option>`).join("")}</select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>${s.searchContentLabel}</span><div class="search-select-wrap"><select name="content"><option value="">${s.searchContentAll}</option><option value="todo" ${params.get("content") === "todo" ? "selected" : ""}>${s.searchOpenTasks}</option><option value="tagged" ${params.get("content") === "tagged" ? "selected" : ""}>${s.searchContentTagged}</option><option value="untagged" ${params.get("content") === "untagged" ? "selected" : ""}>${s.searchContentUntagged}</option></select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>${s.searchSortLabel}</span><div class="search-select-wrap"><select name="sort"><option value="newest" ${params.get("sort") !== "oldest" ? "selected" : ""}>${s.searchSortNewest}</option><option value="oldest" ${params.get("sort") === "oldest" ? "selected" : ""}>${s.searchSortOldest}</option></select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label></div><div class="search-filter-footer"><p>${getLocale() === "tr" ? "Filtreler sonuçları anında günceller." : "Filters update results immediately."}</p><button type="button" class="secondary-button" id="clear-search">${s.clearSearchBtn}</button></div></form><section class="search-results-panel" aria-labelledby="search-results-title"><header><h2 id="search-results-title">${s.notesTitle}</h2><span id="search-result-count" aria-live="polite"></span></header><div id="results"></div></section></div>`;
   const form = requireElement<HTMLFormElement>("#search-form"); let timer: number; const update = () => { window.clearTimeout(timer); timer = window.setTimeout(async () => { const data = new FormData(form); const next = new URLSearchParams(); for (const key of ["q", "from", "to", "tag", "category", "content", "sort"]) { const value = data.get(key)?.toString(); if (value && !(key === "sort" && value === "newest")) next.set(key, value); } history.replaceState({}, "", appUrl(`/search${next.size ? `?${next}` : ""}`)); await renderSearchPageResults(requireElement("#results"), requireElement("#search-result-count"), data, allCategories); }, 150); }; form.addEventListener("input", update); form.addEventListener("change", update); requireElement("#clear-search").addEventListener("click", () => { form.reset(); history.replaceState({}, "", appUrl("/search")); void renderSearchPageResults(requireElement("#results"), requireElement("#search-result-count"), new FormData(form), allCategories); }); await renderSearchPageResults(requireElement("#results"), requireElement("#search-result-count"), new FormData(form), allCategories);
 }
 
 async function renderSearchPageResults(host: HTMLElement, countHost: HTMLElement, data: FormData, allCategories: Category[]): Promise<void> {
+  const s = currentStrings();
   const query = data.get("q")?.toString() ?? ""; const from = data.get("from")?.toString() ?? ""; const to = data.get("to")?.toString() ?? ""; const tag = data.get("tag")?.toString() ?? ""; const category = data.get("category")?.toString() ?? ""; const content = data.get("content")?.toString() ?? ""; const sort = data.get("sort")?.toString() ?? "newest"; const categoryMap = new Map(allCategories.map((item) => [item.id, item.name])); const parsed = parseSearch(query); const wanted = normalize(parsed.text.replace(/^#/, ""));
   const matching = (await notes.listAll()).filter((note) => !note.archived && (!from || note.noteDate >= from) && (!to || note.noteDate <= to) && (!tag || note.tags.includes(tag)) && (!category || note.categoryIds.includes(category)) && (!parsed.tag || note.tags.includes(parsed.tag)) && (!parsed.category || note.categoryIds.some((id) => normalize(categoryMap.get(id) ?? "") === parsed.category)) && (!(parsed.hasTodo || content === "todo") || /^\s*[-*+]\s+\[ \]\s+/m.test(note.content)) && (content !== "tagged" || note.tags.length > 0) && (content !== "untagged" || note.tags.length === 0)).filter((note) => !wanted || notes.searchableText(note, note.categoryIds.map((id) => categoryMap.get(id) ?? "")).includes(wanted)).sort((a, b) => (sort === "oldest" ? a.noteDate.localeCompare(b.noteDate) || a.createdAt.localeCompare(b.createdAt) : b.noteDate.localeCompare(a.noteDate) || b.updatedAt.localeCompare(a.updatedAt)));
-  countHost.textContent = `${matching.length} ${matching.length === 1 ? "note" : "notes"}`; host.innerHTML = matching.length ? `<ol class="search-result-list">${matching.map((note) => `<li><a href="/?date=${note.noteDate}#note-${note.id}" data-link><div class="search-result-meta"><time datetime="${note.noteDate}">${new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(new Date(`${note.noteDate}T12:00:00`))}</time>${note.tags.slice(0, 3).map((item) => `<span>#${escapeHtml(item)}</span>`).join("")}</div><p>${escapeHtml(note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim().slice(0, 240))}</p></a></li>`).join("")}</ol>` : `<div class="empty-notes search-results-empty"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>No notes found</p><span>Try removing a filter or using fewer words.</span></div>`; normalizeAppLinks(host);
+  countHost.textContent = `${matching.length} ${matching.length === 1 ? s.entrySingle : s.entryPlural}`; host.innerHTML = matching.length ? `<ol class="search-result-list">${matching.map((note) => `<li><a href="/?date=${note.noteDate}#note-${note.id}" data-link><div class="search-result-meta"><time datetime="${note.noteDate}">${formatShortDate(note.noteDate)}</time>${note.tags.slice(0, 3).map((item) => `<span>#${escapeHtml(item)}</span>`).join("")}</div><p>${escapeHtml(note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim().slice(0, 240))}</p></a></li>`).join("")}</ol>` : `<div class="empty-notes search-results-empty"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${s.noNotesFound}</p><span>${s.noNotesFoundPrompt}</span></div>`; normalizeAppLinks(host);
 }
 
 async function renderSearchResults(host: HTMLElement, query: string, year: string, categoryId: string, allCategories: Category[], from = "", to = ""): Promise<void> {
+  const s = currentStrings();
   const categoryMap = new Map(allCategories.map((category) => [category.id, category.name])); const parsed = parseSearch(query); const wanted = normalize(parsed.text.replace(/^#/, ""));
   const matching = (await notes.listAll()).filter((note) => !note.archived && (!year || note.noteDate.startsWith(year)) && (!from || note.noteDate >= from) && (!to || note.noteDate <= to) && (!categoryId || note.categoryIds.includes(categoryId)) && (!parsed.tag || note.tags.includes(parsed.tag)) && (!parsed.category || note.categoryIds.some((id) => normalize(categoryMap.get(id) ?? "") === parsed.category)) && (!parsed.hasTodo || /^\s*[-*+]\s+\[ \]\s+/m.test(note.content))).filter((note) => !wanted || notes.searchableText(note, note.categoryIds.map((id) => categoryMap.get(id) ?? "")).includes(wanted)).sort((a, b) => b.noteDate.localeCompare(a.noteDate) || b.updatedAt.localeCompare(a.updatedAt));
-  const commands = query ? "" : `<div class="search-commands"><div class="palette-section-label">Quick actions</div><a href="${appUrl("/")}" data-link data-command="new-note" class="command-item"><div class="command-item-left">${svg(icons.plus, "command-icon")}<span>New note</span></div><kbd>N</kbd></a><a href="${appUrl("/summaries")}" data-link class="command-item"><div class="command-item-left">${svg(icons.summary, "command-icon")}<span>Generate weekly summary</span></div></a><a href="${appUrl("/settings")}" data-link class="command-item"><div class="command-item-left">${svg(icons.settings, "command-icon")}<span>Export notes or open settings</span></div></a></div>`;
-  host.innerHTML = !query && !year && !categoryId ? `${commands}<div class="palette-results-heading"><span>Recent notes</span><span>${matching.slice(0, 5).length}</span></div>${matching.slice(0, 5).length ? searchHits(matching.slice(0, 5)) : '<div class="palette-empty"><p>No notes yet</p><span>Create a note and it will appear here.</span></div>'}` : !matching.length ? `<div class="palette-empty"><img src="${assetUrl("/empty-notes.png")}" alt="" width="96" height="96" class="empty-notes-illustration" aria-hidden="true"><p>No matching notes</p><span>Try fewer words or remove a filter.</span></div>` : `<div class="palette-results-heading"><span>Matching notes</span><span>${matching.length}</span></div>${searchHits(matching)}`;
+  const commands = query ? "" : `<div class="search-commands"><div class="palette-section-label">${s.quickActionsLabel}</div><a href="${appUrl("/")}" data-link data-command="new-note" class="command-item"><div class="command-item-left">${svg(icons.plus, "command-icon")}<span>${s.newNoteCommand}</span></div><kbd>N</kbd></a><a href="${appUrl("/summaries")}" data-link class="command-item"><div class="command-item-left">${svg(icons.summary, "command-icon")}<span>${s.generateSummaryCommand}</span></div></a><a href="${appUrl("/settings")}" data-link class="command-item"><div class="command-item-left">${svg(icons.settings, "command-icon")}<span>${s.settingsCommand}</span></div></a></div>`;
+  host.innerHTML = !query && !year && !categoryId ? `${commands}<div class="palette-results-heading"><span>${s.searchRecentNotes}</span><span>${matching.slice(0, 5).length}</span></div>${matching.slice(0, 5).length ? searchHits(matching.slice(0, 5)) : `<div class="palette-empty"><p>${s.noNotesYet}</p><span>${s.noNotesYetPrompt}</span></div>`}` : !matching.length ? `<div class="palette-empty"><img src="${assetUrl("/empty-notes.png")}" alt="" width="96" height="96" class="empty-notes-illustration" aria-hidden="true"><p>${s.searchNoResults}</p><span>${s.searchNoResultsDesc}</span></div>` : `<div class="palette-results-heading"><span>${s.matchingNotesLabel}</span><span>${matching.length}</span></div>${searchHits(matching)}`;
   normalizeAppLinks(host);
 }
 
 function parseSearch(query: string): { text: string; tag: string; category: string; hasTodo: boolean } { let text = query; const read = (pattern: RegExp) => { const match = text.match(pattern); if (match) text = text.replace(match[0], " "); return normalize(match?.[1] ?? ""); }; const tag = read(/(?:^|\s)tag:([^\s]+)/i); const category = read(/(?:^|\s)category:([^\s]+)/i); const hasTodo = /(?:^|\s)has:todo(?:\s|$)/i.test(text); text = text.replace(/(?:^|\s)has:todo(?:\s|$)/i, " "); return { text, tag, category, hasTodo }; }
-function searchHits(items: Note[]): string { return `<ol class="palette-result-list">${items.map((note) => { const preview = note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim() || "Untitled note"; return `<li><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="palette-result-item"><div class="palette-result-icon">${svg(icons.note, "palette-icon")}</div><div class="palette-result-copy"><p class="palette-result-text">${escapeHtml(preview.slice(0, 180))}</p>${note.tags.length ? `<div class="palette-result-tags">${note.tags.slice(0, 3).map((tag) => `<span>#${escapeHtml(tag)}</span>`).join("")}</div>` : ""}</div><time datetime="${note.noteDate}">${new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(`${note.noteDate}T12:00:00`))}</time></a></li>`; }).join("")}</ol>`; }
+function searchHits(items: Note[]): string { const s = currentStrings(); return `<ol class="palette-result-list">${items.map((note) => { const preview = note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim() || s.untitledNote; return `<li><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="palette-result-item"><div class="palette-result-icon">${svg(icons.note, "palette-icon")}</div><div class="palette-result-copy"><p class="palette-result-text">${escapeHtml(preview.slice(0, 180))}</p>${note.tags.length ? `<div class="palette-result-tags">${note.tags.slice(0, 3).map((tag) => `<span>#${escapeHtml(tag)}</span>`).join("")}</div>` : ""}</div><time datetime="${note.noteDate}">${formatShortDate(note.noteDate)}</time></a></li>`; }).join("")}</ol>`; }
 
 async function renderTodos(content: HTMLElement): Promise<void> {
+  const s = currentStrings();
   const tasks = (await notes.listAll()).flatMap((note) => note.content.split(/\r?\n/).map((line, lineIndex) => ({ note, line, lineIndex })).filter(({ line }) => /^\s*[-*+]\s+\[ \]\s+/.test(line)));
-  document.title = "To do · Rook Lite"; content.innerHTML = `<div class="page-head"><div><h1>To do</h1><p class="lede">Open tasks found in your Markdown notes.</p></div></div>${tasks.length ? `<ul class="todo-list">${tasks.map(({ note, line, lineIndex }) => `<li class="todo-item"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(line.replace(/^\s*[-*+]\s+\[ \]\s+/, ""))}</span></label><a href="/?date=${note.noteDate}#note-${note.id}" data-link class="muted">${note.noteDate}</a></li>`).join("")}</ul>` : '<div class="empty-notes lite-page-placeholder"><p>No open tasks.</p><span>Add a <code>- [ ]</code> item to a note and it will appear here.</span></div>'}`;
+  document.title = `${s.todosTitle} · Rook Lite`; content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div>${tasks.length ? `<ul class="todo-list">${tasks.map(({ note, line, lineIndex }) => `<li class="todo-item"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(line.replace(/^\s*[-*+]\s+\[ \]\s+/, ""))}</span></label><a href="/?date=${note.noteDate}#note-${note.id}" data-link class="muted">${note.noteDate}</a></li>`).join("")}</ul>` : `<div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`}`;
   content.querySelectorAll<HTMLInputElement>("[data-task-note]").forEach((input) => input.addEventListener("change", async () => { input.disabled = true; try { await notes.setTaskDone(input.dataset.taskNote ?? "", Number(input.dataset.taskLine), input.checked); await renderRoute(); } catch (error) { input.checked = false; input.disabled = false; alert(errorMessage(error)); } }));
 }
 
@@ -239,8 +263,9 @@ async function renderSummariesV2(content: HTMLElement): Promise<void> {
   const params = new URLSearchParams(location.search); const type = (["weekly", "monthly", "custom"].includes(params.get("type") ?? "") ? params.get("type") : "weekly") as "weekly" | "monthly" | "custom"; const anchor = validIsoDate(params.get("start")) ? params.get("start") as string : isoDate(new Date()); const end = validIsoDate(params.get("end")) ? params.get("end") as string : anchor; const mode = (["rule-based", "ollama", "raw"].includes(params.get("mode") ?? "") ? params.get("mode") : "rule-based") as "rule-based" | "ollama" | "raw";
   let period; try { period = summaryPeriod(type, anchor, end); } catch { period = summaryPeriod("weekly", isoDate(new Date())); }
   const stored = await summaries.list(); const allNotes = await notes.listAll(); const allCategories = await categories.list(); const source = allNotes.filter((note) => note.noteDate >= period.start && note.noteDate <= period.end && !note.archived); const current = stored.find((summary) => summary.id === `${period.type}:${period.start}:${period.end}`); const range = `${formatShortDate(period.start)} – ${formatShortDate(period.end)}`; const rawMarkdown = rawNotesMarkdown(source); const shownMarkdown = mode === "raw" ? rawMarkdown : current?.editedMarkdown ?? current?.generatedMarkdown;
-  document.title = "Summaries · Rook Lite";
-  content.innerHTML = `<div class="summaries-page"><header class="page-head"><div><h1>Summaries</h1><p class="lede">Review a period, summarize it locally, and export clean Markdown.</p></div></header><form id="summary-period-form" class="summary-control-panel"><div class="summary-period-tabs" aria-label="Summary period">${[["weekly", "This Week"], ["monthly", "This Month"], ["custom", "Custom"]].map(([value, label]) => `<button type="button" data-summary-type="${value}" class="${type === value ? "is-active" : ""}" aria-pressed="${type === value}">${label}</button>`).join("")}</div><input type="hidden" name="type" value="${type}"><div class="summary-date-fields"><label class="summary-date-label"><span>${type === "custom" ? "Start date" : "Date in period"}</span><input name="start" type="date" value="${type === "custom" ? period.start : anchor}"></label><label class="summary-date-label summary-end-field" ${type === "custom" ? "" : "hidden"}><span>End date</span><input name="end" type="date" value="${period.end}"></label></div><fieldset class="summary-mode-picker"><legend>Summary mode</legend>${[["rule-based", "Rule based", "Offline and deterministic"], ["ollama", "Ollama", "Uses your local model"], ["raw", "Raw notes", "Chronological Markdown"]].map(([value, label, help]) => `<label><input type="radio" name="mode" value="${value}" ${mode === value ? "checked" : ""}><span><strong>${label}</strong><small>${help}</small></span></label>`).join("")}</fieldset></form><section class="summary-document" aria-labelledby="summary-document-title"><header><div><p>${source.length} ${source.length === 1 ? "note" : "notes"} · ${range}</p><h2 id="summary-document-title">${type === "weekly" ? `Week ${isoWeek(new Date(`${period.start}T12:00:00`))}` : type === "monthly" ? new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(new Date(`${period.start}T12:00:00`)) : "Custom range"}</h2></div><div class="summary-document-actions">${shownMarkdown ? '<button type="button" class="secondary-button" id="copy-summary">Copy Markdown</button><button type="button" class="secondary-button" id="export-summary">Export Markdown</button>' : ""}${mode !== "raw" ? `<button type="button" id="generate-summary">${current ? "Regenerate" : "Generate summary"}</button>` : ""}</div></header><p id="summary-error" class="notice error" hidden aria-live="polite"></p>${shownMarkdown ? `<div class="summary-prose prose">${renderMarkdown(shownMarkdown)}</div>${mode !== "raw" && current ? `<details class="summary-edit"><summary>Edit Markdown</summary><form id="summary-edit-form"><textarea name="text" rows="12">${escapeHtml(current.editedMarkdown ?? current.generatedMarkdown)}</textarea><button type="submit">Save changes</button></form></details>` : ""}` : `<div class="summary-empty"><img src="/logo.png" alt="" width="48" height="48"><h3>No summary yet</h3><p>${source.length ? "Generate a concise summary from the notes in this period." : "There are no notes in this period."}</p></div>`}</section></div>`;
+  const s = currentStrings();
+  document.title = `${s.summariesTitle} · Rook Lite`;
+  content.innerHTML = `<div class="summaries-page"><header class="page-head"><div><h1>${s.summariesTitle}</h1><p class="lede">${s.summariesLede}</p></div></header><form id="summary-period-form" class="summary-control-panel"><div class="summary-period-tabs" aria-label="Summary period">${[["weekly", s.thisWeek], ["monthly", s.thisMonth], ["custom", s.customRange]].map(([value, label]) => `<button type="button" data-summary-type="${value}" class="${type === value ? "is-active" : ""}" aria-pressed="${type === value}">${label}</button>`).join("")}</div><input type="hidden" name="type" value="${type}"><div class="summary-date-fields"><label class="summary-date-label"><span>${type === "custom" ? s.startDate : s.dateInPeriod}</span><input name="start" type="date" value="${type === "custom" ? period.start : anchor}"></label><label class="summary-date-label summary-end-field" ${type === "custom" ? "" : "hidden"}><span>${s.endDate}</span><input name="end" type="date" value="${period.end}"></label></div><fieldset class="summary-mode-picker"><legend>${s.summaryMode}</legend>${[["rule-based", s.modeRuleBased, s.modeRuleBasedDesc], ["ollama", s.modeOllama, s.modeOllamaDesc], ["raw", s.modeRaw, s.modeRawDesc]].map(([value, label, help]) => `<label><input type="radio" name="mode" value="${value}" ${mode === value ? "checked" : ""}><span><strong>${label}</strong><small>${help}</small></span></label>`).join("")}</fieldset></form><section class="summary-document" aria-labelledby="summary-document-title"><header><div><p>${source.length} ${source.length === 1 ? s.entrySingle : s.entryPlural} · ${range}</p><h2 id="summary-document-title">${type === "weekly" ? s.weekLabel(isoWeek(new Date(`${period.start}T12:00:00`))) : type === "monthly" ? formatMonthYear(new Date(`${period.start}T12:00:00`)) : s.customRange}</h2></div><div class="summary-document-actions">${shownMarkdown ? `<button type="button" class="secondary-button" id="copy-summary">${s.copySummary}</button><button type="button" class="secondary-button" id="export-summary">${s.exportSummary}</button>` : ""}${mode !== "raw" ? `<button type="button" id="generate-summary">${current ? s.regenerateSummary : s.generateSummary}</button>` : ""}</div></header><p id="summary-error" class="notice error" hidden aria-live="polite"></p>${shownMarkdown ? `<div class="summary-prose prose">${renderMarkdown(shownMarkdown)}</div>${mode !== "raw" && current ? `<details class="summary-edit"><summary>${s.editMarkdown}</summary><form id="summary-edit-form"><textarea name="text" rows="12">${escapeHtml(current.editedMarkdown ?? current.generatedMarkdown)}</textarea><button type="submit">${s.saveChanges}</button></form></details>` : ""}` : `<div class="summary-empty"><img src="${assetUrl("/logo.png")}" alt="" width="48" height="48"><h3>${s.noSummaryYet}</h3><p>${s.noSummaryYetDesc(source.length > 0)}</p></div>`}</section></div>`;
   const form = requireElement<HTMLFormElement>("#summary-period-form"); form.querySelectorAll<HTMLButtonElement>("[data-summary-type]").forEach((button) => button.addEventListener("click", () => { const nextType = button.dataset.summaryType ?? "weekly"; const next = new URLSearchParams({ type: nextType, start: isoDate(new Date()), mode }); if (nextType === "custom") next.set("end", isoDate(new Date())); history.replaceState({}, "", appUrl(`/summaries?${next}`)); void renderRoute(); }));
   const navigate = () => { const data = new FormData(form); const next = new URLSearchParams({ type: data.get("type")?.toString() ?? "weekly", start: data.get("start")?.toString() ?? isoDate(new Date()), mode: data.get("mode")?.toString() ?? "rule-based" }); if (data.get("type") === "custom") next.set("end", data.get("end")?.toString() ?? ""); history.replaceState({}, "", appUrl(`/summaries?${next}`)); void renderRoute(); }; form.addEventListener("submit", (event) => { event.preventDefault(); navigate(); }); form.querySelectorAll<HTMLInputElement>('input[type="date"], input[name="mode"]').forEach((input) => input.addEventListener("change", navigate));
   document.querySelector<HTMLButtonElement>("#generate-summary")?.addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; button.textContent = "Generating…"; const settings = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS; const engine = mode === "ollama" ? new OllamaSummaryEngine(settings) : new RuleBasedSummaryEngine(); try { const result = await summaries.generate(source, allCategories, period, engine); if (result.fallbackError) sessionStorage.setItem("summary-fallback", result.fallbackError); await renderRoute(); } catch (error) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = errorMessage(error); button.disabled = false; button.textContent = "Generate summary"; } });
@@ -249,31 +274,36 @@ async function renderSummariesV2(content: HTMLElement): Promise<void> {
   document.querySelector<HTMLFormElement>("#summary-edit-form")?.addEventListener("submit", async (event) => { event.preventDefault(); if (!current) return; const editForm = event.currentTarget as HTMLFormElement; await summaries.edit(current.id, new FormData(editForm).get("text")?.toString() ?? ""); await renderRoute(); });
 }
 
-function formatShortDate(date: string): string { return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(`${date}T12:00:00`)); }
-function rawNotesMarkdown(items: Note[]): string { return items.length ? `${items.slice().sort((a, b) => a.noteDate.localeCompare(b.noteDate) || a.createdAt.localeCompare(b.createdAt)).map((note) => `## ${new Intl.DateTimeFormat("en", { dateStyle: "long" }).format(new Date(`${note.noteDate}T12:00:00`))}\n\n${note.content.trim()}`).join("\n\n")}\n` : "# Notes\n\nNo notes were written in this period.\n"; }
+function rawNotesMarkdown(items: Note[]): string {
+  const s = currentStrings();
+  return items.length ? `${items.slice().sort((a, b) => a.noteDate.localeCompare(b.noteDate) || a.createdAt.localeCompare(b.createdAt)).map((note) => `## ${formatDateHeading(note.noteDate)}\n\n${note.content.trim()}`).join("\n\n")}\n` : `# ${s.notesTitle}\n\n${s.noSummaryYetDesc(false)}\n`;
+}
 
 async function renderData(content: HTMLElement): Promise<void> {
-  const allNotes = await notes.listAll(); const allCategories = await categories.list(); const lastExport = await settingsRepository.get<string>("lastExportAt"); document.title = "Data Management · Rook Lite";
-  content.innerHTML = `<div class="dashboard-welcome"><div class="welcome-left"><h1 class="welcome-title">Export and backup</h1><p class="welcome-banner-subtitle">Your notes stay in this browser unless you explicitly export them.</p></div></div><p id="data-message" class="notice" hidden></p><div class="settings-stack"><section class="data-panel panel-row"><h2 class="panel-title">Markdown export</h2><p class="panel-subtitle">Create human-readable Markdown organized by year, month, and ISO week.</p><p class="hint">${lastExport ? `Last directory export: ${escapeHtml(new Date(lastExport).toLocaleString())}` : "No directory export yet."}</p><div class="lite-panel-actions"><button id="directory-export" ${allNotes.length ? "" : "disabled"}>Choose export folder</button><button id="zip-export" ${allNotes.length ? "" : "disabled"}>Download Markdown ZIP</button></div></section><section class="data-panel panel-row"><h2 class="panel-title">Full backup</h2><p class="panel-subtitle">Create or restore a complete JSON backup.</p><div class="lite-panel-actions"><button id="create-backup">Create JSON backup</button><label class="save-btn-rect lite-file-label" for="restore-backup">Restore JSON backup</label><input class="visually-hidden" type="file" id="restore-backup" accept="application/json,.json"></div></section></div>`;
+  const s = currentStrings();
+  const allNotes = await notes.listAll(); const allCategories = await categories.list(); const lastExport = await settingsRepository.get<string>("lastExportAt"); document.title = `${s.dataManagementTitle} · Rook Lite`;
+  content.innerHTML = `<div class="dashboard-welcome"><div class="welcome-left"><h1 class="welcome-title">${s.dataManagementTitle}</h1><p class="welcome-banner-subtitle">${s.dataManagementSubtitle}</p></div></div><p id="data-message" class="notice" hidden></p><div class="settings-stack"><section class="data-panel panel-row"><h2 class="panel-title">${s.markdownExportTitle}</h2><p class="panel-subtitle">${s.markdownExportSubtitle}</p><p class="hint">${lastExport ? `${s.lastExportPrefix} ${escapeHtml(new Date(lastExport).toLocaleString(getLocale() === "tr" ? "tr-TR" : "en-US"))}` : s.noExportYet}</p><div class="lite-panel-actions"><button id="directory-export" ${allNotes.length ? "" : "disabled"}>${s.chooseExportFolderBtn}</button><button id="zip-export" ${allNotes.length ? "" : "disabled"}>${s.downloadZipBtn}</button></div></section><section class="data-panel panel-row"><h2 class="panel-title">${s.fullBackupTitle}</h2><p class="panel-subtitle">${s.fullBackupSubtitle}</p><div class="lite-panel-actions"><button id="create-backup">${s.createJsonBackupBtn}</button><label class="save-btn-rect lite-file-label" for="restore-backup">${s.restoreJsonBackupLabel}</label><input class="visually-hidden" type="file" id="restore-backup" accept="application/json,.json"></div></section></div>`;
   document.querySelector<HTMLButtonElement>("#zip-export")?.addEventListener("click", () => downloadMarkdownZip(allNotes, allCategories));
-  document.querySelector<HTMLButtonElement>("#directory-export")?.addEventListener("click", async () => { try { const count = await exportToDirectory(allNotes, allCategories); dataMessage(`Exported ${count} notes.`, false); } catch (error) { dataMessage(errorMessage(error), true); } });
+  document.querySelector<HTMLButtonElement>("#directory-export")?.addEventListener("click", async () => { try { const count = await exportToDirectory(allNotes, allCategories); dataMessage(s.exportedNotesCount(count), false); } catch (error) { dataMessage(errorMessage(error), true); } });
   requireElement("#create-backup").addEventListener("click", async () => downloadJson(await createBackup()));
-  requireElement<HTMLInputElement>("#restore-backup").addEventListener("change", async (event) => { const file = (event.currentTarget as HTMLInputElement).files?.[0]; if (!file) return; try { const backup = parseBackup(await file.text()); showConfirm("Replace local data?", `Restore ${backup.notes.length} notes, ${backup.categories.length} categories, and ${backup.summaries.length} summaries? Current local data will be replaced.`, "Restore backup", async () => { await restoreBackup(backup); await refreshCalendar(); await renderRoute(); }); } catch (error) { dataMessage(errorMessage(error), true); } });
+  requireElement<HTMLInputElement>("#restore-backup").addEventListener("change", async (event) => { const file = (event.currentTarget as HTMLInputElement).files?.[0]; if (!file) return; try { const backup = parseBackup(await file.text()); showConfirm(s.replaceDataTitle, s.replaceDataMessage(backup.notes.length, backup.categories.length, backup.summaries.length), s.restoreBackupBtn, async () => { await restoreBackup(backup); await refreshCalendar(); await renderRoute(); }); } catch (error) { dataMessage(errorMessage(error), true); } });
 }
 
 export async function renderSettings(content: HTMLElement): Promise<void> {
+  const s = currentStrings();
   const counts = await storageCounts();
   const ollama = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS;
   const estimate = await navigator.storage?.estimate?.();
   const persisted = await navigator.storage?.persisted?.();
   const currentTheme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
-  document.title = "Settings · Rook Lite";
+  const currentLocale = getLocale();
+  document.title = `${s.settingsTitle} · Rook Lite`;
 
   content.innerHTML = `<div class="settings-page">
     <header class="page-head">
       <div>
-        <h1>Settings</h1>
-        <p class="lede">Configure appearance, local AI, storage persistence, and local data.</p>
+        <h1>${s.settingsTitle}</h1>
+        <p class="lede">${s.settingsLede}</p>
       </div>
     </header>
 
@@ -281,15 +311,36 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
       <section class="settings-card">
         <div class="settings-card-header">
           <div class="settings-card-title-group">
-            <h2>Appearance</h2>
-            <p>Choose your preferred interface theme for this device.</p>
+            <h2>${s.languageTitle}</h2>
+            <p>${s.languageSubtitle}</p>
+          </div>
+        </div>
+        <div class="theme-selector-grid language-selector-grid">
+          ${getAvailableLocales().map((loc) => `
+            <label class="theme-option-card ${currentLocale === loc.code ? "is-selected" : ""}">
+              <input type="radio" name="settings-language" value="${loc.code}" ${currentLocale === loc.code ? "checked" : ""}>
+              <div class="theme-card-icon">${svg(icons.globe, "")}</div>
+              <div class="theme-card-info">
+                <strong>${escapeHtml(loc.label)}</strong>
+                <span>${escapeHtml(loc.description)}</span>
+              </div>
+            </label>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title-group">
+            <h2>${s.appearanceTitle}</h2>
+            <p>${s.appearanceSubtitle}</p>
           </div>
         </div>
         <div class="theme-selector-grid">
           ${([
-            ["SYSTEM", "System", "Match device setting", icons.monitor],
-            ["LIGHT", "Light", "Clean & crisp light mode", icons.sun],
-            ["DARK", "Dark", "High contrast dark mode", icons.moon]
+            ["SYSTEM", s.themeSystem, s.themeSystemDesc, icons.monitor],
+            ["LIGHT", s.themeLight, s.themeLightDesc, icons.sun],
+            ["DARK", s.themeDark, s.themeDarkDesc, icons.moon]
           ] as const).map(([val, label, desc, iconSvg]) => `
             <label class="theme-option-card ${currentTheme === val ? "is-selected" : ""}">
               <input type="radio" name="settings-theme" value="${val}" ${currentTheme === val ? "checked" : ""}>
@@ -307,16 +358,16 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
         <div class="settings-card-header">
           <div class="settings-card-title-group">
             <div class="title-with-badge">
-              <h2>Local AI</h2>
-              <span class="ai-privacy-pill">100% Private · Local only</span>
+              <h2>${s.localAiTitle}</h2>
+              <span class="ai-privacy-pill">${s.localAiBadge}</span>
             </div>
-            <p>Summarize notes using an Ollama model running on your machine. No data is sent to external servers.</p>
+            <p>${s.localAiSubtitle}</p>
           </div>
           <div class="ai-toggle-wrapper">
             <label class="toggle-switch" for="ollama-enabled-toggle">
               <input type="checkbox" id="ollama-enabled-toggle" ${ollama.enabled ? "checked" : ""}>
               <span class="toggle-slider"></span>
-              <span class="visually-hidden">Enable local AI</span>
+              <span class="visually-hidden">${s.localAiTitle}</span>
             </label>
           </div>
         </div>
@@ -325,8 +376,8 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
           <div class="disabled-banner-content">
             <span class="disabled-banner-icon">${svg(icons.lock, "")}</span>
             <div>
-              <strong>Local AI is turned off</strong>
-              <p>Rook Lite will generate summaries using the built-in, fast and deterministic offline rule-based engine. Toggle the switch above if you want to connect to a local Ollama model.</p>
+              <strong>${s.localAiDisabledTitle}</strong>
+              <p>${s.localAiDisabledDesc}</p>
             </div>
           </div>
         </div>
@@ -335,32 +386,32 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
           <form id="ollama-form" class="settings-form">
             <div class="form-row">
               <div class="form-field flex-2">
-                <label for="ollama-endpoint">Ollama Endpoint URL</label>
+                <label for="ollama-endpoint">${s.ollamaEndpointLabel}</label>
                 <input class="form-input" id="ollama-endpoint" name="endpoint" value="${escapeHtml(ollama.endpoint)}" placeholder="http://localhost:11434" required>
-                <span class="field-hint">Only local endpoints allowed (localhost, 127.0.0.1, [::1]).</span>
+                <span class="field-hint">${s.ollamaEndpointHint}</span>
               </div>
               <div class="form-field flex-2">
-                <label for="ollama-model">Model</label>
+                <label for="ollama-model">${s.ollamaModelLabel}</label>
                 <div class="model-select-wrapper">
                   <select class="form-input" id="ollama-model" name="model" required>
                     <option value="${escapeHtml(ollama.model)}">${escapeHtml(ollama.model)}</option>
                   </select>
                 </div>
-                <span class="field-hint">Models detected from your running Ollama server.</span>
+                <span class="field-hint">${s.ollamaModelHint}</span>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-field flex-1">
                 <div class="field-label-row">
-                  <label for="ollama-temperature">Temperature (Creativity)</label>
+                  <label for="ollama-temperature">${s.ollamaTempLabel}</label>
                   <span id="temp-val-display" class="temp-badge">${Number(ollama.temperature).toFixed(2)}</span>
                 </div>
                 <input type="range" id="ollama-temperature" name="temperature" min="0" max="1" step="0.05" value="${ollama.temperature}" class="range-slider">
                 <div class="range-labels">
-                  <span>Precise (0.0)</span>
-                  <span>Balanced (0.5)</span>
-                  <span>Creative (1.0)</span>
+                  <span>${s.ollamaTempPrecise}</span>
+                  <span>${s.ollamaTempBalanced}</span>
+                  <span>${s.ollamaTempCreative}</span>
                 </div>
               </div>
             </div>
@@ -368,17 +419,17 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
             <div class="form-row">
               <div class="form-field flex-1">
                 <div class="field-label-row">
-                  <label for="ollama-system-prompt">System Prompt</label>
-                  <button type="button" id="reset-ollama-prompt" class="text-link-btn" title="Reset system prompt to default">Reset to default</button>
+                  <label for="ollama-system-prompt">${s.ollamaSystemPromptLabel}</label>
+                  <button type="button" id="reset-ollama-prompt" class="text-link-btn" title="${s.resetToDefault}">${s.resetToDefault}</button>
                 </div>
-                <textarea class="form-textarea" id="ollama-system-prompt" name="systemPrompt" rows="4" placeholder="Instructions passed to Ollama for structuring summaries…">${escapeHtml(ollama.systemPrompt ?? DEFAULT_OLLAMA_PROMPT)}</textarea>
-                <span class="field-hint">Instructions passed as the system role to the model for structuring summaries.</span>
+                <textarea class="form-textarea" id="ollama-system-prompt" name="systemPrompt" rows="4" placeholder="${s.ollamaSystemPromptHint}">${escapeHtml(ollama.systemPrompt ?? DEFAULT_OLLAMA_PROMPT)}</textarea>
+                <span class="field-hint">${s.ollamaSystemPromptHint}</span>
               </div>
             </div>
 
             <div class="ai-actions-row">
-              <button type="button" id="test-ollama" class="secondary-button">${svg(icons.refresh, "btn-action-icon")}<span>Test connection & refresh models</span></button>
-              <button type="submit" class="save-btn-rect">${svg(icons.check, "btn-action-icon")}<span>Save AI settings</span></button>
+              <button type="button" id="test-ollama" class="secondary-button">${svg(icons.refresh, "btn-action-icon")}<span>${s.testConnectionBtn}</span></button>
+              <button type="submit" class="save-btn-rect">${svg(icons.check, "btn-action-icon")}<span>${s.saveAiSettingsBtn}</span></button>
             </div>
             <div id="ollama-status" class="notice" hidden aria-live="polite"></div>
           </form>
@@ -388,54 +439,54 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
       <section class="settings-card">
         <div class="settings-card-header">
           <div class="settings-card-title-group">
-            <h2>Storage & Persistence</h2>
-            <p>Your notes, categories, and summaries live directly inside your browser storage.</p>
+            <h2>${s.storageTitle}</h2>
+            <p>${s.storageSubtitle}</p>
           </div>
         </div>
         <div class="storage-metrics-grid">
           <div class="storage-metric-box">
             <span class="metric-num">${counts.notes}</span>
-            <span class="metric-label">Notes</span>
+            <span class="metric-label">${s.metricNotes}</span>
           </div>
           <div class="storage-metric-box">
             <span class="metric-num">${counts.categories}</span>
-            <span class="metric-label">Categories</span>
+            <span class="metric-label">${s.metricCategories}</span>
           </div>
           <div class="storage-metric-box">
             <span class="metric-num">${counts.summaries}</span>
-            <span class="metric-label">Summaries</span>
+            <span class="metric-label">${s.metricSummaries}</span>
           </div>
           <div class="storage-metric-box">
             <span class="metric-num">${estimate?.usage ? formatBytes(estimate.usage) : "Local DB"}</span>
-            <span class="metric-label">Estimated Usage</span>
+            <span class="metric-label">${s.estimatedUsage}</span>
           </div>
         </div>
         <div class="persistence-row">
           <div class="persistence-text">
-            <strong>${persisted ? "✓ Persistent storage active" : "Standard browser storage"}</strong>
-            <p>${persisted ? "Your browser is configured not to clear Rook Lite storage automatically when disk space is constrained." : "Ask the browser not to automatically clear your local notes if device storage runs low."}</p>
+            <strong>${persisted ? `✓ ${s.persistencePersisted}` : s.persistenceBestEffort}</strong>
+            <p>${s.persistenceDesc}</p>
           </div>
-          ${persisted ? "" : '<button type="button" id="request-persistence" class="secondary-button">Request persistence</button>'}
+          ${persisted ? "" : `<button type="button" id="request-persistence" class="secondary-button">${s.requestPersistenceBtn}</button>`}
         </div>
       </section>
 
       <section class="settings-card">
         <div class="settings-card-header">
           <div class="settings-card-title-group">
-            <h2>Export & Backup Hub</h2>
-            <p>Download full Markdown archives or JSON snapshots of your notes to your computer.</p>
+            <h2>${s.dataManagementTitle}</h2>
+            <p>${s.dataManagementSubtitle}</p>
           </div>
-          <a href="${appUrl("/data")}" data-link class="secondary-button action-link-btn">Open Export Hub &rarr;</a>
+          <a href="${appUrl("/data")}" data-link class="secondary-button action-link-btn">${s.navData} &rarr;</a>
         </div>
       </section>
 
       <section class="settings-card danger-card">
         <div class="settings-card-header">
           <div class="settings-card-title-group">
-            <h2 class="danger-title">Danger Zone</h2>
-            <p>Permanently remove every note, category, and summary from this browser. This cannot be undone.</p>
+            <h2 class="danger-title">${s.dangerZoneTitle}</h2>
+            <p>${s.dangerZoneSubtitle}</p>
           </div>
-          <button type="button" id="delete-local-data" class="danger-save-btn">Delete all data</button>
+          <button type="button" id="delete-local-data" class="danger-save-btn">${s.clearAllDataBtn}</button>
         </div>
       </section>
     </div>
@@ -444,6 +495,15 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
 }
 
 function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void {
+  const s = currentStrings();
+  content.querySelectorAll<HTMLInputElement>('input[name="settings-language"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      const selected = input.value as SupportedLocale;
+      if (selected === getLocale()) return;
+      setLocale(selected);
+      void renderShell();
+    });
+  });
   content.querySelectorAll<HTMLInputElement>('input[name="settings-theme"]').forEach((input) => {
     input.addEventListener("change", () => {
       setTheme(input.value as ThemePreference);
@@ -552,18 +612,18 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
     persistenceButton.addEventListener("click", async () => {
       const granted = await navigator.storage.persist();
       if (!granted) {
-        alert("The browser did not grant persistent storage.");
+        alert(getLocale() === "tr" ? "Tarayıcı kalıcı depolama izni vermedi." : "The browser did not grant persistent storage.");
         return;
       }
       await renderRoute();
     });
   }
 
-  requireElement("#delete-local-data").addEventListener("click", () =>
+  content.querySelector<HTMLButtonElement>("#delete-local-data")?.addEventListener("click", () =>
     showConfirm(
-      "Delete all local data?",
-      "This permanently removes every note, category, and summary and cannot be undone. Create a backup first if you need one.",
-      "Delete all data",
+      s.clearConfirmTitle,
+      s.clearConfirmMessage,
+      s.clearAllAction,
       async () => {
         await clearAllData();
         await categories.seedDefaults();
@@ -584,12 +644,17 @@ function dataMessage(message: string, error: boolean): void { const element = re
 function formatBytes(bytes: number): string { if (bytes < 1024) return `${bytes} B`; if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`; return `${(bytes / 1024 / 1024).toFixed(1)} MB`; }
 
 function showConfirm(title: string, message: string, actionLabel: string, action: () => Promise<void>): void {
-  const host = requireElement<HTMLElement>("#dialog-host"); host.innerHTML = `<div class="note-edit-backdrop"><section class="note-edit-dialog lite-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"><header class="note-edit-dialog-head"><div><h2 id="confirm-title">${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p></div></header><footer class="note-edit-dialog-actions"><button type="button" class="note-modal-cancel" data-close-dialog>Cancel</button><button type="button" class="danger-save-btn" id="confirm-action">${escapeHtml(actionLabel)}</button></footer></section></div>`; document.body.style.overflow = "hidden";
+  const s = currentStrings();
+  const host = requireElement<HTMLElement>("#dialog-host"); host.innerHTML = `<div class="note-edit-backdrop"><section class="note-edit-dialog lite-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"><header class="note-edit-dialog-head"><div><h2 id="confirm-title">${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p></div></header><footer class="note-edit-dialog-actions"><button type="button" class="note-modal-cancel" data-close-dialog>${s.cancel}</button><button type="button" class="danger-save-btn" id="confirm-action">${escapeHtml(actionLabel)}</button></footer></section></div>`; document.body.style.overflow = "hidden";
   requireElement<HTMLButtonElement>("#confirm-action").addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; try { await action(); closeDialog(); } catch (error) { button.disabled = false; alert(errorMessage(error)); } });
 }
 
 export function closeDialog(): void { const host = document.querySelector<HTMLElement>("#dialog-host"); if (host) host.replaceChildren(); document.body.style.overflow = ""; }
-function renderNotFound(content: HTMLElement): void { document.title = "Not found · Rook Lite"; content.innerHTML = '<div class="page-head"><div><p class="eyebrow">404</p><h1>That page does not exist.</h1><p class="lede"><a href="/" data-link>Return to today\'s notes.</a></p></div></div>'; }
+function renderNotFound(content: HTMLElement): void {
+  const s = currentStrings();
+  document.title = `${s.notFoundTitle} · Rook Lite`;
+  content.innerHTML = `<div class="page-head"><div><p class="eyebrow">${s.notFoundDesc}</p><h1>${s.notFoundTitle}</h1><p class="lede"><a href="${appUrl("/")}" data-link>${s.notFoundReturnHome}</a></p></div></div>`;
+}
 
 async function updateModalSearch(): Promise<void> {
   const query = requireElement<HTMLInputElement>("#modal-search-input").value;
@@ -609,7 +674,11 @@ async function updateModalSearch(): Promise<void> {
   await renderSearchResults(requireElement("#modal-search-results"), terms, "", "", await categories.list(), range?.start, range?.end);
 }
 
+let shellEventsBound = false;
 function bindShellEvents(): void {
+  if (shellEventsBound) return;
+  shellEventsBound = true;
+
   document.addEventListener("click", (event) => {
     const target = event.target as Element;
     document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
@@ -632,6 +701,15 @@ function bindShellEvents(): void {
     if (action === "close-sidebar") closeSidebar();
     if (action === "open-search") openSearch();
     if (action === "toggle-theme") setTheme(document.documentElement.dataset.theme === "dark" ? "LIGHT" : "DARK");
+    if (action === "toggle-language") {
+      const locales = getAvailableLocales();
+      const currentIndex = locales.findIndex((l) => l.code === getLocale());
+      const nextIndex = (currentIndex + 1) % (locales.length || 1);
+      const nextLocale = locales[nextIndex]?.code ?? "en";
+      setLocale(nextLocale);
+      void renderShell();
+      return;
+    }
     if (target.closest("[data-close-dialog]")) closeDialog();
     if (target.id === "search-modal") closeSearch();
   });
@@ -641,10 +719,20 @@ function bindShellEvents(): void {
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
   window.addEventListener("online", updateNetworkStatus);
   window.addEventListener("offline", updateNetworkStatus);
-  requireElement<HTMLInputElement>("#modal-search-input").addEventListener("input", updateModalSearch);
-  requireElement<HTMLSelectElement>("#modal-search-tag").addEventListener("change", updateModalSearch);
-  requireElement<HTMLSelectElement>("#modal-search-period").addEventListener("change", updateModalSearch);
-  requireElement<HTMLInputElement>("#modal-search-todo").addEventListener("change", updateModalSearch);
+  document.addEventListener("input", (event) => {
+    const target = event.target as Element;
+    if (target.id === "modal-search-input") void updateModalSearch();
+  });
+  document.addEventListener("change", (event) => {
+    const target = event.target as Element;
+    if (
+      target.id === "modal-search-tag" ||
+      target.id === "modal-search-period" ||
+      target.id === "modal-search-todo"
+    ) {
+      void updateModalSearch();
+    }
+  });
 }
 
 function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): void { form.querySelectorAll<HTMLButtonElement>("[data-format]").forEach((button) => button.addEventListener("click", () => formatNote(textarea, button.dataset.format ?? ""))); }
@@ -704,7 +792,19 @@ function toggleSidebar(): void { if (innerWidth <= 960) document.body.classList.
 function closeSidebar(): void { document.body.classList.remove("sidebar-drawer-open"); updateSidebarButton(); }
 function updateSidebarButton(): void { const visible = innerWidth <= 960 ? document.body.classList.contains("sidebar-drawer-open") : !document.documentElement.classList.contains("sidebar-collapsed"); document.querySelectorAll(".sidebar-collapse-button, .mobile-sidebar-open").forEach((button) => button.setAttribute("aria-expanded", String(visible))); }
 function setTheme(theme: ThemePreference): void { localStorage.setItem("theme-preference", theme); applyTheme(); }
-function applyTheme(): void { const theme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference; const resolved = theme === "SYSTEM" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme.toLowerCase(); document.documentElement.dataset.theme = resolved; document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0d1117" : "#f6f8fa"); const toggle = document.querySelector<HTMLElement>(".sidebar-theme-toggle"); if (toggle) { const next = resolved === "dark" ? "light" : "dark"; toggle.setAttribute("aria-label", `Switch to ${next} theme`); toggle.dataset.sidebarTooltip = `Switch to ${next} theme`; } }
+function applyTheme(): void {
+  const s = currentStrings();
+  const theme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
+  const resolved = theme === "SYSTEM" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme.toLowerCase();
+  document.documentElement.dataset.theme = resolved;
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0d1117" : "#f6f8fa");
+  const toggle = document.querySelector<HTMLElement>(".sidebar-theme-toggle");
+  if (toggle) {
+    const nextLabel = resolved === "dark" ? s.themeToggleLight : s.themeToggleDark;
+    toggle.setAttribute("aria-label", s.themeToggleAria);
+    toggle.dataset.sidebarTooltip = nextLabel;
+  }
+}
 function openSearch(): void {
   const modal = requireElement<HTMLElement>("#search-modal");
   const input = requireElement<HTMLInputElement>("#modal-search-input");
@@ -728,11 +828,11 @@ function shiftDate(date: string, days: number): string { const value = new Date(
 function tagCounts(items: Note[]): Array<[string, number]> { const counts = new Map<string, number>(); items.forEach((note) => note.tags.forEach((tag) => counts.set(tag, (counts.get(tag) ?? 0) + 1))); return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])); }
 function isoWeek(date: Date): number { const value = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())); value.setUTCDate(value.getUTCDate() + 4 - (value.getUTCDay() || 7)); return Math.ceil((((value.getTime() - Date.UTC(value.getUTCFullYear(), 0, 1)) / 86400000) + 1) / 7); }
 function validIsoDate(value: string | null): boolean { return Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T12:00:00`).getTime())); }
-function formatTime(createdAt: string, noteDate: string): string { return noteDate === isoDate(new Date()) ? new Intl.DateTimeFormat("en", { hour: "numeric", minute: "2-digit" }).format(new Date(createdAt)) : noteDate; }
+function formatTime(createdAt: string, noteDate: string): string { return formatTimeLocale(createdAt, noteDate, isoDate(new Date()), getLocale()); }
 function errorMessage(error: unknown): string { return error instanceof Error ? error.message : "Something went wrong."; }
 function requireElement<T extends Element>(selector: string): T { const element = document.querySelector<T>(selector); if (!element) throw new Error(`Missing required element: ${selector}`); return element; }
 
-async function start(): Promise<void> { try { await initializeLocalData(); await renderShell(); } catch (error) { app.innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`; } }
+async function start(): Promise<void> { try { setLocale(getLocale()); await initializeLocalData(); await renderShell(); } catch (error) { app.innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`; } }
 
 void start();
 if ("serviceWorker" in navigator && import.meta.env.PROD) window.addEventListener("load", () => { void navigator.serviceWorker.register(assetUrl("sw.js"), { scope: normalizeBase().prefix }); });
