@@ -1,0 +1,67 @@
+src/summaries.ts
+  s_bbf4fca5ba9f87::t_f58797e24f5bbc 38-43,46,49,51,60-63,65
+  s_bbf4fca5ba9f87::t_617d37251c93d2 2
+src/i18n.test.ts
+  s_bbf4fca5ba9f87::t_f9db3c71877331 6-21
+  s_bbf4fca5ba9f87::t_fd85ffade04564 1-3,5,22-27,45-79,81-94,107-130,132-147,205
+  s_bbf4fca5ba9f87::t_a5790348289686 4,28-44,131
+  s_bbf4fca5ba9f87::t_18c212587785ae 148-178
+  s_bbf4fca5ba9f87::t_7192b13128168d 80,95-106
+  s_bbf4fca5ba9f87::t_c76dd6a0d13efa 179-204
+src/lite.css
+  s_bbf4fca5ba9f87::t_45697c3f94b48d 3516-3564
+src/main.ts
+  s_bbf4fca5ba9f87::t_48a1af49ccd219 795-807
+  s_bbf4fca5ba9f87::t_feb9713a71e098 218,220
+  s_bbf4fca5ba9f87::t_23513855ef449b 82,85,90-91,94-95
+  s_bbf4fca5ba9f87::t_74802ba428b983 225,228,232,235-236,241
+  s_bbf4fca5ba9f87::t_38b4f8aae21424 277-280,283-285,287,289
+  s_bbf4fca5ba9f87::t_db5331759d9024 319-321,324-325
+  s_bbf4fca5ba9f87::t_5accb80806e07b 615
+  s_bbf4fca5ba9f87::t_1be7580f15a2c0 501-503
+  s_bbf4fca5ba9f87::t_2aeec34f1c1d0b 60,62-66,71-77
+  s_bbf4fca5ba9f87::t_3599ec3b408d89 199-201,206-207,211,214
+  s_bbf4fca5ba9f87::t_fa972d5f40c7bb 622,624-626
+  s_bbf4fca5ba9f87::t_73f212fc86d6d3 677,679-681,711,722-735
+  s_bbf4fca5ba9f87::t_5f09784d7e05cd 293,299-300,305-306,314-318,322-323,326-336,341-343
+  s_bbf4fca5ba9f87::t_c9c3ed9b36f9cd 45
+  s_bbf4fca5ba9f87::t_0cb7c22aecc078 244,246
+  s_bbf4fca5ba9f87::t_a9ee58554e551e 153,156
+  s_bbf4fca5ba9f87::t_8e036dd5986487 116,119-120,126,128,132,134,138,140,143-144,146-148,163-164,169,171-172
+  s_bbf4fca5ba9f87::t_401bb351b77a9d 394,400,407,412-414,422-423,425-426,431-432,442-443,449,453,457,461
+  s_bbf4fca5ba9f87::t_eabb5a0f5886ba 704,709-710,712
+  s_bbf4fca5ba9f87::t_31665c1edc94f7 268
+  s_bbf4fca5ba9f87::t_9fe9085cb85326 499-500,504-506
+  s_bbf4fca5ba9f87::t_8fa522739e9cd9 266-267
+  s_bbf4fca5ba9f87::t_43d08ac5052d37 466-467,469,476-477,479,486-487,489,498
+  s_bbf4fca5ba9f87::t_0dc3b20fd715c1 647-648,653-657
+  s_bbf4fca5ba9f87::t_c7b5e6f973473e 705-708
+  s_bbf4fca5ba9f87::t_5afe4a814bed0c 5
+  s_bbf4fca5ba9f87::t_90b9437cec2fe9 831,835
+  s_bbf4fca5ba9f87::t_a9d4b2d8fd39a4 361-362,364,370,379-380,389,391
+src/locales/en.ts
+  s_bbf4fca5ba9f87::t_bafe83cb27bacc 1-250
+src/locales/tr.ts
+  s_bbf4fca5ba9f87::t_59970a89560353 1-250
+src/i18n.ts
+  s_bbf4fca5ba9f87::t_124f6c859f0140 1-9,12-28,30-33,35-37,39-41,45,48,52-56,58,61-62,64,69,74-104,107,109,117,119,125-126,132,134
+  s_bbf4fca5ba9f87::t_3ce7bf46fa3ffa 10-11,29,34,38,42-44,46-47,49-51,57,59-60,63,65-68,70-73,105-106,108,110-116,118,120-124,127-131,133,135-140
+src/i18n.types.ts
+  s_bbf4fca5ba9f87::t_222aacc576afa6 1-261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "40fb427fd75894006671a20f58dce6a4e15cf964",
+  "prompts": {},
+  "sessions": {
+    "s_bbf4fca5ba9f87": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ac5177b8-6bd0-4b20-a4d8-d679a782fe32",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
