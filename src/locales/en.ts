@@ -176,6 +176,8 @@ export const locale: LocaleDefinition = {
     themeLightDesc: "Clean & crisp light mode",
     themeDark: "Dark",
     themeDarkDesc: "High contrast dark mode",
+    themeEink: "E-ink",
+    themeEinkDesc: "Monochrome high contrast",
 
     localAiTitle: "Local AI",
     localAiBadge: "100% Private · Local only",

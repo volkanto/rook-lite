@@ -110,12 +110,14 @@
 }
 
 .sidebar-theme-toggle .theme-light-icon,
-:root[data-theme="light"] .sidebar-theme-toggle .theme-light-icon {
+:root[data-theme="light"] .sidebar-theme-toggle .theme-light-icon,
+:root[data-theme="eink"] .sidebar-theme-toggle .theme-light-icon {
   display: none !important;
 }
 
 .sidebar-theme-toggle .theme-dark-icon,
-:root[data-theme="light"] .sidebar-theme-toggle .theme-dark-icon {
+:root[data-theme="light"] .sidebar-theme-toggle .theme-dark-icon,
+:root[data-theme="eink"] .sidebar-theme-toggle .theme-dark-icon {
   display: block !important;
 }
 
@@ -2449,9 +2451,15 @@
 
 .theme-selector-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.85rem;
   margin-top: 1.25rem;
+}
+
+@media (max-width: 64rem) {
+  .theme-selector-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .theme-option-card {
@@ -4340,4 +4348,1125 @@
   .language-selector-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==========================================================================
+   E-ink Monochromatic Mode (inspired by Minimal Theme's E-ink mode)
+   Prioritizes maximum contrast, zero ghosting, low dithering, and high readability
+   ========================================================================== */
+:root[data-theme="eink"] {
+  color-scheme: light;
+  --color-bg-app: #ffffff;
+  --color-bg-page: #ffffff;
+  --color-bg-surface: #ffffff;
+  --color-bg-raised: #ffffff;
+  --color-bg-sunken: #f5f5f5;
+  --color-bg-hover: #ebebeb;
+  --color-bg-active: #e0e0e0;
+  --color-bg-selected: #f0f0f0;
+  --color-note-hover-bg: #f7f7f7;
+  --color-note-hover-border: #000000;
+  --color-bg-overlay: rgba(0, 0, 0, 0.45);
+  --color-text-primary: #000000;
+  --color-text-secondary: #1a1a1a;
+  --color-text-tertiary: #333333;
+  --color-text-muted: #444444;
+  --color-text-disabled: #777777;
+  --color-text-inverse: #ffffff;
+  --color-text-link: #000000;
+  --color-text-link-hover: #000000;
+  --color-icon-primary: #000000;
+  --color-icon-secondary: #222222;
+  --color-icon-muted: #444444;
+  --color-border-subtle: #777777;
+  --color-border-default: #000000;
+  --color-border-strong: #000000;
+  --color-border-hover: #000000;
+  --color-focus: #000000;
+  --color-focus-ring: #000000;
+  --color-brand: #000000;
+  --color-brand-hover: #222222;
+  --color-brand-active: #000000;
+  --color-brand-soft: #f0f0f0;
+  --color-brand-softer: #f5f5f5;
+  --color-on-brand: #ffffff;
+  --color-danger: #000000;
+  --color-danger-hover: #222222;
+  --color-danger-bg: #f0f0f0;
+  --color-danger-text: #000000;
+  --color-warning-bg: #f0f0f0;
+  --color-warning-text: #000000;
+  --color-success-bg: #f0f0f0;
+  --color-success-text: #000000;
+  --color-evidence-bg: #f0f0f0;
+  --color-evidence-text: #000000;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --bg: var(--color-bg-page);
+  --surface: var(--color-bg-surface);
+  --surface-sunk: var(--color-bg-sunken);
+  --surface-lift: var(--color-bg-raised);
+  --text: var(--color-text-primary);
+  --text-soft: var(--color-text-secondary);
+  --muted: var(--color-text-muted);
+  --border: var(--color-border-default);
+  --border-strong: var(--color-border-strong);
+  --accent: var(--color-text-primary);
+  --accent-soft: var(--color-bg-selected);
+  --accent-text: #ffffff;
+  --button: var(--color-brand);
+  --button-hover: var(--color-brand-hover);
+  --danger: var(--color-danger-text);
+  --danger-soft: var(--color-danger-bg);
+  --shadow: none;
+  --shadow-lift: none;
+}
+
+/* Zero transitions & animations to eliminate ghosting on e-ink displays */
+:root[data-theme="eink"],
+:root[data-theme="eink"] * {
+  animation: none !important;
+  transition: none !important;
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* E-ink Link styling: clear underline since color cannot differentiate links */
+:root[data-theme="eink"] a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+:root[data-theme="eink"] .sidebar a,
+:root[data-theme="eink"] .theme-option-card,
+:root[data-theme="eink"] .tag-pill,
+:root[data-theme="eink"] .btn-primary,
+:root[data-theme="eink"] .btn-secondary,
+:root[data-theme="eink"] .minimal-nav-btn,
+:root[data-theme="eink"] .minimal-today-link,
+:root[data-theme="eink"] .palette-result-list a,
+:root[data-theme="eink"] .search-result-list a,
+:root[data-theme="eink"] button {
+  text-decoration: none;
+}
+
+/* Crisp solid black borders on key surfaces */
+:root[data-theme="eink"] .card,
+:root[data-theme="eink"] .settings-card,
+:root[data-theme="eink"] .notes-panel,
+:root[data-theme="eink"] .search-results-panel,
+:root[data-theme="eink"] .summary-document,
+:root[data-theme="eink"] .summary-control-panel,
+:root[data-theme="eink"] .calendar-container,
+:root[data-theme="eink"] .copilot-input-container .editor-card {
+  border: 1.5px solid #000000 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+}
+
+:root[data-theme="eink"] .notes-list .note {
+  background: #ffffff !important;
+  border: 1.5px solid #000000 !important;
+  border-left: 5px solid #000000 !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+:root[data-theme="eink"] .notes-list .note:hover {
+  background: #f7f7f7 !important;
+  border-color: #000000 !important;
+  border-left-color: #000000 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+:root[data-theme="eink"] .copilot-input-container .editor-card:focus-within {
+  border-color: #000000 !important;
+  outline: 2px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+/* Note Action Toolbar in E-ink */
+:root[data-theme="eink"] .notes-list .note-header-actions {
+  opacity: 1 !important;
+}
+
+:root[data-theme="eink"] .note-quick-action-btn {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .note-quick-action-btn:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .note-quick-action-btn:hover .action-icon-svg {
+  stroke: #ffffff !important;
+}
+
+:root[data-theme="eink"] .note-quick-action-btn.is-copied {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .note-quick-action-btn.is-copied .action-icon-svg {
+  stroke: #ffffff !important;
+}
+
+:root[data-theme="eink"] .note-time-text {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* Sidebar Navigation on E-ink */
+:root[data-theme="eink"] .sidebar nav a.is-active {
+  color: #ffffff !important;
+  background: #000000 !important;
+  border-radius: 8px !important;
+}
+
+:root[data-theme="eink"] .sidebar nav a.is-active .nav-svg {
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .sidebar nav a:hover:not(.is-active) {
+  background: #ebebeb !important;
+  color: #000000 !important;
+  border-radius: 8px !important;
+}
+
+/* Buttons in E-ink */
+:root[data-theme="eink"] button.button,
+:root[data-theme="eink"] button.primary,
+:root[data-theme="eink"] button[type="submit"],
+:root[data-theme="eink"] .btn-primary,
+:root[data-theme="eink"] .btn-danger-confirm,
+:root[data-theme="eink"] .save-btn-rect {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+:root[data-theme="eink"] button.button:hover,
+:root[data-theme="eink"] button.primary:hover,
+:root[data-theme="eink"] button[type="submit"]:hover,
+:root[data-theme="eink"] .btn-primary:hover,
+:root[data-theme="eink"] .btn-danger-confirm:hover,
+:root[data-theme="eink"] .save-btn-rect:hover {
+  background: #222222 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .btn-secondary,
+:root[data-theme="eink"] button.secondary,
+:root[data-theme="eink"] .lite-panel-actions button,
+:root[data-theme="eink"] .lite-file-label {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+:root[data-theme="eink"] .btn-secondary:hover,
+:root[data-theme="eink"] button.secondary:hover,
+:root[data-theme="eink"] .lite-panel-actions button:hover,
+:root[data-theme="eink"] .lite-file-label:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] button:disabled,
+:root[data-theme="eink"] .btn-secondary:disabled,
+:root[data-theme="eink"] .lite-panel-actions button:disabled {
+  opacity: 0.5 !important;
+  border-color: #888888 !important;
+  color: #888888 !important;
+  background: #ffffff !important;
+  cursor: not-allowed !important;
+}
+
+/* ==========================================================================
+   DROPDOWNS & SELECT MENUS IN E-INK MODE
+   ========================================================================== */
+
+/* Native select & option elements */
+:root[data-theme="eink"] select {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="eink"] select:focus {
+  outline: 2px solid #000000 !important;
+  outline-offset: 1px !important;
+}
+
+:root[data-theme="eink"] select option {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] select option:checked,
+:root[data-theme="eink"] select option:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Search modal select dropdowns (.palette-select-wrap) */
+:root[data-theme="eink"] .palette-select-wrap {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="eink"] .palette-select-wrap select {
+  color: #000000 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+:root[data-theme="eink"] .palette-select-wrap .palette-select-arrow {
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .palette-select-wrap .palette-filter-icon svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+:root[data-theme="eink"] .palette-select-wrap.is-active {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .palette-select-wrap.is-active select {
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .palette-select-wrap.is-active .palette-select-arrow {
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .palette-select-wrap.is-active .palette-filter-icon svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+:root[data-theme="eink"] .palette-filters label.filter-todo-chip {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .palette-filters label.filter-todo-chip.is-active {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+/* Search page filter select wraps (.search-select-wrap) */
+:root[data-theme="eink"] .search-select-wrap {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="eink"] .search-select-wrap:focus-within {
+  border-color: #000000 !important;
+  outline: 2px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="eink"] .search-select-wrap select {
+  border: none !important;
+  background: transparent !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .search-select-wrap .search-select-arrow {
+  color: #000000 !important;
+}
+
+/* Category dropdown in Composer (.footer-category-picker & .footer-category-menu) */
+:root[data-theme="eink"] .footer-category-picker > summary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .footer-category-picker[open] > summary,
+:root[data-theme="eink"] .footer-category-picker > summary:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .footer-category-picker > summary svg {
+  stroke: currentColor !important;
+}
+
+:root[data-theme="eink"] .footer-category-menu {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  padding: 0.85rem !important;
+  gap: 0.5rem !important;
+}
+
+:root[data-theme="eink"] .footer-category-empty {
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+/* Language picker dropdown in sidebar */
+:root[data-theme="eink"] .sidebar-lang-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .sidebar-lang-picker[open] .sidebar-lang-toggle,
+:root[data-theme="eink"] .sidebar-lang-toggle:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .sidebar-lang-popover {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  padding: 0.5rem !important;
+  gap: 4px !important;
+}
+
+:root[data-theme="eink"] .lang-option-btn {
+  background: transparent !important;
+  color: #000000 !important;
+  border: 1px solid transparent !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+:root[data-theme="eink"] .lang-option-btn:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .lang-option-btn:hover * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+:root[data-theme="eink"] .lang-option-btn.is-active {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="eink"] .lang-option-btn.is-active * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Note Action Popover on note cards */
+:root[data-theme="eink"] .note-action-popover {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  padding: 0.5rem !important;
+}
+
+:root[data-theme="eink"] .note-action-popover a,
+:root[data-theme="eink"] .note-action-popover button {
+  color: #000000 !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+:root[data-theme="eink"] .note-action-popover a:hover,
+:root[data-theme="eink"] .note-action-popover button:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .note-action-popover a:hover *,
+:root[data-theme="eink"] .note-action-popover button:hover * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+:root[data-theme="eink"] .note-action-popover .delete-note-action {
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .note-action-divider {
+  background: #000000 !important;
+}
+
+/* Date picker calendar popover */
+:root[data-theme="eink"] .date-picker-popover {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="eink"] .calendar-popover-head button {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .calendar-popover-head button:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .calendar-week {
+  background: transparent !important;
+}
+
+:root[data-theme="eink"] .calendar-week.has-notes {
+  background: #f7f7f7 !important;
+  border: 1px solid #000000 !important;
+}
+
+:root[data-theme="eink"] .calendar-day {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+}
+
+:root[data-theme="eink"] .calendar-day:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .calendar-day.is-selected {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .calendar-day i {
+  background: #000000 !important;
+}
+
+:root[data-theme="eink"] .calendar-day.is-selected i,
+:root[data-theme="eink"] .calendar-day:hover i {
+  background: #ffffff !important;
+}
+
+:root[data-theme="eink"] .calendar-day.is-outside {
+  color: #777777 !important;
+}
+
+:root[data-theme="eink"] .calendar-week-activity {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* Tag autocomplete dropdown */
+:root[data-theme="eink"] .tag-autocomplete-dropdown {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  padding: 0.4rem !important;
+}
+
+:root[data-theme="eink"] .tag-autocomplete-item {
+  border: 1px solid transparent !important;
+  border-radius: 6px !important;
+  color: #000000 !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+:root[data-theme="eink"] .tag-autocomplete-item.is-selected,
+:root[data-theme="eink"] .tag-autocomplete-item:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .tag-autocomplete-item .tag-autocomplete-tag-name {
+  color: inherit !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="eink"] .tag-autocomplete-item .tag-autocomplete-count {
+  color: #555555 !important;
+  font-weight: 600 !important;
+}
+
+:root[data-theme="eink"] .tag-autocomplete-item.is-selected .tag-autocomplete-count,
+:root[data-theme="eink"] .tag-autocomplete-item:hover .tag-autocomplete-count {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   LISTS IN E-INK MODE
+   ========================================================================== */
+
+/* Search page results list */
+:root[data-theme="eink"] .search-result-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.65rem !important;
+}
+
+:root[data-theme="eink"] .search-result-list li {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+}
+
+:root[data-theme="eink"] .search-result-list li + li {
+  border-top: 1.5px solid #000000 !important;
+}
+
+:root[data-theme="eink"] .search-result-list a {
+  color: #000000 !important;
+  padding: 0.9rem 1.15rem !important;
+  display: block !important;
+}
+
+:root[data-theme="eink"] .search-result-list a:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .search-result-list a:hover * {
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .search-result-meta time {
+  color: inherit !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="eink"] .search-result-meta span {
+  border: 1px solid currentColor !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  color: inherit !important;
+}
+
+/* Command palette search results list */
+:root[data-theme="eink"] .palette-result-list {
+  gap: 0.45rem !important;
+}
+
+:root[data-theme="eink"] .palette-result-list a,
+:root[data-theme="eink"] .palette-result-item {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .palette-result-list a:hover,
+:root[data-theme="eink"] .palette-result-list a:focus,
+:root[data-theme="eink"] .palette-result-list a:focus-visible {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .palette-result-list a:hover *,
+:root[data-theme="eink"] .palette-result-list a:focus * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+:root[data-theme="eink"] .palette-result-icon {
+  border: 1px solid #000000 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .palette-result-tags span {
+  border: 1px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 4px !important;
+}
+
+:root[data-theme="eink"] .search-commands a.command-item {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  margin-bottom: 0.35rem !important;
+}
+
+:root[data-theme="eink"] .search-commands a.command-item:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .search-commands a.command-item:hover * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+:root[data-theme="eink"] .search-commands kbd {
+  border: 1px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 4px !important;
+}
+
+:root[data-theme="eink"] .search-commands a.command-item:hover kbd {
+  background: #000000 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Todos list */
+:root[data-theme="eink"] .todo-list {
+  gap: 0.65rem !important;
+}
+
+:root[data-theme="eink"] .todo-item {
+  border: 1.5px solid #000000 !important;
+  border-left: 5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .todo-item:hover {
+  background: #f7f7f7 !important;
+}
+
+:root[data-theme="eink"] .lite-task-check input {
+  border: 2px solid #000000 !important;
+  accent-color: #000000 !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
+
+:root[data-theme="eink"] .todo-item a {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+}
+
+/* Categories page list */
+:root[data-theme="eink"] .category-section {
+  border: 1.5px solid #000000 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+}
+
+:root[data-theme="eink"] .category-item + .category-item {
+  border-top: 1.5px solid #000000 !important;
+}
+
+:root[data-theme="eink"] .category-marker {
+  background: #000000 !important;
+  border: 1px solid #000000 !important;
+  border-radius: 2px !important;
+}
+
+:root[data-theme="eink"] .category-edit-trigger {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  padding: 0.35rem 0.75rem !important;
+}
+
+:root[data-theme="eink"] .category-edit-trigger:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .category-editor {
+  background: #f7f7f7 !important;
+  border-top: 1.5px solid #000000 !important;
+}
+
+:root[data-theme="eink"] .category-editor input {
+  border: 1.5px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 4px !important;
+}
+
+:root[data-theme="eink"] .category-editor button {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+:root[data-theme="eink"] .archived-categories summary {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  padding: 0.75rem 1rem !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="eink"] .archived-categories ul {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  margin-top: 0.5rem !important;
+}
+
+:root[data-theme="eink"] .archived-categories li {
+  border-top: 1px solid #000000 !important;
+  color: #000000 !important;
+}
+
+/* Summary period tabs & Mode selection list */
+:root[data-theme="eink"] .summary-period-tabs {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  display: flex !important;
+}
+
+:root[data-theme="eink"] .summary-period-tabs button {
+  border: 0 !important;
+  border-right: 1.5px solid #000000 !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="eink"] .summary-period-tabs button:last-child {
+  border-right: 0 !important;
+}
+
+:root[data-theme="eink"] .summary-period-tabs button.is-active {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .summary-mode-picker {
+  border: 1.5px solid #000000 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  padding: 1rem !important;
+}
+
+:root[data-theme="eink"] .summary-mode-picker legend {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  padding: 0 0.4rem !important;
+}
+
+:root[data-theme="eink"] .summary-mode-picker label {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .summary-mode-picker label:has(input:checked) {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .summary-mode-picker label:has(input:checked) * {
+  color: #ffffff !important;
+}
+
+/* Composer formatting toolbar buttons */
+:root[data-theme="eink"] .simple-editor-toolbar button {
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+}
+
+:root[data-theme="eink"] .simple-editor-toolbar button:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Modals & Dialogs on E-ink */
+:root[data-theme="eink"] .modal-backdrop,
+:root[data-theme="eink"] .note-edit-backdrop {
+  background: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root[data-theme="eink"] .modal-content,
+:root[data-theme="eink"] .search-palette,
+:root[data-theme="eink"] .note-edit-dialog,
+:root[data-theme="eink"] .lite-confirm-dialog {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="eink"] .note-edit-dialog-head {
+  border-bottom: 1.5px solid #000000 !important;
+  background: #ffffff !important;
+}
+
+:root[data-theme="eink"] .note-edit-close {
+  border: 1.5px solid #000000 !important;
+  border-radius: 4px !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .note-edit-close:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .confirm-dialog-footer {
+  border-top: 1.5px solid #000000 !important;
+  background: #ffffff !important;
+}
+
+/* Form inputs on E-ink */
+:root[data-theme="eink"] input,
+:root[data-theme="eink"] textarea {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+}
+
+:root[data-theme="eink"] input:focus,
+:root[data-theme="eink"] textarea:focus {
+  outline: 2px solid #000000 !important;
+  outline-offset: 1px !important;
+}
+
+/* Interactive Checklists on E-ink */
+:root[data-theme="eink"] .notes-list .prose input[type="checkbox"].interactive-task-checkbox,
+:root[data-theme="eink"] .notes-list .prose input[type="checkbox"] {
+  border: 2px solid #000000 !important;
+  background-color: #ffffff !important;
+  transform: none !important;
+}
+
+:root[data-theme="eink"] .notes-list .prose input[type="checkbox"].interactive-task-checkbox:checked,
+:root[data-theme="eink"] .notes-list .prose input[type="checkbox"]:checked {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .notes-list .prose input[type="checkbox"].interactive-task-checkbox::before,
+:root[data-theme="eink"] .notes-list .prose input[type="checkbox"]::before {
+  border-left-color: #ffffff !important;
+  border-bottom-color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .notes-list .prose .task-item-content::after {
+  background-color: #000000 !important;
+}
+
+/* Prose formatting on E-ink */
+:root[data-theme="eink"] .prose blockquote {
+  border-left: 3px solid #000000 !important;
+  background: #f5f5f5 !important;
+  color: #111111 !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+:root[data-theme="eink"] .prose table {
+  border-collapse: collapse !important;
+  border: 1.5px solid #000000 !important;
+  width: 100% !important;
+}
+
+:root[data-theme="eink"] .prose th,
+:root[data-theme="eink"] .prose td {
+  border: 1px solid #000000 !important;
+  padding: 0.45rem 0.7rem !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .prose th {
+  background: #f0f0f0 !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="eink"] .prose code {
+  border: 1px solid #000000 !important;
+  background: #f5f5f5 !important;
+  color: #000000 !important;
+  border-radius: 3px !important;
+}
+
+:root[data-theme="eink"] .prose pre {
+  border: 1.5px solid #000000 !important;
+  background: #f5f5f5 !important;
+  border-radius: 6px !important;
+}
+
+/* Category pills and color classes override on E-ink */
+:root[data-theme="eink"] .label-chip,
+:root[data-theme="eink"] .category-pill,
+:root[data-theme="eink"] .label-chip[class*="color-"],
+:root[data-theme="eink"] .category-pill[class*="color-"] {
+  background: #ffffff !important;
+  border: 1.5px solid #000000 !important;
+  color: #000000 !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+:root[data-theme="eink"] .label-chip:has(input:checked)[class*="color-"],
+:root[data-theme="eink"] .category-pill:has(input:checked)[class*="color-"],
+:root[data-theme="eink"] .category-pill:has(input:checked) {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #000000 !important;
+}
+
+:root[data-theme="eink"] .label-chip:has(input:checked)[class*="color-"] *,
+:root[data-theme="eink"] .category-pill:has(input:checked)[class*="color-"] * {
+  color: #ffffff !important;
+}
+
+/* Date header badges on E-ink */
+:root[data-theme="eink"] .minimal-week-badge,
+:root[data-theme="eink"] .minimal-date-badge,
+:root[data-theme="eink"] .notes-count-badge {
+  background: #ffffff !important;
+  border: 1.5px solid #000000 !important;
+  color: #000000 !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="eink"] .minimal-date-badge.is-today {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+:root[data-theme="eink"] .minimal-date-badge .live-pulse-dot {
+  background: #ffffff !important;
+  animation: none !important;
+}
+
+:root[data-theme="eink"] .minimal-nav-btn,
+:root[data-theme="eink"] .minimal-today-link,
+:root[data-theme="eink"] .minimal-calendar-btn {
+  border: 1.5px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .minimal-nav-btn:hover,
+:root[data-theme="eink"] .minimal-today-link:hover,
+:root[data-theme="eink"] .minimal-calendar-btn:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .minimal-today-link.is-active {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+/* Settings theme option card on E-ink */
+:root[data-theme="eink"] .theme-option-card {
+  border: 1.5px solid #000000 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="eink"] .theme-option-card.is-selected {
+  border: 2px solid #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .theme-option-card.is-selected .theme-card-icon {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #ffffff !important;
+}
+
+:root[data-theme="eink"] .theme-option-card.is-selected strong,
+:root[data-theme="eink"] .theme-option-card.is-selected span {
+  color: #ffffff !important;
+}
+
+:root[data-theme="eink"] .theme-card-icon {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1.5px solid #000000 !important;
+}
+
+/* Grayscale illustrations and brand logo on E-ink */
+:root[data-theme="eink"] .empty-notes-illustration,
+:root[data-theme="eink"] .sidebar-brand-logo {
+  filter: grayscale(100%) contrast(180%) !important;
+}
+
+/* Crisp monochrome scrollbars for E-ink devices */
+:root[data-theme="eink"] ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+:root[data-theme="eink"] ::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+:root[data-theme="eink"] ::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 0;
 }

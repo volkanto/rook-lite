@@ -77,7 +77,7 @@
  * it on.
  */
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) {
         /* ---- dark: github color schema ------------------------------------- */
         --bg: #0d1117;
         --surface: #161b22;
@@ -1660,19 +1660,19 @@ mark {
 }
 
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .pill.rollover-once {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .pill.rollover-once {
         color: #e5cf7b;
         background: rgba(164, 132, 42, 0.18);
         border-color: rgba(229, 207, 123, 0.25);
     }
 
-    :root:not([data-theme="light"]) .pill.rollover-twice {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .pill.rollover-twice {
         color: #efb36f;
         background: rgba(183, 101, 34, 0.2);
         border-color: rgba(239, 179, 111, 0.26);
     }
 
-    :root:not([data-theme="light"]) .pill.rollover-stuck {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .pill.rollover-stuck {
         color: #f19b96;
         background: rgba(172, 62, 55, 0.2);
         border-color: rgba(241, 155, 150, 0.27);
@@ -2127,7 +2127,7 @@ body.app .sidebar nav a.is-active .nav-label {
 }
 
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) {
         --color-bg-app: #071426;
         --color-bg-page: #071426;
         --color-bg-surface: #101d35;
@@ -5649,7 +5649,7 @@ main.wide {
  * explicitly.
  */
 :root[data-theme="dark"],
-:root:not([data-theme="light"]) {
+:root:not([data-theme="light"]):not([data-theme="eink"]) {
     color-scheme: dark;
 }
 
@@ -5658,10 +5658,10 @@ main.wide {
 }
 
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .card,
-    :root:not([data-theme="light"]) .note,
-    :root:not([data-theme="light"]) .draft,
-    :root:not([data-theme="light"]) .summary {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .card,
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .note,
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .draft,
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .summary {
         background: var(--surface);
         border-color: var(--border);
     }
@@ -5669,23 +5669,23 @@ main.wide {
     /* The active item in the sidebar sits on the sunk panel, so it has to be
        lighter than the surface to read as raised rather than as selected-and-
        greyed. */
-    :root:not([data-theme="light"]) .sidebar nav a.is-active,
-    :root:not([data-theme="light"]) .account:hover,
-    :root:not([data-theme="light"]) .account.is-active {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .sidebar nav a.is-active,
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .account:hover,
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .account.is-active {
         background: var(--surface-lift);
     }
 
     /* Inputs are holes, not cards: on paper they are white against grey, and
        in the dark they have to be darker than what surrounds them or they
        read as buttons. */
-    :root:not([data-theme="light"]) input,
-    :root:not([data-theme="light"]) textarea,
-    :root:not([data-theme="light"]) select {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) input,
+    :root:not([data-theme="light"]):not([data-theme="eink"]) textarea,
+    :root:not([data-theme="light"]):not([data-theme="eink"]) select {
         background: var(--surface-sunk);
         border-color: var(--border-strong);
     }
 
-    :root:not([data-theme="light"]) .topsearch input {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .topsearch input {
         background: var(--surface-sunk);
     }
 }
@@ -7712,16 +7712,16 @@ main.wide {
 
 /* Dark Media Query overrides */
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .label-chip.color-0, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-0 { background: rgba(248, 81, 73, 0.15); border: 1px solid #f85149; color: #ff7b72; }
-    :root:not([data-theme="light"]) .label-chip.color-1, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-1 { background: rgba(56, 139, 253, 0.15); border: 1px solid #388bfd; color: #79c0ff; }
-    :root:not([data-theme="light"]) .label-chip.color-2, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-2 { background: rgba(88, 166, 255, 0.15); border: 1px solid #58a6ff; color: #a5d6ff; }
-    :root:not([data-theme="light"]) .label-chip.color-3, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-3 { background: rgba(46, 160, 67, 0.15); border: 1px solid #2ea043; color: #56d364; }
-    :root:not([data-theme="light"]) .label-chip.color-4, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-4 { background: rgba(110, 118, 129, 0.15); border: 1px solid #8b949e; color: #c9d1d9; }
-    :root:not([data-theme="light"]) .label-chip.color-5, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-5 { background: rgba(188, 140, 255, 0.15); border: 1px solid #bc8cff; color: #d3b3ff; }
-    :root:not([data-theme="light"]) .label-chip.color-6, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-6 { background: rgba(240, 136, 62, 0.15); border: 1px solid #f0883e; color: #ff9e64; }
-    :root:not([data-theme="light"]) .label-chip.color-7, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-7 { background: rgba(0, 164, 180, 0.15); border: 1px solid #00a4b4; color: #70e1ec; }
-    :root:not([data-theme="light"]) .label-chip.color-8, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-8 { background: rgba(33, 139, 255, 0.15); border: 1px solid #218bff; color: #79c0ff; }
-    :root:not([data-theme="light"]) .label-chip.color-9, :root:not([data-theme="light"]) .category-pill:has(input:checked).color-9 { background: rgba(212, 167, 44, 0.15); border: 1px solid #d4a72c; color: #f2cc60; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-0, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-0 { background: rgba(248, 81, 73, 0.15); border: 1px solid #f85149; color: #ff7b72; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-1, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-1 { background: rgba(56, 139, 253, 0.15); border: 1px solid #388bfd; color: #79c0ff; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-2, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-2 { background: rgba(88, 166, 255, 0.15); border: 1px solid #58a6ff; color: #a5d6ff; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-3, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-3 { background: rgba(46, 160, 67, 0.15); border: 1px solid #2ea043; color: #56d364; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-4, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-4 { background: rgba(110, 118, 129, 0.15); border: 1px solid #8b949e; color: #c9d1d9; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-5, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-5 { background: rgba(188, 140, 255, 0.15); border: 1px solid #bc8cff; color: #d3b3ff; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-6, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-6 { background: rgba(240, 136, 62, 0.15); border: 1px solid #f0883e; color: #ff9e64; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-7, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-7 { background: rgba(0, 164, 180, 0.15); border: 1px solid #00a4b4; color: #70e1ec; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-8, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-8 { background: rgba(33, 139, 255, 0.15); border: 1px solid #218bff; color: #79c0ff; }
+    :root:not([data-theme="light"]):not([data-theme="eink"]) .label-chip.color-9, :root:not([data-theme="light"]):not([data-theme="eink"]) .category-pill:has(input:checked).color-9 { background: rgba(212, 167, 44, 0.15); border: 1px solid #d4a72c; color: #f2cc60; }
 }
 
 /* ================================================= login page === */
@@ -8529,7 +8529,7 @@ main.wide {
 }
 
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    :root:not([data-theme="light"]):not([data-theme="eink"]) {
         --bg: #181a18;
         --surface: #1d201d;
         --surface-sunk: #242824;

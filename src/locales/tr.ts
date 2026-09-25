@@ -176,6 +176,8 @@ export const locale: LocaleDefinition = {
     themeLightDesc: "Ferah ve net açık mod",
     themeDark: "Koyu",
     themeDarkDesc: "Yüksek kontrastlı koyu mod",
+    themeEink: "E-mürekkep",
+    themeEinkDesc: "Yüksek kontrastlı siyah-beyaz",
 
     localAiTitle: "Yerel Yapay Zeka",
     localAiBadge: "%100 Gizli · Yalnızca yerel",

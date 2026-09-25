@@ -8,7 +8,7 @@
           ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
           : theme.toLowerCase();
         document.documentElement.setAttribute('data-theme', resolved);
-        document.documentElement.style.colorScheme = resolved;
+        document.documentElement.style.colorScheme = resolved === 'dark' ? 'dark' : 'light';
         if (window.matchMedia('(min-width: 60.001rem)').matches &&
             localStorage.getItem('sidebar-collapsed') === 'true') {
           document.documentElement.classList.add('sidebar-collapsed');

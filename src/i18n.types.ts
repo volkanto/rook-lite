@@ -175,6 +175,8 @@ export interface TranslationStrings {
   themeLightDesc: string;
   themeDark: string;
   themeDarkDesc: string;
+  themeEink: string;
+  themeEinkDesc: string;
 
   // Local AI settings
   localAiTitle: string;

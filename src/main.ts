@@ -10,7 +10,7 @@ import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./r
 import { CategoryService, initializeLocalData, normalize, NoteService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
 
-type ThemePreference = "SYSTEM" | "LIGHT" | "DARK";
+type ThemePreference = "SYSTEM" | "LIGHT" | "DARK" | "EINK";
 
 interface NavigationItem { path: string; label: string; icon: string; divider?: boolean }
 
@@ -35,6 +35,7 @@ export const icons = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/>',
   moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>',
   monitor: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
   sidebarCollapse: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9-3 3 3 3"/>',
   close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
   menu: '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
@@ -410,7 +411,8 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
           ${([
             ["SYSTEM", s.themeSystem, s.themeSystemDesc, icons.monitor],
             ["LIGHT", s.themeLight, s.themeLightDesc, icons.sun],
-            ["DARK", s.themeDark, s.themeDarkDesc, icons.moon]
+            ["DARK", s.themeDark, s.themeDarkDesc, icons.moon],
+            ["EINK", s.themeEink, s.themeEinkDesc, icons.book]
           ] as const).map(([val, label, desc, iconSvg]) => `
             <label class="theme-option-card ${currentTheme === val ? "is-selected" : ""}">
               <input type="radio" name="settings-theme" value="${val}" ${currentTheme === val ? "checked" : ""}>
@@ -916,7 +918,7 @@ function applyTheme(): void {
   const theme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
   const resolved = theme === "SYSTEM" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme.toLowerCase();
   document.documentElement.dataset.theme = resolved;
-  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0d1117" : "#f6f8fa");
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0d1117" : resolved === "eink" ? "#ffffff" : "#f6f8fa");
   const toggle = document.querySelector<HTMLElement>(".sidebar-theme-toggle");
   if (toggle) {
     const nextLabel = resolved === "dark" ? s.themeToggleLight : s.themeToggleDark;
