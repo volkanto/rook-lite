@@ -160,6 +160,10 @@ describe("Left menu bar icons and navigation", () => {
     const noteItems = notesList?.querySelectorAll(".note-list-item");
     expect(noteItems?.length).toBe(1);
 
+    const noteEl = noteItems?.[0]?.querySelector(".note");
+    expect(noteEl).not.toBeNull();
+    expect(noteEl?.id).toBe(`note-${createdNote.id}`);
+
     const actions = noteItems?.[0]?.querySelector(".note-header-actions");
     expect(actions).not.toBeNull();
 
@@ -391,5 +395,30 @@ describe("Left menu bar icons and navigation", () => {
     expect(document.querySelector(".lite-confirm-dialog")).toBeNull();
 
     await noteService.delete(createdNote.id);
+  });
+
+  it("renders composer with stable empty state and toggles has-content on input", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+
+    expect(form).not.toBeNull();
+    expect(textarea).not.toBeNull();
+    // Empty composer does not have .has-content
+    expect(form?.classList.contains("has-content")).toBe(false);
+
+    // Textarea has placeholder
+    expect(textarea?.placeholder).toBeTruthy();
+
+    // Typing adds .has-content, clearing removes it
+    textarea!.value = "Remember this";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(form?.classList.contains("has-content")).toBe(true);
+
+    textarea!.value = "";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(form?.classList.contains("has-content")).toBe(false);
   });
 });

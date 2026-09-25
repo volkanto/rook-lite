@@ -1063,7 +1063,7 @@
   border-left: 4px solid var(--color-border-subtle, var(--border));
   border-radius: var(--radius-md, 10px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
   scroll-margin-top: 5rem;
   box-sizing: border-box;
   overflow: visible;
@@ -1075,7 +1075,7 @@
   border-left-width: 4px !important;
   border-left-color: var(--color-note-hover-border, #0969da) !important;
   box-shadow: 0 6px 20px rgba(9, 105, 218, 0.12), 0 2px 6px rgba(9, 105, 218, 0.06) !important;
-  transform: translateY(-2px);
+  transform: none;
 }
 
 :root[data-theme="dark"] .notes-list .note:hover {
@@ -1102,12 +1102,6 @@
     background: transparent;
     box-shadow: inset 3px 0 0 transparent;
   }
-}
-
-.notes-list .note:hover {
-  border-color: transparent;
-  background: var(--color-bg-hover, var(--surface-sunk));
-  box-shadow: none;
 }
 
 .notes-list .note-header {
@@ -1915,7 +1909,6 @@
   display: none;
 }
 
-#new-note-form:focus-within,
 #new-note-form.has-content {
   padding-top: 0.45rem;
 }
