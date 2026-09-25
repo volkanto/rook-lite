@@ -140,22 +140,34 @@ export function formatTimeLocale(createdAt: string, noteDate: string, todayIso: 
   const timeFormatted = format24HourTime(createdAt);
   const s = translations[code] ?? translations.en;
 
+  const createdDate = new Date(createdAt);
+  const isInvalid = Number.isNaN(createdDate.getTime());
+  const createdIso = isInvalid
+    ? noteDate
+    : `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, "0")}-${String(createdDate.getDate()).padStart(2, "0")}`;
+
   let dateLabel: string;
-  if (noteDate === todayIso) {
+  if (createdIso === todayIso) {
     dateLabel = s.today;
   } else {
-    const yesterday = new Date(`${todayIso}T12:00:00`);
+    const todayObj = new Date(`${todayIso}T12:00:00`);
+    const yesterday = new Date(todayObj);
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayIso = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
 
-    if (noteDate === yesterdayIso) {
+    const tomorrow = new Date(todayObj);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowIso = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+
+    if (createdIso === yesterdayIso) {
       dateLabel = s.yesterday;
+    } else if (createdIso === tomorrowIso) {
+      dateLabel = s.tomorrow;
     } else {
-      const noteDateObj = new Date(`${noteDate}T12:00:00`);
       dateLabel = new Intl.DateTimeFormat(getDateTimeLocale(code), {
         month: "short",
         day: "numeric"
-      }).format(noteDateObj);
+      }).format(isInvalid ? new Date(`${noteDate}T12:00:00`) : createdDate);
     }
   }
 

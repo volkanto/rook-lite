@@ -102,6 +102,21 @@ describe("i18n internationalization and language support", () => {
     const timeEn = formatTimeLocale("2026-09-24T14:30:00", testDate, testDate, "en");
     expect(timeEn).toBe("Today · 14:30");
 
+    // Note created on 2026-09-24 for tomorrow (2026-09-25). When viewed on 2026-09-25, it must show Yesterday, NOT Today!
+    const noteCreatedYesterday = formatTimeLocale("2026-09-24T14:30:00", "2026-09-25", "2026-09-25", "en");
+    expect(noteCreatedYesterday).toBe("Yesterday · 14:30");
+
+    // When viewed multiple days later, it must show the actual creation date
+    const noteCreatedDaysAgo = formatTimeLocale("2026-09-24T14:30:00", "2026-09-25", "2026-09-28", "en");
+    expect(noteCreatedDaysAgo).toBe("Sep 24 · 14:30");
+
+    // Turkish locale verification
+    const noteTrYesterday = formatTimeLocale("2026-09-24T14:30:00", "2026-09-25", "2026-09-25", "tr");
+    expect(noteTrYesterday).toBe("Dün · 14:30");
+
+    const noteTrDaysAgo = formatTimeLocale("2026-09-24T14:30:00", "2026-09-25", "2026-09-28", "tr");
+    expect(noteTrDaysAgo).toBe("24 Eyl · 14:30");
+
     expect(translations.en.notesTitle).toBe("Notes");
     expect(translations.tr.notesTitle).toBe("Notlar");
   });
