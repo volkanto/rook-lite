@@ -128,9 +128,11 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 
   const relativeInfo = getRelativeDateInfo(date, today, getLocale());
 
-  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}">${relativeInfo.status === "today" ? '<span class="live-pulse-dot"></span>' : ""}<span>${relativeInfo.label}</span></span><span class="minimal-week-badge" title="${s.weekLabel(isoWeek(value))}">${s.weekLabel(isoWeek(value))}</span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active is-disabled" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", draft?.categoryIds ?? [], allCategories, s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allCategories, date)).join("")}</div><footer class="notes-stream-footer"><button type="button" class="back-to-top-btn" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
+  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}">${relativeInfo.status === "today" ? '<span class="live-pulse-dot"></span>' : ""}<span>${relativeInfo.label}</span></span><span class="minimal-week-badge" title="${s.weekLabel(isoWeek(value))}">${s.weekLabel(isoWeek(value))}</span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active is-disabled" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", draft?.categoryIds ?? [], allCategories, s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allCategories, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-btn" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
   bindCreateEditor(date); bindNoteActions(allCategories);
+  updateBackToTopVisibility();
+  requestAnimationFrame(() => updateBackToTopVisibility());
 }
 
 function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string, isModal = false): string {
@@ -757,6 +759,40 @@ function showConfirm(title: string, message: string, actionLabel: string, action
 }
 
 export function closeDialog(): void { const host = document.querySelector<HTMLElement>("#dialog-host"); if (host) host.replaceChildren(); document.body.style.overflow = ""; }
+
+export function updateBackToTopVisibility(): void {
+  const streamFooter = document.querySelector<HTMLElement>(".notes-stream-footer");
+  if (!streamFooter) return;
+
+  const notesList = document.querySelector<HTMLElement>(".notes-list");
+  if (!notesList) {
+    streamFooter.classList.add("is-hidden");
+    streamFooter.setAttribute("hidden", "");
+    return;
+  }
+
+  const shell = document.querySelector<HTMLElement>(".shell");
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+  const listRect = notesList.getBoundingClientRect();
+  const currentScroll = window.scrollY || shell?.scrollTop || 0;
+  const listTotalBottom = listRect.bottom + currentScroll;
+
+  const docOverflows = document.documentElement.scrollHeight > viewportHeight + 40;
+  const shellOverflows = shell ? shell.scrollHeight > shell.clientHeight + 40 : false;
+  const listOverflows = listTotalBottom > viewportHeight + 40;
+  const isScrolled = currentScroll > 60;
+
+  const shouldShow = docOverflows || shellOverflows || listOverflows || isScrolled;
+
+  if (shouldShow) {
+    streamFooter.classList.remove("is-hidden");
+    streamFooter.removeAttribute("hidden");
+  } else {
+    streamFooter.classList.add("is-hidden");
+    streamFooter.setAttribute("hidden", "");
+  }
+}
+
 function renderNotFound(content: HTMLElement): void {
   const s = currentStrings();
   document.title = `${s.notFoundTitle} · Rook Lite`;
@@ -786,6 +822,16 @@ function bindShellEvents(): void {
   if (shellEventsBound) return;
   shellEventsBound = true;
 
+  window.addEventListener("resize", () => {
+    updateBackToTopVisibility();
+  });
+  window.addEventListener("scroll", () => {
+    updateBackToTopVisibility();
+  }, { passive: true });
+  document.querySelector(".shell")?.addEventListener("scroll", () => {
+    updateBackToTopVisibility();
+  }, { passive: true });
+
   document.addEventListener("click", (event) => {
     const target = event.target as Element;
     document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
@@ -804,6 +850,13 @@ function bindShellEvents(): void {
         top: 0,
         behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
       });
+      const shell = document.querySelector<HTMLElement>(".shell");
+      if (shell) {
+        shell.scrollTo({
+          top: 0,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+        });
+      }
       const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea");
       if (textarea) {
         window.setTimeout(() => textarea.focus(), 350);

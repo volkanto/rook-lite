@@ -170,6 +170,14 @@ describe("Left menu bar icons and navigation", () => {
     const streamFooter = document.querySelector(".notes-stream-footer");
     expect(streamFooter).not.toBeNull();
     expect(streamFooter?.querySelector(".back-to-top-btn")).not.toBeNull();
+    expect(streamFooter?.classList.contains("is-hidden")).toBe(true);
+
+    // When page content overflows viewport, back to top button becomes visible
+    const { updateBackToTopVisibility } = await import("./main");
+    Object.defineProperty(document.documentElement, "scrollHeight", { value: 1800, configurable: true });
+    Object.defineProperty(window, "innerHeight", { value: 800, configurable: true });
+    updateBackToTopVisibility();
+    expect(streamFooter?.classList.contains("is-hidden")).toBe(false);
 
     // Clean up created note
     await noteService.delete(createdNote.id);

@@ -1437,6 +1437,11 @@
   width: 100%;
 }
 
+.notes-stream-footer[hidden],
+.notes-stream-footer.is-hidden {
+  display: none !important;
+}
+
 .back-to-top-btn {
   display: inline-flex;
   align-items: center;
