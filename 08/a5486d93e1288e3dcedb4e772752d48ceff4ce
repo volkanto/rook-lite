@@ -1,0 +1,19 @@
+src/i18n.ts
+  s_50aea4cff10561::t_11848722b588fc 143-148,150,153-154,158-162,164-165,170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "08a5486d93e1288e3dcedb4e772752d48ceff4ce",
+  "prompts": {},
+  "sessions": {
+    "s_50aea4cff10561": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "90a5dd7d-ba26-45e6-82fe-6ed2256034fd",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
