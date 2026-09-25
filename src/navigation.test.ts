@@ -140,6 +140,10 @@ describe("Left menu bar icons and navigation", () => {
     allSidebarSvgs?.forEach((svgEl) => {
       expect(svgEl.getAttribute("viewBox")).toBe("0 0 24 24");
     });
+
+    // Theme toggle is a clean sidebar-theme-toggle button
+    expect(themeToggle?.tagName).toBe("BUTTON");
+    expect(themeToggle?.className).toBe("sidebar-theme-toggle");
   });
 
   it("renders complete edit and delete buttons in single item note action popup", async () => {

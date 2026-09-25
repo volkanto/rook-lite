@@ -87,6 +87,7 @@
   border: 0;
   border-radius: 10px;
   background: transparent;
+  box-shadow: none;
   color: var(--color-icon-secondary, var(--text-soft));
   text-decoration: none;
   cursor: pointer;
@@ -107,6 +108,14 @@
 .sidebar-theme-toggle:hover {
   background: var(--color-bg-hover);
   color: var(--color-text-primary);
+  box-shadow: none;
+}
+
+.sidebar-theme-toggle,
+.sidebar-theme-toggle:hover,
+.sidebar-theme-toggle:focus,
+.sidebar-theme-toggle:active {
+  box-shadow: none;
 }
 
 .sidebar-theme-toggle .theme-light-icon,
@@ -232,6 +241,7 @@
   border: 0;
   border-radius: 6px;
   background: transparent;
+  box-shadow: none;
   color: var(--color-icon-secondary);
   cursor: pointer;
 }
