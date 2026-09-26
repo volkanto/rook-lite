@@ -2032,7 +2032,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-.editor-card .simple-editor-toolbar button {
+.editor-card .simple-editor-toolbar button[data-format] {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -2053,12 +2053,12 @@
   transition: all 120ms ease !important;
 }
 
-.editor-card .simple-editor-toolbar button:hover {
+.editor-card .simple-editor-toolbar button[data-format]:hover {
   background: var(--color-bg-hover, var(--surface-sunk)) !important;
   color: var(--color-text-primary, var(--text)) !important;
 }
 
-.editor-card .simple-editor-toolbar button:active {
+.editor-card .simple-editor-toolbar button[data-format]:active {
   transform: scale(0.95) !important;
 }
 
@@ -2091,13 +2091,88 @@
   height: 0.85rem;
 }
 
+.editor-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 7px;
+  background: var(--color-bg-surface, var(--surface));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.editor-card .simple-editor-toolbar .editor-mode-btn,
+.editor-mode-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  height: 1.75rem !important;
+  min-height: 1.75rem !important;
+  width: auto !important;
+  min-width: fit-content !important;
+  padding: 0 0.65rem !important;
+  flex: 0 0 auto !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: all 120ms ease !important;
+}
+
+.editor-card .simple-editor-toolbar .editor-mode-btn:hover,
+.editor-mode-btn:hover {
+  background: var(--color-bg-hover, var(--surface-sunk)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+}
+
+.editor-card .simple-editor-toolbar .editor-mode-btn.is-active,
+.editor-mode-btn.is-active {
+  background: color-mix(in srgb, var(--accent, #0969da) 12%, transparent) !important;
+  color: var(--accent, #0969da) !important;
+  font-weight: 600 !important;
+}
+
+.editor-mode-svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: 0 0 0.85rem;
+}
+
+.editor-preview {
+  box-sizing: border-box;
+}
+
+:root .is-hidden,
+.is-hidden {
+  display: none !important;
+}
+
+.editor-preview-empty {
+  color: var(--color-text-muted, var(--muted));
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
 .note-modal-form textarea,
 .note-modal-form .editor-card .simple-editor-textarea,
-.editor-card-modal .simple-editor-textarea {
-  display: block !important;
+.editor-card-modal .simple-editor-textarea,
+.note-modal-form .editor-card .editor-preview,
+.editor-card-modal .editor-preview {
+  display: block;
   flex: 1 1 auto;
-  min-height: 0 !important;
-  width: 100% !important;
+  min-height: 0;
+  width: 100%;
   margin: 0 !important;
   padding: 1.15rem 1.25rem !important;
   color: var(--color-text-primary, var(--text));
@@ -2111,6 +2186,16 @@
   overflow-y: auto !important;
   resize: none !important;
   box-sizing: border-box;
+}
+
+.note-modal-form textarea.is-hidden,
+.note-modal-form .editor-card .simple-editor-textarea.is-hidden,
+.editor-card-modal .simple-editor-textarea.is-hidden,
+.note-modal-form .editor-card .editor-preview.is-hidden,
+.editor-card-modal .editor-preview.is-hidden,
+textarea.simple-editor-textarea.is-hidden,
+.editor-preview.is-hidden {
+  display: none !important;
 }
 
 .note-modal-form .editor-card .simple-editor-textarea:focus,
@@ -2366,6 +2451,14 @@
 
 #new-note-form .simple-editor-textarea {
   order: 2;
+}
+
+#new-note-form .editor-preview {
+  order: 2;
+  min-height: 3rem;
+  max-height: 12rem;
+  padding: 0.65rem 0.7rem;
+  overflow-y: auto;
 }
 
 #new-note-form .simple-editor-footer {

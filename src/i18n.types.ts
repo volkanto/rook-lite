@@ -42,6 +42,9 @@ export interface TranslationStrings {
   draftSaved: string;
   savingDraft: string;
   markdownSupported: string;
+  editorWrite: string;
+  editorPreview: string;
+  editorEmptyPreview: string;
   notesTitle: string;
   entrySingle: string;
   entryPlural: string;

@@ -39,6 +39,7 @@ export const icons = {
   close: '<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',
   menu: '<path d="M4 6l16 0"/><path d="M4 12l16 0"/><path d="M4 18l16 0"/>',
   edit: '<path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415"/><path d="M16 5l3 3"/>',
+  eye: '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>',
   trash: '<path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>',
   more: '<path d="M4 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M18 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/>',
   refresh: '<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>',
@@ -138,7 +139,7 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string, isModal = false): string {
   const s = currentStrings();
   const active = allCategories.filter((category) => !category.archived);
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div>${isModal ? `<span class="editor-toolbar-mode-badge" aria-hidden="true">${svg(icons.note, "toolbar-badge-icon")}<span>Markdown</span></span>` : ""}</div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="simple-editor-footer"><details class="footer-category-picker"><summary class="category-picker-trigger" aria-label="${s.navCategories}" title="${s.navCategories}">${svg(icons.category, "nav-svg")}</summary><div class="footer-category-menu">${active.length ? active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("") : `<span class="footer-category-empty">${s.noCategoriesInPicker}</span>`}</div></details><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘</kbd><kbd>Enter</kbd> to save</span>' : (value ? s.draftRestored : s.markdownSupported)}</span><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}<span>${s.editorWrite}</span></button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}<span>${s.editorPreview}</span></button></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><details class="footer-category-picker"><summary class="category-picker-trigger" aria-label="${s.navCategories}" title="${s.navCategories}">${svg(icons.category, "nav-svg")}</summary><div class="footer-category-menu">${active.length ? active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("") : `<span class="footer-category-empty">${s.noCategoriesInPicker}</span>`}</div></details><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘</kbd><kbd>Enter</kbd> to save</span>' : (value ? s.draftRestored : s.markdownSupported)}</span><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
 function noteMarkup(note: Note, allCategories: Category[], selectedDate = note.noteDate): string {
@@ -162,9 +163,54 @@ function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string
   host.querySelectorAll<HTMLButtonElement>("[data-calendar-month]").forEach((button) => button.addEventListener("click", () => renderCalendar(host, new Date(`${button.dataset.calendarMonth}T12:00:00`), selectedDate, allNotes)));
 }
 
+function bindEditorPreview(form: HTMLFormElement): void {
+  const writeBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+  const previewBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+  const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+  const previewPane = form.querySelector<HTMLElement>(".editor-preview");
+  const toolsCluster = form.querySelector<HTMLElement>(".editor-tools-cluster");
+  const hintEl = form.querySelector<HTMLElement>(".simple-editor-hint");
+
+  if (!writeBtn || !previewBtn || !textarea || !previewPane) return;
+
+  const showWriteMode = () => {
+    writeBtn.classList.add("is-active");
+    writeBtn.setAttribute("aria-selected", "true");
+    previewBtn.classList.remove("is-active");
+    previewBtn.setAttribute("aria-selected", "false");
+    textarea.classList.remove("is-hidden");
+    previewPane.classList.add("is-hidden");
+    toolsCluster?.classList.remove("is-hidden");
+    if (hintEl) hintEl.classList.remove("is-hidden");
+    textarea.focus();
+  };
+
+  const showPreviewMode = () => {
+    previewBtn.classList.add("is-active");
+    previewBtn.setAttribute("aria-selected", "true");
+    writeBtn.classList.remove("is-active");
+    writeBtn.setAttribute("aria-selected", "false");
+    textarea.classList.add("is-hidden");
+    previewPane.classList.remove("is-hidden");
+    toolsCluster?.classList.add("is-hidden");
+    if (hintEl) hintEl.classList.add("is-hidden");
+
+    const content = textarea.value.trim();
+    if (content) {
+      previewPane.innerHTML = renderMarkdown(content, true);
+    } else {
+      const s = currentStrings();
+      previewPane.innerHTML = `<p class="editor-preview-empty">${s.editorEmptyPreview}</p>`;
+    }
+  };
+
+  writeBtn.addEventListener("click", showWriteMode);
+  previewBtn.addEventListener("click", showPreviewMode);
+}
+
 function bindCreateEditor(date: string): void {
   const s = currentStrings();
-  const form = requireElement<HTMLFormElement>("#new-note-form"); const textarea = requireElement<HTMLTextAreaElement>("#new-note-form textarea"); bindFormatting(form, textarea); resizeEditor(textarea);
+  const form = requireElement<HTMLFormElement>("#new-note-form"); const textarea = requireElement<HTMLTextAreaElement>("#new-note-form textarea"); bindFormatting(form, textarea); bindEditorPreview(form); resizeEditor(textarea);
   const updateComposer = () => form.classList.toggle("has-content", Boolean(textarea.value.trim())); updateComposer();
   const saveDraft = () => { window.clearTimeout(draftTimer); status(form, s.savingDraft); draftTimer = window.setTimeout(async () => { await notes.saveDraft(date, textarea.value, selectedCategories(form)); status(form, s.draftSaved); }, 450); };
   textarea.addEventListener("input", () => { resizeEditor(textarea); updateComposer(); saveDraft(); }); form.addEventListener("change", saveDraft);
@@ -235,6 +281,7 @@ export function showEditDialog(note: Note, allCategories: Category[]): void {
   const form = requireElement<HTMLFormElement>("#edit-note-form");
   const textarea = requireElement<HTMLTextAreaElement>("#edit-note-form textarea");
   bindFormatting(form, textarea);
+  bindEditorPreview(form);
   textarea.focus();
   textarea.addEventListener("keydown", (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
@@ -863,6 +910,45 @@ function bindShellEvents(): void {
       }
       return;
     }
+
+    const modeBtn = target.closest<HTMLButtonElement>("[data-editor-mode]");
+    if (modeBtn) {
+      const form = modeBtn.closest("form");
+      if (form) {
+        const mode = modeBtn.dataset.editorMode;
+        const writeBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+        const previewBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+        const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+        const previewPane = form.querySelector<HTMLElement>(".editor-preview");
+        const toolsCluster = form.querySelector<HTMLElement>(".editor-tools-cluster");
+        const hintEl = form.querySelector<HTMLElement>(".simple-editor-hint");
+
+        if (mode === "preview" && previewBtn && textarea && previewPane) {
+          previewBtn.classList.add("is-active");
+          previewBtn.setAttribute("aria-selected", "true");
+          writeBtn?.classList.remove("is-active");
+          writeBtn?.setAttribute("aria-selected", "false");
+          textarea.classList.add("is-hidden");
+          previewPane.classList.remove("is-hidden");
+          toolsCluster?.classList.add("is-hidden");
+          if (hintEl) hintEl.classList.add("is-hidden");
+          const content = textarea.value.trim();
+          previewPane.innerHTML = content ? renderMarkdown(content, true) : `<p class="editor-preview-empty">${currentStrings().editorEmptyPreview}</p>`;
+        } else if (mode === "write" && writeBtn && textarea && previewPane) {
+          writeBtn.classList.add("is-active");
+          writeBtn.setAttribute("aria-selected", "true");
+          previewBtn?.classList.remove("is-active");
+          previewBtn?.setAttribute("aria-selected", "false");
+          textarea.classList.remove("is-hidden");
+          previewPane.classList.add("is-hidden");
+          toolsCluster?.classList.remove("is-hidden");
+          if (hintEl) hintEl.classList.remove("is-hidden");
+          textarea.focus();
+        }
+      }
+      return;
+    }
+
     document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
     const langBtn = target.closest<HTMLButtonElement>("[data-select-lang]");
     if (langBtn) {

@@ -491,4 +491,81 @@ describe("Left menu bar icons and navigation", () => {
 
     await noteService.delete(createdNote.id);
   });
+
+  it("toggles between write and preview modes in note composer", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const writeBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+    const previewBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    const previewPane = form?.querySelector<HTMLElement>(".editor-preview");
+
+    expect(writeBtn).not.toBeNull();
+    expect(previewBtn).not.toBeNull();
+    expect(textarea).not.toBeNull();
+    expect(previewPane).not.toBeNull();
+
+    // Default state: write is active, textarea is visible, preview is hidden
+    expect(writeBtn?.classList.contains("is-active")).toBe(true);
+    expect(previewBtn?.classList.contains("is-active")).toBe(false);
+    expect(textarea?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(true);
+
+    // Type markdown text
+    textarea!.value = "**Important task** with `code`";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+
+    // Click Preview
+    previewBtn?.click();
+    expect(previewBtn?.classList.contains("is-active")).toBe(true);
+    expect(writeBtn?.classList.contains("is-active")).toBe(false);
+    expect(textarea?.classList.contains("is-hidden")).toBe(true);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.innerHTML).toContain("<strong>Important task</strong>");
+
+    // Click Write to switch back
+    writeBtn?.click();
+    expect(writeBtn?.classList.contains("is-active")).toBe(true);
+    expect(previewBtn?.classList.contains("is-active")).toBe(false);
+    expect(textarea?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(true);
+  });
+
+  it("toggles between write and preview modes in edit note popup", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("## Header\n- [ ] Task item", today, []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    await renderShell();
+
+    showEditDialog(createdNote, []);
+
+    const dialog = document.querySelector(".note-edit-dialog");
+    const writeBtn = dialog?.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+    const previewBtn = dialog?.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+    const textarea = dialog?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    const previewPane = dialog?.querySelector<HTMLElement>(".editor-preview");
+
+    expect(writeBtn).not.toBeNull();
+    expect(previewBtn).not.toBeNull();
+
+    // Switch to preview
+    previewBtn?.click();
+    expect(previewBtn?.classList.contains("is-active")).toBe(true);
+    expect(textarea?.classList.contains("is-hidden")).toBe(true);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.innerHTML).toContain("<h2>Header</h2>");
+
+    // Switch back to write
+    writeBtn?.click();
+    expect(writeBtn?.classList.contains("is-active")).toBe(true);
+    expect(textarea?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(true);
+
+    dialog?.querySelector<HTMLButtonElement>(".editor-modal-actions .btn-secondary")?.click();
+    await noteService.delete(createdNote.id);
+  });
 });
