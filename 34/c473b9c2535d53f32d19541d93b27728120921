@@ -1,0 +1,32 @@
+index.html
+  s_1a61148204abe4::t_1583263bd19ad2 22-24
+src/lite.css
+  s_1a61148204abe4::t_1eb84350fff393 3433,3436
+  s_1a61148204abe4::t_1f0fafb63a8319 2533-2534
+  s_1a61148204abe4::t_76065654830b29 1549
+  s_1a61148204abe4::t_40cb0ec24d13cc 1122
+  s_1a61148204abe4::t_93cc960523f504 2090,2123,2125-2126
+  s_1a61148204abe4::t_a7776e0923d1f9 218,221-222
+  s_1a61148204abe4::t_a5daa89f06b85f 732,736
+  s_1a61148204abe4::t_9b39ad77d3fc6f 1-7
+src/app.css
+  s_1a61148204abe4::t_03596ef2c694fe 18-20
+  s_1a61148204abe4::t_f58d4be131fbf6 146,148-149,151
+  s_1a61148204abe4::t_180f9a1509f63c 8512-8515
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "34c473b9c2535d53f32d19541d93b27728120921",
+  "prompts": {},
+  "sessions": {
+    "s_1a61148204abe4": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "464a15ac-855f-4ae3-9d55-8eab6a15de84",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
