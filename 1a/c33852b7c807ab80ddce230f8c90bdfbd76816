@@ -1,0 +1,37 @@
+src/lite.css
+  s_1a61148204abe4::t_975629d6ee9a03 2154,2172,2174-2175,2191-2198
+  s_1a61148204abe4::t_67d6451091d1c7 2199,2456-2463
+  s_1a61148204abe4::t_10dbf4fde348e9 2035,2056,2061,2105,2112,2114-2116,2125,2131,2137
+  s_1a61148204abe4::t_d795355f8249b9 2094-2104,2106-2111,2113,2117-2124,2126-2130,2132-2136,2138-2153,2155-2166,2169-2171
+  s_1a61148204abe4::t_a4165f7947cf6a 2200
+src/main.ts
+  s_1a61148204abe4::t_879e0604e32a63 913-951
+  s_1a61148204abe4::t_83d93a989c36cd 166-210,213
+  s_1a61148204abe4::t_e50341e4e9967c 42
+  s_1a61148204abe4::t_f1f13024187367 284
+  s_1a61148204abe4::t_646f230155dc47 142
+src/locales/en.ts
+  s_1a61148204abe4::t_6a1e196955ccea 51-53
+src/navigation.test.ts
+  s_1a61148204abe4::t_33def79105de2a 494-570
+src/locales/tr.ts
+  s_1a61148204abe4::t_b038c423c7fd92 51-53
+src/i18n.types.ts
+  s_1a61148204abe4::t_03f57459aa1fbb 45-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "1ac33852b7c807ab80ddce230f8c90bdfbd76816",
+  "prompts": {},
+  "sessions": {
+    "s_1a61148204abe4": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "464a15ac-855f-4ae3-9d55-8eab6a15de84",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
