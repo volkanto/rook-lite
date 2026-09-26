@@ -259,6 +259,42 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(createdNote.id);
   });
 
+  it("keeps note edit modal layout bounded and scrollable for long notes without inline height explosion", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const longContent = Array.from({ length: 80 }, (_, i) => `Line ${i + 1}: Detailed notes about project progress and milestones.`).join("\n");
+    const longNote = await noteService.create(longContent, today, []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    await renderShell();
+
+    showEditDialog(longNote, []);
+
+    const dialog = document.querySelector(".note-edit-dialog");
+    expect(dialog).not.toBeNull();
+
+    const editorCard = dialog?.querySelector(".editor-card");
+    expect(editorCard).not.toBeNull();
+
+    const textarea = editorCard?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    expect(textarea).not.toBeNull();
+    expect(textarea?.value).toBe(longContent);
+
+    // Textarea does not have blown-up inline style height
+    expect(textarea?.style.height).not.toMatch(/^\d{3,5}px$/);
+
+    // Both cancel and save buttons remain mounted in the modal footer
+    const cancelBtn = editorCard?.querySelector<HTMLButtonElement>(".editor-modal-actions .btn-secondary");
+    const saveBtn = editorCard?.querySelector<HTMLButtonElement>(".editor-modal-actions .save-btn-rect");
+    expect(cancelBtn).not.toBeNull();
+    expect(saveBtn).not.toBeNull();
+
+    cancelBtn?.click();
+    expect(document.querySelector(".note-edit-dialog")).toBeNull();
+
+    await noteService.delete(longNote.id);
+  });
+
   it("renders aligned Local AI settings buttons and status notice banner", async () => {
     const { renderSettings } = await import("./main");
     const container = document.createElement("div");
