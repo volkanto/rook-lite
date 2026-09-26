@@ -1233,4 +1233,8 @@ function requireElement<T extends Element>(selector: string): T { const element 
 async function start(): Promise<void> { try { setLocale(getLocale()); await initializeLocalData(); await renderShell(); } catch (error) { app.innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`; } }
 
 void start();
-if ("serviceWorker" in navigator && import.meta.env.PROD) window.addEventListener("load", () => { void navigator.serviceWorker.register(assetUrl("sw.js"), { scope: normalizeBase().prefix }); });
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    void navigator.serviceWorker.register(assetUrl("sw.js"), { scope: normalizeBase().prefix });
+  });
+}
