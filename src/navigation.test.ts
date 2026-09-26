@@ -421,4 +421,38 @@ describe("Left menu bar icons and navigation", () => {
     textarea!.dispatchEvent(new Event("input", { bubbles: true }));
     expect(form?.classList.contains("has-content")).toBe(false);
   });
+
+  it("copies code block to clipboard and updates button state on copy click", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create('```java\nSystem.out.println("Hello from code block");\n```', today, []);
+
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    let copied = "";
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: async (text: string) => {
+          copied = text;
+        }
+      }
+    });
+
+    const noteEl = document.querySelector(`#note-${createdNote.id}`);
+    expect(noteEl).not.toBeNull();
+
+    const copyBtn = noteEl?.querySelector<HTMLButtonElement>(".copy-code-btn");
+    expect(copyBtn).not.toBeNull();
+    expect(copyBtn?.textContent).toContain("Copy");
+
+    copyBtn?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(copied).toContain('System.out.println("Hello from code block");');
+    expect(copyBtn?.classList.contains("is-copied")).toBe(true);
+    expect(copyBtn?.textContent).toContain("Copied!");
+
+    await noteService.delete(createdNote.id);
+  });
 });

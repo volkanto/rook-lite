@@ -832,8 +832,38 @@ function bindShellEvents(): void {
     updateBackToTopVisibility();
   }, { passive: true });
 
-  document.addEventListener("click", (event) => {
+  document.addEventListener("click", async (event) => {
     const target = event.target as Element;
+    const copyCodeBtn = target.closest<HTMLButtonElement>(".copy-code-btn");
+    if (copyCodeBtn) {
+      const wrapper = copyCodeBtn.closest(".code-block-wrapper");
+      const code = wrapper?.querySelector("code")?.textContent ?? "";
+      if (code) {
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(code);
+          } else {
+            throw new Error("Clipboard API unavailable");
+          }
+        } catch {
+          const ta = document.createElement("textarea");
+          ta.value = code;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        copyCodeBtn.classList.add("is-copied");
+        copyCodeBtn.innerHTML = `${svg(icons.check, "copy-code-svg")}<span class="copy-code-text">Copied!</span>`;
+        window.setTimeout(() => {
+          copyCodeBtn.classList.remove("is-copied");
+          copyCodeBtn.innerHTML = `${svg(icons.copy, "copy-code-svg")}<span class="copy-code-text">Copy</span>`;
+        }, 1500);
+      }
+      return;
+    }
     document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
     const langBtn = target.closest<HTMLButtonElement>("[data-select-lang]");
     if (langBtn) {
