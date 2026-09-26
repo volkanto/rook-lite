@@ -50,7 +50,7 @@ describe("Left menu bar icons and navigation", () => {
     expect(settingsItem?.label).toBe("Settings");
     expect(settingsItem?.icon).toBe(icons.settings);
 
-    // All icons are rendered through the standard 24x24 Lucide/Feather SVG envelope
+    // All icons are rendered through the standard 24x24 Tabler SVG envelope
     navItems.forEach((item) => {
       const rendered = svg(item.icon);
       expect(rendered).toContain('viewBox="0 0 24 24"');
