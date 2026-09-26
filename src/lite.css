@@ -2091,6 +2091,13 @@
   height: 0.85rem;
 }
 
+.editor-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+
 .editor-mode-toggle {
   display: inline-flex;
   align-items: center;
@@ -2102,27 +2109,170 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
+.editor-word-count {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--color-text-secondary, var(--text-soft));
+  white-space: nowrap;
+}
+
+/* Distraction-Free Zen Writing Mode */
+body.is-zen-mode {
+  overflow: hidden !important;
+}
+
+body.is-zen-mode .sidebar,
+body.is-zen-mode .minimal-date-header,
+body.is-zen-mode .day-notes,
+body.is-zen-mode .notes-stream-footer,
+body.is-zen-mode .notes-panel,
+body.is-zen-mode .notes-count-badge,
+body.is-zen-mode .tag-filters {
+  display: none !important;
+}
+
+/* Zen mode for the main screen composer */
+body.is-zen-mode:not(:has(#edit-note-form)) .copilot-input-container {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1500 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100svh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 2rem 1.5rem !important;
+  background: var(--color-bg-app, var(--bg)) !important;
+  box-sizing: border-box !important;
+}
+
+body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form {
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(52rem, 100%) !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  border: 1px solid var(--color-border-default, var(--border)) !important;
+  border-radius: var(--radius-lg, 12px) !important;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.28) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-toolbar {
+  display: flex !important;
+  order: 1 !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  padding: 0.65rem 1.5rem !important;
+  min-height: 3rem !important;
+  background: color-mix(in srgb, var(--color-bg-surface-sunken, var(--surface-sunk)) 70%, var(--color-bg-surface, var(--surface))) !important;
+  border-bottom: 1px solid var(--color-border-subtle, var(--border)) !important;
+  box-sizing: border-box !important;
+}
+
+body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-textarea {
+  display: block !important;
+  order: 2 !important;
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 1.5rem 1.5rem !important;
+  font-size: 1.12rem !important;
+  line-height: 1.8 !important;
+  overflow-y: auto !important;
+  resize: none !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  box-sizing: border-box !important;
+}
+
+body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .editor-preview {
+  order: 2 !important;
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 1.5rem 1.5rem !important;
+  font-size: 1.08rem !important;
+  line-height: 1.8 !important;
+  overflow-y: auto !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  box-sizing: border-box !important;
+}
+
+body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-footer {
+  display: flex !important;
+  order: 3 !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  padding: 0.75rem 1.5rem !important;
+  min-height: 3.5rem !important;
+  background: color-mix(in srgb, var(--color-bg-surface-sunken, var(--surface-sunk)) 70%, var(--color-bg-surface, var(--surface))) !important;
+  border-top: 1px solid var(--color-border-subtle, var(--border)) !important;
+  box-sizing: border-box !important;
+}
+
+/* Zen mode for the edit modal dialog */
+body.is-zen-mode .note-edit-backdrop {
+  padding: 0 !important;
+  background: var(--color-bg-app, var(--bg)) !important;
+  backdrop-filter: none !important;
+}
+
+body.is-zen-mode .note-edit-dialog {
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100svh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+body.is-zen-mode .note-modal-form,
+body.is-zen-mode .editor-card-modal {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 52rem !important;
+  margin: 0 auto !important;
+}
+
+body.is-zen-mode .note-edit-dialog-head {
+  padding: 0.75rem calc(max(1.25rem, (100vw - 52rem) / 2)) !important;
+}
+
+body.is-zen-mode .editor-card-modal .simple-editor-textarea,
+body.is-zen-mode .editor-card-modal .editor-preview {
+  font-size: 1.12rem !important;
+  line-height: 1.8 !important;
+  padding: 1.5rem 1.25rem !important;
+}
+
 .editor-card .simple-editor-toolbar .editor-mode-btn,
 .editor-mode-btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 0.35rem !important;
+  width: 1.95rem !important;
   height: 1.75rem !important;
   min-height: 1.75rem !important;
-  width: auto !important;
-  min-width: fit-content !important;
-  padding: 0 0.65rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
   flex: 0 0 auto !important;
   border: 0 !important;
   border-radius: 5px !important;
   background: transparent !important;
   color: var(--color-text-secondary, var(--text-soft)) !important;
-  font-family: var(--font-ui) !important;
-  font-size: 0.78rem !important;
-  font-weight: 500 !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
   cursor: pointer !important;
   box-shadow: none !important;
   transition: all 120ms ease !important;
@@ -2138,13 +2288,12 @@
 .editor-mode-btn.is-active {
   background: color-mix(in srgb, var(--accent, #0969da) 12%, transparent) !important;
   color: var(--accent, #0969da) !important;
-  font-weight: 600 !important;
 }
 
 .editor-mode-svg {
-  width: 0.85rem;
-  height: 0.85rem;
-  flex: 0 0 0.85rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 0.95rem;
 }
 
 .editor-preview {

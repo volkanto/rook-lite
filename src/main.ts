@@ -51,6 +51,8 @@ export const icons = {
   chevronRight: '<path d="M9 6l6 6l-6 6"/>',
   clock: '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 7v5l3 3"/>',
   arrowUp: '<path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>',
+  maximize: '<path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/>',
+  minimize: '<path d="M15 19v-2a2 2 0 0 1 2 -2h2"/><path d="M15 5v2a2 2 0 0 0 2 2h2"/><path d="M5 15h2a2 2 0 0 1 2 2v2"/><path d="M5 9h2a2 2 0 0 0 2 -2v-2"/>',
   copy: '<path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666"/><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>',
   plus: '<path d="M12 5l0 14"/><path d="M5 12l14 0"/>'
 } as const;
@@ -139,7 +141,7 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string, isModal = false): string {
   const s = currentStrings();
   const active = allCategories.filter((category) => !category.archived);
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}<span>${s.editorWrite}</span></button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}<span>${s.editorPreview}</span></button></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><details class="footer-category-picker"><summary class="category-picker-trigger" aria-label="${s.navCategories}" title="${s.navCategories}">${svg(icons.category, "nav-svg")}</summary><div class="footer-category-menu">${active.length ? active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("") : `<span class="footer-category-empty">${s.noCategoriesInPicker}</span>`}</div></details><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘</kbd><kbd>Enter</kbd> to save</span>' : (value ? s.draftRestored : s.markdownSupported)}</span><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-toolbar-actions"><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><details class="footer-category-picker"><summary class="category-picker-trigger" aria-label="${s.navCategories}" title="${s.navCategories}">${svg(icons.category, "nav-svg")}</summary><div class="footer-category-menu">${active.length ? active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("") : `<span class="footer-category-empty">${s.noCategoriesInPicker}</span>`}</div></details><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘</kbd><kbd>Enter</kbd> to save</span>' : (value ? s.draftRestored : s.markdownSupported)}</span><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
 function noteMarkup(note: Note, allCategories: Category[], selectedDate = note.noteDate): string {
@@ -208,6 +210,38 @@ function bindEditorPreview(form: HTMLFormElement): void {
   previewBtn.addEventListener("click", showPreviewMode);
 }
 
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function updateEditorWordCount(form: HTMLFormElement): void {
+  const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+  const countEl = form.querySelector<HTMLElement>(".editor-word-count");
+  if (!textarea || !countEl) return;
+  const count = countWords(textarea.value);
+  const s = currentStrings();
+  countEl.textContent = count > 0 ? s.wordCount(count) : "";
+}
+
+function toggleZenMode(targetForm?: HTMLFormElement): void {
+  const isZen = document.body.classList.toggle("is-zen-mode");
+  const s = currentStrings();
+  document.querySelectorAll<HTMLButtonElement>('[data-action="toggle-zen"]').forEach((btn) => {
+    btn.classList.toggle("is-active", isZen);
+    btn.innerHTML = `${svg(isZen ? icons.minimize : icons.maximize, "editor-mode-svg")}`;
+    const label = isZen ? s.exitZenMode : s.zenMode;
+    btn.setAttribute("title", `${label} (⌘D)`);
+    btn.setAttribute("aria-label", label);
+  });
+  const formToFocus = targetForm ?? document.querySelector<HTMLFormElement>("#edit-note-form, #new-note-form");
+  if (formToFocus) {
+    const textarea = formToFocus.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    if (isZen) {
+      textarea?.focus();
+    }
+  }
+}
+
 function bindCreateEditor(date: string): void {
   const s = currentStrings();
   const form = requireElement<HTMLFormElement>("#new-note-form");
@@ -215,6 +249,7 @@ function bindCreateEditor(date: string): void {
   bindFormatting(form, textarea);
   bindEditorPreview(form);
   resizeEditor(textarea);
+  updateEditorWordCount(form);
   const updateComposer = () => {
     const hasText = Boolean(textarea.value.trim());
     const isFocused = form.contains(document.activeElement);
@@ -237,6 +272,7 @@ function bindCreateEditor(date: string): void {
   textarea.addEventListener("input", () => {
     resizeEditor(textarea);
     updateComposer();
+    updateEditorWordCount(form);
     saveDraft();
   });
   form.addEventListener("change", saveDraft);
@@ -329,6 +365,8 @@ export function showEditDialog(note: Note, allCategories: Category[]): void {
   const textarea = requireElement<HTMLTextAreaElement>("#edit-note-form textarea");
   bindFormatting(form, textarea);
   bindEditorPreview(form);
+  updateEditorWordCount(form);
+  textarea.addEventListener("input", () => updateEditorWordCount(form));
   textarea.focus();
   textarea.addEventListener("keydown", (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
@@ -851,7 +889,14 @@ function showConfirm(title: string, message: string, actionLabel: string, action
   });
 }
 
-export function closeDialog(): void { const host = document.querySelector<HTMLElement>("#dialog-host"); if (host) host.replaceChildren(); document.body.style.overflow = ""; }
+export function closeDialog(): void {
+  const host = document.querySelector<HTMLElement>("#dialog-host");
+  if (host) host.replaceChildren();
+  document.body.style.overflow = "";
+  if (document.body.classList.contains("is-zen-mode")) {
+    toggleZenMode();
+  }
+}
 
 export function updateBackToTopVisibility(): void {
   const streamFooter = document.querySelector<HTMLElement>(".notes-stream-footer");
@@ -1040,6 +1085,12 @@ function bindShellEvents(): void {
       return;
     }
     const action = target.closest<HTMLElement>("[data-action]")?.dataset.action;
+    if (action === "toggle-zen") {
+      event.preventDefault();
+      const form = target.closest<HTMLFormElement>("form") ?? undefined;
+      toggleZenMode(form);
+      return;
+    }
     if (action === "toggle-sidebar") toggleSidebar();
     if (action === "close-sidebar") closeSidebar();
     if (action === "open-search") openSearch();
@@ -1111,12 +1162,25 @@ function handleKeyboard(event: KeyboardEvent): void {
       void renderRoute().then(() => document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus());
     } else document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
   }
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "d") {
+    event.preventDefault();
+    const activeDialog = document.querySelector<HTMLFormElement>("#edit-note-form");
+    const activeComposer = document.querySelector<HTMLFormElement>("#new-note-form");
+    const target = (activeDialog && !activeDialog.closest(".is-hidden")) ? activeDialog : activeComposer ?? undefined;
+    toggleZenMode(target);
+    return;
+  }
   if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && !editing && appPath() === "/") {
     const date = new URLSearchParams(location.search).get("date") ?? isoDate(new Date());
     history.pushState({}, "", appUrl(`/?date=${shiftDate(date, event.key === "ArrowLeft" ? -1 : 1)}`));
     void renderRoute();
   }
   if (event.key === "Escape") {
+    if (document.body.classList.contains("is-zen-mode")) {
+      event.preventDefault();
+      toggleZenMode();
+      return;
+    }
     closeSearch();
     closeDialog();
     document.querySelector<HTMLDetailsElement>(".date-picker[open]")?.removeAttribute("open");

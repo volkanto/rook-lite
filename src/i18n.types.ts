@@ -45,6 +45,9 @@ export interface TranslationStrings {
   editorWrite: string;
   editorPreview: string;
   editorEmptyPreview: string;
+  zenMode: string;
+  exitZenMode: string;
+  wordCount: (count: number) => string;
   notesTitle: string;
   entrySingle: string;
   entryPlural: string;

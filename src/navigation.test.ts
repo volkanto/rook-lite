@@ -576,4 +576,43 @@ describe("Left menu bar icons and navigation", () => {
     dialog?.querySelector<HTMLButtonElement>(".editor-modal-actions .btn-secondary")?.click();
     await noteService.delete(createdNote.id);
   });
+
+  it("toggles distraction-free Zen mode and updates live word count", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const zenBtn = form?.querySelector<HTMLButtonElement>('[data-action="toggle-zen"]');
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    const wordCountEl = form?.querySelector<HTMLElement>(".editor-word-count");
+
+    expect(zenBtn).not.toBeNull();
+    expect(wordCountEl).not.toBeNull();
+
+    // Initially not in zen mode
+    expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+
+    // Type words and verify live word count
+    textarea!.value = "Focus on writing thoughts clearly";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(wordCountEl?.textContent).toBe("5 words");
+
+    // Click Zen button
+    zenBtn?.click();
+    expect(document.body.classList.contains("is-zen-mode")).toBe(true);
+    expect(zenBtn?.title).toContain("Exit Zen mode");
+
+    // Press Escape to exit Zen mode
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+    expect(zenBtn?.title).toContain("Zen mode");
+
+    // Press Cmd+D to enter Zen mode
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "d", metaKey: true, bubbles: true }));
+    expect(document.body.classList.contains("is-zen-mode")).toBe(true);
+
+    // Press Cmd+D again to exit Zen mode
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "d", metaKey: true, bubbles: true }));
+    expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+  });
 });
