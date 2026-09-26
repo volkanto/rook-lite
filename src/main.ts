@@ -210,12 +210,59 @@ function bindEditorPreview(form: HTMLFormElement): void {
 
 function bindCreateEditor(date: string): void {
   const s = currentStrings();
-  const form = requireElement<HTMLFormElement>("#new-note-form"); const textarea = requireElement<HTMLTextAreaElement>("#new-note-form textarea"); bindFormatting(form, textarea); bindEditorPreview(form); resizeEditor(textarea);
-  const updateComposer = () => form.classList.toggle("has-content", Boolean(textarea.value.trim())); updateComposer();
-  const saveDraft = () => { window.clearTimeout(draftTimer); status(form, s.savingDraft); draftTimer = window.setTimeout(async () => { await notes.saveDraft(date, textarea.value, selectedCategories(form)); status(form, s.draftSaved); }, 450); };
-  textarea.addEventListener("input", () => { resizeEditor(textarea); updateComposer(); saveDraft(); }); form.addEventListener("change", saveDraft);
-  form.addEventListener("submit", async (event) => { event.preventDefault(); if (!textarea.value.trim()) return; window.clearTimeout(draftTimer); setBusy(form, true); try { const content = textarea.value; const categoryIds = selectedCategories(form); textarea.value = ""; updateComposer(); await notes.create(content, date, categoryIds); await renderRoute(); } catch (error) { status(form, errorMessage(error), true); setBusy(form, false); } });
-  textarea.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key === "Enter") { event.preventDefault(); form.requestSubmit(); } });
+  const form = requireElement<HTMLFormElement>("#new-note-form");
+  const textarea = requireElement<HTMLTextAreaElement>("#new-note-form textarea");
+  bindFormatting(form, textarea);
+  bindEditorPreview(form);
+  resizeEditor(textarea);
+  const updateComposer = () => {
+    const hasText = Boolean(textarea.value.trim());
+    const isFocused = form.contains(document.activeElement);
+    form.classList.toggle("has-content", hasText || isFocused);
+  };
+  updateComposer();
+  const saveDraft = () => {
+    window.clearTimeout(draftTimer);
+    status(form, s.savingDraft);
+    draftTimer = window.setTimeout(async () => {
+      await notes.saveDraft(date, textarea.value, selectedCategories(form));
+      status(form, s.draftSaved);
+    }, 450);
+  };
+  textarea.addEventListener("focus", updateComposer);
+  form.addEventListener("focusin", updateComposer);
+  form.addEventListener("focusout", () => {
+    window.setTimeout(updateComposer, 50);
+  });
+  textarea.addEventListener("input", () => {
+    resizeEditor(textarea);
+    updateComposer();
+    saveDraft();
+  });
+  form.addEventListener("change", saveDraft);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!textarea.value.trim()) return;
+    window.clearTimeout(draftTimer);
+    setBusy(form, true);
+    try {
+      const content = textarea.value;
+      const categoryIds = selectedCategories(form);
+      textarea.value = "";
+      updateComposer();
+      await notes.create(content, date, categoryIds);
+      await renderRoute();
+    } catch (error) {
+      status(form, errorMessage(error), true);
+      setBusy(form, false);
+    }
+  });
+  textarea.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
   attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
 }
 

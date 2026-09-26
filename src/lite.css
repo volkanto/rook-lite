@@ -2434,15 +2434,19 @@ textarea.simple-editor-textarea.is-hidden,
   display: none;
 }
 
+#new-note-form:focus-within,
 #new-note-form.has-content {
   padding-top: 0.45rem;
 }
 
+#new-note-form:focus-within .simple-editor-toolbar,
+#new-note-form:focus-within .simple-editor-footer,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-footer {
   display: flex;
 }
 
+#new-note-form:focus-within .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-toolbar {
   order: 1;
   min-height: 2.5rem;
@@ -2461,7 +2465,8 @@ textarea.simple-editor-textarea.is-hidden,
   overflow-y: auto;
 }
 
-#new-note-form .simple-editor-footer {
+#new-note-form:focus-within .simple-editor-footer,
+#new-note-form.has-content .simple-editor-footer {
   order: 3;
   padding: 0 0.45rem 0.35rem;
 }

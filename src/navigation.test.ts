@@ -433,7 +433,7 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(createdNote.id);
   });
 
-  it("renders composer with stable empty state and toggles has-content on input", async () => {
+  it("renders composer with stable empty state and expands full controls on focus or typing", async () => {
     const { renderShell } = await import("./main");
     await renderShell();
 
@@ -442,19 +442,27 @@ describe("Left menu bar icons and navigation", () => {
 
     expect(form).not.toBeNull();
     expect(textarea).not.toBeNull();
-    // Empty composer does not have .has-content
+    // Empty unfocused composer does not have .has-content
     expect(form?.classList.contains("has-content")).toBe(false);
 
     // Textarea has placeholder
     expect(textarea?.placeholder).toBeTruthy();
 
-    // Typing adds .has-content, clearing removes it
+    // Focusing the composer immediately activates full controls
+    textarea?.focus();
+    expect(form?.classList.contains("has-content")).toBe(true);
+
+    // Typing maintains full controls
     textarea!.value = "Remember this";
     textarea!.dispatchEvent(new Event("input", { bubbles: true }));
     expect(form?.classList.contains("has-content")).toBe(true);
 
+    // Clearing and blurring collapses it back
     textarea!.value = "";
     textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    textarea?.blur();
+    form?.dispatchEvent(new Event("focusout", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 80));
     expect(form?.classList.contains("has-content")).toBe(false);
   });
 
