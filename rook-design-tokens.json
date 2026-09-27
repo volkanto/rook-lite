@@ -1,615 +1,170 @@
 {
-  "$schema": "https://design-tokens.github.io/community-group/format/",
-  "name": "Rook Design Tokens",
+  "$schema": "https://example.com/rook-design-tokens.schema.json",
+  "name": "rook-design-tokens",
   "version": "1.0.0",
-  "description": "Complete light and dark design-token system for the Rook web application.",
-  "primitives": {
-    "color": {
-      "rook": {
-        "navy": {
-          "950": "#071426",
-          "900": "#101D35",
-          "800": "#182943",
-          "700": "#21344B",
-          "600": "#38505E"
-        },
-        "slate": {
-          "700": "#3F4D5A",
-          "600": "#52606D",
-          "500": "#64748B",
-          "400": "#82918D",
-          "300": "#B7C4C0",
-          "200": "#C8D4CF",
-          "100": "#DEE6E2",
-          "50": "#F1F5F3"
-        },
-        "mint": {
-          "900": "#0D523C",
-          "800": "#106347",
-          "700": "#188864",
-          "600": "#20A878",
-          "500": "#36D99A",
-          "400": "#60F0B0",
-          "300": "#9AF7CD",
-          "200": "#BDF9DB",
-          "100": "#D9FBEA",
-          "50": "#EDFFF6"
-        },
-        "purple": {
-          "500": "#8B5CF6",
-          "400": "#A78BFA",
-          "300": "#C4B5FD",
-          "100": "#F1EBFF"
-        },
-        "blue": {
-          "500": "#3B82F6",
-          "400": "#60A5FA",
-          "300": "#93C5FD"
-        },
-        "green": {
-          "500": "#22C55E",
-          "300": "#86EFAC"
-        },
-        "amber": {
-          "500": "#F59E0B",
-          "400": "#FBBF24",
-          "300": "#FCD66D"
-        },
-        "red": {
-          "500": "#EF4444",
-          "400": "#F87171",
-          "300": "#FCA5A5"
-        },
-        "pink": {
-          "500": "#EC4899",
-          "400": "#F472B6"
-        },
-        "teal": {
-          "500": "#14B8A6",
-          "400": "#2DD4BF"
-        },
-        "indigo": {
-          "500": "#6366F1",
-          "400": "#818CF8"
-        },
-        "orange": {
-          "500": "#F97316",
-          "400": "#FB923C"
-        },
-        "neutral": {
-          "white": "#FFFFFF",
-          "ivory": "#FAFAF7",
-          "black": "#111827"
-        }
-      }
-    },
-    "spacing": {
-      "0": "0px",
-      "1": "4px",
-      "2": "8px",
-      "3": "12px",
-      "4": "16px",
-      "5": "20px",
-      "6": "24px",
-      "8": "32px",
-      "10": "40px",
-      "12": "48px",
-      "16": "64px",
-      "20": "80px",
-      "24": "96px"
-    },
-    "radius": {
-      "xs": "4px",
-      "sm": "6px",
-      "md": "8px",
-      "lg": "12px",
-      "xl": "16px",
-      "2xl": "24px",
-      "full": "9999px"
-    },
-    "borderWidth": {
-      "none": "0px",
-      "thin": "1px",
-      "medium": "2px"
-    },
-    "shadow": {
-      "light": {
-        "sm": "0 1px 2px rgba(7, 20, 38, 0.05)",
-        "md": "0 4px 12px rgba(7, 20, 38, 0.08)",
-        "lg": "0 12px 32px rgba(7, 20, 38, 0.12)"
-      },
-      "dark": {
-        "sm": "0 1px 2px rgba(0, 0, 0, 0.18)",
-        "md": "0 6px 18px rgba(0, 0, 0, 0.24)",
-        "lg": "0 16px 40px rgba(0, 0, 0, 0.32)"
+  "description": "Design tokens for the Rook application. Optimized for a calm, minimal productivity UI with explicit light and dark themes.",
+  "meta": {
+    "brand": "Rook",
+    "principles": [
+      "calm",
+      "minimal",
+      "mature",
+      "productivity-first",
+      "subtle hierarchy",
+      "no neon",
+      "semantic color usage"
+    ],
+    "usageRules": {
+      "primaryColorMeaning": "Primary actions, active navigation, links, focused controls, markdown/export actions",
+      "successColorMeaning": "AI, local, private, connected, success, today/current state where appropriate",
+      "warningColorMeaning": "Warnings, caution, attention",
+      "dangerColorMeaning": "Errors, destructive actions, dangerous states",
+      "visualBalance": {
+        "neutral": "75%",
+        "brand": "20%",
+        "semanticAccents": "5%"
       }
     }
   },
   "themes": {
     "light": {
-      "semantic": {
-        "background": {
-          "app": "#F8FAF9",
-          "page": "#F8FAF9",
+      "color": {
+        "bg": {
+          "app": "#F7F7FA",
+          "page": "#F7F7FA",
           "surface": "#FFFFFF",
-          "surfaceRaised": "#FFFFFF",
-          "surfaceSunken": "#F1F5F3",
-          "subtle": "#F1F5F3",
-          "muted": "#E9F0ED",
-          "hover": "#EDF3F0",
-          "active": "#E4ECE8",
-          "selected": "#D9FBEA",
-          "overlay": "rgba(7, 20, 38, 0.48)",
-          "disabled": "#EDF1EF"
+          "raised": "#FFFFFF",
+          "sunken": "#F2F4F7",
+          "hover": "#EEF1F5",
+          "active": "#E8ECF3",
+          "selected": "#ECECFF",
+          "overlay": "rgba(15, 23, 42, 0.48)"
         },
         "text": {
-          "primary": "#111827",
-          "secondary": "#52606D",
-          "tertiary": "#64748B",
-          "muted": "#7B8794",
-          "disabled": "#9DA8A3",
-          "inverse": "#F8FAF9",
-          "brand": "#106347",
-          "link": "#188864",
-          "linkHover": "#106347"
+          "primary": "#1F2937",
+          "secondary": "#667085",
+          "tertiary": "#7A8599",
+          "muted": "#98A2B3",
+          "disabled": "#B6BEC9",
+          "inverse": "#FFFFFF",
+          "link": "#5B5BD6",
+          "linkHover": "#4B4BC3"
         },
         "icon": {
-          "primary": "#334155",
-          "secondary": "#64748B",
-          "muted": "#94A3B8",
-          "brand": "#20A878",
-          "inverse": "#F8FAF9",
-          "disabled": "#AAB4AF"
+          "primary": "#344054",
+          "secondary": "#667085",
+          "muted": "#98A2B3"
         },
         "border": {
-          "subtle": "#E8EEEB",
-          "default": "#DEE6E2",
-          "strong": "#C8D4CF",
-          "hover": "#AABAB3",
-          "focus": "#20A878",
-          "selected": "#20A878",
-          "disabled": "#E3E8E6"
+          "subtle": "#ECEFF3",
+          "default": "#E5E7EB",
+          "strong": "#D0D5DD",
+          "hover": "#BFC6D4"
         },
         "focus": {
-          "ring": "#60F0B0",
-          "ringOffset": "#FFFFFF"
+          "default": "#5B5BD6",
+          "ring": "#A5B4FC"
         },
         "brand": {
-          "primary": "#20A878",
-          "primaryHover": "#188864",
-          "primaryActive": "#106347",
-          "accent": "#60F0B0",
-          "soft": "#D9FBEA",
-          "softer": "#EDFFF6",
-          "onPrimary": "#FFFFFF"
-        }
-      },
-      "component": {
-        "button": {
-          "primary": {
-            "background": "#20A878",
-            "backgroundHover": "#188864",
-            "backgroundActive": "#106347",
-            "text": "#FFFFFF",
-            "border": "#20A878"
-          },
-          "secondary": {
-            "background": "#FFFFFF",
-            "backgroundHover": "#EDF3F0",
-            "backgroundActive": "#E4ECE8",
-            "text": "#111827",
-            "border": "#DEE6E2",
-            "borderHover": "#C8D4CF"
-          },
-          "ghost": {
-            "background": "transparent",
-            "backgroundHover": "#EDF3F0",
-            "backgroundActive": "#E4ECE8",
-            "text": "#52606D"
-          },
-          "danger": {
-            "background": "#EF4444",
-            "backgroundHover": "#DC2626",
-            "text": "#FFFFFF"
-          },
-          "disabled": {
-            "background": "#EDF1EF",
-            "text": "#9DA8A3",
-            "border": "#E3E8E6"
-          }
+          "default": "#5B5BD6",
+          "hover": "#4B4BC3",
+          "active": "#3F3FB4",
+          "soft": "#ECECFF",
+          "softer": "#F5F5FF",
+          "onBrand": "#FFFFFF"
         },
-        "input": {
-          "background": "#FFFFFF",
-          "backgroundHover": "#FFFFFF",
-          "backgroundDisabled": "#EDF1EF",
-          "text": "#111827",
-          "placeholder": "#7B8794",
-          "label": "#52606D",
-          "border": "#DEE6E2",
-          "borderHover": "#C8D4CF",
-          "borderFocus": "#20A878",
-          "focusRing": "#60F0B0",
-          "disabledText": "#9DA8A3",
-          "errorBorder": "#F6B8B8",
-          "errorRing": "#FCA5A5"
-        },
-        "tag": {
-          "neutral": {
-            "background": "#F1F5F3",
-            "text": "#52606D",
-            "border": "#DEE6E2"
-          },
-          "brand": {
-            "background": "#D9FBEA",
-            "text": "#106347",
-            "border": "transparent"
-          },
-          "evidence": {
-            "background": "#F1EBFF",
-            "text": "#6D3FD1",
-            "border": "#D9C8FF"
-          },
-          "success": {
-            "background": "#E8F9EE",
-            "text": "#16733A"
-          },
-          "warning": {
-            "background": "#FFF7DD",
-            "text": "#8A5A00"
-          },
-          "danger": {
-            "background": "#FDECEC",
-            "text": "#B42323"
-          }
-        },
-        "navigation": {
-          "background": "#FFFFFF",
-          "border": "#E8EEEB",
-          "itemText": "#52606D",
-          "itemIcon": "#64748B",
-          "itemHoverBackground": "#EDF3F0",
-          "itemHoverText": "#111827",
-          "itemActiveBackground": "#D9FBEA",
-          "itemActiveText": "#106347",
-          "itemActiveIcon": "#20A878",
-          "sectionLabel": "#7B8794"
-        },
-        "note": {
-          "background": "#FFFFFF",
-          "backgroundHover": "#EDF3F0",
-          "title": "#111827",
-          "body": "#52606D",
-          "meta": "#7B8794",
-          "border": "#E8EEEB",
-          "pinnedIndicator": "#F59E0B",
-          "selectedBackground": "#EDFFF6",
-          "selectedBorder": "#20A878"
-        },
-        "ai": {
-          "background": "#F1EBFF",
-          "text": "#6D3FD1",
-          "border": "#D9C8FF",
-          "icon": "#8B5CF6",
-          "thinkingBackground": "#F7F4FF"
-        }
-      },
-      "state": {
         "success": {
-          "solid": "#22C55E",
-          "background": "#E8F9EE",
-          "text": "#16733A",
-          "border": "#B6EBC9"
-        },
-        "info": {
-          "solid": "#3B82F6",
-          "background": "#EAF2FF",
-          "text": "#245EBC",
-          "border": "#BDD4FF"
-        },
-        "warning": {
-          "solid": "#F59E0B",
-          "background": "#FFF7DD",
-          "text": "#8A5A00",
-          "border": "#F6DA91"
+          "default": "#2F9E74",
+          "bg": "#E7F6EF",
+          "text": "#1F7A57"
         },
         "danger": {
-          "solid": "#EF4444",
-          "solidHover": "#DC2626",
-          "background": "#FDECEC",
-          "text": "#B42323",
-          "border": "#F6B8B8",
-          "focus": "#FCA5A5"
+          "default": "#E25555",
+          "bg": "#FDECEC",
+          "text": "#B93838"
         },
-        "evidence": {
-          "solid": "#8B5CF6",
-          "background": "#F1EBFF",
-          "text": "#6D3FD1",
-          "border": "#D9C8FF"
+        "warning": {
+          "default": "#D4A72C",
+          "bg": "#FFF7E0",
+          "text": "#8A6500"
         },
-        "careerFramework": {
-          "background": "#EEF2FF",
-          "text": "#4F46E5"
-        },
-        "achievement": {
-          "background": "#FFF7DA",
-          "text": "#9A6700"
-        },
-        "summary": {
-          "background": "#E9F8FF",
-          "text": "#176B87"
-        }
-      },
-      "chart": {
-        "series": {
-          "1": "#20A878",
-          "2": "#8B5CF6",
-          "3": "#3B82F6",
-          "4": "#F59E0B",
-          "5": "#EC4899",
-          "6": "#14B8A6",
-          "7": "#6366F1",
-          "8": "#F97316"
-        },
-        "semanticSeries": {
-          "notes": "#20A878",
-          "evidence": "#8B5CF6",
-          "summaries": "#3B82F6",
-          "achievements": "#F59E0B",
-          "careerCompetencies": "#6366F1"
-        },
-        "grid": "#E5EBE8",
-        "axis": "#9CA9A4",
-        "label": "#52606D",
-        "tooltip": {
-          "background": "#FFFFFF",
-          "text": "#111827",
-          "border": "#DEE6E2"
+        "info": {
+          "default": "#5B8DEF",
+          "bg": "#EEF4FF",
+          "text": "#3457B1"
         }
       },
       "shadow": {
-        "sm": "0 1px 2px rgba(7, 20, 38, 0.05)",
-        "md": "0 4px 12px rgba(7, 20, 38, 0.08)",
-        "lg": "0 12px 32px rgba(7, 20, 38, 0.12)"
+        "sm": "0 1px 2px rgba(16, 24, 40, 0.04)",
+        "md": "0 4px 12px rgba(16, 24, 40, 0.08)",
+        "lg": "0 10px 28px rgba(16, 24, 40, 0.12)"
       }
     },
     "dark": {
-      "semantic": {
-        "background": {
-          "app": "#071426",
-          "page": "#071426",
-          "surface": "#101D35",
-          "surfaceRaised": "#182943",
-          "surfaceSunken": "#0C192B",
-          "subtle": "#16253A",
-          "muted": "#1B2D43",
-          "hover": "#21344B",
-          "active": "#293D52",
-          "selected": "#123B34",
-          "overlay": "rgba(0, 0, 0, 0.64)",
-          "disabled": "#162236"
+      "color": {
+        "bg": {
+          "app": "#0F172A",
+          "page": "#0F172A",
+          "surface": "#111827",
+          "raised": "#172033",
+          "sunken": "#0D1526",
+          "hover": "#182235",
+          "active": "#1D2940",
+          "selected": "#232C45",
+          "overlay": "rgba(0, 0, 0, 0.58)"
         },
         "text": {
-          "primary": "#F4F7F6",
-          "secondary": "#B7C4C0",
-          "tertiary": "#95A49F",
-          "muted": "#82918D",
-          "disabled": "#5F706B",
+          "primary": "#E5E7EB",
+          "secondary": "#B7C0CF",
+          "tertiary": "#94A3B8",
+          "muted": "#7C8BA1",
+          "disabled": "#66758B",
           "inverse": "#111827",
-          "brand": "#9AF7CD",
-          "link": "#60F0B0",
-          "linkHover": "#9AF7CD"
+          "link": "#8B93FF",
+          "linkHover": "#A6ADFF"
         },
         "icon": {
-          "primary": "#D9E2DF",
-          "secondary": "#9DACA7",
-          "muted": "#70817B",
-          "brand": "#60F0B0",
-          "inverse": "#071426",
-          "disabled": "#52635E"
+          "primary": "#D1D7E0",
+          "secondary": "#94A3B8",
+          "muted": "#6B7A90"
         },
         "border": {
-          "subtle": "#1C2D41",
-          "default": "#293B50",
-          "strong": "#38505E",
-          "hover": "#496273",
-          "focus": "#60F0B0",
-          "selected": "#60F0B0",
-          "disabled": "#253447"
+          "subtle": "#1E293B",
+          "default": "#263245",
+          "strong": "#334155",
+          "hover": "#41536B"
         },
         "focus": {
-          "ring": "#60F0B0",
-          "ringOffset": "#071426"
+          "default": "#8B93FF",
+          "ring": "#A5B4FC"
         },
         "brand": {
-          "primary": "#60F0B0",
-          "primaryHover": "#78F0BB",
-          "primaryActive": "#36D99A",
-          "accent": "#60F0B0",
-          "soft": "#123B34",
-          "softer": "#0F2B28",
-          "onPrimary": "#071426"
-        }
-      },
-      "component": {
-        "button": {
-          "primary": {
-            "background": "#60F0B0",
-            "backgroundHover": "#78F0BB",
-            "backgroundActive": "#36D99A",
-            "text": "#071426",
-            "border": "#60F0B0"
-          },
-          "secondary": {
-            "background": "#101D35",
-            "backgroundHover": "#21344B",
-            "backgroundActive": "#293D52",
-            "text": "#F4F7F6",
-            "border": "#293B50",
-            "borderHover": "#38505E"
-          },
-          "ghost": {
-            "background": "transparent",
-            "backgroundHover": "#21344B",
-            "backgroundActive": "#293D52",
-            "text": "#B7C4C0"
-          },
-          "danger": {
-            "background": "#F87171",
-            "backgroundHover": "#EF4444",
-            "text": "#071426"
-          },
-          "disabled": {
-            "background": "#162236",
-            "text": "#5F706B",
-            "border": "#253447"
-          }
+          "default": "#8B93FF",
+          "hover": "#A6ADFF",
+          "active": "#BCC2FF",
+          "soft": "#232C45",
+          "softer": "#1C2440",
+          "onBrand": "#0F172A"
         },
-        "input": {
-          "background": "#101D35",
-          "backgroundHover": "#101D35",
-          "backgroundDisabled": "#162236",
-          "text": "#F4F7F6",
-          "placeholder": "#82918D",
-          "label": "#B7C4C0",
-          "border": "#293B50",
-          "borderHover": "#38505E",
-          "borderFocus": "#60F0B0",
-          "focusRing": "#60F0B0",
-          "disabledText": "#5F706B",
-          "errorBorder": "#713237",
-          "errorRing": "#F87171"
-        },
-        "tag": {
-          "neutral": {
-            "background": "#16253A",
-            "text": "#B7C4C0",
-            "border": "#293B50"
-          },
-          "brand": {
-            "background": "#123B34",
-            "text": "#9AF7CD",
-            "border": "transparent"
-          },
-          "evidence": {
-            "background": "#281D46",
-            "text": "#C4B5FD",
-            "border": "#493875"
-          },
-          "success": {
-            "background": "#122F20",
-            "text": "#86EFAC"
-          },
-          "warning": {
-            "background": "#332A12",
-            "text": "#FCD66D"
-          },
-          "danger": {
-            "background": "#391A1D",
-            "text": "#FCA5A5"
-          }
-        },
-        "navigation": {
-          "background": "#101D35",
-          "border": "#1C2D41",
-          "itemText": "#B7C4C0",
-          "itemIcon": "#9DACA7",
-          "itemHoverBackground": "#21344B",
-          "itemHoverText": "#F4F7F6",
-          "itemActiveBackground": "#123B34",
-          "itemActiveText": "#9AF7CD",
-          "itemActiveIcon": "#60F0B0",
-          "sectionLabel": "#82918D"
-        },
-        "note": {
-          "background": "#101D35",
-          "backgroundHover": "#21344B",
-          "title": "#F4F7F6",
-          "body": "#B7C4C0",
-          "meta": "#82918D",
-          "border": "#1C2D41",
-          "pinnedIndicator": "#FBBF24",
-          "selectedBackground": "#0F2B28",
-          "selectedBorder": "#60F0B0"
-        },
-        "ai": {
-          "background": "#281D46",
-          "text": "#C4B5FD",
-          "border": "#493875",
-          "icon": "#A78BFA",
-          "thinkingBackground": "#211A38"
-        }
-      },
-      "state": {
         "success": {
-          "solid": "#22C55E",
-          "background": "#122F20",
-          "text": "#86EFAC",
-          "border": "#245B39"
-        },
-        "info": {
-          "solid": "#60A5FA",
-          "background": "#142A46",
-          "text": "#93C5FD",
-          "border": "#294E78"
-        },
-        "warning": {
-          "solid": "#FBBF24",
-          "background": "#332A12",
-          "text": "#FCD66D",
-          "border": "#635025"
+          "default": "#63C69D",
+          "bg": "#173328",
+          "text": "#8BE0B7"
         },
         "danger": {
-          "solid": "#F87171",
-          "solidHover": "#EF4444",
-          "background": "#391A1D",
-          "text": "#FCA5A5",
-          "border": "#713237",
-          "focus": "#F87171"
+          "default": "#F07A7A",
+          "bg": "#3A1D22",
+          "text": "#FFB0B0"
         },
-        "evidence": {
-          "solid": "#A78BFA",
-          "background": "#281D46",
-          "text": "#C4B5FD",
-          "border": "#493875"
+        "warning": {
+          "default": "#E5BE57",
+          "bg": "#3A3118",
+          "text": "#F7DA8A"
         },
-        "careerFramework": {
-          "background": "#202548",
-          "text": "#A5B4FC"
-        },
-        "achievement": {
-          "background": "#332A12",
-          "text": "#FCD66D"
-        },
-        "summary": {
-          "background": "#102D3A",
-          "text": "#7DD3FC"
-        }
-      },
-      "chart": {
-        "series": {
-          "1": "#60F0B0",
-          "2": "#A78BFA",
-          "3": "#60A5FA",
-          "4": "#FBBF24",
-          "5": "#F472B6",
-          "6": "#2DD4BF",
-          "7": "#818CF8",
-          "8": "#FB923C"
-        },
-        "semanticSeries": {
-          "notes": "#60F0B0",
-          "evidence": "#A78BFA",
-          "summaries": "#60A5FA",
-          "achievements": "#FBBF24",
-          "careerCompetencies": "#818CF8"
-        },
-        "grid": "#223447",
-        "axis": "#526B73",
-        "label": "#9DACA7",
-        "tooltip": {
-          "background": "#182943",
-          "text": "#F4F7F6",
-          "border": "#38505E"
+        "info": {
+          "default": "#7CA7FF",
+          "bg": "#16233E",
+          "text": "#B7CBFF"
         }
       },
       "shadow": {
@@ -619,28 +174,403 @@
       }
     }
   },
-  "layout": {
-    "spacing": {
-      "pageXSmall": "16px",
-      "pageXMedium": "24px",
-      "pageXLarge": "32px",
-      "pageY": "24px",
-      "sectionGap": "32px",
-      "cardPadding": "20px",
-      "cardGap": "16px",
-      "formGap": "16px",
-      "fieldGap": "8px",
-      "inlineGap": "8px",
-      "stackGapSmall": "8px",
-      "stackGapMedium": "16px",
-      "stackGapLarge": "24px"
+  "typography": {
+    "fontFamily": {
+      "sans": "Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif",
+      "mono": "'SFMono-Regular', ui-monospace, Menlo, Monaco, Consolas, 'Liberation Mono', monospace"
     },
-    "size": {
-      "controlSmall": "32px",
-      "controlMedium": "40px",
-      "controlLarge": "48px",
-      "sidebarWidth": "264px",
-      "contentMax": "1200px"
+    "fontSize": {
+      "xs": "12px",
+      "sm": "14px",
+      "md": "16px",
+      "lg": "18px",
+      "xl": "22px",
+      "2xl": "28px",
+      "3xl": "36px"
+    },
+    "fontWeight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "lineHeight": {
+      "tight": 1.2,
+      "normal": 1.5,
+      "relaxed": 1.7
     }
+  },
+  "spacing": {
+    "0": "0px",
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "8": "32px",
+    "10": "40px",
+    "12": "48px",
+    "16": "64px"
+  },
+  "radius": {
+    "xs": "4px",
+    "sm": "6px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px",
+    "full": "999px"
+  },
+  "motion": {
+    "duration": {
+      "fast": "120ms",
+      "normal": "180ms",
+      "slow": "280ms"
+    },
+    "easing": {
+      "standard": "cubic-bezier(0.2, 0, 0, 1)"
+    }
+  },
+  "semantic": {
+    "light": {
+      "appBackground": "{themes.light.color.bg.page}",
+      "surfaceBackground": "{themes.light.color.bg.surface}",
+      "surfaceSubtleBackground": "{themes.light.color.bg.sunken}",
+      "surfaceHoverBackground": "{themes.light.color.bg.hover}",
+      "surfaceActiveBackground": "{themes.light.color.bg.active}",
+      "surfaceSelectedBackground": "{themes.light.color.bg.selected}",
+      "overlayBackground": "{themes.light.color.bg.overlay}",
+      "textPrimary": "{themes.light.color.text.primary}",
+      "textSecondary": "{themes.light.color.text.secondary}",
+      "textMuted": "{themes.light.color.text.muted}",
+      "textDisabled": "{themes.light.color.text.disabled}",
+      "textLink": "{themes.light.color.text.link}",
+      "iconPrimary": "{themes.light.color.icon.primary}",
+      "iconSecondary": "{themes.light.color.icon.secondary}",
+      "borderSubtle": "{themes.light.color.border.subtle}",
+      "borderDefault": "{themes.light.color.border.default}",
+      "borderStrong": "{themes.light.color.border.strong}",
+      "focus": "{themes.light.color.focus.default}",
+      "focusRing": "{themes.light.color.focus.ring}",
+      "brand": "{themes.light.color.brand.default}",
+      "brandHover": "{themes.light.color.brand.hover}",
+      "brandActive": "{themes.light.color.brand.active}",
+      "brandSoft": "{themes.light.color.brand.soft}",
+      "onBrand": "{themes.light.color.brand.onBrand}",
+      "success": "{themes.light.color.success.default}",
+      "successBg": "{themes.light.color.success.bg}",
+      "successText": "{themes.light.color.success.text}",
+      "danger": "{themes.light.color.danger.default}",
+      "dangerBg": "{themes.light.color.danger.bg}",
+      "dangerText": "{themes.light.color.danger.text}",
+      "warning": "{themes.light.color.warning.default}",
+      "warningBg": "{themes.light.color.warning.bg}",
+      "warningText": "{themes.light.color.warning.text}",
+      "info": "{themes.light.color.info.default}",
+      "infoBg": "{themes.light.color.info.bg}",
+      "infoText": "{themes.light.color.info.text}"
+    },
+    "dark": {
+      "appBackground": "{themes.dark.color.bg.page}",
+      "surfaceBackground": "{themes.dark.color.bg.surface}",
+      "surfaceSubtleBackground": "{themes.dark.color.bg.sunken}",
+      "surfaceHoverBackground": "{themes.dark.color.bg.hover}",
+      "surfaceActiveBackground": "{themes.dark.color.bg.active}",
+      "surfaceSelectedBackground": "{themes.dark.color.bg.selected}",
+      "overlayBackground": "{themes.dark.color.bg.overlay}",
+      "textPrimary": "{themes.dark.color.text.primary}",
+      "textSecondary": "{themes.dark.color.text.secondary}",
+      "textMuted": "{themes.dark.color.text.muted}",
+      "textDisabled": "{themes.dark.color.text.disabled}",
+      "textLink": "{themes.dark.color.text.link}",
+      "iconPrimary": "{themes.dark.color.icon.primary}",
+      "iconSecondary": "{themes.dark.color.icon.secondary}",
+      "borderSubtle": "{themes.dark.color.border.subtle}",
+      "borderDefault": "{themes.dark.color.border.default}",
+      "borderStrong": "{themes.dark.color.border.strong}",
+      "focus": "{themes.dark.color.focus.default}",
+      "focusRing": "{themes.dark.color.focus.ring}",
+      "brand": "{themes.dark.color.brand.default}",
+      "brandHover": "{themes.dark.color.brand.hover}",
+      "brandActive": "{themes.dark.color.brand.active}",
+      "brandSoft": "{themes.dark.color.brand.soft}",
+      "onBrand": "{themes.dark.color.brand.onBrand}",
+      "success": "{themes.dark.color.success.default}",
+      "successBg": "{themes.dark.color.success.bg}",
+      "successText": "{themes.dark.color.success.text}",
+      "danger": "{themes.dark.color.danger.default}",
+      "dangerBg": "{themes.dark.color.danger.bg}",
+      "dangerText": "{themes.dark.color.danger.text}",
+      "warning": "{themes.dark.color.warning.default}",
+      "warningBg": "{themes.dark.color.warning.bg}",
+      "warningText": "{themes.dark.color.warning.text}",
+      "info": "{themes.dark.color.info.default}",
+      "infoBg": "{themes.dark.color.info.bg}",
+      "infoText": "{themes.dark.color.info.text}"
+    }
+  },
+  "components": {
+    "button": {
+      "primary": {
+        "light": {
+          "background": "{themes.light.color.brand.default}",
+          "backgroundHover": "{themes.light.color.brand.hover}",
+          "backgroundActive": "{themes.light.color.brand.active}",
+          "text": "{themes.light.color.brand.onBrand}",
+          "border": "{themes.light.color.brand.default}"
+        },
+        "dark": {
+          "background": "{themes.dark.color.brand.default}",
+          "backgroundHover": "{themes.dark.color.brand.hover}",
+          "backgroundActive": "{themes.dark.color.brand.active}",
+          "text": "{themes.dark.color.brand.onBrand}",
+          "border": "{themes.dark.color.brand.default}"
+        }
+      },
+      "secondary": {
+        "light": {
+          "background": "{themes.light.color.bg.surface}",
+          "backgroundHover": "{themes.light.color.bg.hover}",
+          "text": "{themes.light.color.text.primary}",
+          "border": "{themes.light.color.border.default}"
+        },
+        "dark": {
+          "background": "{themes.dark.color.bg.surface}",
+          "backgroundHover": "{themes.dark.color.bg.hover}",
+          "text": "{themes.dark.color.text.primary}",
+          "border": "{themes.dark.color.border.default}"
+        }
+      },
+      "destructive": {
+        "light": {
+          "background": "{themes.light.color.danger.default}",
+          "backgroundHover": "#CF4848",
+          "text": "#FFFFFF",
+          "border": "{themes.light.color.danger.default}"
+        },
+        "dark": {
+          "background": "{themes.dark.color.danger.default}",
+          "backgroundHover": "#F59090",
+          "text": "#111827",
+          "border": "{themes.dark.color.danger.default}"
+        }
+      }
+    },
+    "input": {
+      "light": {
+        "background": "{themes.light.color.bg.surface}",
+        "text": "{themes.light.color.text.primary}",
+        "placeholder": "{themes.light.color.text.muted}",
+        "border": "{themes.light.color.border.default}",
+        "borderHover": "{themes.light.color.border.hover}",
+        "borderFocus": "{themes.light.color.focus.default}",
+        "focusRing": "{themes.light.color.focus.ring}"
+      },
+      "dark": {
+        "background": "{themes.dark.color.bg.surface}",
+        "text": "{themes.dark.color.text.primary}",
+        "placeholder": "{themes.dark.color.text.muted}",
+        "border": "{themes.dark.color.border.default}",
+        "borderHover": "{themes.dark.color.border.hover}",
+        "borderFocus": "{themes.dark.color.focus.default}",
+        "focusRing": "{themes.dark.color.focus.ring}"
+      }
+    },
+    "editor": {
+      "light": {
+        "background": "{themes.light.color.bg.surface}",
+        "border": "{themes.light.color.border.default}",
+        "borderFocus": "{themes.light.color.focus.default}",
+        "focusRing": "0 0 0 3px rgba(165, 180, 252, 0.18)",
+        "toolbarBackground": "{themes.light.color.bg.surface}",
+        "toolbarBorder": "{themes.light.color.border.subtle}",
+        "placeholder": "{themes.light.color.text.muted}"
+      },
+      "dark": {
+        "background": "{themes.dark.color.bg.surface}",
+        "border": "{themes.dark.color.border.default}",
+        "borderFocus": "{themes.dark.color.focus.default}",
+        "focusRing": "0 0 0 3px rgba(165, 180, 252, 0.18)",
+        "toolbarBackground": "{themes.dark.color.bg.surface}",
+        "toolbarBorder": "{themes.dark.color.border.subtle}",
+        "placeholder": "{themes.dark.color.text.muted}"
+      }
+    },
+    "card": {
+      "note": {
+        "light": {
+          "background": "{themes.light.color.bg.surface}",
+          "border": "{themes.light.color.border.subtle}",
+          "borderHover": "{themes.light.color.border.default}",
+          "shadow": "{themes.light.shadow.sm}",
+          "textPrimary": "{themes.light.color.text.primary}",
+          "textSecondary": "{themes.light.color.text.secondary}"
+        },
+        "dark": {
+          "background": "{themes.dark.color.bg.surface}",
+          "border": "{themes.dark.color.border.subtle}",
+          "borderHover": "{themes.dark.color.border.default}",
+          "shadow": "{themes.dark.shadow.sm}",
+          "textPrimary": "{themes.dark.color.text.primary}",
+          "textSecondary": "{themes.dark.color.text.secondary}"
+        }
+      }
+    },
+    "sidebar": {
+      "light": {
+        "background": "{themes.light.color.bg.surface}",
+        "itemText": "{themes.light.color.text.secondary}",
+        "itemHoverBackground": "{themes.light.color.bg.hover}",
+        "itemHoverText": "{themes.light.color.text.primary}",
+        "itemActiveBackground": "{themes.light.color.bg.selected}",
+        "itemActiveText": "{themes.light.color.brand.default}",
+        "border": "{themes.light.color.border.subtle}"
+      },
+      "dark": {
+        "background": "{themes.dark.color.bg.surface}",
+        "itemText": "{themes.dark.color.text.secondary}",
+        "itemHoverBackground": "{themes.dark.color.bg.hover}",
+        "itemHoverText": "{themes.dark.color.text.primary}",
+        "itemActiveBackground": "{themes.dark.color.bg.selected}",
+        "itemActiveText": "{themes.dark.color.brand.default}",
+        "border": "{themes.dark.color.border.subtle}"
+      }
+    },
+    "search": {
+      "light": {
+        "background": "{themes.light.color.bg.surface}",
+        "border": "{themes.light.color.border.default}",
+        "text": "{themes.light.color.text.primary}",
+        "placeholder": "{themes.light.color.text.muted}"
+      },
+      "dark": {
+        "background": "{themes.dark.color.bg.surface}",
+        "border": "{themes.dark.color.border.default}",
+        "text": "{themes.dark.color.text.primary}",
+        "placeholder": "{themes.dark.color.text.muted}"
+      }
+    },
+    "badge": {
+      "today": {
+        "light": {
+          "background": "{themes.light.color.success.bg}",
+          "text": "{themes.light.color.success.text}",
+          "border": "transparent"
+        },
+        "dark": {
+          "background": "{themes.dark.color.success.bg}",
+          "text": "{themes.dark.color.success.text}",
+          "border": "transparent"
+        }
+      },
+      "neutral": {
+        "light": {
+          "background": "{themes.light.color.bg.sunken}",
+          "text": "{themes.light.color.text.secondary}",
+          "border": "{themes.light.color.border.subtle}"
+        },
+        "dark": {
+          "background": "{themes.dark.color.bg.selected}",
+          "text": "{themes.dark.color.text.secondary}",
+          "border": "{themes.dark.color.border.subtle}"
+        }
+      },
+      "warning": {
+        "light": {
+          "background": "{themes.light.color.warning.bg}",
+          "text": "{themes.light.color.warning.text}",
+          "border": "transparent"
+        },
+        "dark": {
+          "background": "{themes.dark.color.warning.bg}",
+          "text": "{themes.dark.color.warning.text}",
+          "border": "transparent"
+        }
+      },
+      "danger": {
+        "light": {
+          "background": "{themes.light.color.danger.bg}",
+          "text": "{themes.light.color.danger.text}",
+          "border": "transparent"
+        },
+        "dark": {
+          "background": "{themes.dark.color.danger.bg}",
+          "text": "{themes.dark.color.danger.text}",
+          "border": "transparent"
+        }
+      }
+    }
+  },
+  "aliases": {
+    "light": {
+      "--bg": "{themes.light.color.bg.page}",
+      "--surface": "{themes.light.color.bg.surface}",
+      "--surface-sunk": "{themes.light.color.bg.sunken}",
+      "--surface-lift": "{themes.light.color.bg.raised}",
+      "--text": "{themes.light.color.text.primary}",
+      "--text-soft": "{themes.light.color.text.secondary}",
+      "--muted": "{themes.light.color.text.muted}",
+      "--border": "{themes.light.color.border.default}",
+      "--border-strong": "{themes.light.color.border.strong}",
+      "--accent": "{themes.light.color.brand.default}",
+      "--accent-soft": "{themes.light.color.brand.soft}",
+      "--accent-text": "{themes.light.color.brand.onBrand}",
+      "--button": "{themes.light.color.brand.default}",
+      "--button-hover": "{themes.light.color.brand.hover}",
+      "--danger": "{themes.light.color.danger.default}",
+      "--danger-soft": "{themes.light.color.danger.bg}"
+    },
+    "dark": {
+      "--bg": "{themes.dark.color.bg.page}",
+      "--surface": "{themes.dark.color.bg.surface}",
+      "--surface-sunk": "{themes.dark.color.bg.sunken}",
+      "--surface-lift": "{themes.dark.color.bg.raised}",
+      "--text": "{themes.dark.color.text.primary}",
+      "--text-soft": "{themes.dark.color.text.secondary}",
+      "--muted": "{themes.dark.color.text.muted}",
+      "--border": "{themes.dark.color.border.default}",
+      "--border-strong": "{themes.dark.color.border.strong}",
+      "--accent": "{themes.dark.color.brand.default}",
+      "--accent-soft": "{themes.dark.color.brand.soft}",
+      "--accent-text": "{themes.dark.color.brand.onBrand}",
+      "--button": "{themes.dark.color.brand.default}",
+      "--button-hover": "{themes.dark.color.brand.hover}",
+      "--danger": "{themes.dark.color.danger.default}",
+      "--danger-soft": "{themes.dark.color.danger.bg}"
+    }
+  },
+  "agentInstructions": {
+    "must": [
+      "Do not redesign layout, spacing, or typography unless needed for accessibility.",
+      "Do not introduce hardcoded colors where a token exists.",
+      "Use semantic tokens first, aliases only for legacy compatibility.",
+      "Preserve support for explicit light mode, explicit dark mode, and system theme.",
+      "Ensure explicit user-selected theme overrides system theme.",
+      "Keep cards neutral.",
+      "Keep borders subtle.",
+      "Keep shadows subtle.",
+      "Keep focus states visible."
+    ],
+    "mustNot": [
+      "Do not use gradients.",
+      "Do not use glow effects.",
+      "Do not use pure black backgrounds in dark mode.",
+      "Do not use green as a generic brand color.",
+      "Do not make ordinary note cards colorful.",
+      "Do not use multiple accent colors decoratively on a single screen.",
+      "Do not remove existing functional selectors."
+    ],
+    "priorityAreas": [
+      "editor",
+      "note cards",
+      "sidebar",
+      "active navigation",
+      "search",
+      "buttons",
+      "badges",
+      "focus states",
+      "light theme",
+      "dark theme"
+    ]
   }
 }

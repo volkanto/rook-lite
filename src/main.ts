@@ -1042,6 +1042,17 @@ function bindShellEvents(): void {
     }
 
     document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
+
+    const clickedNote = target.closest<HTMLElement>(".note");
+    if (clickedNote && !target.closest("button, a, input, details, summary")) {
+      document.querySelectorAll(".note.is-selected").forEach((n) => {
+        if (n !== clickedNote) n.classList.remove("is-selected");
+      });
+      clickedNote.classList.toggle("is-selected");
+    } else if (!clickedNote) {
+      document.querySelectorAll(".note.is-selected").forEach((n) => n.classList.remove("is-selected"));
+    }
+
     const langBtn = target.closest<HTMLButtonElement>("[data-select-lang]");
     if (langBtn) {
       const selected = langBtn.dataset.selectLang as SupportedLocale;
@@ -1195,7 +1206,7 @@ function applyTheme(): void {
   const theme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
   const resolved = theme === "SYSTEM" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme.toLowerCase();
   document.documentElement.dataset.theme = resolved;
-  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0d1117" : "#f6f8fa");
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0F172A" : "#F7F7FA");
   const toggle = document.querySelector<HTMLElement>(".sidebar-theme-toggle");
   if (toggle) {
     const nextLabel = resolved === "dark" ? s.themeToggleLight : s.themeToggleDark;
