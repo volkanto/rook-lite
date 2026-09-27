@@ -312,12 +312,16 @@ describe("Left menu bar icons and navigation", () => {
     expect(saveBtn).not.toBeNull();
     expect(statusBanner).not.toBeNull();
 
-    // Both buttons contain action icons
+    // Both buttons contain action icons and accessible tooltips
     expect(testBtn?.querySelector(".btn-action-icon")).not.toBeNull();
     expect(saveBtn?.querySelector(".btn-action-icon")).not.toBeNull();
 
-    expect(testBtn?.textContent).toContain("Test connection & refresh models");
-    expect(saveBtn?.textContent).toContain("Save AI settings");
+    expect(testBtn?.title).toContain("Test connection");
+    expect(saveBtn?.title).toContain("Save AI settings");
+
+    // Temperature slider is tucked inside the advanced disclosure panel
+    const disclosure = container.querySelector(".advanced-prompt-disclosure");
+    expect(disclosure?.querySelector("#ollama-temperature")).not.toBeNull();
   });
 
   it("renders minimal date header with date title, badges, navigation, and note items with clock icon time", async () => {

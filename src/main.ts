@@ -49,6 +49,7 @@ export const icons = {
   github: '<path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"/>',
   chevronLeft: '<path d="M15 6l-6 6l6 6"/>',
   chevronRight: '<path d="M9 6l6 6l-6 6"/>',
+  chevronDown: '<path d="M6 9l6 6l6 -6"/>',
   clock: '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 7v5l3 3"/>',
   arrowUp: '<path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>',
   maximize: '<path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/>',
@@ -510,61 +511,54 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
       </div>
     </header>
 
-    <div class="settings-cards-stack">
-      <section class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title-group">
-            <h2>${s.languageTitle}</h2>
-            <p>${s.languageSubtitle}</p>
+    <div class="settings-streamlined-stack">
+      <section class="settings-section">
+        <h2 class="settings-section-title">${s.appearanceTitle}</h2>
+        
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">${s.appearanceTitle}</span>
+            <span class="settings-row-desc">${s.appearanceSubtitle}</span>
+          </div>
+          <div class="settings-segmented-control" role="radiogroup" aria-label="${s.appearanceTitle}">
+            ${([
+              ["SYSTEM", s.themeSystem, icons.monitor],
+              ["LIGHT", s.themeLight, icons.sun],
+              ["DARK", s.themeDark, icons.moon]
+            ] as const).map(([val, label, iconSvg]) => `
+              <label class="settings-segmented-btn ${currentTheme === val ? "is-active" : ""}">
+                <input type="radio" name="settings-theme" value="${val}" ${currentTheme === val ? "checked" : ""} class="visually-hidden">
+                ${svg(iconSvg, "settings-segmented-icon")}
+                <span>${label}</span>
+              </label>
+            `).join("")}
           </div>
         </div>
-        <div class="theme-selector-grid language-selector-grid">
-          ${getAvailableLocales().map((loc) => `
-            <label class="theme-option-card ${currentLocale === loc.code ? "is-selected" : ""}">
-              <input type="radio" name="settings-language" value="${loc.code}" ${currentLocale === loc.code ? "checked" : ""}>
-              <div class="theme-card-icon">${svg(icons.globe, "")}</div>
-              <div class="theme-card-info">
-                <strong>${escapeHtml(loc.label)}</strong>
-                <span>${escapeHtml(loc.description)}</span>
-              </div>
-            </label>
-          `).join("")}
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">${s.languageTitle}</span>
+            <span class="settings-row-desc">${s.languageSubtitle}</span>
+          </div>
+          <div class="settings-segmented-control" role="radiogroup" aria-label="${s.languageTitle}">
+            ${getAvailableLocales().map((loc) => `
+              <label class="settings-segmented-btn ${currentLocale === loc.code ? "is-active" : ""}">
+                <input type="radio" name="settings-language" value="${loc.code}" ${currentLocale === loc.code ? "checked" : ""} class="visually-hidden">
+                <span>${escapeHtml(loc.label)}</span>
+              </label>
+            `).join("")}
+          </div>
         </div>
       </section>
 
-      <section class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title-group">
-            <h2>${s.appearanceTitle}</h2>
-            <p>${s.appearanceSubtitle}</p>
-          </div>
-        </div>
-        <div class="theme-selector-grid">
-          ${([
-            ["SYSTEM", s.themeSystem, s.themeSystemDesc, icons.monitor],
-            ["LIGHT", s.themeLight, s.themeLightDesc, icons.sun],
-            ["DARK", s.themeDark, s.themeDarkDesc, icons.moon]
-          ] as const).map(([val, label, desc, iconSvg]) => `
-            <label class="theme-option-card ${currentTheme === val ? "is-selected" : ""}">
-              <input type="radio" name="settings-theme" value="${val}" ${currentTheme === val ? "checked" : ""}>
-              <div class="theme-card-icon">${svg(iconSvg, "")}</div>
-              <div class="theme-card-info">
-                <strong>${label}</strong>
-                <span>${desc}</span>
-              </div>
-            </label>
-          `).join("")}
-        </div>
-      </section>
-
-      <section class="settings-card local-ai-card ${ollama.enabled ? "is-enabled" : "is-collapsed"}">
-        <div class="settings-card-header">
-          <div class="settings-card-title-group">
+      <section class="settings-section local-ai-card ${ollama.enabled ? "is-enabled" : "is-collapsed"}">
+        <div class="settings-row settings-toggle-row">
+          <div class="settings-row-info">
             <div class="title-with-badge">
-              <h2>${s.localAiTitle}</h2>
+              <span class="settings-row-label">${s.localAiTitle}</span>
               <span class="ai-privacy-pill">${s.localAiBadge}</span>
             </div>
-            <p>${s.localAiSubtitle}</p>
+            <span class="settings-row-desc">${s.localAiSubtitle}</span>
           </div>
           <div class="ai-toggle-wrapper">
             <label class="toggle-switch" for="ollama-enabled-toggle">
@@ -604,102 +598,88 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-field flex-1">
-                <div class="field-label-row">
-                  <label for="ollama-temperature">${s.ollamaTempLabel}</label>
-                  <span id="temp-val-display" class="temp-badge">${Number(ollama.temperature).toFixed(2)}</span>
+            <details class="advanced-prompt-disclosure">
+              <summary class="advanced-prompt-summary">
+                <span class="advanced-prompt-title">Advanced options (Temperature & Prompt)</span>
+                ${svg(icons.chevronDown, "disclosure-chevron-svg")}
+              </summary>
+              <div class="advanced-prompt-body">
+                <div class="form-field flex-1">
+                  <div class="field-label-row">
+                    <label for="ollama-temperature">${s.ollamaTempLabel}</label>
+                    <span id="temp-val-display" class="temp-badge">${Number(ollama.temperature).toFixed(2)}</span>
+                  </div>
+                  <input type="range" id="ollama-temperature" name="temperature" min="0" max="1" step="0.05" value="${ollama.temperature}" class="range-slider">
+                  <div class="range-labels">
+                    <span>${s.ollamaTempPrecise}</span>
+                    <span>${s.ollamaTempBalanced}</span>
+                    <span>${s.ollamaTempCreative}</span>
+                  </div>
                 </div>
-                <input type="range" id="ollama-temperature" name="temperature" min="0" max="1" step="0.05" value="${ollama.temperature}" class="range-slider">
-                <div class="range-labels">
-                  <span>${s.ollamaTempPrecise}</span>
-                  <span>${s.ollamaTempBalanced}</span>
-                  <span>${s.ollamaTempCreative}</span>
-                </div>
-              </div>
-            </div>
 
-            <div class="form-row">
-              <div class="form-field flex-1">
-                <div class="field-label-row">
-                  <label for="ollama-system-prompt">${s.ollamaSystemPromptLabel}</label>
-                  <button type="button" id="reset-ollama-prompt" class="text-link-btn" title="${s.resetToDefault}">${s.resetToDefault}</button>
+                <div class="form-field flex-1">
+                  <div class="field-label-row">
+                    <label for="ollama-system-prompt">${s.ollamaSystemPromptLabel}</label>
+                    <button type="button" id="reset-ollama-prompt" class="text-link-btn" title="${s.resetToDefault}">${s.resetToDefault}</button>
+                  </div>
+                  <textarea class="form-textarea" id="ollama-system-prompt" name="systemPrompt" rows="3" placeholder="${s.ollamaSystemPromptHint}">${escapeHtml(ollama.systemPrompt ?? DEFAULT_OLLAMA_PROMPT)}</textarea>
+                  <span class="field-hint">${s.ollamaSystemPromptHint}</span>
                 </div>
-                <textarea class="form-textarea" id="ollama-system-prompt" name="systemPrompt" rows="4" placeholder="${s.ollamaSystemPromptHint}">${escapeHtml(ollama.systemPrompt ?? DEFAULT_OLLAMA_PROMPT)}</textarea>
-                <span class="field-hint">${s.ollamaSystemPromptHint}</span>
               </div>
-            </div>
+            </details>
 
             <div class="ai-actions-row">
-              <button type="button" id="test-ollama" class="secondary-button">${svg(icons.refresh, "btn-action-icon")}<span>${s.testConnectionBtn}</span></button>
-              <button type="submit" class="save-btn-rect">${svg(icons.check, "btn-action-icon")}<span>${s.saveAiSettingsBtn}</span></button>
+              <button type="button" id="test-ollama" class="secondary-button icon-action-btn" title="${s.testConnectionBtn}" aria-label="${s.testConnectionBtn}">${svg(icons.refresh, "btn-action-icon")}<span class="visually-hidden">${s.testConnectionBtn}</span></button>
+              <button type="submit" class="save-btn-rect icon-action-btn" title="${s.saveAiSettingsBtn}" aria-label="${s.saveAiSettingsBtn}">${svg(icons.check, "btn-action-icon")}<span class="visually-hidden">${s.saveAiSettingsBtn}</span></button>
             </div>
             <div id="ollama-status" class="notice" hidden aria-live="polite"></div>
           </form>
         </div>
       </section>
 
-      <section class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title-group">
-            <h2>${s.storageTitle}</h2>
-            <p>${s.storageSubtitle}</p>
+      <section class="settings-section">
+        <h2 class="settings-section-title">${s.storageTitle}</h2>
+        
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">${s.storageTitle}</span>
+            <span class="settings-row-desc">${counts.notes} ${counts.notes === 1 ? s.entrySingle : s.entryPlural} · ${counts.categories} ${s.navCategories.toLowerCase()} · ${counts.summaries} ${s.navSummaries.toLowerCase()}${estimate?.usage ? ` · ${formatBytes(estimate.usage)}` : ""}</span>
+          </div>
+          <div class="settings-row-action">
+            ${persisted ? `<span class="persistence-status-badge">✓ ${s.persistencePersisted}</span>` : `<button type="button" id="request-persistence" class="secondary-button icon-action-btn" title="${s.requestPersistenceBtn}" aria-label="${s.requestPersistenceBtn}">${svg(icons.shield, "btn-action-icon")}<span class="visually-hidden">${s.requestPersistenceBtn}</span></button>`}
           </div>
         </div>
-        <div class="storage-metrics-grid">
-          <div class="storage-metric-box">
-            <span class="metric-num">${counts.notes}</span>
-            <span class="metric-label">${s.metricNotes}</span>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">${s.dataManagementTitle}</span>
+            <span class="settings-row-desc">${s.dataManagementSubtitle}</span>
           </div>
-          <div class="storage-metric-box">
-            <span class="metric-num">${counts.categories}</span>
-            <span class="metric-label">${s.metricCategories}</span>
-          </div>
-          <div class="storage-metric-box">
-            <span class="metric-num">${counts.summaries}</span>
-            <span class="metric-label">${s.metricSummaries}</span>
-          </div>
-          <div class="storage-metric-box">
-            <span class="metric-num">${estimate?.usage ? formatBytes(estimate.usage) : "Local DB"}</span>
-            <span class="metric-label">${s.estimatedUsage}</span>
+          <div class="settings-row-action">
+            <a href="${appUrl("/data")}" data-link class="secondary-button icon-action-btn" title="${s.navData}" aria-label="${s.navData}">${svg(icons.export, "btn-action-icon")}<span class="visually-hidden">${s.navData}</span></a>
           </div>
         </div>
-        <div class="persistence-row">
-          <div class="persistence-text">
-            <strong>${persisted ? `✓ ${s.persistencePersisted}` : s.persistenceBestEffort}</strong>
-            <p>${s.persistenceDesc}</p>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">${s.aboutTitle}</span>
+            <span class="settings-row-desc">Rook Lite · ${s.aboutSubtitle}</span>
           </div>
-          ${persisted ? "" : `<button type="button" id="request-persistence" class="secondary-button">${s.requestPersistenceBtn}</button>`}
+          <div class="settings-row-action">
+            <a href="https://github.com/volkanto/rook-lite" target="_blank" rel="noopener noreferrer" class="secondary-button icon-action-btn" title="GitHub" aria-label="GitHub">${svg(icons.github, "btn-action-icon")}<span class="visually-hidden">GitHub</span></a>
+          </div>
         </div>
       </section>
 
-      <section class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title-group">
-            <h2>${s.dataManagementTitle}</h2>
-            <p>${s.dataManagementSubtitle}</p>
+      <section class="settings-section danger-section">
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label danger-title">${s.dangerZoneTitle}</span>
+            <span class="settings-row-desc">${s.dangerZoneSubtitle}</span>
           </div>
-          <a href="${appUrl("/data")}" data-link class="secondary-button action-link-btn">${s.navData} &rarr;</a>
-        </div>
-      </section>
-
-      <section class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title-group">
-            <h2>${s.aboutTitle}</h2>
-            <p>${s.aboutSubtitle}</p>
+          <div class="settings-row-action">
+            <button type="button" id="delete-local-data" class="danger-save-btn icon-action-btn" title="${s.clearAllDataBtn}" aria-label="${s.clearAllDataBtn}">${svg(icons.trash, "btn-action-icon")}<span class="visually-hidden">${s.clearAllDataBtn}</span></button>
           </div>
-          <a href="https://github.com/volkanto/rook-lite" target="_blank" rel="noopener noreferrer" class="secondary-button action-link-btn">${svg(icons.github, "btn-action-icon")}<span>GitHub</span></a>
-        </div>
-      </section>
-
-      <section class="settings-card danger-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title-group">
-            <h2 class="danger-title">${s.dangerZoneTitle}</h2>
-            <p>${s.dangerZoneSubtitle}</p>
-          </div>
-          <button type="button" id="delete-local-data" class="danger-save-btn">${s.clearAllDataBtn}</button>
         </div>
       </section>
     </div>
@@ -720,9 +700,9 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
   content.querySelectorAll<HTMLInputElement>('input[name="settings-theme"]').forEach((input) => {
     input.addEventListener("change", () => {
       setTheme(input.value as ThemePreference);
-      content.querySelectorAll(".theme-option-card").forEach((card) => {
-        const isMatch = (card.querySelector("input") as HTMLInputElement)?.value === input.value;
-        card.classList.toggle("is-selected", isMatch);
+      content.querySelectorAll(".settings-segmented-btn").forEach((btn) => {
+        const isMatch = (btn.querySelector("input") as HTMLInputElement)?.value === input.value;
+        btn.classList.toggle("is-active", isMatch);
       });
     });
   });
