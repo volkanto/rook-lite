@@ -956,9 +956,25 @@ async function updateModalSearch(): Promise<void> {
 }
 
 let shellEventsBound = false;
+let editorHadFocusBeforeScrollToTop = false;
+
 function bindShellEvents(): void {
   if (shellEventsBound) return;
   shellEventsBound = true;
+
+  const recordScrollToTopIntent = (event: Event) => {
+    const target = event.target as Element | null;
+    if (target?.closest('[data-action="scroll-to-top"]')) {
+      const form = document.querySelector<HTMLFormElement>("#new-note-form");
+      editorHadFocusBeforeScrollToTop = form !== null && form.contains(document.activeElement);
+      if (editorHadFocusBeforeScrollToTop) {
+        event.preventDefault();
+      }
+    }
+  };
+
+  document.addEventListener("pointerdown", recordScrollToTopIntent, true);
+  document.addEventListener("mousedown", recordScrollToTopIntent, true);
 
   window.addEventListener("resize", () => {
     updateBackToTopVisibility();
@@ -1064,19 +1080,25 @@ function bindShellEvents(): void {
     }
     if (target.closest('[data-action="scroll-to-top"]')) {
       event.preventDefault();
-      window.scrollTo({
-        top: 0,
-        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-      });
+      const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea");
+      const wasFocused = editorHadFocusBeforeScrollToTop || (textarea !== null && (document.activeElement === textarea || textarea.closest("form")?.contains(document.activeElement) === true));
+      editorHadFocusBeforeScrollToTop = false;
+
+      if (typeof window.scrollTo === "function") {
+        window.scrollTo({
+          top: 0,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+        });
+      }
       const shell = document.querySelector<HTMLElement>(".shell");
-      if (shell) {
+      if (shell && typeof shell.scrollTo === "function") {
         shell.scrollTo({
           top: 0,
           behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
         });
       }
-      const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea");
-      if (textarea) {
+      if (wasFocused && textarea) {
+        textarea.focus();
         window.setTimeout(() => textarea.focus(), 350);
       }
       return;

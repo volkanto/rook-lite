@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { NoteRepository } from "./db";
 import { NoteService } from "./services";
 
@@ -614,5 +614,44 @@ describe("Left menu bar icons and navigation", () => {
     // Press Cmd+D again to exit Zen mode
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "d", metaKey: true, bubbles: true }));
     expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+  });
+
+  it("does not focus note editor when back-to-top button is pressed while unfocused, but preserves focus if focused", async () => {
+    window.scrollTo = vi.fn();
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+
+    expect(form).not.toBeNull();
+    expect(textarea).not.toBeNull();
+
+    // 1. When unfocused before clicking, remains unfocused
+    textarea?.blur();
+    expect(document.activeElement).not.toBe(textarea);
+    expect(form?.classList.contains("has-content")).toBe(false);
+
+    const btn = document.createElement("button");
+    btn.dataset.action = "scroll-to-top";
+    document.body.appendChild(btn);
+    btn.click();
+
+    await new Promise((r) => setTimeout(r, 400));
+    expect(document.activeElement).not.toBe(textarea);
+    expect(form?.classList.contains("has-content")).toBe(false);
+
+    // 2. When focused before clicking, preserves focus
+    textarea?.focus();
+    expect(document.activeElement).toBe(textarea);
+    expect(form?.classList.contains("has-content")).toBe(true);
+
+    btn.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+    btn.click();
+
+    await new Promise((r) => setTimeout(r, 400));
+    expect(document.activeElement).toBe(textarea);
+
+    btn.remove();
   });
 });
