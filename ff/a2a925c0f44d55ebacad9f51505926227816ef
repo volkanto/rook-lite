@@ -1,0 +1,21 @@
+.github/workflows/deploy-cloudflare.yml
+  s_4c9bb8b1185d96::t_cc95abeed152d2 1-57
+README.md
+  s_4c9bb8b1185d96::t_d4252cc32e74f3 191,193,195,197-229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "ffa2a925c0f44d55ebacad9f51505926227816ef",
+  "prompts": {},
+  "sessions": {
+    "s_4c9bb8b1185d96": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "4b29d61b-63a9-49cc-b386-121100e7103a",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
