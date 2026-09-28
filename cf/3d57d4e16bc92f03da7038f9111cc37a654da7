@@ -1,0 +1,62 @@
+src/command-palette/commandSearch.ts
+  s_6c67f75e2b4c65::t_61077af2a786ae 1-14
+  s_6c67f75e2b4c65::t_7ada017c0c0f66 252
+  s_6c67f75e2b4c65::t_beb6e134a079f6 330
+  s_6c67f75e2b4c65::t_4512d4b02565d3 433
+  s_6c67f75e2b4c65::t_71e378dc8b4c43 15-46,60-251,253-329,331-432,434-454
+  s_6c67f75e2b4c65::t_067708ccb9119b 47-59
+src/main.ts
+  s_6c67f75e2b4c65::t_5cd736cba9bdd9 80,83,87-190,192,194-235
+  s_6c67f75e2b4c65::t_5af1f314f501ef 75
+  s_6c67f75e2b4c65::t_aca02746c5440b 1336,1338
+  s_6c67f75e2b4c65::t_fd321b1d5a9844 12-13,23-24
+  s_6c67f75e2b4c65::t_c0d45cd7d10383 1174-1182,1184
+  s_6c67f75e2b4c65::t_b2ebba2a025229 1354
+  s_6c67f75e2b4c65::t_8f5b4a5a594709 1337,1340-1342
+  s_6c67f75e2b4c65::t_2c57a8d163a04e 191,193
+  s_6c67f75e2b4c65::t_0b2f1f73281617 236-237
+  s_6c67f75e2b4c65::t_5ad765fc77387b 1339
+src/command-palette/commandPalette.test.ts
+  s_6c67f75e2b4c65::t_217685ae8bbadb 1-131
+src/command-palette/searchParser.test.ts
+  s_6c67f75e2b4c65::t_b966148c8430e6 1-93
+src/command-palette/searchParser.ts
+  s_6c67f75e2b4c65::t_61ee6b7abe6356 1-92
+src/lite.css
+  s_6c67f75e2b4c65::t_5ccc261678d408 4400,4409,4411,4415-4739
+  s_6c67f75e2b4c65::t_301f1c21ac4a52 4740
+src/command-palette/types.ts
+  s_6c67f75e2b4c65::t_49ec7b62e0cf3a 1-27,49-135
+  s_6c67f75e2b4c65::t_0f884602016f5e 28-48
+src/command-palette/commandPaletteIntegration.test.ts
+  s_6c67f75e2b4c65::t_8db59cdf23c87b 1,3,20-22,28-38,40-44,46-62,64,66-72,75-81,83-92,94-98,100-109,111-115,117-126,128-130
+  s_6c67f75e2b4c65::t_ff3610e17f0c4a 39,45,63,65,73-74,82,93,99,110,116,127
+  s_6c67f75e2b4c65::t_b161ac4d43a5fe 23-27
+  s_6c67f75e2b4c65::t_7e2f106074ed7d 2,4-19
+src/command-palette/commandHistory.ts
+  s_6c67f75e2b4c65::t_77dd2738681208 1-60
+src/command-palette/commandPalette.ts
+  s_6c67f75e2b4c65::t_8cf98ccbdd1fa3 1-191,193-525
+  s_6c67f75e2b4c65::t_4e6d32cb3fb473 192
+src/command-palette/commandRegistry.ts
+  s_6c67f75e2b4c65::t_5b9d2220785806 1-287
+src/command-palette/commandSearch.test.ts
+  s_6c67f75e2b4c65::t_20e6585775ca5c 2-159
+  s_6c67f75e2b4c65::t_f2efae29436fd5 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "cf3d57d4e16bc92f03da7038f9111cc37a654da7",
+  "prompts": {},
+  "sessions": {
+    "s_6c67f75e2b4c65": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "08ca4de5-0640-4305-8ebd-74166179ea99",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
