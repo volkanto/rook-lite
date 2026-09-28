@@ -1,0 +1,21 @@
+src/main.ts
+  s_6c67f75e2b4c65::t_767429966cd174 778-779
+src/i18n.test.ts
+  s_6c67f75e2b4c65::t_b806684edcccaf 168-198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "17393157f4547c2b3027cd32da2df14414d9ede8",
+  "prompts": {},
+  "sessions": {
+    "s_6c67f75e2b4c65": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "08ca4de5-0640-4305-8ebd-74166179ea99",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
