@@ -1,0 +1,26 @@
+src/command-palette/commandPaletteIntegration.test.ts
+  s_6c67f75e2b4c65::t_52674cd7750465 130-153,158
+  s_6c67f75e2b4c65::t_933c1e2f6d6c28 154-157
+src/lite.css
+  s_6c67f75e2b4c65::t_d310f78a4397f2 1107-1109,1116,1120-1121,1125-1128
+src/main.ts
+  s_6c67f75e2b4c65::t_87cf4578d3e373 232-235,237-242
+  s_6c67f75e2b4c65::t_63ffbd72b84ffb 285-290,292-294,301-303
+  s_6c67f75e2b4c65::t_4f7e4442fbf628 295-300
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "ae0ca01329799a48d10199f1409777003c3ffcaa",
+  "prompts": {},
+  "sessions": {
+    "s_6c67f75e2b4c65": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "08ca4de5-0640-4305-8ebd-74166179ea99",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
