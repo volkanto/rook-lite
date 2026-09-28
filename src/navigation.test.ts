@@ -708,6 +708,33 @@ describe("Left menu bar icons and navigation", () => {
     expect(document.body.classList.contains("is-zen-mode")).toBe(false);
   });
 
+  it("toggles Zen mode inside the edit note dialog and resets on close", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Testing zen mode in dialog", today, []);
+
+    const { renderShell, showEditDialog, closeDialog } = await import("./main");
+    await renderShell();
+
+    showEditDialog(createdNote, []);
+
+    const dialog = document.querySelector(".note-edit-dialog");
+    const zenBtn = dialog?.querySelector<HTMLButtonElement>('[data-action="toggle-zen"]');
+
+    expect(zenBtn).not.toBeNull();
+    expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+
+    // Toggle zen mode from edit dialog
+    zenBtn?.click();
+    expect(document.body.classList.contains("is-zen-mode")).toBe(true);
+
+    // Close dialog and verify zen mode is cleaned up
+    closeDialog();
+    expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+
+    await noteService.delete(createdNote.id);
+  });
+
   it("does not focus note editor when back-to-top button is pressed while unfocused, but preserves focus if focused", async () => {
     window.scrollTo = vi.fn();
     const { renderShell } = await import("./main");
