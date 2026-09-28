@@ -165,6 +165,37 @@ describe("i18n internationalization and language support", () => {
     expect(document.documentElement.lang).toBe("en");
   });
 
+  it("preserves active language toggle state when toggling appearance theme", async () => {
+    const { renderSettings } = await import("./main");
+
+    setLocale("en");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSettings(container);
+
+    const enRadio = container.querySelector<HTMLInputElement>('input[name="settings-language"][value="en"]');
+    const enBtn = enRadio?.closest(".settings-segmented-btn");
+    expect(enBtn?.classList.contains("is-active")).toBe(true);
+
+    // Toggle theme to DARK
+    const darkThemeRadio = container.querySelector<HTMLInputElement>('input[name="settings-theme"][value="DARK"]');
+    expect(darkThemeRadio).not.toBeNull();
+    darkThemeRadio!.checked = true;
+    darkThemeRadio!.dispatchEvent(new Event("change"));
+
+    // Language button must still retain is-active class
+    expect(enBtn?.classList.contains("is-active")).toBe(true);
+
+    // Toggle theme to LIGHT
+    const lightThemeRadio = container.querySelector<HTMLInputElement>('input[name="settings-theme"][value="LIGHT"]');
+    expect(lightThemeRadio).not.toBeNull();
+    lightThemeRadio!.checked = true;
+    lightThemeRadio!.dispatchEvent(new Event("change"));
+
+    // Language button must still retain is-active class
+    expect(enBtn?.classList.contains("is-active")).toBe(true);
+  });
+
   it("allows switching back and forth between languages multiple times", async () => {
     const { renderShell } = await import("./main");
 

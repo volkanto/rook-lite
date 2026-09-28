@@ -775,7 +775,8 @@ function bindSettingsEvents(content: HTMLElement): void {
   content.querySelectorAll<HTMLInputElement>('input[name="settings-theme"]').forEach((input) => {
     input.addEventListener("change", () => {
       setTheme(input.value as ThemePreference);
-      content.querySelectorAll(".settings-segmented-btn").forEach((btn) => {
+      const control = input.closest(".settings-segmented-control");
+      control?.querySelectorAll(".settings-segmented-btn").forEach((btn) => {
         const isMatch = (btn.querySelector("input") as HTMLInputElement)?.value === input.value;
         btn.classList.toggle("is-active", isMatch);
       });
