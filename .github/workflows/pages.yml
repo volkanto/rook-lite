@@ -37,7 +37,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          VITE_BASE_PATH: /
         run: npm run build
 
       - name: Upload artifact
