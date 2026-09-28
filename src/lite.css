@@ -2222,8 +2222,10 @@ body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-textar
   min-height: 0 !important;
   max-height: none !important;
   padding: 1.5rem 1.5rem !important;
-  font-size: 1.12rem !important;
-  line-height: 1.8 !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+  letter-spacing: -0.011em !important;
   overflow-y: auto !important;
   resize: none !important;
   background: var(--color-bg-surface, var(--surface)) !important;
@@ -2237,8 +2239,10 @@ body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .editor-preview {
   min-height: 0 !important;
   max-height: none !important;
   padding: 1.5rem 1.5rem !important;
-  font-size: 1.08rem !important;
-  line-height: 1.8 !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+  letter-spacing: -0.011em !important;
   overflow-y: auto !important;
   background: var(--color-bg-surface, var(--surface)) !important;
   box-sizing: border-box !important;
@@ -2304,8 +2308,10 @@ body.is-zen-mode .note-edit-dialog-head {
 
 body.is-zen-mode .editor-card-modal .simple-editor-textarea,
 body.is-zen-mode .editor-card-modal .editor-preview {
-  font-size: 1.12rem !important;
-  line-height: 1.8 !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+  letter-spacing: -0.011em !important;
   padding: 1.5rem 1.5rem !important;
 }
 
