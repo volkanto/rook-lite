@@ -1095,8 +1095,6 @@
   }
 }
 
-.notes-list .note:target,
-.notes-list .note.is-search-target,
 .notes-list .note.is-selected {
   border-color: var(--color-brand) !important;
   background: var(--color-bg-selected) !important;
@@ -1106,25 +1104,28 @@
 .notes-list .note:target,
 .notes-list .note.is-search-target {
   animation: note-target-pulse 2.8s ease-out;
+  border-color: var(--color-brand);
+  background: var(--color-bg-selected);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus-ring) 28%, transparent), var(--shadow-md);
 }
 
 @keyframes note-target-pulse {
   0%, 28%, 56% {
     background: var(--color-bg-selected);
     border-color: var(--color-brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 30%, transparent), var(--shadow-md);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand) 36%, transparent), var(--shadow-md);
   }
 
   14%, 42%, 70% {
-    background: color-mix(in srgb, var(--color-brand) 8%, var(--color-bg-surface));
-    border-color: color-mix(in srgb, var(--color-brand) 40%, transparent);
+    background: var(--color-bg-surface);
+    border-color: var(--color-border-default);
     box-shadow: var(--shadow-sm);
   }
 
-  100% {
-    background: var(--color-bg-surface);
-    border-color: var(--color-border-subtle);
-    box-shadow: var(--shadow-sm);
+  84%, 100% {
+    background: var(--color-bg-selected);
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus-ring) 28%, transparent), var(--shadow-md);
   }
 }
 

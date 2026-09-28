@@ -127,4 +127,33 @@ describe("Command Palette Integration", () => {
     const input = document.querySelector<HTMLInputElement>("#command-palette-input")!;
     expect(input.value).toContain("tag:productivity");
   });
+
+  it("navigates to note and triggers blink highlight when note is selected from search", async () => {
+    const { renderShell, openSearch } = await import("../main");
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Blinking search target note\n#search", today, []);
+
+    await renderShell();
+    await openSearch("Blinking search");
+
+    const modal = document.querySelector<HTMLElement>("#search-modal");
+    const noteItem = modal?.querySelector<HTMLElement>(".palette-note-item");
+    expect(noteItem).not.toBeNull();
+
+    // Select the note
+    noteItem?.click();
+
+    // Verify modal is closed
+    expect(modal?.classList.contains("is-open")).toBe(false);
+
+    // Verify target note element in stream exists
+    const noteEl = document.querySelector<HTMLElement>(`#note-${createdNote.id}`);
+    expect(noteEl).not.toBeNull();
+
+    // Wait for async renderRoute and requestAnimationFrame to apply is-search-target
+    await new Promise((r) => setTimeout(r, 250));
+    const targetEl = document.querySelector<HTMLElement>(`#note-${createdNote.id}`);
+    expect(targetEl?.classList.contains("is-search-target")).toBe(true);
+  });
 });

@@ -229,8 +229,17 @@ function initCommandPalette(): void {
     getContext,
     actions,
     onNavigate: (url) => {
+      const parsed = new URL(url, location.origin);
+      const isSamePath = parsed.pathname === location.pathname;
+      const isSameDate = (parsed.searchParams.get("date") ?? "") === (new URLSearchParams(location.search).get("date") ?? "");
+
       history.pushState({}, "", appUrl(url));
-      void renderRoute();
+
+      if (isSamePath && isSameDate && parsed.hash) {
+        highlightLinkedNote(parsed.hash);
+      } else {
+        void renderRoute();
+      }
     }
   });
 }
@@ -273,11 +282,25 @@ async function renderRoute(): Promise<void> {
   normalizeAppLinks(); document.body.classList.remove("sidebar-drawer-open"); content.focus({ preventScroll: true }); highlightLinkedNote();
 }
 
-function highlightLinkedNote(): void {
-  if (!location.hash.startsWith("#note-")) return;
-  const note = document.querySelector<HTMLElement>(location.hash); if (!note) return;
+export function highlightLinkedNote(targetId?: string): void {
+  const hash = targetId ? (targetId.startsWith("#") ? targetId : `#${targetId}`) : location.hash;
+  if (!hash.startsWith("#note-")) return;
+  const note = document.querySelector<HTMLElement>(hash);
+  if (!note) return;
+
   note.classList.remove("is-search-target");
-  requestAnimationFrame(() => requestAnimationFrame(() => { note.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); note.classList.add("is-search-target"); window.setTimeout(() => note.classList.remove("is-search-target"), 3200); }));
+  void note.offsetWidth;
+
+  requestAnimationFrame(() => {
+    if (typeof note.scrollIntoView === "function") {
+      note.scrollIntoView({
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "center"
+      });
+    }
+    note.classList.add("is-search-target");
+    window.setTimeout(() => note.classList.remove("is-search-target"), 3200);
+  });
 }
 
 export async function renderToday(content: HTMLElement): Promise<void> {
