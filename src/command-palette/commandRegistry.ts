@@ -255,6 +255,14 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
       execute: () => actions.navigateTo("/settings")
     },
     {
+      id: "ai-settings",
+      title: "AI & Ollama settings",
+      description: "View local Ollama settings",
+      keywords: ["ai", "ollama", "local ai", "model", "llama", "summary model", "ai settings"],
+      group: "settings",
+      execute: () => actions.navigateTo("/settings")
+    },
+    {
       id: "data-management",
       title: "Data management",
       description: "Export, backup, and storage information",

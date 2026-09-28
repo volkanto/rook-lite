@@ -133,18 +133,8 @@ describe("summary mode picker and local AI setting", () => {
     expect(ruleBasedRadio?.checked).toBe(true);
   });
 
-  it("enables ollama option when local AI is enabled in settings", async () => {
-    const { settingsRepository } = await import("./data");
+  it("keeps ollama option disabled on summaries page for production release", async () => {
     const { renderSummariesV2 } = await import("./main");
-
-    // Enable Ollama in settings
-    await settingsRepository.set("ollama", {
-      enabled: true,
-      endpoint: "http://localhost:11434",
-      model: "llama3.2",
-      temperature: 0.2,
-      timeoutMs: 5000
-    });
 
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -152,10 +142,10 @@ describe("summary mode picker and local AI setting", () => {
 
     const ollamaRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="ollama"]');
     expect(ollamaRadio).not.toBeNull();
-    expect(ollamaRadio?.disabled).toBe(false);
+    expect(ollamaRadio?.disabled).toBe(true);
 
     const ollamaLabel = ollamaRadio?.closest("label");
-    expect(ollamaLabel?.classList.contains("is-disabled")).toBe(false);
+    expect(ollamaLabel?.classList.contains("is-disabled")).toBe(true);
   });
 
   it("renders summary period tabs with proper active and selected states", async () => {

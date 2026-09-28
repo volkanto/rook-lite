@@ -295,20 +295,48 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(longNote.id);
   });
 
-  it("renders streamlined settings sections without Local AI option", async () => {
+  it("renders Local AI settings card with unchangeable and disabled controls", async () => {
     const { renderSettings } = await import("./main");
     const container = document.createElement("div");
     document.body.appendChild(container);
     await renderSettings(container);
 
-    // Verify Ollama / Local AI card is disabled and omitted from settings
     const localAiCard = container.querySelector(".local-ai-card");
-    expect(localAiCard).toBeNull();
-    expect(container.querySelector("#ollama-form")).toBeNull();
+    expect(localAiCard).not.toBeNull();
+    expect(localAiCard?.classList.contains("is-disabled")).toBe(true);
+    expect(localAiCard?.classList.contains("is-collapsed")).toBe(true);
 
-    // Verify Appearance and Storage sections are rendered
-    const sections = container.querySelectorAll(".settings-section");
-    expect(sections.length).toBeGreaterThan(0);
+    const toggle = container.querySelector<HTMLInputElement>("#ollama-enabled-toggle");
+    expect(toggle?.disabled).toBe(true);
+    expect(toggle?.checked).toBe(false);
+
+    const banner = container.querySelector("#ollama-disabled-banner");
+    expect(banner?.hasAttribute("hidden")).toBe(false);
+
+    const endpointInput = container.querySelector<HTMLInputElement>("#ollama-endpoint");
+    expect(endpointInput?.disabled).toBe(true);
+
+    const actionsRow = container.querySelector(".ai-actions-row");
+    expect(actionsRow).not.toBeNull();
+
+    const testBtn = actionsRow?.querySelector<HTMLButtonElement>("#test-ollama.secondary-button");
+    const saveBtn = actionsRow?.querySelector<HTMLButtonElement>("button[type='submit'].save-btn-rect");
+    const statusBanner = container.querySelector("#ollama-status.notice");
+
+    expect(testBtn).not.toBeNull();
+    expect(saveBtn).not.toBeNull();
+    expect(statusBanner).not.toBeNull();
+
+    // Both buttons are disabled to make settings unchangeable
+    expect(testBtn?.disabled).toBe(true);
+    expect(saveBtn?.disabled).toBe(true);
+
+    expect(testBtn?.querySelector(".btn-action-icon")).not.toBeNull();
+    expect(saveBtn?.querySelector(".btn-action-icon")).not.toBeNull();
+
+    const disclosure = container.querySelector(".advanced-prompt-disclosure");
+    expect(disclosure?.querySelector("#ollama-temperature")).not.toBeNull();
+    expect(disclosure?.querySelector<HTMLInputElement>("#ollama-temperature")?.disabled).toBe(true);
   });
 
   it("renders minimal date header with date title, badges, navigation, and note items with clock icon time", async () => {

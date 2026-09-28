@@ -3537,6 +3537,27 @@ textarea.simple-editor-textarea.is-hidden,
   transform: translateX(20px);
 }
 
+.local-ai-card.is-disabled {
+  opacity: 0.55;
+  filter: grayscale(1);
+  user-select: none;
+}
+
+.local-ai-card.is-disabled .ai-privacy-pill {
+  background: var(--color-bg-sunken);
+  color: var(--color-text-muted);
+  border-color: var(--color-border-subtle);
+}
+
+.local-ai-card.is-disabled .toggle-switch {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.local-ai-card.is-disabled .toggle-slider {
+  background-color: var(--color-border-default) !important;
+}
+
 .ai-disabled-banner {
   margin: 0;
   padding: 1.1rem 1.4rem;
