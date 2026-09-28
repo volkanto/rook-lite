@@ -1,0 +1,19 @@
+src/lite.css
+  s_504eabb0282fbb::t_1e51fc3d7e87dd 2225-2228,2242-2245,2311-2314
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "a2bbcc78657f57639a252829fe7c5b9e6ff84152",
+  "prompts": {},
+  "sessions": {
+    "s_504eabb0282fbb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "b9c4242f-ea92-45af-9ddd-8594e8cbffbe",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
