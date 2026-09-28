@@ -188,13 +188,45 @@ npx vitest run --reporter=verbose
 
 ---
 
-## Deployment (GitHub Pages & Static Hosts)
+## Deployment
 
-Rook Lite is designed to run on any static hosting provider (GitHub Pages, Cloudflare Pages, Netlify, Vercel, or S3/CloudFront).
+Production deployments happen when a version tag is pushed.
 
-### Subpath Deployments
+Example:
 
-The application reads the base path dynamically from `process.env.VITE_BASE_PATH`:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Required GitHub repository secrets:
+
+```text
+CLOUDFLARE_API_TOKEN
+CLOUDFLARE_ACCOUNT_ID
+```
+
+Cloudflare Pages project:
+
+```text
+rook-lite
+```
+
+Production domain:
+
+```text
+https://lite.rooknotes.com
+```
+
+Deployments can also be started manually from:
+
+```text
+GitHub → Actions → Deploy to Cloudflare Pages → Run workflow
+```
+
+### Subpath & Alternative Deployments
+
+Rook Lite can also run on other static hosting environments (GitHub Pages, Netlify, Vercel, or S3/CloudFront). The application reads an optional base path dynamically from `process.env.VITE_BASE_PATH`:
 
 ```bash
 VITE_BASE_PATH="/my-subpath/" npm run build
