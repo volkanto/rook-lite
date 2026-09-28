@@ -125,11 +125,11 @@ describe("summary mode picker and local AI setting", () => {
     const ollamaLabel = ollamaRadio?.closest("label");
     expect(ollamaLabel?.classList.contains("is-disabled")).toBe(true);
 
-    // Rule-based and raw modes remain enabled
+    // Rule-based mode remains enabled, raw mode is removed
     const ruleBasedRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="rule-based"]');
     const rawRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="raw"]');
     expect(ruleBasedRadio?.disabled).toBe(false);
-    expect(rawRadio?.disabled).toBe(false);
+    expect(rawRadio).toBeNull();
     expect(ruleBasedRadio?.checked).toBe(true);
   });
 
@@ -156,5 +156,38 @@ describe("summary mode picker and local AI setting", () => {
 
     const ollamaLabel = ollamaRadio?.closest("label");
     expect(ollamaLabel?.classList.contains("is-disabled")).toBe(false);
+  });
+
+  it("renders summary period tabs with proper active and selected states", async () => {
+    const { renderSummariesV2 } = await import("./main");
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSummariesV2(container);
+
+    const tabs = container.querySelector(".summary-period-tabs");
+    expect(tabs).not.toBeNull();
+    expect(tabs?.getAttribute("role")).toBe("tablist");
+
+    const weeklyBtn = container.querySelector<HTMLButtonElement>('button[data-summary-type="weekly"]');
+    const monthlyBtn = container.querySelector<HTMLButtonElement>('button[data-summary-type="monthly"]');
+    const customBtn = container.querySelector<HTMLButtonElement>('button[data-summary-type="custom"]');
+
+    expect(weeklyBtn).not.toBeNull();
+    expect(monthlyBtn).not.toBeNull();
+    expect(customBtn).not.toBeNull();
+
+    // By default, weekly is selected
+    expect(weeklyBtn?.classList.contains("is-active")).toBe(true);
+    expect(weeklyBtn?.getAttribute("aria-pressed")).toBe("true");
+    expect(weeklyBtn?.getAttribute("aria-selected")).toBe("true");
+
+    expect(monthlyBtn?.classList.contains("is-active")).toBe(false);
+    expect(monthlyBtn?.getAttribute("aria-pressed")).toBe("false");
+    expect(monthlyBtn?.getAttribute("aria-selected")).toBe("false");
+
+    expect(customBtn?.classList.contains("is-active")).toBe(false);
+    expect(customBtn?.getAttribute("aria-pressed")).toBe("false");
+    expect(customBtn?.getAttribute("aria-selected")).toBe("false");
   });
 });

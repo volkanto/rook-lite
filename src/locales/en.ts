@@ -135,8 +135,6 @@ export const locale: LocaleDefinition = {
     modeOllama: "Ollama",
     modeOllamaDesc: "Uses your local model",
     modeOllamaDisabledDesc: "Disabled in Settings",
-    modeRaw: "Raw notes",
-    modeRawDesc: "Chronological Markdown",
     generateSummary: "Generate summary",
     regenerateSummary: "Regenerate",
     generating: "Generating…",
@@ -151,7 +149,6 @@ export const locale: LocaleDefinition = {
     noSummaryYetDesc: (hasNotes: boolean) =>
       hasNotes ? "Generate a concise summary from the notes in this period." : "There are no notes in this period.",
     editMarkdown: "Edit Markdown",
-    rawNotesInPeriod: (count: number) => `Raw notes in this period (${count})`,
     readyStatus: "Ready",
     editedPill: "edited",
 

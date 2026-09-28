@@ -132,8 +132,6 @@ export interface TranslationStrings {
   modeOllama: string;
   modeOllamaDesc: string;
   modeOllamaDisabledDesc: string;
-  modeRaw: string;
-  modeRawDesc: string;
   generateSummary: string;
   regenerateSummary: string;
   generating: string;
@@ -145,7 +143,6 @@ export interface TranslationStrings {
   noSummaryYet: string;
   noSummaryYetDesc: (hasNotes: boolean) => string;
   editMarkdown: string;
-  rawNotesInPeriod: (count: number) => string;
   readyStatus: string;
   editedPill: string;
 

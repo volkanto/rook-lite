@@ -4006,36 +4006,96 @@ textarea.simple-editor-textarea.is-hidden,
 .summary-period-tabs {
   display: inline-flex;
   width: fit-content;
-  padding: 0.25rem;
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: 8px;
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
-  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-sunken, var(--surface-sunk));
+  gap: 3px;
 }
 
+body.app .summary-period-tabs button,
 .summary-period-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 2.25rem;
-  padding: 0.35rem 0.85rem;
-  border: 0;
-  border-radius: 6px;
+  padding: 0.35rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
   background: transparent;
   color: var(--color-text-secondary, var(--text-soft));
   font-family: var(--font-ui);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
+  box-shadow: none;
   transition: all 120ms ease;
+  user-select: none;
+  white-space: nowrap;
+  transform: none !important;
 }
 
+body.app .summary-period-tabs button:hover,
 .summary-period-tabs button:hover {
   color: var(--color-text-primary, var(--text));
+  background: color-mix(in srgb, var(--color-text-primary, var(--text)) 6%, transparent);
 }
 
-.summary-period-tabs button.is-active {
-  background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-primary, var(--text));
+body.app .summary-period-tabs button.is-active,
+body.app .summary-period-tabs button[aria-pressed="true"],
+.summary-period-tabs button.is-active,
+.summary-period-tabs button[aria-pressed="true"] {
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-brand, var(--accent)) !important;
   font-weight: 600;
-  box-shadow: var(--shadow-sm, 0 1px 2px rgba(7, 20, 38, 0.08));
+  border-color: color-mix(in srgb, var(--color-brand, var(--accent)) 30%, var(--color-border-subtle, var(--border))) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08), 0 0 0 1px color-mix(in srgb, var(--color-brand, var(--accent)) 15%, transparent) !important;
+}
+
+body.app .summary-period-tabs button.is-active:hover,
+body.app .summary-period-tabs button[aria-pressed="true"]:hover,
+.summary-period-tabs button.is-active:hover,
+.summary-period-tabs button[aria-pressed="true"]:hover {
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-brand, var(--accent)) !important;
+}
+
+:root[data-theme="dark"] .summary-period-tabs button.is-active,
+:root[data-theme="dark"] .summary-period-tabs button[aria-pressed="true"],
+:root[data-theme="dark"] body.app .summary-period-tabs button.is-active,
+:root[data-theme="dark"] body.app .summary-period-tabs button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--color-brand) 28%, #161F36) !important;
+  color: #FFFFFF !important;
+  border-color: var(--color-brand) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 0 1px color-mix(in srgb, var(--color-brand) 50%, transparent) !important;
+}
+
+:root[data-theme="dark"] .summary-period-tabs button.is-active:hover,
+:root[data-theme="dark"] .summary-period-tabs button[aria-pressed="true"]:hover,
+:root[data-theme="dark"] body.app .summary-period-tabs button.is-active:hover,
+:root[data-theme="dark"] body.app .summary-period-tabs button[aria-pressed="true"]:hover {
+  background: color-mix(in srgb, var(--color-brand) 28%, #161F36) !important;
+  color: #FFFFFF !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .summary-period-tabs button.is-active,
+  :root:not([data-theme="light"]) .summary-period-tabs button[aria-pressed="true"],
+  :root:not([data-theme="light"]) body.app .summary-period-tabs button.is-active,
+  :root:not([data-theme="light"]) body.app .summary-period-tabs button[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--color-brand) 28%, #161F36) !important;
+    color: #FFFFFF !important;
+    border-color: var(--color-brand) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 0 1px color-mix(in srgb, var(--color-brand) 50%, transparent) !important;
+  }
+
+  :root:not([data-theme="light"]) .summary-period-tabs button.is-active:hover,
+  :root:not([data-theme="light"]) .summary-period-tabs button[aria-pressed="true"]:hover,
+  :root:not([data-theme="light"]) body.app .summary-period-tabs button.is-active:hover,
+  :root:not([data-theme="light"]) body.app .summary-period-tabs button[aria-pressed="true"]:hover {
+    background: color-mix(in srgb, var(--color-brand) 28%, #161F36) !important;
+    color: #FFFFFF !important;
+  }
 }
 
 .summary-date-fields {
@@ -4107,7 +4167,7 @@ textarea.simple-editor-textarea.is-hidden,
 
 .summary-mode-picker {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
   margin: 0;
   padding: 0;

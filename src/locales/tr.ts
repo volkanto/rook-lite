@@ -135,8 +135,6 @@ export const locale: LocaleDefinition = {
     modeOllama: "Ollama",
     modeOllamaDesc: "Yerel modelinizi kullanır",
     modeOllamaDisabledDesc: "Ayarlarda kapalı",
-    modeRaw: "Ham notlar",
-    modeRawDesc: "Kronolojik Markdown",
     generateSummary: "Özet oluştur",
     regenerateSummary: "Yeniden oluştur",
     generating: "Oluşturuluyor…",
@@ -151,7 +149,6 @@ export const locale: LocaleDefinition = {
     noSummaryYetDesc: (hasNotes: boolean) =>
       hasNotes ? "Bu dönemdeki notlardan kısa ve öz bir özet oluşturun." : "Bu dönemde hiç not bulunmuyor.",
     editMarkdown: "Markdown düzenle",
-    rawNotesInPeriod: (count: number) => `Bu dönemdeki ham notlar (${count})`,
     readyStatus: "Hazır",
     editedPill: "düzenlendi",
 
