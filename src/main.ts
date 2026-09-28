@@ -166,7 +166,7 @@ function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string
   host.querySelectorAll<HTMLButtonElement>("[data-calendar-month]").forEach((button) => button.addEventListener("click", () => renderCalendar(host, new Date(`${button.dataset.calendarMonth}T12:00:00`), selectedDate, allNotes)));
 }
 
-function bindEditorPreview(form: HTMLFormElement): void {
+export function setEditorMode(form: HTMLFormElement, mode: "write" | "preview", shouldFocus = true): void {
   const writeBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
   const previewBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
   const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
@@ -176,7 +176,7 @@ function bindEditorPreview(form: HTMLFormElement): void {
 
   if (!writeBtn || !previewBtn || !textarea || !previewPane) return;
 
-  const showWriteMode = () => {
+  if (mode === "write") {
     writeBtn.classList.add("is-active");
     writeBtn.setAttribute("aria-selected", "true");
     previewBtn.classList.remove("is-active");
@@ -185,10 +185,11 @@ function bindEditorPreview(form: HTMLFormElement): void {
     previewPane.classList.add("is-hidden");
     toolsCluster?.classList.remove("is-hidden");
     if (hintEl) hintEl.classList.remove("is-hidden");
-    textarea.focus();
-  };
-
-  const showPreviewMode = () => {
+    form.classList.remove("is-preview");
+    if (shouldFocus) {
+      textarea.focus();
+    }
+  } else {
     previewBtn.classList.add("is-active");
     previewBtn.setAttribute("aria-selected", "true");
     writeBtn.classList.remove("is-active");
@@ -197,6 +198,7 @@ function bindEditorPreview(form: HTMLFormElement): void {
     previewPane.classList.remove("is-hidden");
     toolsCluster?.classList.add("is-hidden");
     if (hintEl) hintEl.classList.add("is-hidden");
+    form.classList.add("is-preview");
 
     const content = textarea.value.trim();
     if (content) {
@@ -205,10 +207,21 @@ function bindEditorPreview(form: HTMLFormElement): void {
       const s = currentStrings();
       previewPane.innerHTML = `<p class="editor-preview-empty">${s.editorEmptyPreview}</p>`;
     }
-  };
+  }
+}
 
-  writeBtn.addEventListener("click", showWriteMode);
-  previewBtn.addEventListener("click", showPreviewMode);
+function bindEditorPreview(form: HTMLFormElement): void {
+  const writeBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+  const previewBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+  const previewPane = form.querySelector<HTMLElement>(".editor-preview");
+
+  writeBtn?.addEventListener("click", () => setEditorMode(form, "write", true));
+  previewBtn?.addEventListener("click", () => setEditorMode(form, "preview", true));
+  previewPane?.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    if (target.closest("a, button, input")) return;
+    setEditorMode(form, "write", true);
+  });
 }
 
 function countWords(text: string): number {
@@ -254,7 +267,8 @@ function bindCreateEditor(date: string): void {
   const updateComposer = () => {
     const hasText = Boolean(textarea.value.trim());
     const isFocused = form.contains(document.activeElement);
-    form.classList.toggle("has-content", hasText || isFocused);
+    const isPreview = form.classList.contains("is-preview");
+    form.classList.toggle("has-content", hasText || isFocused || isPreview);
   };
   updateComposer();
   const saveDraft = () => {
@@ -268,7 +282,14 @@ function bindCreateEditor(date: string): void {
   textarea.addEventListener("focus", updateComposer);
   form.addEventListener("focusin", updateComposer);
   form.addEventListener("focusout", () => {
-    window.setTimeout(updateComposer, 50);
+    window.setTimeout(() => {
+      if (!form.contains(document.activeElement)) {
+        if (form.classList.contains("is-preview")) {
+          setEditorMode(form, "write", false);
+        }
+        updateComposer();
+      }
+    }, 50);
   });
   textarea.addEventListener("input", () => {
     resizeEditor(textarea);
@@ -998,38 +1019,20 @@ function bindShellEvents(): void {
     if (modeBtn) {
       const form = modeBtn.closest("form");
       if (form) {
-        const mode = modeBtn.dataset.editorMode;
-        const writeBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
-        const previewBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
-        const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
-        const previewPane = form.querySelector<HTMLElement>(".editor-preview");
-        const toolsCluster = form.querySelector<HTMLElement>(".editor-tools-cluster");
-        const hintEl = form.querySelector<HTMLElement>(".simple-editor-hint");
-
-        if (mode === "preview" && previewBtn && textarea && previewPane) {
-          previewBtn.classList.add("is-active");
-          previewBtn.setAttribute("aria-selected", "true");
-          writeBtn?.classList.remove("is-active");
-          writeBtn?.setAttribute("aria-selected", "false");
-          textarea.classList.add("is-hidden");
-          previewPane.classList.remove("is-hidden");
-          toolsCluster?.classList.add("is-hidden");
-          if (hintEl) hintEl.classList.add("is-hidden");
-          const content = textarea.value.trim();
-          previewPane.innerHTML = content ? renderMarkdown(content, true) : `<p class="editor-preview-empty">${currentStrings().editorEmptyPreview}</p>`;
-        } else if (mode === "write" && writeBtn && textarea && previewPane) {
-          writeBtn.classList.add("is-active");
-          writeBtn.setAttribute("aria-selected", "true");
-          previewBtn?.classList.remove("is-active");
-          previewBtn?.setAttribute("aria-selected", "false");
-          textarea.classList.remove("is-hidden");
-          previewPane.classList.add("is-hidden");
-          toolsCluster?.classList.remove("is-hidden");
-          if (hintEl) hintEl.classList.remove("is-hidden");
-          textarea.focus();
+        const mode = modeBtn.dataset.editorMode as "write" | "preview" | undefined;
+        if (mode === "write" || mode === "preview") {
+          setEditorMode(form, mode, true);
         }
       }
       return;
+    }
+
+    const newNoteForm = document.querySelector<HTMLFormElement>("#new-note-form");
+    if (newNoteForm && newNoteForm.classList.contains("is-preview") && !newNoteForm.contains(target)) {
+      setEditorMode(newNoteForm, "write", false);
+      const ta = newNoteForm.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+      const hasContent = Boolean(ta?.value.trim());
+      newNoteForm.classList.toggle("has-content", hasContent);
     }
 
     document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
@@ -1073,6 +1076,8 @@ function bindShellEvents(): void {
         });
       }
       if (wasFocused && textarea) {
+        const form = textarea.closest("form");
+        if (form) setEditorMode(form, "write", false);
         textarea.focus();
         window.setTimeout(() => textarea.focus(), 350);
       }
@@ -1087,6 +1092,8 @@ function bindShellEvents(): void {
       closeSearch();
       void renderRoute().then(() => {
         if (link.dataset.command === "new-note") {
+          const form = document.querySelector<HTMLFormElement>("#new-note-form");
+          if (form) setEditorMode(form, "write", false);
           document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
         }
       });
@@ -1167,8 +1174,16 @@ function handleKeyboard(event: KeyboardEvent): void {
     event.preventDefault();
     if (appPath() !== "/") {
       history.pushState({}, "", appUrl("/"));
-      void renderRoute().then(() => document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus());
-    } else document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
+      void renderRoute().then(() => {
+        const form = document.querySelector<HTMLFormElement>("#new-note-form");
+        if (form) setEditorMode(form, "write", false);
+        document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
+      });
+    } else {
+      const form = document.querySelector<HTMLFormElement>("#new-note-form");
+      if (form) setEditorMode(form, "write", false);
+      document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
+    }
   }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "d") {
     event.preventDefault();

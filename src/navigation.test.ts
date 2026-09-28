@@ -581,6 +581,76 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(createdNote.id);
   });
 
+  it("switches from preview back to write mode when clicking preview pane in composer", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const previewBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+    const writeBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    const previewPane = form?.querySelector<HTMLElement>(".editor-preview");
+
+    textarea!.value = "Preview content";
+    previewBtn?.click();
+    expect(previewPane?.classList.contains("is-hidden")).toBe(false);
+
+    // Clicking the preview pane switches back to write mode
+    previewPane?.click();
+    expect(writeBtn?.classList.contains("is-active")).toBe(true);
+    expect(previewBtn?.classList.contains("is-active")).toBe(false);
+    expect(textarea?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(true);
+  });
+
+  it("resets note composer preview mode when clicking outside the panel", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const previewBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+    const writeBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    const previewPane = form?.querySelector<HTMLElement>(".editor-preview");
+
+    // Enter preview mode
+    previewBtn?.click();
+    expect(form?.classList.contains("is-preview")).toBe(true);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(false);
+    expect(textarea?.classList.contains("is-hidden")).toBe(true);
+
+    // Click outside of the form
+    document.body.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(form?.classList.contains("is-preview")).toBe(false);
+    expect(writeBtn?.classList.contains("is-active")).toBe(true);
+    expect(previewBtn?.classList.contains("is-active")).toBe(false);
+    expect(textarea?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(true);
+  });
+
+  it("restores write mode when new-note shortcut is pressed while composer is in preview", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const previewBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    const previewPane = form?.querySelector<HTMLElement>(".editor-preview");
+
+    previewBtn?.click();
+    expect(previewPane?.classList.contains("is-hidden")).toBe(false);
+
+    // Blur from input/textarea so global shortcut works
+    (document.activeElement as HTMLElement)?.blur();
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "n", bubbles: true }));
+
+    expect(form?.classList.contains("is-preview")).toBe(false);
+    expect(textarea?.classList.contains("is-hidden")).toBe(false);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(true);
+  });
+
   it("toggles distraction-free Zen mode and updates live word count", async () => {
     const { renderShell } = await import("./main");
     await renderShell();

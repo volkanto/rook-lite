@@ -2325,6 +2325,7 @@ body.is-zen-mode .editor-card-modal .editor-preview {
 
 .editor-preview {
   box-sizing: border-box;
+  cursor: text;
 }
 
 :root .is-hidden,
@@ -2624,19 +2625,23 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 #new-note-form:focus-within,
-#new-note-form.has-content {
+#new-note-form.has-content,
+#new-note-form.is-preview {
   padding-top: 0.45rem;
 }
 
 #new-note-form:focus-within .simple-editor-toolbar,
 #new-note-form:focus-within .simple-editor-footer,
 #new-note-form.has-content .simple-editor-toolbar,
-#new-note-form.has-content .simple-editor-footer {
+#new-note-form.has-content .simple-editor-footer,
+#new-note-form.is-preview .simple-editor-toolbar,
+#new-note-form.is-preview .simple-editor-footer {
   display: flex;
 }
 
 #new-note-form:focus-within .simple-editor-toolbar,
-#new-note-form.has-content .simple-editor-toolbar {
+#new-note-form.has-content .simple-editor-toolbar,
+#new-note-form.is-preview .simple-editor-toolbar {
   order: 1;
   min-height: 2.5rem;
   padding: 0 0.4rem;
@@ -2655,7 +2660,8 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 #new-note-form:focus-within .simple-editor-footer,
-#new-note-form.has-content .simple-editor-footer {
+#new-note-form.has-content .simple-editor-footer,
+#new-note-form.is-preview .simple-editor-footer {
   order: 3;
   padding: 0 0.45rem 0.35rem;
 }
