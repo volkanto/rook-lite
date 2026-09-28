@@ -9,6 +9,8 @@ import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
 import { CategoryService, initializeLocalData, normalize, NoteService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
+import { CommandPaletteController } from "./command-palette/commandPalette";
+import type { CommandActions, CommandContext } from "./command-palette/types";
 
 type ThemePreference = "SYSTEM" | "LIGHT" | "DARK";
 
@@ -17,8 +19,9 @@ interface NavigationItem { path: string; label: string; icon: string; divider?: 
 const notes = new NoteService();
 const categories = new CategoryService();
 const summaries = new SummaryService();
-const app = requireElement<HTMLDivElement>("#app");
 let draftTimer: number | undefined;
+let paletteController: CommandPaletteController | null = null;
+let currentActiveNote: Note | null = null;
 
 export const icons = {
   home: '<path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>',
@@ -69,14 +72,167 @@ export function svg(content: string, className = "nav-svg"): string {
 }
 
 export async function renderShell(): Promise<void> {
+  const app = requireElement<HTMLDivElement>("#app");
   const s = currentStrings();
   document.documentElement.classList.add("sidebar-collapsed");
   document.documentElement.lang = getLocale();
   app.innerHTML = `<header class="global-header"><div class="header-left"><button type="button" class="mobile-sidebar-open" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.menu, "mobile-nav-svg")}</button></div><div class="header-middle"><button type="button" class="topsearch-trigger" data-action="open-search"><span class="search-placeholder">${s.searchPlaceholder}</span><kbd class="search-hotkey">⌘ K</kbd></button></div><div class="header-right"></div></header>
-    <div id="search-modal" class="modal-backdrop" aria-hidden="true"><div class="modal-content search-palette" role="dialog" aria-modal="true" aria-labelledby="search-dialog-title"><div class="palette-search-bar">${svg(icons.search, "modal-search-icon")}<label id="search-dialog-title" class="visually-hidden" for="modal-search-input">${s.searchDialogTitle}</label><input type="search" id="modal-search-input" placeholder="${s.searchInputPlaceholder}" autocomplete="off"><span class="modal-close-hint">esc</span></div><div class="palette-filters"><div class="palette-select-wrap"><span class="palette-filter-icon">${svg(icons.category, "palette-icon-svg")}</span><select id="modal-search-tag" aria-label="${s.filterByTag}"><option value="">${s.searchPaletteAllTags}</option></select><span class="palette-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div><div class="palette-select-wrap"><span class="palette-filter-icon">${svg(icons.calendar, "palette-icon-svg")}</span><select id="modal-search-period" aria-label="${s.searchCategoryLabel}"><option value="">${s.searchPeriodAny}</option><option value="week">${s.searchPeriodWeek}</option><option value="month">${s.searchPeriodMonth}</option></select><span class="palette-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div><label class="filter-todo-chip"><input id="modal-search-todo" type="checkbox"> <span>${s.searchOpenTasks}</span></label><a href="${appUrl("/search")}" data-link class="filter-more-link">${s.searchMoreFilters}</a></div><div id="modal-search-results" class="modal-body"></div><div class="palette-footer"><div class="palette-footer-hints"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> ${s.searchHintNavigate}</span><span><kbd>&crarr;</kbd> ${s.searchHintOpen}</span><span><kbd>esc</kbd> ${s.searchHintClose}</span></div></div></div></div>
+    <div id="search-modal" class="modal-backdrop" aria-hidden="true"></div>
     <div id="dialog-host"></div><button type="button" class="scrim" data-action="close-sidebar" aria-label="${s.closeSidebar}"></button>
     <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="${s.brandTooltip}" data-sidebar-tooltip="${s.brandTooltip}"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.sidebarCollapse, "collapse-svg")}<span class="sidebar-toggle-tooltip">${s.collapseSidebar}</span></button></div><div class="sidebar-mobile-head"><span>${s.navNotes}</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="${s.closeSidebar}">${svg(icons.close, "sidebar-close-svg")}</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="${s.themeToggleAria}" data-sidebar-tooltip="${document.documentElement.dataset.theme === "dark" ? s.themeToggleLight : s.themeToggleDark}">${svg(icons.moon, "theme-dark-icon nav-svg")}${svg(icons.sun, "theme-light-icon nav-svg")}</button><details class="sidebar-lang-picker" id="sidebar-lang-picker"><summary class="sidebar-lang-toggle" aria-label="${s.languageSelectTooltip}" data-sidebar-tooltip="${s.languageSelectTooltip}">${svg(icons.globe, "nav-svg")}</summary><div class="sidebar-lang-popover" role="menu">${getAvailableLocales().map((loc) => `<button type="button" class="lang-option-btn ${getLocale() === loc.code ? "is-active" : ""}" data-select-lang="${loc.code}"><span class="lang-option-code">${loc.code.toUpperCase()}</span><span class="lang-option-label">${escapeHtml(loc.label)}</span>${getLocale() === loc.code ? `<span class="lang-active-check">${svg(icons.check, "lang-check-svg")}</span>` : ""}</button>`).join("")}</div></details><div class="sidebar-footer-divider"></div><a href="https://github.com/volkanto/rook-lite" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="${s.githubTooltip}" data-sidebar-tooltip="${s.githubTooltip}">${svg(icons.github, "nav-svg")}</a><span class="local-only-icon" role="img" tabindex="0" aria-label="${s.localOnlyTooltip}" data-sidebar-tooltip="${s.localOnlyTooltip}">${svg(icons.shield, "nav-svg")}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"></main></div></div>`;
+  initCommandPalette();
   bindShellEvents(); applyTheme(); updateSidebarButton(); await renderRoute();
+}
+
+function initCommandPalette(): void {
+  const host = document.getElementById("search-modal");
+  if (!host) return;
+
+  const actions: CommandActions = {
+    navigateTo: (path: string) => {
+      history.pushState({}, "", appUrl(path));
+      closeSearch();
+      void renderRoute();
+    },
+    createNote: () => {
+      closeSearch();
+      if (appPath() !== "/") {
+        history.pushState({}, "", appUrl("/"));
+        void renderRoute().then(() => {
+          const form = document.querySelector<HTMLFormElement>("#new-note-form");
+          if (form) setEditorMode(form, "write", false);
+          document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
+        });
+      } else {
+        const form = document.querySelector<HTMLFormElement>("#new-note-form");
+        if (form) setEditorMode(form, "write", false);
+        document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")?.focus();
+      }
+    },
+    openDatePicker: () => {
+      closeSearch();
+      const datePicker = document.querySelector<HTMLDetailsElement>(".date-picker");
+      if (datePicker) {
+        datePicker.setAttribute("open", "");
+      } else {
+        const date = window.prompt("Jump to date (YYYY-MM-DD):", isoDate(new Date()));
+        if (date && validIsoDate(date)) {
+          history.pushState({}, "", appUrl(`/?date=${date}`));
+          void renderRoute();
+        }
+      }
+    },
+    shiftDate: (delta: number) => {
+      closeSearch();
+      const current = new URLSearchParams(location.search).get("date") ?? isoDate(new Date());
+      const nextDate = shiftDate(current, delta);
+      history.pushState({}, "", appUrl(`/?date=${nextDate}`));
+      void renderRoute();
+    },
+    openTasks: () => {
+      openSearch("has:task");
+    },
+    toggleTheme: () => {
+      setTheme(document.documentElement.dataset.theme === "dark" ? "LIGHT" : "DARK");
+    },
+    setTheme: (theme: "LIGHT" | "DARK" | "SYSTEM") => {
+      setTheme(theme);
+    },
+    toggleZen: () => {
+      toggleZenMode();
+    },
+    exportMarkdownZip: async () => {
+      const [allNotes, allCats] = await Promise.all([notes.listAll(), categories.list()]);
+      downloadMarkdownZip(allNotes, allCats);
+    },
+    exportMarkdownDirectory: async () => {
+      try {
+        const [allNotes, allCats] = await Promise.all([notes.listAll(), categories.list()]);
+        await exportToDirectory(allNotes, allCats);
+      } catch (err) {
+        alert(errorMessage(err));
+      }
+    },
+    createBackup: async () => {
+      downloadJson(await createBackup());
+    },
+    triggerRestoreBackup: () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "application/json,.json";
+      input.addEventListener("change", async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        try {
+          const backup = parseBackup(await file.text());
+          const s = currentStrings();
+          showConfirm(s.replaceDataTitle, s.replaceDataMessage(backup.notes.length, backup.categories.length, backup.summaries.length), s.restoreBackupBtn, async () => {
+            await restoreBackup(backup);
+            await refreshCalendar();
+            await renderRoute();
+          });
+        } catch (err) {
+          alert(errorMessage(err));
+        }
+      });
+      input.click();
+    },
+    editSelectedNote: (note: Note) => {
+      closeSearch();
+      void categories.list().then((allCats) => showEditDialog(note, allCats));
+    },
+    copySelectedNote: async (note: Note) => {
+      closeSearch();
+      await navigator.clipboard.writeText(note.content);
+    },
+    deleteSelectedNote: (note: Note) => {
+      closeSearch();
+      const s = currentStrings();
+      showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
+        await notes.delete(note.id);
+        await refreshCalendar();
+        await renderRoute();
+      });
+    },
+    regenerateSummary: () => {
+      closeSearch();
+      document.querySelector<HTMLButtonElement>("#generate-summary")?.click();
+    },
+    copySummary: () => {
+      closeSearch();
+      document.querySelector<HTMLButtonElement>("#copy-summary")?.click();
+    },
+    downloadSummary: () => {
+      closeSearch();
+      document.querySelector<HTMLButtonElement>("#export-summary")?.click();
+    }
+  };
+
+  const getContext = (): CommandContext => {
+    const summaryBlock = document.querySelector(".summary-document, #summary-block");
+    const summaryMd = summaryBlock?.querySelector(".prose")?.textContent ?? undefined;
+
+    return {
+      currentPath: appPath(),
+      currentDate: new URLSearchParams(location.search).get("date") ?? isoDate(new Date()),
+      selectedNote: currentActiveNote,
+      hasSummary: Boolean(summaryBlock),
+      summaryMarkdown: summaryMd,
+      isZenMode: document.body.classList.contains("is-zen-mode")
+    };
+  };
+
+  paletteController = new CommandPaletteController({
+    hostElement: host,
+    getNotes: () => notes.listAll(),
+    getCategories: () => categories.list(),
+    getContext,
+    actions,
+    onNavigate: (url) => {
+      history.pushState({}, "", appUrl(url));
+      void renderRoute();
+    }
+  });
 }
 
 export function renderNavigation(): string {
@@ -444,17 +600,7 @@ async function renderSearchPageResults(host: HTMLElement, countHost: HTMLElement
   countHost.textContent = `${matching.length} ${matching.length === 1 ? s.entrySingle : s.entryPlural}`; host.innerHTML = matching.length ? `<ol class="search-result-list">${matching.map((note) => `<li><a href="/?date=${note.noteDate}#note-${note.id}" data-link><div class="search-result-meta"><time datetime="${note.noteDate}">${formatShortDate(note.noteDate)}</time>${note.tags.slice(0, 3).map((item) => `<span>#${escapeHtml(item)}</span>`).join("")}</div><p>${escapeHtml(note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim().slice(0, 240))}</p></a></li>`).join("")}</ol>` : `<div class="empty-notes search-results-empty"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${s.noNotesFound}</p><span>${s.noNotesFoundPrompt}</span></div>`; normalizeAppLinks(host);
 }
 
-async function renderSearchResults(host: HTMLElement, query: string, year: string, categoryId: string, allCategories: Category[], from = "", to = ""): Promise<void> {
-  const s = currentStrings();
-  const categoryMap = new Map(allCategories.map((category) => [category.id, category.name])); const parsed = parseSearch(query); const wanted = normalize(parsed.text.replace(/^#/, ""));
-  const matching = (await notes.listAll()).filter((note) => !note.archived && (!year || note.noteDate.startsWith(year)) && (!from || note.noteDate >= from) && (!to || note.noteDate <= to) && (!categoryId || note.categoryIds.includes(categoryId)) && (!parsed.tag || note.tags.includes(parsed.tag)) && (!parsed.category || note.categoryIds.some((id) => normalize(categoryMap.get(id) ?? "") === parsed.category)) && (!parsed.hasTodo || /^\s*[-*+]\s+\[ \]\s+/m.test(note.content))).filter((note) => !wanted || notes.searchableText(note, note.categoryIds.map((id) => categoryMap.get(id) ?? "")).includes(wanted)).sort((a, b) => b.noteDate.localeCompare(a.noteDate) || b.updatedAt.localeCompare(a.updatedAt));
-  const commands = query ? "" : `<div class="search-commands"><div class="palette-section-label">${s.quickActionsLabel}</div><a href="${appUrl("/")}" data-link data-command="new-note" class="command-item"><div class="command-item-left">${svg(icons.plus, "command-icon")}<span>${s.newNoteCommand}</span></div><kbd>N</kbd></a><a href="${appUrl("/summaries")}" data-link class="command-item"><div class="command-item-left">${svg(icons.summary, "command-icon")}<span>${s.generateSummaryCommand}</span></div></a><a href="${appUrl("/settings")}" data-link class="command-item"><div class="command-item-left">${svg(icons.settings, "command-icon")}<span>${s.settingsCommand}</span></div></a></div>`;
-  host.innerHTML = !query && !year && !categoryId ? `${commands}<div class="palette-results-heading"><span>${s.searchRecentNotes}</span><span>${matching.slice(0, 5).length}</span></div>${matching.slice(0, 5).length ? searchHits(matching.slice(0, 5)) : `<div class="palette-empty"><p>${s.noNotesYet}</p><span>${s.noNotesYetPrompt}</span></div>`}` : !matching.length ? `<div class="palette-empty"><img src="${assetUrl("/empty-notes.png")}" alt="" width="96" height="96" class="empty-notes-illustration" aria-hidden="true"><p>${s.searchNoResults}</p><span>${s.searchNoResultsDesc}</span></div>` : `<div class="palette-results-heading"><span>${s.matchingNotesLabel}</span><span>${matching.length}</span></div>${searchHits(matching)}`;
-  normalizeAppLinks(host);
-}
-
 function parseSearch(query: string): { text: string; tag: string; category: string; hasTodo: boolean } { let text = query; const read = (pattern: RegExp) => { const match = text.match(pattern); if (match) text = text.replace(match[0], " "); return normalize(match?.[1] ?? ""); }; const tag = read(/(?:^|\s)tag:([^\s]+)/i); const category = read(/(?:^|\s)category:([^\s]+)/i); const hasTodo = /(?:^|\s)has:todo(?:\s|$)/i.test(text); text = text.replace(/(?:^|\s)has:todo(?:\s|$)/i, " "); return { text, tag, category, hasTodo }; }
-function searchHits(items: Note[]): string { const s = currentStrings(); return `<ol class="palette-result-list">${items.map((note) => { const preview = note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim() || s.untitledNote; return `<li><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="palette-result-item"><div class="palette-result-icon">${svg(icons.note, "palette-icon")}</div><div class="palette-result-copy"><p class="palette-result-text">${escapeHtml(preview.slice(0, 180))}</p>${note.tags.length ? `<div class="palette-result-tags">${note.tags.slice(0, 3).map((tag) => `<span>#${escapeHtml(tag)}</span>`).join("")}</div>` : ""}</div><time datetime="${note.noteDate}">${formatShortDate(note.noteDate)}</time></a></li>`; }).join("")}</ol>`; }
 
 async function renderTodos(content: HTMLElement): Promise<void> {
   const s = currentStrings();
@@ -933,24 +1079,6 @@ function renderNotFound(content: HTMLElement): void {
   content.innerHTML = `<div class="page-head"><div><p class="eyebrow">${s.notFoundDesc}</p><h1>${s.notFoundTitle}</h1><p class="lede"><a href="${appUrl("/")}" data-link>${s.notFoundReturnHome}</a></p></div></div>`;
 }
 
-async function updateModalSearch(): Promise<void> {
-  const query = requireElement<HTMLInputElement>("#modal-search-input").value;
-  const tagSelect = requireElement<HTMLSelectElement>("#modal-search-tag");
-  const periodSelect = requireElement<HTMLSelectElement>("#modal-search-period");
-  const todoInput = requireElement<HTMLInputElement>("#modal-search-todo");
-  const tag = tagSelect.value;
-  const period = periodSelect.value;
-  const todo = todoInput.checked;
-
-  tagSelect.closest(".palette-select-wrap")?.classList.toggle("is-active", Boolean(tag));
-  periodSelect.closest(".palette-select-wrap")?.classList.toggle("is-active", Boolean(period));
-  todoInput.closest(".filter-todo-chip")?.classList.toggle("is-active", todo);
-
-  const terms = [query, tag ? `tag:${tag}` : "", todo ? "has:todo" : ""].filter(Boolean).join(" ");
-  const range = period === "week" ? summaryPeriod("weekly", isoDate(new Date())) : period === "month" ? summaryPeriod("monthly", isoDate(new Date())) : null;
-  await renderSearchResults(requireElement("#modal-search-results"), terms, "", "", await categories.list(), range?.start, range?.end);
-}
-
 let shellEventsBound = false;
 let editorHadFocusBeforeScrollToTop = false;
 
@@ -1043,8 +1171,17 @@ function bindShellEvents(): void {
         if (n !== clickedNote) n.classList.remove("is-selected");
       });
       clickedNote.classList.toggle("is-selected");
-    } else if (!clickedNote) {
+      if (clickedNote.classList.contains("is-selected")) {
+        const id = clickedNote.id.replace(/^note-/, "");
+        void notes.listAll().then((all) => {
+          currentActiveNote = all.find((n) => n.id === id) ?? null;
+        });
+      } else {
+        currentActiveNote = null;
+      }
+    } else if (!clickedNote && !target.closest("#search-modal, .command-palette")) {
       document.querySelectorAll(".note.is-selected").forEach((n) => n.classList.remove("is-selected"));
+      currentActiveNote = null;
     }
 
     const langBtn = target.closest<HTMLButtonElement>("[data-select-lang]");
@@ -1119,20 +1256,6 @@ function bindShellEvents(): void {
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
   window.addEventListener("online", updateNetworkStatus);
   window.addEventListener("offline", updateNetworkStatus);
-  document.addEventListener("input", (event) => {
-    const target = event.target as Element;
-    if (target.id === "modal-search-input") void updateModalSearch();
-  });
-  document.addEventListener("change", (event) => {
-    const target = event.target as Element;
-    if (
-      target.id === "modal-search-tag" ||
-      target.id === "modal-search-period" ||
-      target.id === "modal-search-todo"
-    ) {
-      void updateModalSearch();
-    }
-  });
 }
 
 function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): void { form.querySelectorAll<HTMLButtonElement>("[data-format]").forEach((button) => button.addEventListener("click", () => formatNote(textarea, button.dataset.format ?? ""))); }
@@ -1147,22 +1270,6 @@ function handleKeyboard(event: KeyboardEvent): void {
     if (event.key === "Escape") {
       event.preventDefault();
       closeSearch();
-      return;
-    }
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      const items = modal.querySelectorAll<HTMLAnchorElement>("#modal-search-results a[data-link]");
-      if (items.length) {
-        event.preventDefault();
-        const active = document.activeElement as HTMLElement | null;
-        const index = Array.from(items).indexOf(active as HTMLAnchorElement);
-        if (event.key === "ArrowDown") {
-          const next = index >= 0 && index < items.length - 1 ? index + 1 : 0;
-          items[next]?.focus();
-        } else {
-          const prev = index > 0 ? index - 1 : items.length - 1;
-          items[prev]?.focus();
-        }
-      }
       return;
     }
   }
@@ -1226,23 +1333,14 @@ function applyTheme(): void {
     toggle.dataset.sidebarTooltip = nextLabel;
   }
 }
-function openSearch(): void {
-  const modal = requireElement<HTMLElement>("#search-modal");
-  const input = requireElement<HTMLInputElement>("#modal-search-input");
-  input.value = "";
-  requireElement<HTMLSelectElement>("#modal-search-period").value = "";
-  requireElement<HTMLInputElement>("#modal-search-todo").checked = false;
-  void notes.listAll().then((items) => {
-    const tags = [...new Set(items.flatMap((note) => note.tags))].sort();
-    requireElement<HTMLSelectElement>("#modal-search-tag").innerHTML = `<option value="">All tags</option>${tags.map((tag) => `<option value="${escapeHtml(tag)}">#${escapeHtml(tag)}</option>`).join("")}`;
-  });
-  void updateModalSearch();
-  modal.classList.add("is-open");
-  modal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-  setTimeout(() => input.focus(), 50);
+export async function openSearch(query = ""): Promise<void> {
+  if (!paletteController) initCommandPalette();
+  await paletteController?.open(query);
 }
-function closeSearch(): void { const modal = document.querySelector<HTMLElement>("#search-modal"); if (!modal?.classList.contains("is-open")) return; modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+
+export function closeSearch(): void {
+  paletteController?.close();
+}
 function updateNetworkStatus(): void { const status = document.querySelector<HTMLElement>("#network-status"); if (status) status.textContent = navigator.onLine ? "Online" : "Offline"; }
 function isoDate(date: Date): string { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
 function shiftDate(date: string, days: number): string { const value = new Date(`${date}T12:00:00`); value.setDate(value.getDate() + days); return isoDate(value); }
@@ -1253,7 +1351,7 @@ function formatTime(createdAt: string, noteDate: string): string { return format
 function errorMessage(error: unknown): string { return error instanceof Error ? error.message : "Something went wrong."; }
 function requireElement<T extends Element>(selector: string): T { const element = document.querySelector<T>(selector); if (!element) throw new Error(`Missing required element: ${selector}`); return element; }
 
-async function start(): Promise<void> { try { setLocale(getLocale()); await initializeLocalData(); await renderShell(); } catch (error) { app.innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`; } }
+async function start(): Promise<void> { try { setLocale(getLocale()); await initializeLocalData(); await renderShell(); } catch (error) { requireElement<HTMLDivElement>("#app").innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`; } }
 
 void start();
 if ("serviceWorker" in navigator) {
