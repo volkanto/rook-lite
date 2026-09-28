@@ -8,7 +8,7 @@ import { attachTagAutocomplete } from "./tag-autocomplete";
 import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
 import { CategoryService, initializeLocalData, normalize, NoteService } from "./services";
-import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
+import { OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService } from "./summaries";
 import { CommandPaletteController } from "./command-palette/commandPalette";
 import type { CommandActions, CommandContext } from "./command-palette/types";
 
@@ -658,7 +658,6 @@ async function renderData(content: HTMLElement): Promise<void> {
 export async function renderSettings(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const counts = await storageCounts();
-  const ollama = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS;
   const estimate = await navigator.storage?.estimate?.();
   const persisted = await navigator.storage?.persisted?.();
   const currentTheme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
@@ -713,92 +712,6 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
         </div>
       </section>
 
-      <section class="settings-section local-ai-card ${ollama.enabled ? "is-enabled" : "is-collapsed"}">
-        <div class="settings-row settings-toggle-row">
-          <div class="settings-row-info">
-            <div class="title-with-badge">
-              <span class="settings-row-label">${s.localAiTitle}</span>
-              <span class="ai-privacy-pill">${s.localAiBadge}</span>
-            </div>
-            <span class="settings-row-desc">${s.localAiSubtitle}</span>
-          </div>
-          <div class="ai-toggle-wrapper">
-            <label class="toggle-switch" for="ollama-enabled-toggle">
-              <input type="checkbox" id="ollama-enabled-toggle" ${ollama.enabled ? "checked" : ""}>
-              <span class="toggle-slider"></span>
-              <span class="visually-hidden">${s.localAiTitle}</span>
-            </label>
-          </div>
-        </div>
-
-        <div id="ollama-disabled-banner" class="ai-disabled-banner" ${ollama.enabled ? "hidden" : ""}>
-          <div class="disabled-banner-content">
-            <span class="disabled-banner-icon">${svg(icons.lock, "")}</span>
-            <div>
-              <strong>${s.localAiDisabledTitle}</strong>
-              <p>${s.localAiDisabledDesc}</p>
-            </div>
-          </div>
-        </div>
-
-        <div id="ollama-config-panel" class="ai-config-panel" ${ollama.enabled ? "" : "hidden"}>
-          <form id="ollama-form" class="settings-form">
-            <div class="form-row">
-              <div class="form-field flex-2">
-                <label for="ollama-endpoint">${s.ollamaEndpointLabel}</label>
-                <input class="form-input" id="ollama-endpoint" name="endpoint" value="${escapeHtml(ollama.endpoint)}" placeholder="http://localhost:11434" required>
-                <span class="field-hint">${s.ollamaEndpointHint}</span>
-              </div>
-              <div class="form-field flex-2">
-                <label for="ollama-model">${s.ollamaModelLabel}</label>
-                <div class="model-select-wrapper">
-                  <select class="form-input" id="ollama-model" name="model" required>
-                    <option value="${escapeHtml(ollama.model)}">${escapeHtml(ollama.model)}</option>
-                  </select>
-                </div>
-                <span class="field-hint">${s.ollamaModelHint}</span>
-              </div>
-            </div>
-
-            <details class="advanced-prompt-disclosure">
-              <summary class="advanced-prompt-summary">
-                <span class="advanced-prompt-title">Advanced options (Temperature & Prompt)</span>
-                ${svg(icons.chevronDown, "disclosure-chevron-svg")}
-              </summary>
-              <div class="advanced-prompt-body">
-                <div class="form-field flex-1">
-                  <div class="field-label-row">
-                    <label for="ollama-temperature">${s.ollamaTempLabel}</label>
-                    <span id="temp-val-display" class="temp-badge">${Number(ollama.temperature).toFixed(2)}</span>
-                  </div>
-                  <input type="range" id="ollama-temperature" name="temperature" min="0" max="1" step="0.05" value="${ollama.temperature}" class="range-slider">
-                  <div class="range-labels">
-                    <span>${s.ollamaTempPrecise}</span>
-                    <span>${s.ollamaTempBalanced}</span>
-                    <span>${s.ollamaTempCreative}</span>
-                  </div>
-                </div>
-
-                <div class="form-field flex-1">
-                  <div class="field-label-row">
-                    <label for="ollama-system-prompt">${s.ollamaSystemPromptLabel}</label>
-                    <button type="button" id="reset-ollama-prompt" class="text-link-btn" title="${s.resetToDefault}">${s.resetToDefault}</button>
-                  </div>
-                  <textarea class="form-textarea" id="ollama-system-prompt" name="systemPrompt" rows="3" placeholder="${s.ollamaSystemPromptHint}">${escapeHtml(ollama.systemPrompt ?? DEFAULT_OLLAMA_PROMPT)}</textarea>
-                  <span class="field-hint">${s.ollamaSystemPromptHint}</span>
-                </div>
-              </div>
-            </details>
-
-            <div class="ai-actions-row">
-              <button type="button" id="test-ollama" class="secondary-button icon-action-btn" title="${s.testConnectionBtn}" aria-label="${s.testConnectionBtn}">${svg(icons.refresh, "btn-action-icon")}<span class="visually-hidden">${s.testConnectionBtn}</span></button>
-              <button type="submit" class="save-btn-rect icon-action-btn" title="${s.saveAiSettingsBtn}" aria-label="${s.saveAiSettingsBtn}">${svg(icons.check, "btn-action-icon")}<span class="visually-hidden">${s.saveAiSettingsBtn}</span></button>
-            </div>
-            <div id="ollama-status" class="notice" hidden aria-live="polite"></div>
-          </form>
-        </div>
-      </section>
-
       <section class="settings-section">
         <h2 class="settings-section-title">${s.storageTitle}</h2>
         
@@ -846,10 +759,10 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
       </section>
     </div>
   </div>`;
-  bindSettingsEvents(content, ollama);
+  bindSettingsEvents(content);
 }
 
-function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void {
+function bindSettingsEvents(content: HTMLElement): void {
   const s = currentStrings();
   content.querySelectorAll<HTMLInputElement>('input[name="settings-language"]').forEach((input) => {
     input.addEventListener("change", () => {
@@ -867,99 +780,6 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
         btn.classList.toggle("is-active", isMatch);
       });
     });
-  });
-
-  const tempSlider = content.querySelector<HTMLInputElement>("#ollama-temperature");
-  const tempDisplay = content.querySelector<HTMLElement>("#temp-val-display");
-  tempSlider?.addEventListener("input", () => {
-    if (tempDisplay && tempSlider) tempDisplay.textContent = Number(tempSlider.value).toFixed(2);
-  });
-
-  const form = requireElement<HTMLFormElement>("#ollama-form");
-  const toggle = requireElement<HTMLInputElement>("#ollama-enabled-toggle");
-
-  const readOllama = (): OllamaSettings => {
-    const data = new FormData(form);
-    const customPrompt = data.get("systemPrompt")?.toString().trim();
-    return {
-      enabled: toggle.checked,
-      endpoint: data.get("endpoint")?.toString().trim() ?? "",
-      model: data.get("model")?.toString().trim() ?? "",
-      temperature: Number(data.get("temperature") ?? 0.2),
-      timeoutMs: 60000,
-      systemPrompt: customPrompt || DEFAULT_OLLAMA_PROMPT
-    };
-  };
-
-  content.querySelector<HTMLButtonElement>("#reset-ollama-prompt")?.addEventListener("click", () => {
-    const textarea = content.querySelector<HTMLTextAreaElement>("#ollama-system-prompt");
-    if (textarea) textarea.value = DEFAULT_OLLAMA_PROMPT;
-  });
-
-  const loadModels = async (announce = false) => {
-    try {
-      const models = await testOllama(readOllama());
-      const select = requireElement<HTMLSelectElement>("#ollama-model");
-      const selected = select.value;
-      select.innerHTML = models.length
-        ? models.map((model) => `<option value="${escapeHtml(model)}" ${model === selected ? "selected" : ""}>${escapeHtml(model)}</option>`).join("")
-        : `<option value="${escapeHtml(selected)}">${escapeHtml(selected)}</option>`;
-      if (announce) ollamaMessage(models.length ? `Connected. Found ${models.length} local models.` : "Connected, but no models are installed.", false);
-    } catch (error) {
-      if (announce) ollamaMessage(errorMessage(error), true);
-    }
-  };
-
-  toggle.addEventListener("change", async () => {
-    const isEnabled = toggle.checked;
-    const card = toggle.closest<HTMLElement>(".local-ai-card");
-    const banner = requireElement<HTMLElement>("#ollama-disabled-banner");
-    const panel = requireElement<HTMLElement>("#ollama-config-panel");
-
-    card?.classList.toggle("is-enabled", isEnabled);
-    card?.classList.toggle("is-collapsed", !isEnabled);
-    banner.hidden = isEnabled;
-    panel.hidden = !isEnabled;
-
-    const current = readOllama();
-    current.enabled = isEnabled;
-    await settingsRepository.set("ollama", current);
-
-    if (isEnabled) {
-      void loadModels(false);
-      ollamaMessage("Local AI enabled.", false);
-    } else {
-      const statusEl = document.querySelector<HTMLElement>("#ollama-status");
-      if (statusEl) statusEl.hidden = true;
-    }
-  });
-
-  requireElement<HTMLButtonElement>("#test-ollama").addEventListener("click", async (event) => {
-    const button = event.currentTarget as HTMLButtonElement;
-    button.disabled = true;
-    ollamaMessage("Testing local connection…", false);
-    await loadModels(true);
-    button.disabled = false;
-  });
-
-  if (ollama.enabled) {
-    void loadModels(false);
-  }
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-    if (btn) btn.disabled = true;
-    try {
-      const settings = readOllama();
-      if (settings.enabled) await testOllama(settings);
-      await settingsRepository.set("ollama", settings);
-      ollamaMessage("AI settings saved successfully.", false);
-    } catch (error) {
-      ollamaMessage(errorMessage(error), true);
-    } finally {
-      if (btn) btn.disabled = false;
-    }
   });
 
   const persistenceButton = document.querySelector<HTMLButtonElement>("#request-persistence");
@@ -981,7 +801,8 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
       s.clearAllAction,
       async () => {
         await clearAllData();
-        await categories.seedDefaults();
+        localStorage.removeItem("theme-preference");
+        sessionStorage.clear();
         await refreshCalendar();
         await renderRoute();
       }
@@ -989,12 +810,6 @@ function bindSettingsEvents(content: HTMLElement, ollama: OllamaSettings): void 
   );
 }
 
-function ollamaMessage(message: string, error: boolean): void {
-  const element = requireElement<HTMLElement>("#ollama-status");
-  element.hidden = false;
-  element.innerHTML = `${svg(error ? icons.alert : icons.check, "notice-status-icon")}<span>${escapeHtml(message)}</span>`;
-  element.classList.toggle("error", error);
-}
 function dataMessage(message: string, error: boolean): void { const element = requireElement<HTMLElement>("#data-message"); element.hidden = false; element.textContent = message; element.classList.toggle("error", error); }
 function formatBytes(bytes: number): string { if (bytes < 1024) return `${bytes} B`; if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`; return `${(bytes / 1024 / 1024).toFixed(1)} MB`; }
 

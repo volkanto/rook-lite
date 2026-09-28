@@ -213,7 +213,7 @@ describe("i18n internationalization and language support", () => {
 
     expect(container.textContent).toContain("Dil");
     expect(container.textContent).toContain("Görünüm");
-    expect(container.textContent).toContain("Yerel Yapay Zeka");
+    expect(container.textContent).not.toContain("Yerel Yapay Zeka");
     expect(container.textContent).toContain("Depolama ve Kalıcılık");
     expect(container.textContent).toContain("Dışa aktarma ve yedekleme");
     expect(container.textContent).toContain("Tehlikeli bölge");

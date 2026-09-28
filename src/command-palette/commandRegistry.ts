@@ -249,18 +249,10 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
     {
       id: "open-settings",
       title: "Open Settings",
-      description: "Configure preferences, appearance, and local AI",
+      description: "Configure preferences and appearance",
       keywords: ["settings", "preferences", "config", "options"],
       group: "settings",
       execute: () => actions.navigateTo("/settings")
-    },
-    {
-      id: "ai-settings",
-      title: "AI & Ollama settings",
-      description: "Configure local Ollama endpoint, model, and prompts",
-      keywords: ["ai", "ollama", "local ai", "model", "llama", "summary model", "ai settings"],
-      group: "settings",
-      execute: () => actions.navigateTo("/settings#ai")
     },
     {
       id: "data-management",

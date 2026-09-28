@@ -295,33 +295,20 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(longNote.id);
   });
 
-  it("renders aligned Local AI settings buttons and status notice banner", async () => {
+  it("renders streamlined settings sections without Local AI option", async () => {
     const { renderSettings } = await import("./main");
     const container = document.createElement("div");
     document.body.appendChild(container);
     await renderSettings(container);
 
-    const actionsRow = container.querySelector(".ai-actions-row");
-    expect(actionsRow).not.toBeNull();
+    // Verify Ollama / Local AI card is disabled and omitted from settings
+    const localAiCard = container.querySelector(".local-ai-card");
+    expect(localAiCard).toBeNull();
+    expect(container.querySelector("#ollama-form")).toBeNull();
 
-    const testBtn = actionsRow?.querySelector<HTMLButtonElement>("#test-ollama.secondary-button");
-    const saveBtn = actionsRow?.querySelector<HTMLButtonElement>("button[type='submit'].save-btn-rect");
-    const statusBanner = container.querySelector("#ollama-status.notice");
-
-    expect(testBtn).not.toBeNull();
-    expect(saveBtn).not.toBeNull();
-    expect(statusBanner).not.toBeNull();
-
-    // Both buttons contain action icons and accessible tooltips
-    expect(testBtn?.querySelector(".btn-action-icon")).not.toBeNull();
-    expect(saveBtn?.querySelector(".btn-action-icon")).not.toBeNull();
-
-    expect(testBtn?.title).toContain("Test connection");
-    expect(saveBtn?.title).toContain("Save AI settings");
-
-    // Temperature slider is tucked inside the advanced disclosure panel
-    const disclosure = container.querySelector(".advanced-prompt-disclosure");
-    expect(disclosure?.querySelector("#ollama-temperature")).not.toBeNull();
+    // Verify Appearance and Storage sections are rendered
+    const sections = container.querySelectorAll(".settings-section");
+    expect(sections.length).toBeGreaterThan(0);
   });
 
   it("renders minimal date header with date title, badges, navigation, and note items with clock icon time", async () => {
