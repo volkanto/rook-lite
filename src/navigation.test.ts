@@ -424,6 +424,9 @@ describe("Left menu bar icons and navigation", () => {
     expect(deleteBtn).not.toBeNull();
     deleteBtn?.click();
 
+    const backdrop = document.querySelector("#confirm-backdrop");
+    expect(backdrop).not.toBeNull();
+
     const dialog = document.querySelector(".lite-confirm-dialog");
     expect(dialog).not.toBeNull();
 

@@ -2250,13 +2250,13 @@ body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-footer
 }
 
 /* Zen mode for the edit modal dialog */
-body.is-zen-mode .note-edit-backdrop {
+body.is-zen-mode .note-edit-backdrop:not(#confirm-backdrop) {
   padding: 0 !important;
   background: var(--color-bg-app, var(--bg)) !important;
   backdrop-filter: none !important;
 }
 
-body.is-zen-mode .note-edit-dialog {
+body.is-zen-mode .note-edit-dialog:not(.lite-confirm-dialog) {
   width: 100vw !important;
   height: 100vh !important;
   height: 100svh !important;
@@ -5323,12 +5323,23 @@ mark.palette-highlight {
 }
 
 /* Confirmation Dialog Styling matching Edit Note modal */
+#confirm-backdrop {
+  align-items: center !important;
+  justify-items: center !important;
+  place-items: center !important;
+  padding: 1.5rem 1rem !important;
+}
+
 .lite-confirm-dialog {
   max-width: 29rem !important;
-  width: min(29rem, calc(100vw - 2rem));
-  border-radius: var(--radius-lg, 12px);
+  width: min(29rem, calc(100vw - 2rem)) !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: calc(100vh - 3rem) !important;
+  max-height: calc(100svh - 3rem) !important;
+  border-radius: var(--radius-lg, 12px) !important;
   background: var(--color-bg-surface, var(--surface));
-  border: 1px solid var(--color-border-default, var(--border));
+  border: 1px solid var(--color-border-default, var(--border)) !important;
   box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.28), 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
