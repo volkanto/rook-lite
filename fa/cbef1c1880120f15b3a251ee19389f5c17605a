@@ -1,0 +1,22 @@
+src/markdown.ts
+  s_504eabb0282fbb::t_bd472707a590ed 26
+src/markdown.test.ts
+  s_504eabb0282fbb::t_afa1d69bfdd779 95-98,100
+  s_504eabb0282fbb::t_21a9503e94caf2 99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "facbef1c1880120f15b3a251ee19389f5c17605a",
+  "prompts": {},
+  "sessions": {
+    "s_504eabb0282fbb": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "b9c4242f-ea92-45af-9ddd-8594e8cbffbe",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
