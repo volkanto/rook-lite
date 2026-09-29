@@ -92,4 +92,10 @@ describe("markdown code blocks and syntax highlighting", () => {
     expect(text).toContain("int count = 10;");
     expect(text).toContain("Follow up text.");
   });
+
+  it("renders single newlines as line breaks (<br>) when moving to a second line", () => {
+    const markdown = "First line\nSecond line";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain("First line<br>Second line");
+  });
 });

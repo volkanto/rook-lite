@@ -23,7 +23,7 @@ function normalizeLanguage(lang: string | undefined): string | null {
 
 marked.use({
   gfm: true,
-  breaks: false,
+  breaks: true,
   renderer: {
     code({ text, lang }: { text: string; lang?: string }): string {
       const validLang = normalizeLanguage(lang);
