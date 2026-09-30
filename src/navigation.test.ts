@@ -135,6 +135,35 @@ describe("Left menu bar icons and navigation", () => {
     expect(themeToggle?.className).toBe("sidebar-theme-toggle");
   });
 
+  it("eliminates the persistent global-header and provides search trigger in the sidebar", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    // Verify global-header is removed
+    expect(document.querySelector(".global-header")).toBeNull();
+
+    // Verify sidebar search button exists with correct attributes
+    const sidebar = document.querySelector("#app-sidebar");
+    const searchBtn = sidebar?.querySelector<HTMLButtonElement>(".sidebar-search-btn");
+    expect(searchBtn).not.toBeNull();
+    expect(searchBtn?.dataset.action).toBe("open-search");
+    expect(searchBtn?.hasAttribute("data-sidebar-tooltip")).toBe(true);
+    expect(searchBtn?.getAttribute("data-sidebar-tooltip")).toContain("⌘K");
+
+    // Clicking sidebar search button opens the search modal (Command Palette)
+    const modal = document.querySelector<HTMLElement>("#search-modal");
+    expect(modal?.classList.contains("is-open")).toBe(false);
+
+    searchBtn?.click();
+    expect(modal?.classList.contains("is-open")).toBe(true);
+
+    // Verify mobile-top-bar exists for mobile viewports
+    const mobileBar = document.querySelector(".mobile-top-bar");
+    expect(mobileBar).not.toBeNull();
+    expect(mobileBar?.querySelector(".mobile-sidebar-open")).not.toBeNull();
+    expect(mobileBar?.querySelector(".mobile-search-btn")).not.toBeNull();
+  });
+
   it("renders complete edit and delete buttons in single item note action popup", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
