@@ -2895,15 +2895,16 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .search-page {
-  max-width: 58rem;
+  max-width: 52rem;
   margin: 0 auto;
 }
 
 .search-workspace,
 .search-results-panel {
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: var(--radius-md, 8px);
   background: var(--color-bg-surface, var(--surface));
+  box-shadow: none;
 }
 
 .search-workspace {
@@ -2915,9 +2916,10 @@ textarea.simple-editor-textarea.is-hidden,
 .search-query-field {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  min-height: 3.75rem;
-  padding: 0 1.25rem;
+  gap: 0.65rem;
+  min-height: 3rem;
+  height: 3rem;
+  padding: 0 1rem;
   border-bottom: 1px solid var(--color-border-subtle, var(--border));
   box-sizing: border-box;
 }
@@ -2925,8 +2927,8 @@ textarea.simple-editor-textarea.is-hidden,
 .search-query-field svg,
 .search-query-field .search-field-icon {
   flex-shrink: 0;
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.1rem;
+  height: 1.1rem;
   color: var(--color-icon-muted, var(--muted));
   display: flex;
   align-items: center;
@@ -2936,15 +2938,15 @@ textarea.simple-editor-textarea.is-hidden,
 .search-query-field input {
   flex: 1 1 auto;
   min-width: 0;
-  height: 2.5rem;
+  height: 2.25rem;
   margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
   box-shadow: none;
-  font-family: var(--font-ui);
-  font-size: 1rem;
-  line-height: 2.5rem;
+  font-family: var(--font-app);
+  font-size: 0.95rem;
+  line-height: 2.25rem;
   outline: none;
   color: var(--color-text-primary, var(--text));
 }
@@ -2959,34 +2961,34 @@ textarea.simple-editor-textarea.is-hidden,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 6px;
+  padding: 1px 6px;
   border: 1px solid var(--color-border-default, var(--border));
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   color: var(--color-text-muted, var(--muted));
   font-family: var(--font-mono, monospace);
   font-size: 0.65rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .search-filter-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  padding: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
 }
 
 .search-filter-grid label {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.35rem;
   min-width: 0;
 }
 
 .search-filter-grid label > span {
-  color: var(--color-text-secondary, var(--text-soft));
-  font-size: 0.72rem;
-  font-weight: 600;
+  color: var(--color-text-muted, var(--muted));
+  font-size: 0.68rem;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -2996,24 +2998,26 @@ textarea.simple-editor-textarea.is-hidden,
   display: flex;
   align-items: center;
   width: 100%;
-  height: 2.5rem;
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: var(--radius-sm, 6px);
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: 5px;
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: all 140ms ease;
+  box-shadow: none;
+  transition: all 120ms ease;
   box-sizing: border-box;
   cursor: pointer;
 }
 
 .search-select-wrap:hover {
-  border-color: var(--color-text-muted, var(--muted));
+  border-color: var(--color-border-default, var(--border));
   background: var(--color-bg-surface, var(--surface));
 }
 
 .search-select-wrap:focus-within {
-  border-color: var(--color-text-brand, var(--accent));
-  box-shadow: 0 0 0 2px var(--color-border-selected, rgba(9, 105, 218, 0.2));
+  border-color: var(--color-border-strong, var(--border-strong));
+  box-shadow: 0 0 0 1px var(--color-border-strong, var(--border-strong));
   background: var(--color-bg-surface, var(--surface));
 }
 
@@ -3024,12 +3028,12 @@ textarea.simple-editor-textarea.is-hidden,
   width: 100%;
   height: 100%;
   margin: 0 !important;
-  padding: 0.55rem 2.25rem 0.55rem 0.85rem !important;
+  padding: 0.25rem 1.75rem 0.25rem 0.65rem !important;
   border: none !important;
   background: transparent !important;
   color: var(--color-text-primary, var(--text));
   font-family: var(--font-ui);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 500;
   line-height: 1.25rem;
   vertical-align: middle;
@@ -3041,14 +3045,14 @@ textarea.simple-editor-textarea.is-hidden,
 .search-select-wrap select option {
   background-color: var(--color-bg-surface, var(--surface));
   color: var(--color-text-primary, var(--text));
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   padding: 6px 10px;
 }
 
 .search-select-arrow {
   position: absolute;
   top: 50%;
-  right: 0.75rem;
+  right: 0.65rem;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
@@ -3063,36 +3067,36 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .search-select-wrap:focus-within .search-select-arrow {
-  color: var(--color-text-brand, var(--accent));
+  color: var(--color-text-primary, var(--text));
 }
 
 .search-filter-grid input[type="date"] {
   width: 100%;
-  height: 2.5rem;
-  min-height: 2.5rem;
-  max-height: 2.5rem;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
   margin: 0 !important;
-  padding: 0.55rem 0.75rem !important;
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: var(--radius-sm, 6px);
+  padding: 0 0.55rem !important;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: 5px;
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   color: var(--color-text-primary, var(--text));
-  font-family: var(--font-ui);
-  font-size: 0.85rem;
-  line-height: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 2rem;
   box-sizing: border-box;
   outline: none;
-  transition: all 140ms ease;
+  transition: all 120ms ease;
 }
 
 .search-filter-grid input[type="date"]:hover {
-  border-color: var(--color-text-muted, var(--muted));
+  border-color: var(--color-border-default, var(--border));
   background: var(--color-bg-surface, var(--surface));
 }
 
 .search-filter-grid input[type="date"]:focus {
-  border-color: var(--color-text-brand, var(--accent));
-  box-shadow: 0 0 0 2px var(--color-border-selected, rgba(9, 105, 218, 0.2));
+  border-color: var(--color-border-strong, var(--border-strong));
+  box-shadow: 0 0 0 1px var(--color-border-strong, var(--border-strong));
   background: var(--color-bg-surface, var(--surface));
 }
 
@@ -3101,9 +3105,9 @@ textarea.simple-editor-textarea.is-hidden,
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.75rem 1.1rem;
+  padding: 0.55rem 1rem;
   border-top: 1px solid var(--color-border-subtle, var(--border));
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  background: var(--color-bg-surface, var(--surface));
 }
 
 .search-filter-footer p {
@@ -3120,7 +3124,7 @@ textarea.simple-editor-textarea.is-hidden,
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 1rem 1.15rem;
+  padding: 0.85rem 1.15rem;
   border-bottom: 1px solid var(--color-border-subtle, var(--border));
 }
 
@@ -3128,12 +3132,14 @@ textarea.simple-editor-textarea.is-hidden,
   margin: 0;
   color: var(--color-text-primary, var(--text));
   font-size: 0.95rem;
-  letter-spacing: 0;
+  font-weight: 650;
+  letter-spacing: -0.01em;
   text-transform: none;
 }
 
 .search-results-panel header span {
   color: var(--color-text-muted, var(--muted));
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
 }
@@ -3150,10 +3156,10 @@ textarea.simple-editor-textarea.is-hidden,
 
 .search-result-list a {
   display: block;
-  padding: 1rem 1.15rem 1.1rem;
+  padding: 0.9rem 1.15rem;
   color: inherit;
   text-decoration: none;
-  transition: background-color 150ms ease;
+  transition: background-color 120ms ease;
 }
 
 .search-result-list a:hover {
@@ -3172,11 +3178,14 @@ textarea.simple-editor-textarea.is-hidden,
 
 .search-result-meta time {
   margin-right: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
 }
 
 .search-result-meta span {
   color: var(--color-text-brand, var(--accent));
+  font-size: 0.7rem;
 }
 
 .search-result-list strong {
