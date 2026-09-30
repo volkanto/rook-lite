@@ -34,6 +34,7 @@ export interface CommandActions {
   toggleTheme: () => void;
   setTheme: (theme: "LIGHT" | "DARK" | "SYSTEM") => void;
   toggleZen: () => void;
+  openShortcuts?: () => void;
   exportMarkdownZip: () => void | Promise<void>;
   exportMarkdownDirectory?: () => void | Promise<void>;
   createBackup: () => void | Promise<void>;

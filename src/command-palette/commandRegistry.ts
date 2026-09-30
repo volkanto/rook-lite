@@ -247,6 +247,15 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
 
     // --- Settings ---
     {
+      id: "keyboard-shortcuts",
+      title: "Keyboard Shortcuts",
+      description: "View all keyboard navigation and editing shortcuts",
+      keywords: ["shortcuts", "hotkeys", "cheat sheet", "help", "keys", "keyboard"],
+      shortcut: "?",
+      group: "settings",
+      execute: () => actions.openShortcuts?.()
+    },
+    {
       id: "open-settings",
       title: "Open Settings",
       description: "Configure preferences and appearance",

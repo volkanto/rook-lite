@@ -264,6 +264,22 @@ export interface TranslationStrings {
   // General & Not Found
   aboutTitle: string;
   aboutSubtitle: string;
+  keyboardShortcutsTitle: string;
+  keyboardShortcutsDesc: string;
+  viewShortcuts: string;
+  shortcutsNavTitle: string;
+  shortcutPrevNextDay: string;
+  shortcutToday: string;
+  shortcutScrollTop: string;
+  shortcutsEditorTitle: string;
+  shortcutSaveNote: string;
+  shortcutZenMode: string;
+  shortcutBulletList: string;
+  shortcutChecklist: string;
+  shortcutsGeneralTitle: string;
+  shortcutCommandPalette: string;
+  shortcutHelp: string;
+  shortcutEscape: string;
   notFoundTitle: string;
   notFoundDesc: string;
   notFoundReturnHome: string;

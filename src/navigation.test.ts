@@ -193,17 +193,14 @@ describe("Left menu bar icons and navigation", () => {
     expect(editBtn).not.toBeNull();
     expect(deleteBtn).not.toBeNull();
 
+    // Stream footer contains only back-to-top-link (no end-of-notes-text)
     const streamFooter = document.querySelector(".notes-stream-footer");
     expect(streamFooter).not.toBeNull();
-    expect(streamFooter?.querySelector(".back-to-top-btn")).not.toBeNull();
-    expect(streamFooter?.classList.contains("is-hidden")).toBe(true);
-
-    // When page content overflows viewport, back to top button becomes visible
-    const { updateBackToTopVisibility } = await import("./main");
-    Object.defineProperty(document.documentElement, "scrollHeight", { value: 1800, configurable: true });
-    Object.defineProperty(window, "innerHeight", { value: 800, configurable: true });
-    updateBackToTopVisibility();
-    expect(streamFooter?.classList.contains("is-hidden")).toBe(false);
+    expect(document.querySelector(".end-of-notes-text")).toBeNull();
+    const backToTopLink = streamFooter?.querySelector<HTMLButtonElement>(".back-to-top-link");
+    expect(backToTopLink).not.toBeNull();
+    expect(backToTopLink?.dataset.action).toBe("scroll-to-top");
+    expect(backToTopLink?.textContent).toContain("⌘↑");
 
     // Clean up created note
     await noteService.delete(createdNote.id);
@@ -808,45 +805,71 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(createdNote.id);
   });
 
-  it("does not focus note editor when back-to-top button is pressed while unfocused, but preserves focus if focused", async () => {
-    window.scrollTo = vi.fn();
+  it("keeps the journal stream clean without floating back-to-top button on empty day", async () => {
     const { renderShell } = await import("./main");
     await renderShell();
 
-    const form = document.querySelector<HTMLFormElement>("#new-note-form");
-    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    expect(document.querySelector("#app .back-to-top-btn")).toBeNull();
+    expect(document.querySelector("#app .notes-stream-footer")).toBeNull();
+    expect(document.querySelector("#app .empty-notes")).not.toBeNull();
+  });
 
-    expect(form).not.toBeNull();
-    expect(textarea).not.toBeNull();
+  it("opens keyboard shortcuts dialog via ? key and closes with Escape or close button", async () => {
+    const { renderShell, showShortcutsDialog, closeDialog } = await import("./main");
+    await renderShell();
 
-    // 1. When unfocused before clicking, remains unfocused
-    textarea?.blur();
-    expect(document.activeElement).not.toBe(textarea);
-    expect(form?.classList.contains("has-content")).toBe(false);
+    // Trigger shortcuts modal via function
+    showShortcutsDialog();
+    const dialog = document.querySelector(".shortcuts-dialog");
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain("Keyboard Shortcuts");
+    expect(dialog?.textContent).toContain("Navigation");
+    expect(dialog?.textContent).toContain("Writing & Editor");
 
-    const btn = document.createElement("button");
-    btn.dataset.action = "scroll-to-top";
-    document.body.appendChild(btn);
-    btn.click();
+    // Close dialog
+    closeDialog();
+    expect(document.querySelector(".shortcuts-dialog")).toBeNull();
 
-    await new Promise((r) => setTimeout(r, 400));
-    expect(document.activeElement).not.toBe(textarea);
-    expect(form?.classList.contains("has-content")).toBe(false);
+    // Trigger via ? key when not focused in input
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "?", bubbles: true }));
+    expect(document.querySelector(".shortcuts-dialog")).not.toBeNull();
 
-    // 2. When focused before clicking, preserves focus
-    textarea!.value = "Draft text";
-    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
-    textarea?.focus();
-    expect(document.activeElement).toBe(textarea);
-    expect(form?.classList.contains("has-content")).toBe(true);
+    // Close via close button
+    const closeBtn = document.querySelector<HTMLButtonElement>(".shortcuts-dialog .note-edit-close");
+    closeBtn?.click();
+    expect(document.querySelector(".shortcuts-dialog")).toBeNull();
+  });
 
-    btn.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
-    btn.click();
+  it("shows scroll-to-top button only when note list is long/scrollable and scrolls to top when clicked", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Note for testing back to top scroll link", today, []);
 
-    await new Promise((r) => setTimeout(r, 400));
-    expect(document.activeElement).toBe(textarea);
+    window.scrollTo = vi.fn();
+    const { renderShell, updateScrollToTopVisibility } = await import("./main");
+    await renderShell();
 
-    btn.remove();
+    const streamFooter = document.querySelector<HTMLElement>(".notes-stream-footer");
+    expect(streamFooter).not.toBeNull();
+
+    // When not scrollable, footer is hidden
+    expect(streamFooter?.classList.contains("is-hidden")).toBe(true);
+
+    // Simulate long scrollable page
+    Object.defineProperty(document.documentElement, "scrollHeight", { value: 2000, configurable: true });
+    Object.defineProperty(window, "innerHeight", { value: 800, configurable: true });
+    updateScrollToTopVisibility();
+
+    // Now it is visible
+    expect(streamFooter?.classList.contains("is-hidden")).toBe(false);
+
+    const backToTopLink = document.querySelector<HTMLButtonElement>(".back-to-top-link");
+    expect(backToTopLink).not.toBeNull();
+    backToTopLink?.click();
+
+    expect(window.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
+
+    await noteService.delete(createdNote.id);
   });
 
   it("continues todo and bullet lists on Enter and removes empty prefix on double Enter", async () => {

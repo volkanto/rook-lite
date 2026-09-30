@@ -48,6 +48,7 @@ export const icons = {
   refresh: '<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>',
   check: '<path d="M5 12l5 5l10 -10"/>',
   alert: '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  keyboard: '<path d="M2 6a2 2 0 0 1 2 -2h16a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2z"/><path d="M6 10l0 .01"/><path d="M10 10l0 .01"/><path d="M14 10l0 .01"/><path d="M18 10l0 .01"/><path d="M6 14l0 .01"/><path d="M18 14l0 .01"/><path d="M10 14l4 0"/>',
   globe: '<path d="M9 6.371c0 4.418 -2.239 6.629 -5 6.629"/><path d="M4 6.371h7"/><path d="M5 9c0 2.144 2.252 3.908 6 4"/><path d="M12 20l4 -9l4 9"/><path d="M19.1 18h-6.2"/><path d="M6.694 3l.793 .582"/>',
   github: '<path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"/>',
   chevronLeft: '<path d="M15 6l-6 6l6 6"/>',
@@ -141,6 +142,10 @@ function initCommandPalette(): void {
     },
     toggleZen: () => {
       toggleZenMode();
+    },
+    openShortcuts: () => {
+      closeSearch();
+      showShortcutsDialog();
     },
     exportMarkdownZip: async () => {
       const [allNotes, allCats] = await Promise.all([notes.listAll(), categories.list()]);
@@ -313,11 +318,11 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 
   const relativeInfo = getRelativeDateInfo(date, today, getLocale());
 
-  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", draft?.categoryIds ?? [], allCategories, s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allCategories, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-btn" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
+  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", draft?.categoryIds ?? [], allCategories, s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allCategories, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
   bindCreateEditor(date); bindNoteActions(allCategories);
-  updateBackToTopVisibility();
-  requestAnimationFrame(() => updateBackToTopVisibility());
+  updateScrollToTopVisibility();
+  requestAnimationFrame(() => updateScrollToTopVisibility());
 }
 
 function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string, isModal = false): string {
@@ -597,6 +602,29 @@ export function showEditDialog(note: Note, allCategories: Category[]): void {
   });
 }
 
+export function showShortcutsDialog(): void {
+  const s = currentStrings();
+  const host = requireElement<HTMLElement>("#dialog-host");
+  const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  const modKey = isMac ? "⌘" : "Ctrl";
+
+  host.innerHTML = `<div class="note-edit-backdrop" id="shortcuts-backdrop"><section class="note-edit-dialog shortcuts-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title"><header class="note-edit-dialog-head"><div class="shortcuts-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.keyboard, "note-edit-icon-svg")}</span><h2 id="shortcuts-dialog-title">${s.keyboardShortcutsTitle}</h2></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="shortcuts-dialog-body"><section class="shortcuts-group"><h3>${s.shortcutsNavTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>${s.shortcutPrevNextDay}</dd></div><div class="shortcut-entry"><dt><kbd>T</kbd></dt><dd>${s.shortcutToday}</dd></div><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>↑</kbd> <span class="shortcut-or">/</span> <kbd>Home</kbd></dt><dd>${s.shortcutScrollTop}</dd></div></dl></section><section class="shortcuts-group"><h3>${s.shortcutsEditorTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>Enter</kbd></dt><dd>${s.shortcutSaveNote}</dd></div><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>D</kbd></dt><dd>${s.shortcutZenMode}</dd></div><div class="shortcut-entry"><dt><kbd>*</kbd><kbd>Space</kbd></dt><dd>${s.shortcutBulletList}</dd></div><div class="shortcut-entry"><dt><kbd>-</kbd><kbd>[</kbd><kbd>]</kbd><kbd>Space</kbd></dt><dd>${s.shortcutChecklist}</dd></div></dl></section><section class="shortcuts-group"><h3>${s.shortcutsGeneralTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>K</kbd> <span class="shortcut-or">/</span> <kbd>/</kbd></dt><dd>${s.shortcutCommandPalette}</dd></div><div class="shortcut-entry"><dt><kbd>?</kbd></dt><dd>${s.shortcutHelp}</dd></div><div class="shortcut-entry"><dt><kbd>Esc</kbd></dt><dd>${s.shortcutEscape}</dd></div></dl></section></div></section></div>`;
+
+  document.body.style.overflow = "hidden";
+  const backdrop = requireElement<HTMLElement>("#shortcuts-backdrop");
+  backdrop.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target === backdrop || target.closest("[data-close-dialog]")) closeDialog();
+  });
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      window.removeEventListener("keydown", onKeydown);
+      closeDialog();
+    }
+  };
+  window.addEventListener("keydown", onKeydown);
+}
+
 async function renderCategories(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const all = await categories.list(); const active = all.filter((category) => !category.archived); const archived = all.filter((category) => category.archived); document.title = `${s.categoriesTitle} · Rook Lite`;
@@ -850,6 +878,16 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
 
         <div class="settings-row">
           <div class="settings-row-info">
+            <span class="settings-row-label">${s.keyboardShortcutsTitle}</span>
+            <span class="settings-row-desc">${s.keyboardShortcutsDesc}</span>
+          </div>
+          <div class="settings-row-action">
+            <button type="button" data-action="open-shortcuts" class="secondary-button icon-action-btn" title="${s.viewShortcuts} (?)" aria-label="${s.viewShortcuts}">${svg(icons.keyboard, "btn-action-icon")}<span class="visually-hidden">${s.viewShortcuts}</span></button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
             <span class="settings-row-label">${s.aboutTitle}</span>
             <span class="settings-row-desc">Rook Lite · ${s.aboutSubtitle}</span>
           </div>
@@ -969,36 +1007,29 @@ export function closeDialog(): void {
   }
 }
 
-export function updateBackToTopVisibility(): void {
-  const streamFooter = document.querySelector<HTMLElement>(".notes-stream-footer");
-  if (!streamFooter) return;
-
+export function updateScrollToTopVisibility(): void {
+  const footer = document.querySelector<HTMLElement>(".notes-stream-footer");
+  if (!footer) return;
   const notesList = document.querySelector<HTMLElement>(".notes-list");
   if (!notesList) {
-    streamFooter.classList.add("is-hidden");
-    streamFooter.setAttribute("hidden", "");
+    footer.classList.add("is-hidden");
+    footer.setAttribute("hidden", "");
     return;
   }
-
   const shell = document.querySelector<HTMLElement>(".shell");
   const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-  const listRect = notesList.getBoundingClientRect();
-  const currentScroll = window.scrollY || shell?.scrollTop || 0;
-  const listTotalBottom = listRect.bottom + currentScroll;
-
   const docOverflows = document.documentElement.scrollHeight > viewportHeight + 40;
   const shellOverflows = shell ? shell.scrollHeight > shell.clientHeight + 40 : false;
-  const listOverflows = listTotalBottom > viewportHeight + 40;
-  const isScrolled = currentScroll > 60;
+  const listRect = notesList.getBoundingClientRect();
+  const listOverflows = listRect.bottom > viewportHeight + 40;
+  const isScrollable = docOverflows || shellOverflows || listOverflows;
 
-  const shouldShow = docOverflows || shellOverflows || listOverflows || isScrolled;
-
-  if (shouldShow) {
-    streamFooter.classList.remove("is-hidden");
-    streamFooter.removeAttribute("hidden");
+  if (isScrollable) {
+    footer.classList.remove("is-hidden");
+    footer.removeAttribute("hidden");
   } else {
-    streamFooter.classList.add("is-hidden");
-    streamFooter.setAttribute("hidden", "");
+    footer.classList.add("is-hidden");
+    footer.setAttribute("hidden", "");
   }
 }
 
@@ -1009,35 +1040,10 @@ function renderNotFound(content: HTMLElement): void {
 }
 
 let shellEventsBound = false;
-let editorHadFocusBeforeScrollToTop = false;
 
 function bindShellEvents(): void {
   if (shellEventsBound) return;
   shellEventsBound = true;
-
-  const recordScrollToTopIntent = (event: Event) => {
-    const target = event.target as Element | null;
-    if (target?.closest('[data-action="scroll-to-top"]')) {
-      const form = document.querySelector<HTMLFormElement>("#new-note-form");
-      editorHadFocusBeforeScrollToTop = form !== null && form.contains(document.activeElement);
-      if (editorHadFocusBeforeScrollToTop) {
-        event.preventDefault();
-      }
-    }
-  };
-
-  document.addEventListener("pointerdown", recordScrollToTopIntent, true);
-  document.addEventListener("mousedown", recordScrollToTopIntent, true);
-
-  window.addEventListener("resize", () => {
-    updateBackToTopVisibility();
-  });
-  window.addEventListener("scroll", () => {
-    updateBackToTopVisibility();
-  }, { passive: true });
-  document.querySelector(".shell")?.addEventListener("scroll", () => {
-    updateBackToTopVisibility();
-  }, { passive: true });
 
   document.addEventListener("click", async (event) => {
     const target = event.target as Element;
@@ -1122,33 +1128,6 @@ function bindShellEvents(): void {
       }
       return;
     }
-    if (target.closest('[data-action="scroll-to-top"]')) {
-      event.preventDefault();
-      const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea");
-      const wasFocused = editorHadFocusBeforeScrollToTop || (textarea !== null && (document.activeElement === textarea || textarea.closest("form")?.contains(document.activeElement) === true));
-      editorHadFocusBeforeScrollToTop = false;
-
-      if (typeof window.scrollTo === "function") {
-        window.scrollTo({
-          top: 0,
-          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-        });
-      }
-      const shell = document.querySelector<HTMLElement>(".shell");
-      if (shell && typeof shell.scrollTo === "function") {
-        shell.scrollTo({
-          top: 0,
-          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-        });
-      }
-      if (wasFocused && textarea) {
-        const form = textarea.closest("form");
-        if (form) setEditorMode(form, "write", false);
-        textarea.focus();
-        window.setTimeout(() => textarea.focus(), 350);
-      }
-      return;
-    }
     const link = target.closest<HTMLAnchorElement>("a[data-link]");
     if (link && link.origin === location.origin && !event.metaKey && !event.ctrlKey) {
       event.preventDefault();
@@ -1165,7 +1144,29 @@ function bindShellEvents(): void {
       });
       return;
     }
+    if (target.closest('[data-action="scroll-to-top"]')) {
+      event.preventDefault();
+      if (typeof window.scrollTo === "function") {
+        window.scrollTo({
+          top: 0,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+        });
+      }
+      const shell = document.querySelector<HTMLElement>(".shell");
+      if (typeof shell?.scrollTo === "function") {
+        shell.scrollTo({
+          top: 0,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+        });
+      }
+      return;
+    }
     const action = target.closest<HTMLElement>("[data-action]")?.dataset.action;
+    if (action === "open-shortcuts") {
+      event.preventDefault();
+      showShortcutsDialog();
+      return;
+    }
     if (action === "toggle-zen") {
       event.preventDefault();
       const form = target.closest<HTMLFormElement>("form") ?? undefined;
@@ -1180,7 +1181,10 @@ function bindShellEvents(): void {
     if (target.id === "search-modal") closeSearch();
   });
   window.addEventListener("popstate", () => void renderRoute());
-  window.addEventListener("resize", closeSidebar);
+  window.addEventListener("resize", () => {
+    closeSidebar();
+    updateScrollToTopVisibility();
+  });
   document.addEventListener("keydown", handleKeyboard);
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
   window.addEventListener("online", updateNetworkStatus);
@@ -1277,6 +1281,17 @@ function handleKeyboard(event: KeyboardEvent): void {
   const editing = active === "INPUT" || active === "TEXTAREA" || active === "SELECT";
   if (event.key === "/" && !editing) { event.preventDefault(); openSearch(); }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); openSearch(); }
+  if (event.key === "?" && !editing) {
+    event.preventDefault();
+    showShortcutsDialog();
+    return;
+  }
+  if ((event.key === "t" || event.key === "T") && !editing && appPath() === "/") {
+    event.preventDefault();
+    history.pushState({}, "", appUrl("/"));
+    void renderRoute();
+    return;
+  }
   if (event.key.toLowerCase() === "n" && !editing) {
     event.preventDefault();
     if (appPath() !== "/") {
