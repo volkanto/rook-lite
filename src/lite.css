@@ -726,56 +726,31 @@
 }
 
 .minimal-date-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  height: 1.35rem;
-  padding: 0 0.55rem;
-  border-radius: 9999px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
-  border: 1px solid var(--color-border-subtle, var(--border));
-  color: var(--color-text-secondary, var(--text-soft));
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 1.45rem !important;
+  padding: 0 0.65rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.72rem !important;
+  font-weight: 550 !important;
+  letter-spacing: 0.01em !important;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  line-height: 1 !important;
 }
 
 .minimal-date-badge.is-today {
-  background: #EDF3EC;
-  border-color: #D3E4D1;
-  color: #346538;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  border-color: var(--color-border-default, var(--border)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
 :root[data-theme="dark"] .minimal-date-badge.is-today {
-  background: #172B1F;
-  border-color: #234330;
-  color: #79D19E;
-}
-
-.minimal-date-badge .live-pulse-dot {
-  width: 0.35rem;
-  height: 0.35rem;
-  border-radius: 50%;
-  background: #346538;
-  opacity: 0.85;
-}
-
-:root[data-theme="dark"] .minimal-date-badge .live-pulse-dot {
-  background: #79D19E;
-}
-
-.minimal-week-badge {
-  display: inline-flex;
-  align-items: center;
-  height: 1.35rem;
-  padding: 0 0.45rem;
-  border-radius: 4px;
-  background: transparent;
-  border: 1px solid var(--color-border-subtle, var(--border));
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 500;
-  color: var(--color-text-muted, var(--muted));
+  background: var(--color-bg-raised, #172033) !important;
+  border-color: var(--color-border-default, #374151) !important;
+  color: var(--color-text-primary, #F9FAFB) !important;
 }
 
 .minimal-date-nav {
@@ -824,32 +799,44 @@
 }
 
 .minimal-today-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 1.85rem;
-  padding: 0 0.6rem;
-  border-radius: 5px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-secondary, var(--text-soft));
-  background: transparent;
-  border: none;
-  text-decoration: none;
-  transition: all 120ms ease;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 1.85rem !important;
+  padding: 0 0.75rem !important;
+  border-radius: 5px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+  white-space: nowrap !important;
 }
 
 .minimal-today-link:hover {
-  background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-primary, var(--text));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  border-color: var(--color-border-subtle, var(--border)) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
 .minimal-today-link.is-active {
-  background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-primary, var(--text));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  pointer-events: none;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  border: 1px solid var(--color-border-default, var(--border)) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  font-weight: 650 !important;
+  pointer-events: none !important;
+}
+
+:root[data-theme="dark"] .minimal-today-link.is-active {
+  background: var(--color-bg-raised, #172033) !important;
+  border-color: var(--color-border-default, #374151) !important;
+  color: var(--color-text-primary, #F9FAFB) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
 }
 
 .minimal-picker {

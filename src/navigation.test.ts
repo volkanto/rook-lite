@@ -357,7 +357,7 @@ describe("Left menu bar icons and navigation", () => {
     expect(disclosure?.querySelector<HTMLInputElement>("#ollama-temperature")?.disabled).toBe(true);
   });
 
-  it("renders minimal date header with date title, badges, navigation, and note items with clock icon time", async () => {
+  it("renders minimal typographic date anchor header without pulse dot or week badge", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
     const createdNote = await noteService.create("Checking note time badge icon", today, []);
@@ -375,22 +375,21 @@ describe("Left menu bar icons and navigation", () => {
     expect(dateTitle).not.toBeNull();
     expect(dateTitle?.textContent).toContain("2026");
 
-    // Relative badge & week badge
-    const relativeBadge = header?.querySelector(".minimal-date-badge");
-    expect(relativeBadge).not.toBeNull();
-    expect(relativeBadge?.classList.contains("is-today")).toBe(true);
-    expect(relativeBadge?.textContent).toContain("Today");
-    expect(relativeBadge?.querySelector(".live-pulse-dot")).not.toBeNull();
+    // Typographic date anchor: no pulsing green dot and no redundant week badge
+    expect(header?.querySelector(".live-pulse-dot")).toBeNull();
+    expect(header?.querySelector(".minimal-week-badge")).toBeNull();
+    const todayBadge = header?.querySelector(".minimal-date-badge");
+    expect(todayBadge).not.toBeNull();
+    expect(todayBadge?.classList.contains("is-today")).toBe(true);
+    expect(todayBadge?.textContent).toMatch(/^(Today|Bugün)$/);
 
-    const weekBadge = header?.querySelector(".minimal-week-badge");
-    expect(weekBadge).not.toBeNull();
-    expect(weekBadge?.textContent).toContain("Week");
-
-    // Date navigation
+    // Date navigation: Today link is active and clearly present
     const dateNav = header?.querySelector(".minimal-date-nav");
     expect(dateNav).not.toBeNull();
     expect(dateNav?.querySelector(".prev-btn")).not.toBeNull();
-    expect(dateNav?.querySelector(".minimal-today-link")).not.toBeNull();
+    const todayLink = dateNav?.querySelector(".minimal-today-link");
+    expect(todayLink).not.toBeNull();
+    expect(todayLink?.classList.contains("is-active")).toBe(true);
     expect(dateNav?.querySelector(".next-btn")).not.toBeNull();
     expect(dateNav?.querySelector(".minimal-calendar-btn")).not.toBeNull();
 
@@ -400,6 +399,30 @@ describe("Left menu bar icons and navigation", () => {
     expect(noteTime?.textContent).toMatch(/^(Today|Bugün) · \d{2}:\d{2}$/);
 
     await noteService.delete(createdNote.id);
+  });
+
+  it("renders relative date badge for non-today date without is-today class", async () => {
+    const { renderToday } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    // Set search param to yesterday
+    const yesterday = "2026-09-29";
+    history.pushState({}, "", `/?date=${yesterday}`);
+    await renderToday(container);
+
+    const header = container.querySelector(".notes-day-header.minimal-date-header");
+    const badge = header?.querySelector(".minimal-date-badge");
+    expect(badge).not.toBeNull();
+    expect(badge?.classList.contains("is-today")).toBe(false);
+    expect(badge?.querySelector(".live-pulse-dot")).toBeNull();
+
+    // Today link in navigation is not active when on a historical date
+    const todayLink = header?.querySelector(".minimal-today-link");
+    expect(todayLink?.classList.contains("is-active")).toBe(false);
+
+    // Reset url
+    history.pushState({}, "", "/");
   });
 
   it("toggles task checkbox directly in note card and updates content", async () => {
