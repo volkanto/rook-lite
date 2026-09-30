@@ -127,18 +127,6 @@ body.app .global-header {
   padding: 0;
 }
 
-.sidebar-footer-divider {
-  display: block !important;
-  width: 24px;
-  height: 1px;
-  background: var(--color-border-subtle, var(--border));
-  margin: 4px auto;
-  flex: 0 0 1px;
-  border: 0;
-}
-
-.local-only-icon,
-.sidebar-github-link,
 .sidebar-lang-toggle,
 .sidebar-theme-toggle {
   position: relative;
@@ -160,15 +148,6 @@ body.app .global-header {
   transition: background 120ms ease, color 120ms ease;
 }
 
-.local-only-icon {
-  cursor: default;
-}
-
-.local-only-icon:hover {
-  color: var(--color-text-primary);
-}
-
-.sidebar-github-link:hover,
 .sidebar-lang-toggle:hover,
 .sidebar-lang-picker[open] .sidebar-lang-toggle,
 .sidebar-theme-toggle:hover {
@@ -203,11 +182,8 @@ body.app .global-header {
 }
 
 .sidebar .nav-svg,
-.sidebar-github-link .nav-svg,
 .sidebar-lang-toggle .nav-svg,
-.sidebar-theme-toggle .nav-svg,
-.local-only-icon .nav-svg,
-.local-only-icon svg {
+.sidebar-theme-toggle .nav-svg {
   flex: 0 0 20px;
   width: 20px;
   height: 20px;
@@ -440,10 +416,6 @@ body.app .global-header {
   :root.sidebar-collapsed body.app .sidebar nav a,
   body.app .sidebar nav > a,
   :root.sidebar-collapsed body.app .sidebar nav > a,
-  body.app .local-only-icon,
-  :root.sidebar-collapsed body.app .local-only-icon,
-  body.app .sidebar-github-link,
-  :root.sidebar-collapsed body.app .sidebar-github-link,
   body.app .sidebar-lang-picker,
   :root.sidebar-collapsed body.app .sidebar-lang-picker,
   body.app .sidebar-lang-toggle,
@@ -504,10 +476,6 @@ body.app .global-header {
     pointer-events: auto !important;
   }
 
-  body.app .local-only-icon,
-  :root.sidebar-collapsed body.app .local-only-icon,
-  body.app .sidebar-github-link,
-  :root.sidebar-collapsed body.app .sidebar-github-link,
   body.app .sidebar-lang-picker,
   :root.sidebar-collapsed body.app .sidebar-lang-picker,
   body.app .sidebar-lang-toggle,
@@ -591,12 +559,8 @@ body.app .global-header {
 
   body.app .sidebar-footer .sidebar-theme-toggle,
   body.app .sidebar-footer .sidebar-lang-picker,
-  body.app .sidebar-footer .sidebar-github-link,
-  body.app .sidebar-footer .local-only-icon,
   body.sidebar-drawer-open .sidebar-footer .sidebar-theme-toggle,
-  body.sidebar-drawer-open .sidebar-footer .sidebar-lang-picker,
-  body.sidebar-drawer-open .sidebar-footer .sidebar-github-link,
-  body.sidebar-drawer-open .sidebar-footer .local-only-icon {
+  body.sidebar-drawer-open .sidebar-footer .sidebar-lang-picker {
     margin: 0;
   }
 
@@ -605,16 +569,6 @@ body.app .global-header {
     left: auto;
     right: 0;
     bottom: calc(100% + 0.5rem);
-  }
-
-  body.app .sidebar-footer .sidebar-footer-divider,
-  body.sidebar-drawer-open .sidebar-footer .sidebar-footer-divider {
-    display: block !important;
-    width: 1px;
-    height: 24px;
-    margin: 0 4px;
-    flex: 0 0 1px;
-    border: 0;
   }
 }
 
