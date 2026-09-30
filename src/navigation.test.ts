@@ -773,4 +773,83 @@ describe("Left menu bar icons and navigation", () => {
 
     btn.remove();
   });
+
+  it("continues todo and bullet lists on Enter and removes empty prefix on double Enter", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    expect(textarea).not.toBeNull();
+
+    // 1. Todo item continuation
+    textarea.value = "- [ ] First task";
+    textarea.setSelectionRange(16, 16);
+    const enterEvent1 = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    textarea.dispatchEvent(enterEvent1);
+
+    expect(textarea.value).toBe("- [ ] First task\n- [ ] ");
+    expect(textarea.selectionStart).toBe(23);
+
+    // 2. Double enter removes the empty todo item
+    const enterEvent2 = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    textarea.dispatchEvent(enterEvent2);
+    expect(textarea.value).toBe("- [ ] First task\n");
+    expect(textarea.selectionStart).toBe(17);
+
+    // 3. Completed todo continues as an unchecked todo
+    textarea.value = "- [x] Done task";
+    textarea.setSelectionRange(15, 15);
+    const enterEvent3 = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    textarea.dispatchEvent(enterEvent3);
+    expect(textarea.value).toBe("- [x] Done task\n- [ ] ");
+
+    // 4. Bullet item continuation and double enter removal
+    textarea.value = "- Bullet one";
+    textarea.setSelectionRange(12, 12);
+    const enterEvent4 = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    textarea.dispatchEvent(enterEvent4);
+    expect(textarea.value).toBe("- Bullet one\n- ");
+
+    // Double enter on empty bullet removes the bullet
+    const enterEvent5 = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    textarea.dispatchEvent(enterEvent5);
+    expect(textarea.value).toBe("- Bullet one\n");
+
+    // 5. Shift+Enter does not continue list
+    textarea.value = "- Bullet item";
+    textarea.setSelectionRange(13, 13);
+    const shiftEnterEvent = new KeyboardEvent("keydown", { key: "Enter", shiftKey: true, bubbles: true, cancelable: true });
+    textarea.dispatchEvent(shiftEnterEvent);
+    expect(textarea.value).toBe("- Bullet item");
+  });
+
+  it("handles smart list continuation in the edit note dialog", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("- [ ] Edit dialog task", today, []);
+
+    const { renderShell, showEditDialog, closeDialog } = await import("./main");
+    await renderShell();
+
+    showEditDialog(createdNote, []);
+
+    const dialog = document.querySelector(".note-edit-dialog");
+    const textarea = dialog?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    expect(textarea).not.toBeNull();
+
+    textarea.setSelectionRange(22, 22);
+    const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    textarea.dispatchEvent(enterEvent);
+
+    expect(textarea.value).toBe("- [ ] Edit dialog task\n- [ ] ");
+
+    // Double enter removes the empty task item
+    const doubleEnter = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    textarea.dispatchEvent(doubleEnter);
+    expect(textarea.value).toBe("- [ ] Edit dialog task\n");
+
+    closeDialog();
+    await noteService.delete(createdNote.id);
+  });
 });
