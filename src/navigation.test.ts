@@ -984,4 +984,24 @@ describe("Left menu bar icons and navigation", () => {
     closeDialog();
     await noteService.delete(createdNote.id);
   });
+
+  it("renders clean date labels without extra icon prefix in summaries page date fields", async () => {
+    const { renderSummariesV2 } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    await renderSummariesV2(container);
+
+    const dateLabels = container.querySelectorAll(".summary-date-fields .summary-date-label");
+    expect(dateLabels.length).toBeGreaterThanOrEqual(1);
+
+    // No extra icon prefix inside labels
+    expect(container.querySelector(".summary-date-fields svg")).toBeNull();
+
+    // Date inputs exist for start and end
+    const dateInputs = container.querySelectorAll('.summary-date-fields input[type="date"]');
+    expect(dateInputs.length).toBe(2);
+
+    container.remove();
+  });
 });
