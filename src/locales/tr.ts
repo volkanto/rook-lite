@@ -44,7 +44,7 @@ export const locale: LocaleDefinition = {
     viewingFutureDate: "Gelecek planlama tarihi",
     recordSubtitle: "Hatırlamaya değer bir şeyler kaydedin.",
     finishNote: "Notu kaydet",
-    composerPlaceholder: "Bugünden hatırlamaya değer ne var?",
+    composerPlaceholder: "Bir not yazın... (Kaydetmek için ⌘Enter)",
     draftRestored: "Taslak geri yüklendi",
     draftSaved: "Yerel olarak kaydedildi ✓",
     savingDraft: "Kaydediliyor…",

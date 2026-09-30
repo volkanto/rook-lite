@@ -2815,73 +2815,119 @@ textarea.simple-editor-textarea.is-hidden,
   border-color: var(--color-border-default);
 }
 
+/* Ghost Composer (#new-note-form) - 1 row when unfocused, toolbars visible on focus, auto-expansion on enter till 20 rows */
 #new-note-form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  min-height: 3.5rem;
-  padding: 0.25rem 0.4rem;
-}
-
-#new-note-form .simple-editor-textarea {
-  min-height: 3rem;
-  max-height: 12rem;
-  padding: 0.65rem 0.75rem;
-  resize: none;
-  font-family: var(--font-app);
-  font-size: 0.95rem;
-  line-height: 1.6;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 8px !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease !important;
+  overflow: hidden !important;
 }
 
 #new-note-form .simple-editor-toolbar,
 #new-note-form .simple-editor-footer {
-  display: none;
+  display: none !important;
 }
 
-#new-note-form:focus-within,
-#new-note-form.has-content,
-#new-note-form.is-preview {
-  padding-top: 0.45rem;
+#new-note-form .simple-editor-textarea {
+  order: 2 !important;
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 2.65rem !important;
+  max-height: 32rem !important; /* extends with Enter till 20 rows, then scrolls */
+  padding: 0.65rem 0.95rem !important;
+  margin: 0 !important;
+  resize: none !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow-y: auto !important;
+  transition: border-color 150ms ease !important;
 }
 
+#new-note-form .editor-preview {
+  order: 2;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.65rem;
+  max-height: 32rem;
+  padding: 0.65rem 0.95rem;
+  margin: 0;
+  overflow-y: auto;
+}
+
+#new-note-form .editor-preview.is-hidden,
+#new-note-form .simple-editor-textarea.is-hidden {
+  display: none !important;
+}
+
+/* When focused (clicked into text area) or has content/preview, all the toolbar is visible */
 #new-note-form:focus-within .simple-editor-toolbar,
 #new-note-form:focus-within .simple-editor-footer,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-toolbar,
 #new-note-form.is-preview .simple-editor-footer {
-  display: flex;
+  display: flex !important;
 }
 
 #new-note-form:focus-within .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.is-preview .simple-editor-toolbar {
-  order: 1;
-  min-height: 2.5rem;
-  padding: 0 0.4rem;
+  order: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  min-height: 2.65rem !important;
+  padding: 0.4rem 0.95rem !important;
+  background: color-mix(in srgb, var(--color-bg-surface-sunken, var(--surface-sunk)) 65%, var(--color-bg-surface, var(--surface))) !important;
+  border-bottom: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
 }
 
-#new-note-form .simple-editor-textarea {
-  order: 2;
-}
-
-#new-note-form .editor-preview {
-  order: 2;
-  min-height: 3rem;
-  max-height: 12rem;
-  padding: 0.65rem 0.75rem;
-  overflow-y: auto;
+:root[data-theme="dark"] #new-note-form:focus-within .simple-editor-toolbar,
+:root[data-theme="dark"] #new-note-form.has-content .simple-editor-toolbar,
+:root[data-theme="dark"] #new-note-form.is-preview .simple-editor-toolbar {
+  background: color-mix(in srgb, var(--color-bg-raised, #172033) 80%, var(--color-bg-surface, #111827)) !important;
 }
 
 #new-note-form:focus-within .simple-editor-footer,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-footer {
-  order: 3;
-  padding: 0 0.45rem 0.35rem;
+  order: 3 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  min-height: 2.65rem !important;
+  padding: 0.4rem 0.95rem !important;
+  border-top: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  background: transparent !important;
 }
 
 .copilot-input-container .editor-card:focus-within {
-  border-color: var(--color-border-strong);
-  box-shadow: 0 0 0 1px var(--color-border-strong);
+  border-color: var(--color-border-strong, var(--border-dark)) !important;
+  box-shadow: 0 0 0 1px var(--color-border-strong, var(--border-dark)), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
 }
 
 .editor-card:focus-within .simple-editor-toolbar {

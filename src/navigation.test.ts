@@ -510,12 +510,13 @@ describe("Left menu bar icons and navigation", () => {
 
     // Textarea has placeholder
     expect(textarea?.placeholder).toBeTruthy();
+    expect(textarea?.placeholder).toContain("⌘Enter to save");
 
-    // Focusing the composer immediately activates full controls
+    // Focusing the composer activates toolbars while textarea remains 1-row initial size
     textarea?.focus();
     expect(form?.classList.contains("has-content")).toBe(true);
 
-    // Typing maintains full controls
+    // Typing content maintains full controls
     textarea!.value = "Remember this";
     textarea!.dispatchEvent(new Event("input", { bubbles: true }));
     expect(form?.classList.contains("has-content")).toBe(true);
@@ -527,6 +528,37 @@ describe("Left menu bar icons and navigation", () => {
     form?.dispatchEvent(new Event("focusout", { bubbles: true }));
     await new Promise((r) => setTimeout(r, 80));
     expect(form?.classList.contains("has-content")).toBe(false);
+  });
+
+  it("auto-expands textarea height when multiple lines are entered and shrinks on clear", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    expect(textarea).not.toBeNull();
+
+    // Mock scrollHeight
+    let mockScrollHeight = 38;
+    Object.defineProperty(textarea, "scrollHeight", {
+      get: () => mockScrollHeight,
+      configurable: true,
+    });
+
+    textarea.focus();
+    expect(textarea.style.height).toBe("38px");
+
+    // When typing multiple lines (e.g. pressing enter)
+    mockScrollHeight = 84;
+    textarea.value = "First line\nSecond line\nThird line";
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(textarea.style.height).toBe("84px");
+
+    // Clearing textarea shrinks height back
+    mockScrollHeight = 38;
+    textarea.value = "";
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(textarea.style.height).toBe("38px");
   });
 
   it("copies code block to clipboard and updates button state on copy click", async () => {
@@ -802,6 +834,8 @@ describe("Left menu bar icons and navigation", () => {
     expect(form?.classList.contains("has-content")).toBe(false);
 
     // 2. When focused before clicking, preserves focus
+    textarea!.value = "Draft text";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
     textarea?.focus();
     expect(document.activeElement).toBe(textarea);
     expect(form?.classList.contains("has-content")).toBe(true);

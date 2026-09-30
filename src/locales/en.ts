@@ -44,7 +44,7 @@ export const locale: LocaleDefinition = {
     viewingFutureDate: "Future date planner",
     recordSubtitle: "Record something worth remembering.",
     finishNote: "Finish note",
-    composerPlaceholder: "What’s worth remembering from today?",
+    composerPlaceholder: "Write a note... (⌘Enter to save)",
     draftRestored: "Draft restored",
     draftSaved: "Saved locally ✓",
     savingDraft: "Saving…",

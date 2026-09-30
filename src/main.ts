@@ -446,7 +446,7 @@ function bindCreateEditor(date: string): void {
   resizeEditor(textarea);
   updateEditorWordCount(form);
   const updateComposer = () => {
-    const hasText = Boolean(textarea.value.trim());
+    const hasText = Boolean(textarea.value.trim()) || textarea.value.includes("\n");
     const isFocused = form.contains(document.activeElement);
     const isPreview = form.classList.contains("is-preview");
     form.classList.toggle("has-content", hasText || isFocused || isPreview);
@@ -460,7 +460,10 @@ function bindCreateEditor(date: string): void {
       status(form, s.draftSaved);
     }, 450);
   };
-  textarea.addEventListener("focus", updateComposer);
+  textarea.addEventListener("focus", () => {
+    resizeEditor(textarea);
+    updateComposer();
+  });
   form.addEventListener("focusin", updateComposer);
   form.addEventListener("focusout", () => {
     window.setTimeout(() => {
@@ -468,6 +471,7 @@ function bindCreateEditor(date: string): void {
         if (form.classList.contains("is-preview")) {
           setEditorMode(form, "write", false);
         }
+        resizeEditor(textarea);
         updateComposer();
       }
     }, 50);
@@ -488,6 +492,7 @@ function bindCreateEditor(date: string): void {
       const content = textarea.value;
       const categoryIds = selectedCategories(form);
       textarea.value = "";
+      resizeEditor(textarea);
       updateComposer();
       await notes.create(content, date, categoryIds);
       await renderRoute();
