@@ -1285,7 +1285,9 @@
 .prose .task-item-content {
   position: relative;
   display: inline-block;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
+  width: fit-content;
+  max-width: 100%;
   line-height: inherit;
   color: var(--color-text-primary, var(--text));
   transition: color 260ms ease, opacity 260ms ease;
