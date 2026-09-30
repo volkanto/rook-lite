@@ -804,24 +804,58 @@ describe("Left menu bar icons and navigation", () => {
     textarea.dispatchEvent(enterEvent3);
     expect(textarea.value).toBe("- [x] Done task\n- [ ] ");
 
-    // 4. Bullet item continuation and double enter removal
-    textarea.value = "- Bullet one";
+    // 4. Bullet item continuation and double enter removal with asterisk (*)
+    textarea.value = "* Bullet one";
     textarea.setSelectionRange(12, 12);
     const enterEvent4 = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
     textarea.dispatchEvent(enterEvent4);
-    expect(textarea.value).toBe("- Bullet one\n- ");
+    expect(textarea.value).toBe("* Bullet one\n* ");
 
-    // Double enter on empty bullet removes the bullet
+    // Double enter on empty asterisk bullet removes the bullet
     const enterEvent5 = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
     textarea.dispatchEvent(enterEvent5);
-    expect(textarea.value).toBe("- Bullet one\n");
+    expect(textarea.value).toBe("* Bullet one\n");
 
     // 5. Shift+Enter does not continue list
-    textarea.value = "- Bullet item";
+    textarea.value = "* Bullet item";
     textarea.setSelectionRange(13, 13);
     const shiftEnterEvent = new KeyboardEvent("keydown", { key: "Enter", shiftKey: true, bubbles: true, cancelable: true });
     textarea.dispatchEvent(shiftEnterEvent);
-    expect(textarea.value).toBe("- Bullet item");
+    expect(textarea.value).toBe("* Bullet item");
+
+    // 6. Bullet format button formats with asterisk (*)
+    textarea.value = "";
+    textarea.setSelectionRange(0, 0);
+    const listBtn = form?.querySelector<HTMLButtonElement>('button[data-format="list"]');
+    listBtn?.click();
+    expect(textarea.value).toBe("* ");
+  });
+
+  it("renders aligned todo items with task classes in editor preview", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form")!;
+    const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    const previewBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+    const previewPane = form.querySelector<HTMLElement>(".editor-preview")!;
+
+    textarea.value = "- [ ] First aligned todo\n- [x] Second aligned todo";
+    previewBtn?.click();
+
+    expect(previewPane.classList.contains("is-hidden")).toBe(false);
+    const taskItems = previewPane.querySelectorAll(".task-list-item");
+    expect(taskItems.length).toBe(2);
+
+    const checkboxes = previewPane.querySelectorAll<HTMLInputElement>(".interactive-task-checkbox");
+    expect(checkboxes.length).toBe(2);
+    expect(checkboxes[0].checked).toBe(false);
+    expect(checkboxes[1].checked).toBe(true);
+
+    const contents = previewPane.querySelectorAll(".task-item-content");
+    expect(contents.length).toBe(2);
+    expect(contents[0].textContent).toBe("First aligned todo");
+    expect(contents[1].textContent).toBe("Second aligned todo");
   });
 
   it("handles smart list continuation in the edit note dialog", async () => {

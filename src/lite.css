@@ -1150,86 +1150,119 @@
 }
 
 /* Dribbble-Style Animated Interactive Markdown Task Items */
-.notes-list .prose ul:has(> li.task-list-item) {
+.notes-list .prose ul:has(> li.task-list-item),
+.editor-preview ul:has(> li.task-list-item),
+.prose ul:has(> li.task-list-item) {
   padding-left: 0 !important;
   margin-left: 0 !important;
   list-style: none !important;
 }
 
 .notes-list .prose li.task-list-item,
-.notes-list .prose li:has(> input[type="checkbox"]) {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin: 0.25rem 0;
+.notes-list .prose li:has(> input[type="checkbox"]),
+.editor-preview li.task-list-item,
+.editor-preview li:has(> input[type="checkbox"]),
+.prose li.task-list-item,
+.prose li:has(> input[type="checkbox"]) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  margin: 0.25rem 0 !important;
   margin-left: 0 !important;
-  padding: 0.35rem 0.6rem;
+  padding: 0.25rem 0.5rem !important;
   border-radius: var(--radius-sm, 6px);
-  list-style: none;
-  line-height: 1.55;
+  list-style: none !important;
+  line-height: 1.6 !important;
   transition: background-color 140ms ease;
   position: relative;
 }
 
-.notes-list .prose li.task-list-item:hover {
+.notes-list .prose li.task-list-item:hover,
+.editor-preview li.task-list-item:hover,
+.prose li.task-list-item:hover {
   background: color-mix(in srgb, var(--color-brand) 8%, transparent);
 }
 
 /* Checkbox container matching the Dribbble GIF */
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox,
-.notes-list .prose input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  flex: 0 0 1.25rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  margin: 0.12rem 0 0 0;
-  border: 2px solid var(--color-border-strong);
-  border-radius: 5px;
-  background-color: transparent;
+.notes-list .prose input[type="checkbox"],
+.editor-preview input[type="checkbox"].interactive-task-checkbox,
+.editor-preview input[type="checkbox"],
+.prose input[type="checkbox"].interactive-task-checkbox,
+.prose input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  flex: 0 0 1.15rem !important;
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+  margin: 0 !important;
+  align-self: center !important;
+  border: 2px solid var(--color-border-strong) !important;
+  border-radius: 4px !important;
+  background-color: transparent !important;
   cursor: pointer;
-  display: inline-grid;
-  place-content: center;
+  display: inline-grid !important;
+  place-content: center !important;
   transition: border-color 220ms ease, transform 160ms ease, box-shadow 160ms ease;
   position: relative;
   box-sizing: border-box;
 }
 
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox:hover,
-.notes-list .prose input[type="checkbox"]:hover {
-  border-color: var(--color-brand);
+.notes-list .prose input[type="checkbox"]:hover,
+.editor-preview input[type="checkbox"].interactive-task-checkbox:hover,
+.editor-preview input[type="checkbox"]:hover,
+.prose input[type="checkbox"].interactive-task-checkbox:hover,
+.prose input[type="checkbox"]:hover {
+  border-color: var(--color-brand) !important;
   transform: scale(1.08);
   box-shadow: 0 0 0 2px var(--color-brand-soft);
 }
 
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox:active,
-.notes-list .prose input[type="checkbox"]:active {
+.notes-list .prose input[type="checkbox"]:active,
+.editor-preview input[type="checkbox"].interactive-task-checkbox:active,
+.editor-preview input[type="checkbox"]:active,
+.prose input[type="checkbox"].interactive-task-checkbox:active,
+.prose input[type="checkbox"]:active {
   transform: scale(0.92);
 }
 
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox:focus-visible,
-.notes-list .prose input[type="checkbox"]:focus-visible {
+.notes-list .prose input[type="checkbox"]:focus-visible,
+.editor-preview input[type="checkbox"].interactive-task-checkbox:focus-visible,
+.editor-preview input[type="checkbox"]:focus-visible,
+.prose input[type="checkbox"].interactive-task-checkbox:focus-visible,
+.prose input[type="checkbox"]:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
 /* When checked: the outer box border fades to transparent, morphing into the standalone checkmark */
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox:checked,
-.notes-list .prose input[type="checkbox"]:checked {
-  border-color: transparent;
-  background-color: transparent;
-  box-shadow: none;
+.notes-list .prose input[type="checkbox"]:checked,
+.editor-preview input[type="checkbox"].interactive-task-checkbox:checked,
+.editor-preview input[type="checkbox"]:checked,
+.prose input[type="checkbox"].interactive-task-checkbox:checked,
+.prose input[type="checkbox"]:checked {
+  border-color: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
   transform: scale(1);
 }
 
 /* The Bold Animated Checkmark from the Dribbble GIF */
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox::before,
-.notes-list .prose input[type="checkbox"]::before {
+.notes-list .prose input[type="checkbox"]::before,
+.editor-preview input[type="checkbox"].interactive-task-checkbox::before,
+.editor-preview input[type="checkbox"]::before,
+.prose input[type="checkbox"].interactive-task-checkbox::before,
+.prose input[type="checkbox"]::before {
   content: "";
-  width: 0.72rem;
-  height: 0.4rem;
-  border-left: 2.5px solid var(--color-brand);
-  border-bottom: 2.5px solid var(--color-brand);
+  width: 0.65rem;
+  height: 0.36rem;
+  border-left: 2.5px solid var(--color-brand) !important;
+  border-bottom: 2.5px solid var(--color-brand) !important;
   border-radius: 1px;
   transform: rotate(-45deg) translate(0.04rem, -0.06rem) scale(0);
   opacity: 0;
@@ -1237,21 +1270,31 @@
 }
 
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox:checked::before,
-.notes-list .prose input[type="checkbox"]:checked::before {
+.notes-list .prose input[type="checkbox"]:checked::before,
+.editor-preview input[type="checkbox"].interactive-task-checkbox:checked::before,
+.editor-preview input[type="checkbox"]:checked::before,
+.prose input[type="checkbox"].interactive-task-checkbox:checked::before,
+.prose input[type="checkbox"]:checked::before {
   transform: rotate(-45deg) translate(0.04rem, -0.06rem) scale(1);
   opacity: 1;
 }
 
 /* Task Item Content with Animated Horizontal Strikethrough Line */
-.notes-list .prose .task-item-content {
+.notes-list .prose .task-item-content,
+.editor-preview .task-item-content,
+.prose .task-item-content {
   position: relative;
   display: inline-block;
+  flex: 1 1 auto;
+  line-height: inherit;
   color: var(--color-text-primary, var(--text));
   transition: color 260ms ease, opacity 260ms ease;
 }
 
 /* The animated cyan/accent strikethrough line drawing from left to right */
-.notes-list .prose .task-item-content::after {
+.notes-list .prose .task-item-content::after,
+.editor-preview .task-item-content::after,
+.prose .task-item-content::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -1268,18 +1311,30 @@
 
 /* When checked: the line slides across and text fades into cyan-tinted muted tone */
 .notes-list .prose li.task-list-item:has(input:checked) .task-item-content::after,
-.notes-list .prose li.task-list-item.is-task-completed .task-item-content::after {
+.notes-list .prose li.task-list-item.is-task-completed .task-item-content::after,
+.editor-preview li.task-list-item:has(input:checked) .task-item-content::after,
+.editor-preview li.task-list-item.is-task-completed .task-item-content::after,
+.prose li.task-list-item:has(input:checked) .task-item-content::after,
+.prose li.task-list-item.is-task-completed .task-item-content::after {
   transform: scaleX(1);
 }
 
 .notes-list .prose li.task-list-item:has(input:checked) .task-item-content,
-.notes-list .prose li.task-list-item.is-task-completed .task-item-content {
+.notes-list .prose li.task-list-item.is-task-completed .task-item-content,
+.editor-preview li.task-list-item:has(input:checked) .task-item-content,
+.editor-preview li.task-list-item.is-task-completed .task-item-content,
+.prose li.task-list-item:has(input:checked) .task-item-content,
+.prose li.task-list-item.is-task-completed .task-item-content {
   color: var(--color-btn-primary-bg, var(--accent, #00c4cc));
   opacity: 0.42;
 }
 
 .notes-list .prose li.task-list-item:has(input:checked):hover .task-item-content,
-.notes-list .prose li.task-list-item.is-task-completed:hover .task-item-content {
+.notes-list .prose li.task-list-item.is-task-completed:hover .task-item-content,
+.editor-preview li.task-list-item:has(input:checked):hover .task-item-content,
+.editor-preview li.task-list-item.is-task-completed:hover .task-item-content,
+.prose li.task-list-item:has(input:checked):hover .task-item-content,
+.prose li.task-list-item.is-task-completed:hover .task-item-content {
   opacity: 0.65;
 }
 
