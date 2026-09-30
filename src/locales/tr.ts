@@ -9,6 +9,7 @@ export const locale: LocaleDefinition = {
   dayNames: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"],
   strings: {
     navNotes: "Notlar",
+    navTodos: "Görevler",
     navSummaries: "Özetler",
     navSettings: "Ayarlar",
     navCategories: "Kategoriler",

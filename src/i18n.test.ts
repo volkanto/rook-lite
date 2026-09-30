@@ -61,6 +61,7 @@ describe("i18n internationalization and language support", () => {
     setLocale("en");
     const en = currentStrings();
     expect(en.navNotes).toBe("Notes");
+    expect(en.navTodos).toBe("Tasks");
     expect(en.navSummaries).toBe("Summaries");
     expect(en.navSettings).toBe("Settings");
     expect(en.today).toBe("Today");
@@ -69,6 +70,7 @@ describe("i18n internationalization and language support", () => {
     setLocale("tr");
     const tr = currentStrings();
     expect(tr.navNotes).toBe("Notlar");
+    expect(tr.navTodos).toBe("Görevler");
     expect(tr.navSummaries).toBe("Özetler");
     expect(tr.navSettings).toBe("Ayarlar");
     expect(tr.today).toBe("Bugün");

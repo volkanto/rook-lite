@@ -63,6 +63,7 @@ export const icons = {
 
 export const navItems: readonly NavigationItem[] = [
   { path: "/", label: "Notes", icon: icons.note },
+  { path: "/todos", label: "Tasks", icon: icons.todo },
   { path: "/summaries", label: "Summaries", icon: icons.summary },
   { path: "/settings", label: "Settings", icon: icons.settings, divider: true }
 ];
@@ -248,6 +249,7 @@ export function renderNavigation(): string {
   const s = currentStrings();
   const items: readonly NavigationItem[] = [
     { path: "/", label: s.navNotes, icon: icons.note },
+    { path: "/todos", label: s.navTodos, icon: icons.todo },
     { path: "/summaries", label: s.navSummaries, icon: icons.summary },
     { path: "/settings", label: s.navSettings, icon: icons.settings, divider: true }
   ];

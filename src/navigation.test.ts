@@ -29,7 +29,7 @@ describe("Left menu bar icons and navigation", () => {
   it("exports navItems using consistent Lucide/Feather icon family", async () => {
     const { navItems, icons, svg } = await import("./main");
 
-    expect(navItems).toHaveLength(3);
+    expect(navItems).toHaveLength(4);
 
     // Notes item uses the note document icon rather than the home icon
     const notesItem = navItems.find((item) => item.path === "/");
@@ -37,6 +37,12 @@ describe("Left menu bar icons and navigation", () => {
     expect(notesItem?.label).toBe("Notes");
     expect(notesItem?.icon).toBe(icons.note);
     expect(notesItem?.icon).not.toBe(icons.home);
+
+    // Tasks item uses the todo checklist icon
+    const todosItem = navItems.find((item) => item.path === "/todos");
+    expect(todosItem).toBeDefined();
+    expect(todosItem?.label).toBe("Tasks");
+    expect(todosItem?.icon).toBe(icons.todo);
 
     // Summaries uses the book-open summary icon
     const summariesItem = navItems.find((item) => item.path === "/summaries");
@@ -85,9 +91,9 @@ describe("Left menu bar icons and navigation", () => {
     expect(brand).not.toBeNull();
     expect(brand?.getAttribute("data-sidebar-tooltip")).toBe("Rook Notes Lite");
 
-    // Nav has 3 links with nav-svg icons
+    // Nav has 4 links with nav-svg icons
     const navLinks = sidebar?.querySelectorAll("nav a");
-    expect(navLinks?.length).toBe(3);
+    expect(navLinks?.length).toBe(4);
     navLinks?.forEach((link) => {
       const svgEl = link.querySelector("svg.nav-svg");
       expect(svgEl).not.toBeNull();

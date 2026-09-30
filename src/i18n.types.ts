@@ -1,6 +1,7 @@
 export interface TranslationStrings {
   // Navigation
   navNotes: string;
+  navTodos: string;
   navSummaries: string;
   navSettings: string;
   navCategories: string;

@@ -9,6 +9,7 @@ export const locale: LocaleDefinition = {
   dayNames: ["M", "T", "W", "T", "F", "S", "S"],
   strings: {
     navNotes: "Notes",
+    navTodos: "Tasks",
     navSummaries: "Summaries",
     navSettings: "Settings",
     navCategories: "Categories",
