@@ -108,12 +108,12 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
       execute: () => actions.openTasks()
     },
     {
-      id: "browse-categories",
-      title: "Browse categories",
-      description: "View and manage note categories",
-      keywords: ["categories", "topics", "folders", "browse categories", "tags"],
+      id: "filter-tags",
+      title: "Filter notes by tag",
+      description: "Search notes by hashtag",
+      keywords: ["tags", "topics", "hashtags", "filter tags", "categories"],
       group: "notes",
-      execute: () => actions.navigateTo("/categories")
+      execute: () => actions.openSearch?.("tag:")
     },
 
     // --- Summaries ---

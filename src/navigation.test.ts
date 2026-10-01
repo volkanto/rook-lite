@@ -206,17 +206,16 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(createdNote.id);
   });
 
-  it("opens redesigned edit note popup dialog with editor tools inside card and working categories", async () => {
+  it("opens redesigned edit note popup dialog with editor tools inside card", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
     const createdNote = await noteService.create("Testing edit modal redesign", today, []);
-    const testCategory = { id: "cat-1", name: "Engineering", slug: "engineering", color: "#3b82f6", sortOrder: 0, archived: false, createdAt: today, updatedAt: today };
 
     const { renderShell, showEditDialog } = await import("./main");
     await renderShell();
 
-    // Open edit dialog with category
-    showEditDialog(createdNote, [testCategory]);
+    // Open edit dialog
+    showEditDialog(createdNote);
 
     // Dialog is mounted in #dialog-host
     const dialog = document.querySelector(".note-edit-dialog");
@@ -247,16 +246,11 @@ describe("Left menu bar icons and navigation", () => {
     const textarea = editorCard?.querySelector("textarea.simple-editor-textarea");
     expect(textarea).not.toBeNull();
 
-    // Categories section inside the editor card
-    const categoryPicker = editorCard?.querySelector(".footer-category-picker");
-    expect(categoryPicker).not.toBeNull();
-
-    const categoryMenu = categoryPicker?.querySelector(".footer-category-menu");
-    expect(categoryMenu).not.toBeNull();
-
-    const categoryPill = categoryMenu?.querySelector(".category-pill");
-    expect(categoryPill).not.toBeNull();
-    expect(categoryPill?.textContent).toBe("#Engineering");
+    // Streamlined footer metadata inside the editor card
+    const meta = editorCard?.querySelector(".editor-footer-meta");
+    expect(meta).not.toBeNull();
+    expect(meta?.querySelector(".editor-word-count")).not.toBeNull();
+    expect(meta?.querySelector(".editor-save-hint")).not.toBeNull();
 
     // Footer actions include both Cancel and Save changes buttons
     const cancelBtn = editorCard?.querySelector<HTMLButtonElement>(".editor-modal-actions .btn-secondary");
@@ -1163,5 +1157,16 @@ describe("Left menu bar icons and navigation", () => {
     expect(window.location.pathname).toBe("/");
 
     container.remove();
+  });
+
+  it("renders not found page for removed /categories route", async () => {
+    const { renderRoute, renderShell } = await import("./main");
+    await renderShell();
+
+    history.pushState({}, "", "/categories");
+    await renderRoute();
+
+    const content = document.querySelector("#page-content");
+    expect(content?.textContent).toMatch(/404|That page does not exist|Bu sayfa mevcut değil/);
   });
 });

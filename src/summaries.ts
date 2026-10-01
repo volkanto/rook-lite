@@ -34,19 +34,21 @@ export class RuleBasedSummaryEngine implements SummaryEngine {
   }
 }
 
-export function generateRuleBasedSummary(notes: Note[], categories: Category[], period: SummaryPeriod): string {
+export function generateRuleBasedSummary(notes: Note[], categories: Category[] = [], period: SummaryPeriod): string {
   const isTr = getLocale() === "tr";
   const typeLabel = isTr
     ? (period.type === "weekly" ? "Haftalık" : period.type === "monthly" ? "Aylık" : period.type === "yearly" ? "Yıllık" : "Özel")
     : (period.type[0].toUpperCase() + period.type.slice(1));
   const title = isTr ? `# ${typeLabel} Özeti` : `# ${typeLabel} Summary`;
   if (!notes.length) return `${title}\n\n${isTr ? "Bu dönemde hiç not yazılmadı." : "No notes were written in this period."}\n`;
-  const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
+  const categoryMap = new Map((categories ?? []).map((category) => [category.id, category.name]));
   const groups = new Map<string, Note[]>();
-  const defaultCategory = isTr ? "Diğer" : "Other";
+  const defaultGroup = isTr ? "Genel" : "General";
   for (const note of notes) {
-    const names = note.categoryIds.map((id) => categoryMap.get(id)).filter((name): name is string => Boolean(name));
-    for (const name of names.length ? names : [defaultCategory]) groups.set(name, [...(groups.get(name) ?? []), note]);
+    const catNames = note.categoryIds.map((id) => categoryMap.get(id)).filter((name): name is string => Boolean(name));
+    const tagNames = note.tags.map((t) => `#${t}`);
+    const keys = catNames.length ? catNames : (tagNames.length ? tagNames : [defaultGroup]);
+    for (const name of keys) groups.set(name, [...(groups.get(name) ?? []), note]);
   }
   const out = [title, ""];
   for (const [name, grouped] of [...groups].sort(([a], [b]) => a.localeCompare(b))) {

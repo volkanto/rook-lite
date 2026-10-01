@@ -29,6 +29,7 @@ export interface CommandActions {
   navigateTo: (path: string) => void | Promise<void>;
   createNote: () => void;
   openDatePicker: () => void;
+  openSearch?: (query?: string) => void | Promise<void>;
   shiftDate: (delta: number) => void;
   openTasks: () => void;
   toggleTheme: () => void;
