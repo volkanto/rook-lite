@@ -310,7 +310,7 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(longNote.id);
   });
 
-  it("renders Local AI settings card with unchangeable and disabled controls", async () => {
+  it("renders Local AI settings card with toggle switch and collapsible configuration", async () => {
     const { renderSettings } = await import("./main");
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -318,40 +318,21 @@ describe("Left menu bar icons and navigation", () => {
 
     const localAiCard = container.querySelector(".local-ai-card");
     expect(localAiCard).not.toBeNull();
-    expect(localAiCard?.classList.contains("is-disabled")).toBe(true);
-    expect(localAiCard?.classList.contains("is-collapsed")).toBe(true);
 
+    // Toggle switch exists and is interactive
     const toggle = container.querySelector<HTMLInputElement>("#ollama-enabled-toggle");
-    expect(toggle?.disabled).toBe(true);
+    expect(toggle).not.toBeNull();
+    expect(toggle?.disabled).toBe(false);
     expect(toggle?.checked).toBe(false);
 
-    const banner = container.querySelector("#ollama-disabled-banner");
-    expect(banner?.hasAttribute("hidden")).toBe(false);
+    // Loud lock banner is removed
+    expect(container.querySelector("#ollama-disabled-banner")).toBeNull();
 
-    const endpointInput = container.querySelector<HTMLInputElement>("#ollama-endpoint");
-    expect(endpointInput?.disabled).toBe(true);
+    // Config panel is hidden by default when disabled
+    const configPanel = container.querySelector<HTMLElement>("#ollama-config-panel");
+    expect(configPanel?.hasAttribute("hidden")).toBe(true);
 
-    const actionsRow = container.querySelector(".ai-actions-row");
-    expect(actionsRow).not.toBeNull();
-
-    const testBtn = actionsRow?.querySelector<HTMLButtonElement>("#test-ollama.secondary-button");
-    const saveBtn = actionsRow?.querySelector<HTMLButtonElement>("button[type='submit'].save-btn-rect");
-    const statusBanner = container.querySelector("#ollama-status.notice");
-
-    expect(testBtn).not.toBeNull();
-    expect(saveBtn).not.toBeNull();
-    expect(statusBanner).not.toBeNull();
-
-    // Both buttons are disabled to make settings unchangeable
-    expect(testBtn?.disabled).toBe(true);
-    expect(saveBtn?.disabled).toBe(true);
-
-    expect(testBtn?.querySelector(".btn-action-icon")).not.toBeNull();
-    expect(saveBtn?.querySelector(".btn-action-icon")).not.toBeNull();
-
-    const disclosure = container.querySelector(".advanced-prompt-disclosure");
-    expect(disclosure?.querySelector("#ollama-temperature")).not.toBeNull();
-    expect(disclosure?.querySelector<HTMLInputElement>("#ollama-temperature")?.disabled).toBe(true);
+    container.remove();
   });
 
   it("renders minimal typographic date anchor header without pulse dot or week badge", async () => {

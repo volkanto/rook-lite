@@ -123,6 +123,7 @@ export interface TranslationStrings {
   summariesLede: string;
   thisWeek: string;
   thisMonth: string;
+  thisYear: string;
   customRange: string;
   dateInPeriod: string;
   startDate: string;

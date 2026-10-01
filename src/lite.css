@@ -4404,11 +4404,18 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .summary-toolbar-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+  gap: 0.65rem !important;
+  width: 100% !important;
+}
+
+@media (max-width: 54rem) {
+  .summary-toolbar-row {
+    flex-wrap: wrap !important;
+  }
 }
 
 .summary-period-tabs {
@@ -4420,6 +4427,7 @@ textarea.simple-editor-textarea.is-hidden,
   border-radius: 6px;
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   gap: 2px;
+  flex: 0 0 auto;
 }
 
 body.app .summary-period-tabs button,
@@ -4474,12 +4482,13 @@ body.app .summary-period-tabs button[aria-pressed="true"],
 .summary-date-fields {
   display: inline-flex !important;
   align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 0.65rem !important;
+  flex-wrap: nowrap !important;
+  gap: 0.35rem !important;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
   box-sizing: border-box !important;
+  flex: 0 0 auto !important;
 }
 
 .summary-date-fields .summary-date-label,
@@ -4487,12 +4496,24 @@ body.app .summary-period-tabs button[aria-pressed="true"],
   display: inline-flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  gap: 0.4rem !important;
+  gap: 0.35rem !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
   flex: 0 0 auto !important;
   max-width: none !important;
+}
+
+.summary-date-fields.is-custom label span.summary-date-text {
+  display: none !important;
+}
+
+.summary-date-sep {
+  color: var(--color-text-muted, var(--muted)) !important;
+  font-size: 0.85rem !important;
+  padding: 0 0.15rem !important;
+  user-select: none !important;
+  font-weight: 600 !important;
 }
 
 .summary-date-fields label[hidden],
@@ -4534,12 +4555,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .summary-date-fields input[type="date"],
 .summary-date-fields input {
-  width: auto !important;
+  width: 7.75rem !important;
+  min-width: 7.75rem !important;
+  max-width: 8rem !important;
   height: 1.85rem !important;
   min-height: 1.85rem !important;
   max-height: 1.85rem !important;
   margin: 0 !important;
-  padding: 0 0.5rem !important;
+  padding: 0 0.45rem !important;
   border: 1px solid var(--color-border-subtle, var(--border)) !important;
   border-radius: 5px !important;
   background: var(--color-bg-surface, var(--surface)) !important;
@@ -4556,70 +4579,78 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   box-shadow: 0 0 0 1px var(--color-border-strong, var(--border-strong)) !important;
 }
 
+/* Polished Inline Segmented Mode Control matching period tabs */
 .summary-mode-picker {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin: 0;
-  padding-top: 0.5rem;
-  border: 0;
-  border-top: 1px solid var(--color-border-subtle, var(--border));
-}
-
-.summary-mode-picker legend {
-  margin: 0 0.35rem 0 0;
-  color: var(--color-text-muted, var(--muted));
-  font-size: 0.72rem;
-  font-weight: 500;
-  float: left;
-  line-height: 1.7rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px !important;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-radius: 6px !important;
+  gap: 2px !important;
+  margin: 0 !important;
+  width: fit-content !important;
 }
 
 .summary-mode-picker label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  min-height: 1.65rem;
-  padding: 0.15rem 0.55rem;
-  border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: 5px;
-  color: var(--color-text-secondary, var(--text-soft));
-  cursor: pointer;
-  font-size: 0.75rem;
-  line-height: 1;
-  background: var(--color-bg-surface, var(--surface));
-  transition: all 120ms ease;
-  letter-spacing: 0;
-  text-transform: none;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 1.85rem !important;
+  min-height: 1.85rem !important;
+  padding: 0 0.85rem !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+  user-select: none !important;
+  white-space: nowrap !important;
+  background: transparent !important;
 }
 
+.summary-mode-picker label input {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.summary-mode-picker label:hover {
+  color: var(--color-text-primary, var(--text)) !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+}
+
+.summary-mode-picker label.is-active,
 .summary-mode-picker label:has(input:checked) {
-  border-color: var(--color-border-default, var(--border));
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
-  color: var(--color-text-primary, var(--text));
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+:root[data-theme="dark"] .summary-mode-picker label.is-active,
+:root[data-theme="dark"] .summary-mode-picker label:has(input:checked) {
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
 
 .summary-mode-picker label.is-disabled,
 .summary-mode-picker label:has(input:disabled) {
-  opacity: 0.45;
-  cursor: not-allowed;
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+.summary-mode-picker label.is-disabled:hover,
+.summary-mode-picker label:has(input:disabled):hover {
   background: transparent !important;
-  border-color: var(--color-border-subtle, var(--border)) !important;
-}
-
-.summary-mode-picker label.is-disabled input,
-.summary-mode-picker label:has(input:disabled) input {
-  cursor: not-allowed;
-}
-
-.summary-mode-picker label strong {
-  font-weight: 550;
-  font-size: 0.74rem;
-}
-
-.summary-mode-picker label small {
-  display: none;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
 }
 
 .summary-document {
