@@ -1067,4 +1067,33 @@ describe("Left menu bar icons and navigation", () => {
     expect(formatTaskAge("2026-08-01", today).label).toBe("2mo open");
     expect(formatTaskAge("2026-08-01", today).ageClass).toBe("stale");
   });
+
+  it("keeps calendar popover open when navigating months", async () => {
+    const { renderShell, renderToday } = await import("./main");
+
+    const app = document.querySelector("#app");
+    expect(app).not.toBeNull();
+    await renderShell();
+
+    const container = document.querySelector("#page-content") as HTMLElement;
+    expect(container).not.toBeNull();
+    await renderToday(container);
+
+    const datePicker = container.querySelector<HTMLDetailsElement>(".date-picker");
+    expect(datePicker).not.toBeNull();
+
+    // Open the calendar
+    datePicker?.setAttribute("open", "");
+    expect(datePicker?.hasAttribute("open")).toBe(true);
+
+    // Find previous month button
+    const prevMonthBtn = container.querySelector<HTMLButtonElement>("[data-calendar-month]");
+    expect(prevMonthBtn).not.toBeNull();
+
+    // Click previous month button
+    prevMonthBtn?.click();
+
+    // Verify calendar details element remains open
+    expect(datePicker?.hasAttribute("open")).toBe(true);
+  });
 });

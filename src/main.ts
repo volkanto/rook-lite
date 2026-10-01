@@ -349,7 +349,12 @@ function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string
   const previousMonth = new Date(year, month - 1, 1); const nextMonth = new Date(year, month + 1, 1);
   const weekDays = getLocale() === "tr" ? ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"] : ["M", "T", "W", "T", "F", "S", "S"];
   host.innerHTML = `<div class="calendar-popover-head"><button type="button" data-calendar-month="${isoDate(previousMonth)}" aria-label="${s.previousDay}">‹</button><strong>${monthLabel}</strong><button type="button" data-calendar-month="${isoDate(nextMonth)}" aria-label="${s.nextDay}">›</button></div><div class="calendar-weekdays"><span>Wk</span>${weekDays.map((day) => `<span>${day}</span>`).join("")}<span></span></div><div class="calendar-weeks">${rows.join("")}</div><div class="calendar-legend"><span><i></i> ${getLocale() === "tr" ? "Notu olan gün" : "Day has notes"}</span><span>${getLocale() === "tr" ? "Haftalık toplamlar sağda" : "Weekly totals on right"}</span></div>`;
-  host.querySelectorAll<HTMLButtonElement>("[data-calendar-month]").forEach((button) => button.addEventListener("click", () => renderCalendar(host, new Date(`${button.dataset.calendarMonth}T12:00:00`), selectedDate, allNotes)));
+  host.querySelectorAll<HTMLButtonElement>("[data-calendar-month]").forEach((button) =>
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      renderCalendar(host, new Date(`${button.dataset.calendarMonth}T12:00:00`), selectedDate, allNotes);
+    })
+  );
 }
 
 export function setEditorMode(form: HTMLFormElement, mode: "write" | "preview", shouldFocus = true): void {
@@ -1301,7 +1306,10 @@ function bindShellEvents(): void {
       newNoteForm.classList.toggle("has-content", hasContent);
     }
 
-    document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => { if (!details.contains(target)) details.removeAttribute("open"); });
+    const clickPath = event.composedPath();
+    document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => {
+      if (!details.contains(target) && !clickPath.includes(details)) details.removeAttribute("open");
+    });
 
     const clickedNote = target.closest<HTMLElement>(".note");
     if (clickedNote && !target.closest("button, a, input, details, summary")) {
