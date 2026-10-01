@@ -158,6 +158,12 @@ export const locale: LocaleDefinition = {
     todosLede: "Open tasks found in your Markdown notes.",
     noOpenTasks: "No open tasks.",
     noOpenTasksPrompt: "Add a - [ ] item to a note and it will appear here.",
+    taskAgeToday: "Today",
+    taskAgeDays: (days: number) => `${days}d open`,
+    taskAgeWeeks: (weeks: number) => `${weeks}w open`,
+    taskAgeMonths: (months: number) => `${months}mo open`,
+    openNote: "Note",
+    goToNote: "Go to note",
 
     editAction: "Edit",
     deleteAction: "Delete",

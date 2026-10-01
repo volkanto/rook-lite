@@ -153,6 +153,12 @@ export interface TranslationStrings {
   todosLede: string;
   noOpenTasks: string;
   noOpenTasksPrompt: string;
+  taskAgeToday: string;
+  taskAgeDays: (days: number) => string;
+  taskAgeWeeks: (weeks: number) => string;
+  taskAgeMonths: (months: number) => string;
+  openNote: string;
+  goToNote: string;
 
   // Common UI
   editAction: string;

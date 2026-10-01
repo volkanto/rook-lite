@@ -158,6 +158,12 @@ export const locale: LocaleDefinition = {
     todosLede: "Markdown notlarınızda bulunan açık görevler.",
     noOpenTasks: "Açık görev yok.",
     noOpenTasksPrompt: "Bir nota - [ ] öğesi eklediğinizde burada görünecektir.",
+    taskAgeToday: "Bugün",
+    taskAgeDays: (days: number) => `${days}g açık`,
+    taskAgeWeeks: (weeks: number) => `${weeks}h açık`,
+    taskAgeMonths: (months: number) => `${months}a açık`,
+    openNote: "Not",
+    goToNote: "Nota git",
 
     editAction: "Düzenle",
     deleteAction: "Sil",

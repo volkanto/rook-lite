@@ -660,11 +660,71 @@ async function renderSearchPageResults(host: HTMLElement, countHost: HTMLElement
 
 function parseSearch(query: string): { text: string; tag: string; category: string; hasTodo: boolean } { let text = query; const read = (pattern: RegExp) => { const match = text.match(pattern); if (match) text = text.replace(match[0], " "); return normalize(match?.[1] ?? ""); }; const tag = read(/(?:^|\s)tag:([^\s]+)/i); const category = read(/(?:^|\s)category:([^\s]+)/i); const hasTodo = /(?:^|\s)has:todo(?:\s|$)/i.test(text); text = text.replace(/(?:^|\s)has:todo(?:\s|$)/i, " "); return { text, tag, category, hasTodo }; }
 
+export function formatTaskAge(noteDate: string, todayIso = isoDate(new Date())): { label: string; ageClass: "fresh" | "aging" | "stale" } {
+  const s = currentStrings();
+  const noteTime = new Date(`${noteDate}T12:00:00`).getTime();
+  const todayTime = new Date(`${todayIso}T12:00:00`).getTime();
+  const days = Math.max(0, Math.round((todayTime - noteTime) / (1000 * 60 * 60 * 24)));
+
+  if (days === 0) {
+    return { label: s.taskAgeToday, ageClass: "fresh" };
+  }
+  if (days < 3) {
+    return { label: s.taskAgeDays(days), ageClass: "fresh" };
+  }
+  if (days < 7) {
+    return { label: s.taskAgeDays(days), ageClass: "aging" };
+  }
+  if (days < 30) {
+    const weeks = Math.floor(days / 7);
+    return { label: s.taskAgeWeeks(weeks), ageClass: "stale" };
+  }
+  const months = Math.floor(days / 30);
+  return { label: s.taskAgeMonths(months), ageClass: "stale" };
+}
+
 export async function renderTodos(content: HTMLElement): Promise<void> {
   const s = currentStrings();
-  const tasks = (await notes.listAll()).flatMap((note) => note.content.split(/\r?\n/).map((line, lineIndex) => ({ note, line, lineIndex })).filter(({ line }) => /^\s*[-*+]\s+\[ \]\s+/.test(line)));
-  document.title = `${s.todosTitle} · Rook Lite`; content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div>${tasks.length ? `<ul class="todo-list">${tasks.map(({ note, line, lineIndex }) => `<li class="todo-item"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(line.replace(/^\s*[-*+]\s+\[ \]\s+/, ""))}</span></label><a href="/?date=${note.noteDate}#note-${note.id}" data-link class="muted">${note.noteDate}</a></li>`).join("")}</ul>` : `<div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`}`;
-  content.querySelectorAll<HTMLInputElement>("[data-task-note]").forEach((input) => input.addEventListener("change", async () => { input.disabled = true; try { await notes.setTaskDone(input.dataset.taskNote ?? "", Number(input.dataset.taskLine), input.checked); await renderRoute(); } catch (error) { input.checked = false; input.disabled = false; alert(errorMessage(error)); } }));
+  const tasks = (await notes.listAll()).flatMap((note) =>
+    note.content
+      .split(/\r?\n/)
+      .map((line, lineIndex) => ({ note, line, lineIndex }))
+      .filter(({ line }) => /^\s*[-*+]\s+\[ \]\s+/.test(line))
+  );
+
+  document.title = `${s.todosTitle} · Rook Lite`;
+
+  content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div>${
+    tasks.length
+      ? `<ul class="todo-list">${tasks
+          .map(({ note, line, lineIndex }) => {
+            const age = formatTaskAge(note.noteDate);
+            const noteHeading = note.title?.trim()
+              ? `${s.goToNote}: ${note.title.trim()} · ${formatShortDate(note.noteDate)}`
+              : `${s.goToNote} · ${formatShortDate(note.noteDate)}`;
+            return `<li class="todo-item"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(
+              line.replace(/^\s*[-*+]\s+\[ \]\s+/, "")
+            )}</span></label><div class="todo-item-meta"><span class="todo-age-chip age-${age.ageClass}">${age.label}</span><a href="${appUrl(
+              `/?date=${note.noteDate}#note-${note.id}`
+            )}" data-link class="todo-note-link todo-note-jump" data-tooltip="${escapeHtml(noteHeading)}" aria-label="${escapeHtml(noteHeading)}"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="todo-jump-svg" aria-hidden="true"><path d="M4 12L12 4M12 4H6M12 4V10"/></svg></a></div></li>`;
+          })
+          .join("")}</ul>`
+      : `<div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`
+  }`;
+
+  content.querySelectorAll<HTMLInputElement>("[data-task-note]").forEach((input) =>
+    input.addEventListener("change", async () => {
+      input.disabled = true;
+      try {
+        await notes.setTaskDone(input.dataset.taskNote ?? "", Number(input.dataset.taskLine), input.checked);
+        await renderRoute();
+      } catch (error) {
+        input.checked = false;
+        input.disabled = false;
+        alert(errorMessage(error));
+      }
+    })
+  );
 }
 
 export async function renderSummaries(content: HTMLElement): Promise<void> {

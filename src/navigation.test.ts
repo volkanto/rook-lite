@@ -1032,7 +1032,39 @@ describe("Left menu bar icons and navigation", () => {
     expect(texts).toContain("Buy fresh groceries");
     expect(texts).toContain("Call Dr. Smith");
 
+    // Task age chip exists
+    const ageChips = container.querySelectorAll(".todo-item .todo-age-chip");
+    expect(ageChips.length).toBeGreaterThanOrEqual(2);
+
+    // Note link exists with link to note and jump icon
+    const noteLinks = container.querySelectorAll(".todo-item .todo-note-link");
+    expect(noteLinks.length).toBeGreaterThanOrEqual(2);
+    expect((noteLinks[0] as HTMLAnchorElement).href).toContain(`#note-${note.id}`);
+    expect((noteLinks[0] as HTMLAnchorElement).getAttribute("aria-label")).toContain("Go to note");
+    expect((noteLinks[0] as HTMLAnchorElement).getAttribute("data-tooltip")).toContain("Go to note");
+    expect(noteLinks[0].querySelector(".todo-jump-svg")).not.toBeNull();
+
     await noteService.delete(note.id);
     container.remove();
+  });
+
+  it("calculates task age correctly with formatTaskAge", async () => {
+    const { formatTaskAge } = await import("./main");
+
+    const today = "2026-10-01";
+    expect(formatTaskAge("2026-10-01", today).label).toBe("Today");
+    expect(formatTaskAge("2026-10-01", today).ageClass).toBe("fresh");
+
+    expect(formatTaskAge("2026-09-30", today).label).toBe("1d open");
+    expect(formatTaskAge("2026-09-30", today).ageClass).toBe("fresh");
+
+    expect(formatTaskAge("2026-09-27", today).label).toBe("4d open");
+    expect(formatTaskAge("2026-09-27", today).ageClass).toBe("aging");
+
+    expect(formatTaskAge("2026-09-17", today).label).toBe("2w open");
+    expect(formatTaskAge("2026-09-17", today).ageClass).toBe("stale");
+
+    expect(formatTaskAge("2026-08-01", today).label).toBe("2mo open");
+    expect(formatTaskAge("2026-08-01", today).ageClass).toBe("stale");
   });
 });
