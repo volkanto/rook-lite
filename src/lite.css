@@ -2357,29 +2357,29 @@
 .editor-tools-cluster {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px 4px;
-  border-radius: 7px;
+  gap: 1px;
+  padding: 1px 2px;
+  border-radius: 6px;
   background: var(--color-bg-surface, var(--surface));
   border: 1px solid var(--color-border-subtle, var(--border));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: none;
 }
 
 .editor-card .simple-editor-toolbar button[data-format] {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 1.95rem !important;
-  height: 1.75rem !important;
+  width: 1.85rem !important;
+  height: 1.65rem !important;
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
-  border-radius: 5px !important;
+  border-radius: 4px !important;
   background: transparent !important;
   color: var(--color-text-secondary, var(--text-soft)) !important;
   font-family: var(--font-ui) !important;
-  font-size: 0.85rem !important;
+  font-size: 0.82rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
   box-shadow: none !important;
@@ -2392,14 +2392,14 @@
 }
 
 .editor-card .simple-editor-toolbar button[data-format]:active {
-  transform: scale(0.95) !important;
+  transform: scale(0.96) !important;
 }
 
 .editor-tool-sep {
   display: inline-block;
   width: 1px;
-  height: 1.1rem;
-  margin: 0 3px;
+  height: 1rem;
+  margin: 0 2px;
   background: var(--color-border-subtle, var(--border));
 }
 
@@ -2434,12 +2434,42 @@
 .editor-mode-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px;
-  border-radius: 7px;
+  gap: 1px;
+  padding: 1px;
+  border-radius: 6px;
   background: var(--color-bg-surface, var(--surface));
   border: 1px solid var(--color-border-subtle, var(--border));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: none;
+}
+
+.editor-card .simple-editor-toolbar .editor-mode-btn,
+.editor-mode-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.85rem !important;
+  height: 1.65rem !important;
+  min-height: 1.65rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: all 120ms ease !important;
+}
+
+.editor-mode-btn.is-active {
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  font-weight: 600 !important;
+}
+
+.editor-mode-btn:hover {
+  background: var(--color-bg-hover, var(--surface-sunk)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
 }
 
 .editor-word-count {
@@ -2449,7 +2479,7 @@
   font-size: 0.72rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: var(--color-text-secondary, var(--text-soft));
+  color: var(--color-text-tertiary, var(--muted));
   white-space: nowrap;
 }
 
@@ -2746,13 +2776,13 @@ textarea.simple-editor-textarea.is-hidden,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  min-height: 2rem;
+  width: 1.85rem;
+  height: 1.85rem;
+  min-height: 1.85rem;
   padding: 0;
   background: var(--color-bg-surface, var(--surface));
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: 6px;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: 5px;
   color: var(--color-text-secondary, var(--text-soft));
   cursor: pointer;
   list-style: none;
@@ -2762,14 +2792,14 @@ textarea.simple-editor-textarea.is-hidden,
 
 .category-picker-trigger:hover,
 .footer-category-picker[open] .category-picker-trigger {
-  border-color: var(--color-border-strong, var(--border-strong));
+  border-color: var(--color-border-default, var(--border));
   color: var(--color-text-primary, var(--text));
   background: var(--color-bg-hover, var(--surface-sunk));
 }
 
 .category-picker-trigger svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1rem;
+  height: 1rem;
   display: block;
 }
 
@@ -2777,26 +2807,26 @@ textarea.simple-editor-textarea.is-hidden,
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  color: var(--color-text-secondary, var(--text-soft));
-  font-size: 0.72rem;
+  color: var(--color-text-tertiary, var(--muted));
+  font-size: 0.7rem;
 }
 
 .shortcut-kbd-hint kbd {
   display: inline-block;
   padding: 0.15rem 0.35rem;
   background: var(--color-bg-surface, var(--surface));
-  border: 1px solid var(--color-border-default, var(--border));
+  border: 1px solid var(--color-border-subtle, var(--border));
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   line-height: 1;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: none;
 }
 
 .editor-modal-actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.5rem;
   margin-left: auto;
 }
 
@@ -2804,13 +2834,14 @@ textarea.simple-editor-textarea.is-hidden,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.25rem;
-  padding: 0.45rem 1rem;
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: 6px;
+  min-height: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: 5px;
   background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-primary, var(--text));
-  font-size: 0.82rem;
+  color: var(--color-text-secondary, var(--text-soft));
+  font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -2818,28 +2849,34 @@ textarea.simple-editor-textarea.is-hidden,
 
 .editor-modal-actions .btn-secondary:hover {
   background: var(--color-bg-hover, var(--surface-sunk));
-  border-color: var(--color-border-strong, var(--border-strong));
+  border-color: var(--color-border-default, var(--border));
+  color: var(--color-text-primary, var(--text));
 }
 
 .editor-modal-actions .save-btn-rect {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  min-height: 2.25rem;
-  padding: 0.45rem 1.15rem;
+  gap: 0.35rem;
+  min-height: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.95rem;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 5px;
   background: var(--color-brand);
   color: var(--color-on-brand);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   cursor: pointer;
   transition: all 120ms ease;
 }
 
 .editor-modal-actions .save-btn-rect:hover {
   background: var(--color-brand-hover);
+}
+
+.editor-modal-actions .save-btn-rect:active {
+  transform: scale(0.98);
 }
 
 .save-icon-svg {
@@ -3094,16 +3131,16 @@ textarea.simple-editor-textarea.is-hidden,
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.85rem;
+  height: 1.85rem;
   padding: 0;
-  border: 0;
-  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  border-radius: 5px;
   background: transparent;
   color: var(--color-icon-secondary, var(--text-soft));
   cursor: pointer;
   list-style: none;
-  transition: background 120ms ease, color 120ms ease;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
 }
 
 .footer-category-picker > summary::marker {
@@ -3116,13 +3153,14 @@ textarea.simple-editor-textarea.is-hidden,
 
 .footer-category-picker > summary:hover,
 .footer-category-picker[open] > summary {
-  background: var(--color-bg-hover, var(--surface-sunk));
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border-color: var(--color-border-subtle, var(--border));
   color: var(--color-text-primary, var(--text));
 }
 
 .footer-category-picker > summary svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1rem;
+  height: 1rem;
 }
 
 .footer-category-menu {
@@ -3132,11 +3170,11 @@ textarea.simple-editor-textarea.is-hidden,
   z-index: 100;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: 0.4rem;
   width: min(24rem, calc(100vw - 4rem));
   max-height: 12rem;
   overflow-y: auto;
-  padding: 0.75rem;
+  padding: 0.65rem;
   background: var(--color-bg-surface, var(--surface));
   border: 1px solid var(--color-border-default, var(--border));
   border-radius: var(--radius-md, 8px);
@@ -3145,20 +3183,20 @@ textarea.simple-editor-textarea.is-hidden,
 
 .footer-category-empty {
   color: var(--color-text-muted, var(--muted));
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   padding: 0.2rem 0.25rem;
 }
 
 .category-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.65rem;
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: 999px;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: 4px;
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   color: var(--color-text-secondary, var(--text-soft));
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
@@ -3167,9 +3205,9 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .category-pill:hover {
-  border-color: var(--color-border-selected, var(--accent));
-  background: var(--color-bg-selected, var(--accent-soft));
-  color: var(--color-text-brand, var(--accent));
+  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
+  background: var(--color-bg-selected);
+  color: var(--color-brand);
 }
 
 .category-pill input[type="checkbox"] {
@@ -3177,9 +3215,9 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .category-pill:has(input:checked) {
-  background: var(--color-bg-selected, var(--accent-soft));
-  border-color: var(--color-border-selected, var(--accent));
-  color: var(--color-text-brand, var(--accent));
+  background: var(--color-bg-selected);
+  border-color: color-mix(in srgb, var(--color-brand) 35%, transparent);
+  color: var(--color-brand);
   font-weight: 600;
 }
 
