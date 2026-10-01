@@ -985,4 +985,26 @@ describe("Left menu bar icons and navigation", () => {
 
     container.remove();
   });
+
+  it("renders tasks preserving original persisted casing without uppercase transformation", async () => {
+    const { renderTodos } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const note = await noteService.create("- [ ] Buy fresh groceries\n- [ ] Call Dr. Smith", "2026-10-01", []);
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    const taskItems = container.querySelectorAll(".todo-item .lite-task-check span");
+    expect(taskItems.length).toBeGreaterThanOrEqual(2);
+    const texts = Array.from(taskItems).map((el) => el.textContent);
+    expect(texts).toContain("Buy fresh groceries");
+    expect(texts).toContain("Call Dr. Smith");
+
+    await noteService.delete(note.id);
+    container.remove();
+  });
 });

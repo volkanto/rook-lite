@@ -406,7 +406,7 @@ form.inline {
     margin: 0;
 }
 
-label {
+label:not(.lite-task-check):not(.toggle-switch):not(.mode-tab):not(.summary-date-label) {
     font-size: var(--text-xs);
     font-weight: 600;
     letter-spacing: 0.03em;

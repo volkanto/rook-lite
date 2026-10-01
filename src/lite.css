@@ -5946,6 +5946,7 @@ mark.palette-highlight {
   border-radius: var(--radius-md, 8px);
   background: var(--color-bg-surface, var(--surface));
   transition: border-color 120ms ease;
+  text-transform: none !important;
 }
 
 .todo-item:hover {
@@ -5971,13 +5972,24 @@ mark.palette-highlight {
 }
 
 .lite-task-check {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  cursor: pointer;
-  color: var(--color-text-primary, var(--text));
-  font-size: 0.9rem;
-  flex: 1 1 auto;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  cursor: pointer !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  font-size: 0.9rem !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  flex: 1 1 auto !important;
+}
+
+.lite-task-check span {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-size: 0.9rem !important;
+  font-weight: 400 !important;
+  color: var(--color-text-primary, var(--text)) !important;
 }
 
 .lite-task-check input[type="checkbox"] {

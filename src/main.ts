@@ -660,7 +660,7 @@ async function renderSearchPageResults(host: HTMLElement, countHost: HTMLElement
 
 function parseSearch(query: string): { text: string; tag: string; category: string; hasTodo: boolean } { let text = query; const read = (pattern: RegExp) => { const match = text.match(pattern); if (match) text = text.replace(match[0], " "); return normalize(match?.[1] ?? ""); }; const tag = read(/(?:^|\s)tag:([^\s]+)/i); const category = read(/(?:^|\s)category:([^\s]+)/i); const hasTodo = /(?:^|\s)has:todo(?:\s|$)/i.test(text); text = text.replace(/(?:^|\s)has:todo(?:\s|$)/i, " "); return { text, tag, category, hasTodo }; }
 
-async function renderTodos(content: HTMLElement): Promise<void> {
+export async function renderTodos(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const tasks = (await notes.listAll()).flatMap((note) => note.content.split(/\r?\n/).map((line, lineIndex) => ({ note, line, lineIndex })).filter(({ line }) => /^\s*[-*+]\s+\[ \]\s+/.test(line)));
   document.title = `${s.todosTitle} · Rook Lite`; content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div>${tasks.length ? `<ul class="todo-list">${tasks.map(({ note, line, lineIndex }) => `<li class="todo-item"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(line.replace(/^\s*[-*+]\s+\[ \]\s+/, ""))}</span></label><a href="/?date=${note.noteDate}#note-${note.id}" data-link class="muted">${note.noteDate}</a></li>`).join("")}</ul>` : `<div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`}`;
