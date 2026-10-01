@@ -277,7 +277,7 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
       description: "Export, backup, and storage information",
       keywords: ["storage", "data", "backup", "export", "data management", "indexeddb"],
       group: "settings",
-      execute: () => actions.navigateTo("/data")
+      execute: () => actions.navigateTo("/settings#data-management-section")
     }
   ];
 

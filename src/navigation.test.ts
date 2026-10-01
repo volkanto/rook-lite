@@ -1096,4 +1096,45 @@ describe("Left menu bar icons and navigation", () => {
     // Verify calendar details element remains open
     expect(datePicker?.hasAttribute("open")).toBe(true);
   });
+
+  it("embeds data management export and backup directly into Settings and handles /data redirect", async () => {
+    const { renderSettings, renderData } = await import("./main");
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSettings(container);
+
+    const dataSection = container.querySelector("#data-management-section");
+    expect(dataSection).not.toBeNull();
+
+    const dirExportBtn = dataSection?.querySelector("#directory-export");
+    const zipExportBtn = dataSection?.querySelector("#zip-export");
+    const backupBtn = dataSection?.querySelector("#create-backup");
+    const restoreInput = dataSection?.querySelector("#restore-backup");
+
+    expect(dirExportBtn).not.toBeNull();
+    expect(zipExportBtn).not.toBeNull();
+    expect(backupBtn).not.toBeNull();
+    expect(restoreInput).not.toBeNull();
+
+    // Verify calling renderData redirects into settings
+    await renderData(container);
+    expect(container.querySelector("#data-management-section")).not.toBeNull();
+    container.remove();
+  });
+
+  it("redirects /search to / and triggers command palette search", async () => {
+    const { renderSearch } = await import("./main");
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    history.pushState({}, "", "/search?q=journal");
+    await renderSearch(container);
+
+    // Should redirect history path to /
+    expect(window.location.pathname).toBe("/");
+
+    container.remove();
+  });
 });
