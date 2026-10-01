@@ -1551,7 +1551,7 @@ function applyTheme(): void {
   const theme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
   const resolved = theme === "SYSTEM" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme.toLowerCase();
   document.documentElement.dataset.theme = resolved;
-  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#0F172A" : "#F7F7FA");
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#121214" : "#F7F7FA");
   const toggle = document.querySelector<HTMLElement>(".sidebar-theme-toggle");
   if (toggle) {
     const nextLabel = resolved === "dark" ? s.themeToggleLight : s.themeToggleDark;

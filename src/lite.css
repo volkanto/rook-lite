@@ -5,6 +5,25 @@
   --font-mono: "SFMono-Regular", ui-monospace, "Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
 }
 
+/* Two-Tone Dark Theme: Pitch black left panel, soft matte main reading canvas */
+:root[data-theme="dark"] body.app .sidebar,
+:root:not([data-theme="light"]) body.app .sidebar {
+  background: #000000 !important;
+  border-right: 1px solid var(--color-border-subtle, #1e1e22) !important;
+}
+
+:root[data-theme="dark"] body.app,
+:root[data-theme="dark"] body.app .shell,
+:root:not([data-theme="light"]) body.app,
+:root:not([data-theme="light"]) body.app .shell {
+  background: var(--color-bg-app, #121214) !important;
+}
+
+:root[data-theme="dark"] .mobile-top-bar {
+  background: #000000 !important;
+  border-bottom: 1px solid var(--color-border-subtle, #1e1e22) !important;
+}
+
 /* Ambient Mobile Header (Mobile Only) */
 .mobile-top-bar {
   display: none !important;
@@ -748,9 +767,9 @@
 }
 
 :root[data-theme="dark"] .minimal-date-badge.is-today {
-  background: var(--color-bg-raised, #172033) !important;
-  border-color: var(--color-border-default, #374151) !important;
-  color: var(--color-text-primary, #F9FAFB) !important;
+  background: var(--color-bg-raised, #1c1c1f) !important;
+  border-color: var(--color-border-default, #27272b) !important;
+  color: var(--color-text-primary, #F4F4F5) !important;
 }
 
 .minimal-date-nav {
@@ -833,10 +852,10 @@
 }
 
 :root[data-theme="dark"] .minimal-today-link.is-active {
-  background: var(--color-bg-raised, #172033) !important;
-  border-color: var(--color-border-default, #374151) !important;
-  color: var(--color-text-primary, #F9FAFB) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  background: var(--color-bg-raised, #1c1c1f) !important;
+  border-color: var(--color-border-default, #27272b) !important;
+  color: var(--color-text-primary, #F4F4F5) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) !important;
 }
 
 .minimal-picker {
@@ -2456,7 +2475,7 @@ body.is-zen-mode:not(:has(#edit-note-form)) .copilot-input-container {
   max-height: 100vh !important;
   margin: 0 !important;
   padding: 2rem 1.5rem !important;
-  background: rgba(15, 23, 42, 0.65) !important;
+  background: rgba(0, 0, 0, 0.8) !important;
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
   box-sizing: border-box !important;
@@ -2464,7 +2483,7 @@ body.is-zen-mode:not(:has(#edit-note-form)) .copilot-input-container {
 
 :root[data-theme="dark"] body.is-zen-mode:not(:has(#edit-note-form)) .copilot-input-container,
 :root:not([data-theme="light"]) body.is-zen-mode:not(:has(#edit-note-form)) .copilot-input-container {
-  background: rgba(0, 0, 0, 0.72) !important;
+  background: rgba(0, 0, 0, 0.88) !important;
 }
 
 body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form {
@@ -2546,7 +2565,7 @@ body.is-zen-mode .note-edit-backdrop:not(#confirm-backdrop) {
   align-items: center !important;
   justify-content: center !important;
   padding: 2rem 1.5rem !important;
-  background: rgba(15, 23, 42, 0.65) !important;
+  background: rgba(0, 0, 0, 0.8) !important;
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
   box-sizing: border-box !important;
@@ -2554,7 +2573,7 @@ body.is-zen-mode .note-edit-backdrop:not(#confirm-backdrop) {
 
 :root[data-theme="dark"] body.is-zen-mode .note-edit-backdrop:not(#confirm-backdrop),
 :root:not([data-theme="light"]) body.is-zen-mode .note-edit-backdrop:not(#confirm-backdrop) {
-  background: rgba(0, 0, 0, 0.72) !important;
+  background: rgba(0, 0, 0, 0.88) !important;
 }
 
 body.is-zen-mode .note-edit-dialog:not(.lite-confirm-dialog) {
@@ -3010,7 +3029,7 @@ textarea.simple-editor-textarea.is-hidden,
 :root[data-theme="dark"] #new-note-form:focus-within .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.has-content .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.is-preview .simple-editor-toolbar {
-  background: color-mix(in srgb, var(--color-bg-raised, #172033) 80%, var(--color-bg-surface, #111827)) !important;
+  background: color-mix(in srgb, var(--color-bg-raised, #1c1c1f) 80%, var(--color-bg-surface, #121215)) !important;
 }
 
 #new-note-form:focus-within .simple-editor-footer,
@@ -3617,30 +3636,78 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .settings-segmented-btn.is-active {
-  background: var(--color-bg-surface);
-  color: var(--color-brand);
-  font-weight: 600;
-  border-color: color-mix(in srgb, var(--color-brand) 30%, var(--color-border-subtle));
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08), 0 0 0 1px color-mix(in srgb, var(--color-brand) 15%, transparent);
+  background: var(--color-bg-surface, #FFFFFF) !important;
+  color: var(--color-text-primary, #1F2937) !important;
+  font-weight: 600 !important;
+  border-color: var(--color-border-default, #D0D5DD) !important;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06) !important;
+}
+
+.settings-segmented-btn .settings-segmented-icon,
+.settings-segmented-btn .settings-segmented-icon svg,
+.settings-segmented-btn .nav-svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  transition: color 120ms ease, opacity 120ms ease;
+}
+
+/* Light Theme Icon: Warm Golden Sun */
+.settings-segmented-btn:has(input[value="LIGHT"]) .settings-segmented-icon,
+.settings-segmented-btn:has(input[value="LIGHT"]) .nav-svg {
+  color: #d97706 !important;
+}
+
+/* Dark Theme Icon: Indigo Crescent Moon */
+.settings-segmented-btn:has(input[value="DARK"]) .settings-segmented-icon,
+.settings-segmented-btn:has(input[value="DARK"]) .nav-svg {
+  color: #6366f1 !important;
+}
+
+/* System Theme Icon: Slate Blue Monitor */
+.settings-segmented-btn:has(input[value="SYSTEM"]) .settings-segmented-icon,
+.settings-segmented-btn:has(input[value="SYSTEM"]) .nav-svg {
+  color: #2563eb !important;
+}
+
+.settings-segmented-btn:not(.is-active):not(:hover) .settings-segmented-icon,
+.settings-segmented-btn:not(.is-active):not(:hover) .nav-svg {
+  opacity: 0.7;
+}
+
+.settings-segmented-btn.is-active .settings-segmented-icon,
+.settings-segmented-btn:hover .settings-segmented-icon {
+  opacity: 1;
 }
 
 :root[data-theme="dark"] .settings-segmented-btn.is-active {
-  background: color-mix(in srgb, var(--color-brand) 28%, #161F36) !important;
+  background: var(--color-bg-selected, #242429) !important;
   color: #FFFFFF !important;
-  border-color: var(--color-brand) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 0 1px color-mix(in srgb, var(--color-brand) 50%, transparent) !important;
+  border-color: var(--color-border-strong, #36363c) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
 }
 
-:root[data-theme="dark"] .settings-segmented-btn.is-active .settings-segmented-icon {
-  color: var(--color-brand) !important;
+:root[data-theme="dark"] .settings-segmented-btn:has(input[value="LIGHT"]) .settings-segmented-icon,
+:root[data-theme="dark"] .settings-segmented-btn:has(input[value="LIGHT"]) .nav-svg {
+  color: #fbbf24 !important;
+}
+
+:root[data-theme="dark"] .settings-segmented-btn:has(input[value="DARK"]) .settings-segmented-icon,
+:root[data-theme="dark"] .settings-segmented-btn:has(input[value="DARK"]) .nav-svg {
+  color: #a5b4fc !important;
+}
+
+:root[data-theme="dark"] .settings-segmented-btn:has(input[value="SYSTEM"]) .settings-segmented-icon,
+:root[data-theme="dark"] .settings-segmented-btn:has(input[value="SYSTEM"]) .nav-svg {
+  color: #60a5fa !important;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .settings-segmented-btn.is-active {
-    background: color-mix(in srgb, var(--color-brand) 28%, #161F36) !important;
+    background: var(--color-bg-selected, #242429) !important;
     color: #FFFFFF !important;
-    border-color: var(--color-brand) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 0 1px color-mix(in srgb, var(--color-brand) 50%, transparent) !important;
+    border-color: var(--color-border-strong, #36363c) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
   }
 
   :root:not([data-theme="light"]) .settings-segmented-btn.is-active .settings-segmented-icon {
@@ -5910,7 +5977,7 @@ mark.palette-highlight {
 }
 
 :root[data-theme="dark"] .btn-danger-confirm {
-  color: #111827;
+  color: #09090b;
 }
 
 .btn-danger-confirm:hover {
@@ -6066,9 +6133,9 @@ mark.palette-highlight {
 }
 
 :root[data-theme="dark"] .todo-note-jump[data-tooltip]::before {
-  background: var(--color-bg-surface, #1e293b);
-  border-color: var(--color-border-subtle, #334155);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  background: var(--color-bg-surface, #121215);
+  border-color: var(--color-border-subtle, #222226);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .todo-note-jump[data-tooltip]:hover::before,

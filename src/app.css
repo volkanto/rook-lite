@@ -79,54 +79,54 @@
  */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        /* ---- dark: Rook fallback palette ------------------------------------ */
-        --bg: #0F172A;
-        --surface: #111827;
-        --surface-sunk: #0D1526;
-        --surface-lift: #172033;
+        /* ---- dark: pitch black sidebar + soft matte canvas -------------------- */
+        --bg: #121214;
+        --surface: #18181b;
+        --surface-sunk: #0c0c0e;
+        --surface-lift: #202024;
 
-        --text: #E5E7EB;
-        --text-soft: #B7C0CF;
-        --muted: #7C8BA1;
+        --text: #F4F4F5;
+        --text-soft: #A1A1AA;
+        --muted: #71717A;
 
-        --border: #263245;
-        --border-strong: #334155;
+        --border: #222226;
+        --border-strong: #2e2e33;
 
-        --accent: #8B93FF;
-        --accent-soft: #232C45;
-        --accent-text: #0F172A;
+        --accent: #FFFFFF;
+        --accent-soft: #202024;
+        --accent-text: #121214;
 
-        --danger: #F07A7A;
-        --danger-soft: #3A1D22;
+        --danger: #f87171;
+        --danger-soft: #2a1215;
 
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-        --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.24);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.6);
     }
 }
 
 :root[data-theme="dark"] {
-        /* ---- dark: Rook fallback palette ------------------------------------ */
-        --bg: #0F172A;
-        --surface: #111827;
-        --surface-sunk: #0D1526;
-        --surface-lift: #172033;
+        /* ---- dark: pitch black sidebar + soft matte canvas -------------------- */
+        --bg: #121214;
+        --surface: #18181b;
+        --surface-sunk: #0c0c0e;
+        --surface-lift: #202024;
 
-        --text: #E5E7EB;
-        --text-soft: #B7C0CF;
-        --muted: #7C8BA1;
+        --text: #F4F4F5;
+        --text-soft: #A1A1AA;
+        --muted: #71717A;
 
-        --border: #263245;
-        --border-strong: #334155;
+        --border: #222226;
+        --border-strong: #2e2e33;
 
-        --accent: #8B93FF;
-        --accent-soft: #232C45;
-        --accent-text: #0F172A;
+        --accent: #FFFFFF;
+        --accent-soft: #202024;
+        --accent-text: #121214;
 
-        --danger: #F07A7A;
-        --danger-soft: #3A1D22;
+        --danger: #f87171;
+        --danger-soft: #2a1215;
 
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-        --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.24);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.6);
 }
 
 *,
@@ -1330,84 +1330,85 @@ body.app .sidebar nav a.is-active .nav-label {
 
     :root:not([data-theme="light"]) {
 
-        /* surfaces - Deep slate/navy */
+        /* surfaces - Pitch black sidebar + Soft matte dark canvas */
 
-        --color-bg-app: #0F172A;
-        --color-bg-page: #0F172A;
+        --color-bg-sidebar: #000000;
+        --color-bg-app: #121214;
+        --color-bg-page: #121214;
 
-        --color-bg-surface: #111827;
-        --color-bg-raised: #172033;
+        --color-bg-surface: #18181b;
+        --color-bg-raised: #202024;
 
-        --color-bg-sunken: #0D1526;
-        --color-bg-hover: #182235;
-        --color-bg-active: #1D2940;
+        --color-bg-sunken: #0c0c0e;
+        --color-bg-hover: #222226;
+        --color-bg-active: #2a2a2f;
 
-        --color-bg-selected: #232C45;
+        --color-bg-selected: #26262b;
 
-        --color-bg-overlay: rgba(0, 0, 0, 0.58);
+        --color-bg-overlay: rgba(0, 0, 0, 0.78);
 
         /* typography */
 
-        --color-text-primary: #E5E7EB;
-        --color-text-secondary: #B7C0CF;
-        --color-text-tertiary: #94A3B8;
-        --color-text-muted: #7C8BA1;
-        --color-text-disabled: #66758B;
+        --color-text-primary: #F4F4F5;
+        --color-text-secondary: #A1A1AA;
+        --color-text-tertiary: #85858f;
+        --color-text-muted: #71717A;
+        --color-text-disabled: #52525B;
 
-        --color-text-inverse: #111827;
+        --color-text-inverse: #000000;
 
-        --color-text-link: #8B93FF;
-        --color-text-link-hover: #A6ADFF;
+        --color-text-link: #E4E4E7;
+        --color-text-link-hover: #FFFFFF;
 
         /* icons */
 
-        --color-icon-primary: #D1D7E0;
-        --color-icon-secondary: #94A3B8;
-        --color-icon-muted: #6B7A90;
+        --color-icon-primary: #F4F4F5;
+        --color-icon-secondary: #A1A1AA;
+        --color-icon-muted: #71717A;
 
-        /* borders - soft, refined, non-glowing */
+        /* borders - soft, refined neutral charcoal */
 
-        --color-border-subtle: #1E293B;
-        --color-border-default: #263245;
-        --color-border-strong: #334155;
-        --color-border-hover: #41536B;
+        --color-border-subtle: #1e1e22;
+        --color-border-default: #27272b;
+        --color-border-strong: #36363c;
+        --color-border-hover: #45454d;
 
-        /* focus - calm, non-glowing */
+        /* focus - calm neutral off-white */
 
-        --color-focus: #8B93FF;
-        --color-focus-ring: #A5B4FC;
+        --color-focus: #FFFFFF;
+        --color-focus-ring: rgba(255, 255, 255, 0.25);
 
-        /* brand - calm indigo, not neon */
+        /* brand - calm clean monochrome contrast */
 
-        --color-brand: #8B93FF;
-        --color-brand-hover: #A6ADFF;
-        --color-brand-active: #BCC2FF;
+        --color-brand: #FFFFFF;
+        --color-brand-hover: #F4F4F5;
+        --color-brand-active: #E4E4E7;
 
-        --color-brand-soft: #232C45;
-        --color-brand-softer: #1C2440;
+        --color-brand-soft: #202024;
+        --color-brand-softer: #161619;
 
-        --color-on-brand: #0F172A;
+        --color-on-brand: #09090b;
 
         /* semantic states */
 
-        --color-success: #63C69D;
-        --color-success-bg: #173328;
-        --color-success-text: #8BE0B7;
+        --color-success: #34d399;
+        --color-success-bg: #06281c;
+        --color-success-text: #6ee7b7;
 
-        --color-danger: #F07A7A;
-        --color-danger-hover: #F59090;
-        --color-danger-bg: #3A1D22;
-        --color-danger-text: #FFB0B0;
+        --color-danger: #f87171;
+        --color-danger-hover: #fca5a5;
+        --color-danger-bg: #2a1215;
+        --color-danger-text: #fecaca;
 
-        --color-warning: #E5BE57;
-        --color-warning-bg: #3A3118;
-        --color-warning-text: #F7DA8A;
+        --color-warning: #fbbf24;
+        --color-warning-bg: #2a2008;
+        --color-warning-text: #fde68a;
 
-        --color-info: #7CA7FF;
-        --color-info-bg: #16233E;
-        --color-info-text: #B7CBFF;
+        --color-info: #a1a1aa;
+        --color-info-bg: #18181b;
+        --color-info-text: #e4e4e7;
 
-        --color-evidence-bg: #2E1065;
+        --color-evidence-bg: #242429;
         --color-evidence-text: #C4B5FD;
 
         /* Rook semantics */
@@ -1465,74 +1466,75 @@ body.app .sidebar nav a.is-active .nav-label {
 
 :root[data-theme="dark"] {
 
-    /* surfaces - Deep slate/navy */
+    /* surfaces - Pitch black sidebar + Soft matte dark canvas */
 
-    --color-bg-app: #0F172A;
-    --color-bg-page: #0F172A;
+    --color-bg-sidebar: #000000;
+    --color-bg-app: #121214;
+    --color-bg-page: #121214;
 
-    --color-bg-surface: #111827;
-    --color-bg-raised: #172033;
+    --color-bg-surface: #18181b;
+    --color-bg-raised: #202024;
 
-    --color-bg-sunken: #0D1526;
-    --color-bg-hover: #182235;
-    --color-bg-active: #1D2940;
+    --color-bg-sunken: #0c0c0e;
+    --color-bg-hover: #222226;
+    --color-bg-active: #2a2a2f;
 
-    --color-bg-selected: #232C45;
+    --color-bg-selected: #26262b;
 
-    --color-bg-overlay: rgba(0, 0, 0, 0.58);
+    --color-bg-overlay: rgba(0, 0, 0, 0.78);
 
     /* typography */
 
-    --color-text-primary: #E5E7EB;
-    --color-text-secondary: #B7C0CF;
-    --color-text-tertiary: #94A3B8;
-    --color-text-muted: #7C8BA1;
-    --color-text-disabled: #66758B;
+    --color-text-primary: #F4F4F5;
+    --color-text-secondary: #A1A1AA;
+    --color-text-tertiary: #85858f;
+    --color-text-muted: #71717A;
+    --color-text-disabled: #52525B;
 
-    --color-text-inverse: #111827;
+    --color-text-inverse: #000000;
 
-    --color-text-link: #8B93FF;
-    --color-text-link-hover: #A6ADFF;
+    --color-text-link: #E4E4E7;
+    --color-text-link-hover: #FFFFFF;
 
     /* icons */
 
-    --color-icon-primary: #D1D7E0;
-    --color-icon-secondary: #94A3B8;
-    --color-icon-muted: #6B7A90;
+    --color-icon-primary: #F4F4F5;
+    --color-icon-secondary: #A1A1AA;
+    --color-icon-muted: #71717A;
 
-    /* borders - soft, refined, non-glowing */
+    /* borders - soft, refined neutral charcoal */
 
-    --color-border-subtle: #1E293B;
-    --color-border-default: #263245;
-    --color-border-strong: #334155;
-    --color-border-hover: #41536B;
+    --color-border-subtle: #1e1e22;
+    --color-border-default: #27272b;
+    --color-border-strong: #36363c;
+    --color-border-hover: #45454d;
 
-    /* focus - calm, non-glowing */
+    /* focus - calm neutral off-white */
 
-    --color-focus: #8B93FF;
-    --color-focus-ring: #A5B4FC;
+    --color-focus: #FFFFFF;
+    --color-focus-ring: rgba(255, 255, 255, 0.25);
 
-    /* brand - calm indigo, not neon */
+    /* brand - calm clean monochrome contrast */
 
-    --color-brand: #8B93FF;
-    --color-brand-hover: #A6ADFF;
-    --color-brand-active: #BCC2FF;
+    --color-brand: #FFFFFF;
+    --color-brand-hover: #F4F4F5;
+    --color-brand-active: #E4E4E7;
 
-    --color-brand-soft: #232C45;
-    --color-brand-softer: #1C2440;
+    --color-brand-soft: #202024;
+    --color-brand-softer: #161619;
 
-    --color-on-brand: #0F172A;
+    --color-on-brand: #09090b;
 
     /* semantic states */
 
-    --color-success: #63C69D;
-    --color-success-bg: #173328;
-    --color-success-text: #8BE0B7;
+    --color-success: #34d399;
+    --color-success-bg: #06281c;
+    --color-success-text: #6ee7b7;
 
-    --color-danger: #F07A7A;
-    --color-danger-hover: #F59090;
-    --color-danger-bg: #3A1D22;
-    --color-danger-text: #FFB0B0;
+    --color-danger: #f87171;
+    --color-danger-hover: #fca5a5;
+    --color-danger-bg: #2a1215;
+    --color-danger-text: #fecaca;
 
     --color-warning: #E5BE57;
     --color-warning-bg: #3A3118;
