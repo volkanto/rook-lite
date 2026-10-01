@@ -1,0 +1,28 @@
+src/command-palette/commandRegistry.ts
+  s_43cfed537fa2a7::t_787352b43b0555 280
+src/main.ts
+  s_43cfed537fa2a7::t_38559c401de90d 975-976,979,985-986,989,992-995,999-1001,1004-1005,1008-1020
+  s_43cfed537fa2a7::t_2d7861e581da88 827-828
+  s_43cfed537fa2a7::t_c8b718b88c5803 1164-1199,1216-1222
+  s_43cfed537fa2a7::t_00f686cbdcf961 10
+src/lite.css
+  s_43cfed537fa2a7::t_080bb1c8b6a7ed 3658-3698
+src/navigation.test.ts
+  s_43cfed537fa2a7::t_d25a8e23378386 1099-1139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "688aa8427183e106d081e7e7b0cef80ab49b82cd",
+  "prompts": {},
+  "sessions": {
+    "s_43cfed537fa2a7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "afcde65b-26de-45a8-81ee-00bb26afe2c2",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
