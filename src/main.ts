@@ -7,7 +7,7 @@ import { escapeHtml, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
 import { attachTagAutocomplete } from "./tag-autocomplete";
 import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
-import { CategoryService, initializeLocalData, normalize, NoteService } from "./services";
+import { CategoryService, initializeLocalData, NoteService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
 import { CommandPaletteController } from "./command-palette/commandPalette";
 import type { CommandActions, CommandContext } from "./command-palette/types";
@@ -649,21 +649,12 @@ function bindCategoryActions(): void {
   document.querySelectorAll<HTMLButtonElement>("[data-delete-category]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteCategoryConfirmTitle, s.categoryRemovedHelp, s.deleteCategoryBtn, async () => { await categories.delete(button.dataset.deleteCategory ?? ""); await renderRoute(); })));
 }
 
-async function renderSearch(content: HTMLElement): Promise<void> {
-  const s = currentStrings();
-  const allCategories = await categories.list(); const allNotes = await notes.listAll(); const tags = [...new Set(allNotes.flatMap((note) => note.tags))].sort(); const params = new URLSearchParams(location.search);
-  document.title = `${s.searchTitle} · Rook Lite`; content.innerHTML = `<div class="search-page"><header class="page-head"><div><h1>${s.searchTitle}</h1><p class="lede">${s.searchLede}</p></div></header><form id="search-form" class="search-workspace"><div class="search-query-field">${svg(icons.search, "search-field-icon")}<label class="visually-hidden" for="search-query">${s.searchDialogTitle}</label><input id="search-query" type="search" name="q" value="${escapeHtml(params.get("q") ?? "")}" placeholder="${s.searchInputPlaceholder}" autocomplete="off"><kbd>/</kbd></div><div class="search-filter-grid"><label><span>${s.searchFromLabel}</span><input type="date" name="from" value="${escapeHtml(params.get("from") ?? "")}"></label><label><span>${s.searchToLabel}</span><input type="date" name="to" value="${escapeHtml(params.get("to") ?? "")}"></label><label><span>${s.filterByTag}</span><div class="search-select-wrap"><select name="tag"><option value="">${s.searchPaletteAllTags}</option>${tags.map((tag) => `<option value="${escapeHtml(tag)}" ${params.get("tag") === tag ? "selected" : ""}>#${escapeHtml(tag)}</option>`).join("")}</select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>${s.searchCategoryLabel}</span><div class="search-select-wrap"><select name="category"><option value="">${s.searchAllCategories}</option>${allCategories.filter((category) => !category.archived).map((category) => `<option value="${category.id}" ${params.get("category") === category.id ? "selected" : ""}>${escapeHtml(category.name)}</option>`).join("")}</select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>${s.searchContentLabel}</span><div class="search-select-wrap"><select name="content"><option value="">${s.searchContentAll}</option><option value="todo" ${params.get("content") === "todo" ? "selected" : ""}>${s.searchOpenTasks}</option><option value="tagged" ${params.get("content") === "tagged" ? "selected" : ""}>${s.searchContentTagged}</option><option value="untagged" ${params.get("content") === "untagged" ? "selected" : ""}>${s.searchContentUntagged}</option></select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label><label><span>${s.searchSortLabel}</span><div class="search-select-wrap"><select name="sort"><option value="newest" ${params.get("sort") !== "oldest" ? "selected" : ""}>${s.searchSortNewest}</option><option value="oldest" ${params.get("sort") === "oldest" ? "selected" : ""}>${s.searchSortOldest}</option></select><span class="search-select-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span></div></label></div><div class="search-filter-footer"><p>${getLocale() === "tr" ? "Filtreler sonuçları anında günceller." : "Filters update results immediately."}</p><button type="button" class="secondary-button" id="clear-search">${s.clearSearchBtn}</button></div></form><section class="search-results-panel" aria-labelledby="search-results-title"><header><h2 id="search-results-title">${s.notesTitle}</h2><span id="search-result-count" aria-live="polite"></span></header><div id="results"></div></section></div>`;
-  const form = requireElement<HTMLFormElement>("#search-form"); let timer: number; const update = () => { window.clearTimeout(timer); timer = window.setTimeout(async () => { const data = new FormData(form); const next = new URLSearchParams(); for (const key of ["q", "from", "to", "tag", "category", "content", "sort"]) { const value = data.get(key)?.toString(); if (value && !(key === "sort" && value === "newest")) next.set(key, value); } history.replaceState({}, "", appUrl(`/search${next.size ? `?${next}` : ""}`)); await renderSearchPageResults(requireElement("#results"), requireElement("#search-result-count"), data, allCategories); }, 150); }; form.addEventListener("input", update); form.addEventListener("change", update); requireElement("#clear-search").addEventListener("click", () => { form.reset(); history.replaceState({}, "", appUrl("/search")); void renderSearchPageResults(requireElement("#results"), requireElement("#search-result-count"), new FormData(form), allCategories); }); await renderSearchPageResults(requireElement("#results"), requireElement("#search-result-count"), new FormData(form), allCategories);
+export async function renderSearch(content: HTMLElement): Promise<void> {
+  const q = new URLSearchParams(location.search).get("q") ?? "";
+  history.replaceState({}, "", appUrl("/"));
+  await renderToday(content);
+  void openSearch(q);
 }
-
-async function renderSearchPageResults(host: HTMLElement, countHost: HTMLElement, data: FormData, allCategories: Category[]): Promise<void> {
-  const s = currentStrings();
-  const query = data.get("q")?.toString() ?? ""; const from = data.get("from")?.toString() ?? ""; const to = data.get("to")?.toString() ?? ""; const tag = data.get("tag")?.toString() ?? ""; const category = data.get("category")?.toString() ?? ""; const content = data.get("content")?.toString() ?? ""; const sort = data.get("sort")?.toString() ?? "newest"; const categoryMap = new Map(allCategories.map((item) => [item.id, item.name])); const parsed = parseSearch(query); const wanted = normalize(parsed.text.replace(/^#/, ""));
-  const matching = (await notes.listAll()).filter((note) => !note.archived && (!from || note.noteDate >= from) && (!to || note.noteDate <= to) && (!tag || note.tags.includes(tag)) && (!category || note.categoryIds.includes(category)) && (!parsed.tag || note.tags.includes(parsed.tag)) && (!parsed.category || note.categoryIds.some((id) => normalize(categoryMap.get(id) ?? "") === parsed.category)) && (!(parsed.hasTodo || content === "todo") || /^\s*[-*+]\s+\[ \]\s+/m.test(note.content)) && (content !== "tagged" || note.tags.length > 0) && (content !== "untagged" || note.tags.length === 0)).filter((note) => !wanted || notes.searchableText(note, note.categoryIds.map((id) => categoryMap.get(id) ?? "")).includes(wanted)).sort((a, b) => (sort === "oldest" ? a.noteDate.localeCompare(b.noteDate) || a.createdAt.localeCompare(b.createdAt) : b.noteDate.localeCompare(a.noteDate) || b.updatedAt.localeCompare(a.updatedAt)));
-  countHost.textContent = `${matching.length} ${matching.length === 1 ? s.entrySingle : s.entryPlural}`; host.innerHTML = matching.length ? `<ol class="search-result-list">${matching.map((note) => `<li><a href="/?date=${note.noteDate}#note-${note.id}" data-link><div class="search-result-meta"><time datetime="${note.noteDate}">${formatShortDate(note.noteDate)}</time>${note.tags.slice(0, 3).map((item) => `<span>#${escapeHtml(item)}</span>`).join("")}</div><p>${escapeHtml(note.content.replace(/[#*_`>\[\]-]/g, " ").replace(/\s+/g, " ").trim().slice(0, 240))}</p></a></li>`).join("")}</ol>` : `<div class="empty-notes search-results-empty"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${s.noNotesFound}</p><span>${s.noNotesFoundPrompt}</span></div>`; normalizeAppLinks(host);
-}
-
-function parseSearch(query: string): { text: string; tag: string; category: string; hasTodo: boolean } { let text = query; const read = (pattern: RegExp) => { const match = text.match(pattern); if (match) text = text.replace(match[0], " "); return normalize(match?.[1] ?? ""); }; const tag = read(/(?:^|\s)tag:([^\s]+)/i); const category = read(/(?:^|\s)category:([^\s]+)/i); const hasTodo = /(?:^|\s)has:todo(?:\s|$)/i.test(text); text = text.replace(/(?:^|\s)has:todo(?:\s|$)/i, " "); return { text, tag, category, hasTodo }; }
 
 export function formatTaskAge(noteDate: string, todayIso = isoDate(new Date())): { label: string; ageClass: "fresh" | "aging" | "stale" } {
   const s = currentStrings();
@@ -720,10 +711,25 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
   content.querySelectorAll<HTMLInputElement>("[data-task-note]").forEach((input) =>
     input.addEventListener("change", async () => {
       input.disabled = true;
+      const item = input.closest<HTMLElement>(".todo-item");
+      if (item) {
+        item.classList.add("is-completing");
+      }
+      const isReducedMotion = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      const animationWait = isReducedMotion ? 40 : 700;
+
+      const savePromise = notes.setTaskDone(input.dataset.taskNote ?? "", Number(input.dataset.taskLine), input.checked);
+
       try {
-        await notes.setTaskDone(input.dataset.taskNote ?? "", Number(input.dataset.taskLine), input.checked);
+        await Promise.all([
+          savePromise,
+          new Promise((resolve) => setTimeout(resolve, animationWait))
+        ]);
         await renderRoute();
       } catch (error) {
+        if (item) {
+          item.classList.remove("is-completing");
+        }
         input.checked = false;
         input.disabled = false;
         alert(errorMessage(error));
@@ -825,19 +831,16 @@ export async function renderSummariesV2(content: HTMLElement): Promise<void> {
   });
 }
 
-async function renderData(content: HTMLElement): Promise<void> {
-  const s = currentStrings();
-  const allNotes = await notes.listAll(); const allCategories = await categories.list(); const lastExport = await settingsRepository.get<string>("lastExportAt"); document.title = `${s.dataManagementTitle} · Rook Lite`;
-  content.innerHTML = `<div class="dashboard-welcome"><div class="welcome-left"><h1 class="welcome-title">${s.dataManagementTitle}</h1><p class="welcome-banner-subtitle">${s.dataManagementSubtitle}</p></div></div><p id="data-message" class="notice" hidden></p><div class="settings-stack"><section class="data-panel panel-row"><h2 class="panel-title">${s.markdownExportTitle}</h2><p class="panel-subtitle">${s.markdownExportSubtitle}</p><p class="hint">${lastExport ? `${s.lastExportPrefix} ${escapeHtml(new Date(lastExport).toLocaleString(getLocale() === "tr" ? "tr-TR" : "en-US"))}` : s.noExportYet}</p><div class="lite-panel-actions"><button id="directory-export" ${allNotes.length ? "" : "disabled"}>${s.chooseExportFolderBtn}</button><button id="zip-export" ${allNotes.length ? "" : "disabled"}>${s.downloadZipBtn}</button></div></section><section class="data-panel panel-row"><h2 class="panel-title">${s.fullBackupTitle}</h2><p class="panel-subtitle">${s.fullBackupSubtitle}</p><div class="lite-panel-actions"><button id="create-backup">${s.createJsonBackupBtn}</button><label class="save-btn-rect lite-file-label" for="restore-backup">${s.restoreJsonBackupLabel}</label><input class="visually-hidden" type="file" id="restore-backup" accept="application/json,.json"></div></section></div>`;
-  document.querySelector<HTMLButtonElement>("#zip-export")?.addEventListener("click", () => downloadMarkdownZip(allNotes, allCategories));
-  document.querySelector<HTMLButtonElement>("#directory-export")?.addEventListener("click", async () => { try { const count = await exportToDirectory(allNotes, allCategories); dataMessage(s.exportedNotesCount(count), false); } catch (error) { dataMessage(errorMessage(error), true); } });
-  requireElement("#create-backup").addEventListener("click", async () => downloadJson(await createBackup()));
-  requireElement<HTMLInputElement>("#restore-backup").addEventListener("change", async (event) => { const file = (event.currentTarget as HTMLInputElement).files?.[0]; if (!file) return; try { const backup = parseBackup(await file.text()); showConfirm(s.replaceDataTitle, s.replaceDataMessage(backup.notes.length, backup.categories.length, backup.summaries.length), s.restoreBackupBtn, async () => { await restoreBackup(backup); await refreshCalendar(); await renderRoute(); }); } catch (error) { dataMessage(errorMessage(error), true); } });
+export async function renderData(content: HTMLElement): Promise<void> {
+  history.replaceState({}, "", appUrl("/settings#data-management-section"));
+  await renderSettings(content);
 }
 
 export async function renderSettings(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const counts = await storageCounts();
+  const allNotes = await notes.listAll();
+  const lastExport = await settingsRepository.get<string>("lastExportAt");
   const ollama = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS;
   const estimate = await navigator.storage?.estimate?.();
   const persisted = await navigator.storage?.persisted?.();
@@ -984,16 +987,6 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
 
         <div class="settings-row">
           <div class="settings-row-info">
-            <span class="settings-row-label">${s.dataManagementTitle}</span>
-            <span class="settings-row-desc">${s.dataManagementSubtitle}</span>
-          </div>
-          <div class="settings-row-action">
-            <a href="${appUrl("/data")}" data-link class="secondary-button icon-action-btn" title="${s.navData}" aria-label="${s.navData}">${svg(icons.export, "btn-action-icon")}<span class="visually-hidden">${s.navData}</span></a>
-          </div>
-        </div>
-
-        <div class="settings-row">
-          <div class="settings-row-info">
             <span class="settings-row-label">${s.keyboardShortcutsTitle}</span>
             <span class="settings-row-desc">${s.keyboardShortcutsDesc}</span>
           </div>
@@ -1011,6 +1004,35 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
             <a href="https://github.com/volkanto/rook-lite" target="_blank" rel="noopener noreferrer" class="secondary-button icon-action-btn" title="GitHub" aria-label="GitHub">${svg(icons.github, "btn-action-icon")}<span class="visually-hidden">GitHub</span></a>
           </div>
         </div>
+      </section>
+
+      <section class="settings-section" id="data-management-section">
+        <h2 class="settings-section-title">${s.dataManagementTitle}</h2>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">${s.markdownExportTitle}</span>
+            <span class="settings-row-desc">${s.markdownExportSubtitle}</span>
+            <span class="hint">${lastExport ? `${s.lastExportPrefix} ${escapeHtml(new Date(lastExport).toLocaleString(getLocale() === "tr" ? "tr-TR" : "en-US"))}` : s.noExportYet}</span>
+          </div>
+          <div class="settings-row-action">
+            <button type="button" id="directory-export" class="secondary-button" ${allNotes.length ? "" : "disabled"} title="${s.chooseExportFolderBtn}">${s.chooseExportFolderBtn}</button>
+            <button type="button" id="zip-export" class="secondary-button" ${allNotes.length ? "" : "disabled"} title="${s.downloadZipBtn}">${s.downloadZipBtn}</button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">${s.fullBackupTitle}</span>
+            <span class="settings-row-desc">${s.fullBackupSubtitle}</span>
+          </div>
+          <div class="settings-row-action">
+            <button type="button" id="create-backup" class="secondary-button" title="${s.createJsonBackupBtn}">${s.createJsonBackupBtn}</button>
+            <label class="save-btn-rect lite-file-label" for="restore-backup">${s.restoreJsonBackupLabel}</label>
+            <input class="visually-hidden" type="file" id="restore-backup" accept="application/json,.json">
+          </div>
+        </div>
+        <p id="data-message" class="notice" hidden></p>
       </section>
 
       <section class="settings-section danger-section">
@@ -1154,6 +1176,42 @@ function bindSettingsEvents(content: HTMLElement): void {
     void loadModels(false);
   }
 
+  content.querySelector<HTMLButtonElement>("#zip-export")?.addEventListener("click", () => {
+    void notes.listAll().then((allN) => categories.list().then((allC) => downloadMarkdownZip(allN, allC)));
+  });
+  content.querySelector<HTMLButtonElement>("#directory-export")?.addEventListener("click", async () => {
+    try {
+      const allN = await notes.listAll();
+      const allC = await categories.list();
+      const count = await exportToDirectory(allN, allC);
+      dataMessage(s.exportedNotesCount(count), false);
+    } catch (error) {
+      dataMessage(errorMessage(error), true);
+    }
+  });
+  content.querySelector<HTMLButtonElement>("#create-backup")?.addEventListener("click", async () => {
+    downloadJson(await createBackup());
+  });
+  content.querySelector<HTMLInputElement>("#restore-backup")?.addEventListener("change", async (event) => {
+    const file = (event.currentTarget as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const backup = parseBackup(await file.text());
+      showConfirm(
+        s.replaceDataTitle,
+        s.replaceDataMessage(backup.notes.length, backup.categories.length, backup.summaries.length),
+        s.restoreBackupBtn,
+        async () => {
+          await restoreBackup(backup);
+          await refreshCalendar();
+          await renderRoute();
+        }
+      );
+    } catch (error) {
+      dataMessage(errorMessage(error), true);
+    }
+  });
+
   content.querySelector<HTMLButtonElement>("#delete-local-data")?.addEventListener("click", () =>
     showConfirm(
       s.clearConfirmTitle,
@@ -1170,7 +1228,13 @@ function bindSettingsEvents(content: HTMLElement): void {
   );
 }
 
-function dataMessage(message: string, error: boolean): void { const element = requireElement<HTMLElement>("#data-message"); element.hidden = false; element.textContent = message; element.classList.toggle("error", error); }
+function dataMessage(message: string, error: boolean): void {
+  const element = document.querySelector<HTMLElement>("#data-message");
+  if (!element) return;
+  element.hidden = false;
+  element.textContent = message;
+  element.classList.toggle("error", error);
+}
 function formatBytes(bytes: number): string { if (bytes < 1024) return `${bytes} B`; if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`; return `${(bytes / 1024 / 1024).toFixed(1)} MB`; }
 
 function showConfirm(title: string, message: string, actionLabel: string, action: () => Promise<void>): void {
@@ -1581,7 +1645,15 @@ async function start(): Promise<void> { try { setLocale(getLocale()); await init
 
 void start();
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    void navigator.serviceWorker.register(assetUrl("sw.js"), { scope: normalizeBase().prefix });
-  });
+  if (import.meta.env.PROD) {
+    window.addEventListener("load", () => {
+      void navigator.serviceWorker.register(assetUrl("sw.js"), { scope: normalizeBase().prefix });
+    });
+  } else {
+    void navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const registration of registrations) {
+        void registration.unregister();
+      }
+    });
+  }
 }

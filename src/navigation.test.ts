@@ -1048,6 +1048,33 @@ describe("Left menu bar icons and navigation", () => {
     container.remove();
   });
 
+  it("applies is-completing animation class when checking a task in todos", async () => {
+    const { renderTodos } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const note = await noteService.create("- [ ] Animate this task completion", "2026-10-01", []);
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    const checkbox = container.querySelector<HTMLInputElement>(".todo-item input[type='checkbox']");
+    expect(checkbox).not.toBeNull();
+    const todoItem = checkbox?.closest(".todo-item");
+
+    checkbox!.checked = true;
+    checkbox!.dispatchEvent(new Event("change"));
+
+    expect(todoItem?.classList.contains("is-completing")).toBe(true);
+    expect(checkbox?.disabled).toBe(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 750));
+
+    await noteService.delete(note.id);
+    container.remove();
+  });
+
   it("calculates task age correctly with formatTaskAge", async () => {
     const { formatTaskAge } = await import("./main");
 
@@ -1095,5 +1122,46 @@ describe("Left menu bar icons and navigation", () => {
 
     // Verify calendar details element remains open
     expect(datePicker?.hasAttribute("open")).toBe(true);
+  });
+
+  it("embeds data management export and backup directly into Settings and handles /data redirect", async () => {
+    const { renderSettings, renderData } = await import("./main");
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSettings(container);
+
+    const dataSection = container.querySelector("#data-management-section");
+    expect(dataSection).not.toBeNull();
+
+    const dirExportBtn = dataSection?.querySelector("#directory-export");
+    const zipExportBtn = dataSection?.querySelector("#zip-export");
+    const backupBtn = dataSection?.querySelector("#create-backup");
+    const restoreInput = dataSection?.querySelector("#restore-backup");
+
+    expect(dirExportBtn).not.toBeNull();
+    expect(zipExportBtn).not.toBeNull();
+    expect(backupBtn).not.toBeNull();
+    expect(restoreInput).not.toBeNull();
+
+    // Verify calling renderData redirects into settings
+    await renderData(container);
+    expect(container.querySelector("#data-management-section")).not.toBeNull();
+    container.remove();
+  });
+
+  it("redirects /search to / and triggers command palette search", async () => {
+    const { renderSearch } = await import("./main");
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    history.pushState({}, "", "/search?q=journal");
+    await renderSearch(container);
+
+    // Should redirect history path to /
+    expect(window.location.pathname).toBe("/");
+
+    container.remove();
   });
 });
