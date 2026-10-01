@@ -1,0 +1,21 @@
+vite.config.ts
+  s_43cfed537fa2a7::t_b5fb13cca1be7e 4-8
+src/main.ts
+  s_43cfed537fa2a7::t_289cb584ff9c97 1648-1658
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "43ba022a08a9b3df3bb3631179e0aa44330c8e09",
+  "prompts": {},
+  "sessions": {
+    "s_43cfed537fa2a7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "afcde65b-26de-45a8-81ee-00bb26afe2c2",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
