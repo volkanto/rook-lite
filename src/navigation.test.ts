@@ -310,7 +310,7 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(longNote.id);
   });
 
-  it("renders Local AI settings card with toggle switch and collapsible configuration", async () => {
+  it("renders Local AI settings card as visually disabled with disabled toggle switch", async () => {
     const { renderSettings } = await import("./main");
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -318,21 +318,49 @@ describe("Left menu bar icons and navigation", () => {
 
     const localAiCard = container.querySelector(".local-ai-card");
     expect(localAiCard).not.toBeNull();
+    expect(localAiCard?.classList.contains("is-disabled")).toBe(true);
 
-    // Toggle switch exists and is interactive
+    // Toggle switch exists and is disabled
     const toggle = container.querySelector<HTMLInputElement>("#ollama-enabled-toggle");
     expect(toggle).not.toBeNull();
-    expect(toggle?.disabled).toBe(false);
+    expect(toggle?.disabled).toBe(true);
     expect(toggle?.checked).toBe(false);
 
-    // Loud lock banner is removed
-    expect(container.querySelector("#ollama-disabled-banner")).toBeNull();
-
-    // Config panel is hidden by default when disabled
+    // Config panel is hidden
     const configPanel = container.querySelector<HTMLElement>("#ollama-config-panel");
     expect(configPanel?.hasAttribute("hidden")).toBe(true);
 
     container.remove();
+  });
+
+  it("preserves testOllama functionality and fetches available models", async () => {
+    const { testOllama } = await import("./summaries");
+
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        models: [
+          { name: "llama3.2:latest" },
+          { name: "qwen2.5:7b" },
+          { name: "mistral:latest" }
+        ]
+      })
+    }) as unknown as typeof fetch;
+
+    const models = await testOllama({
+      enabled: true,
+      endpoint: "http://localhost:11434",
+      model: "llama3.2",
+      temperature: 0.2,
+      timeoutMs: 5000
+    });
+
+    expect(models).toContain("llama3.2:latest");
+    expect(models).toContain("qwen2.5:7b");
+    expect(models).toContain("mistral:latest");
+
+    globalThis.fetch = originalFetch;
   });
 
   it("renders minimal typographic date anchor header without pulse dot or week badge", async () => {

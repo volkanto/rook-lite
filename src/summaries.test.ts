@@ -101,18 +101,8 @@ describe("OllamaSummaryEngine system prompt", () => {
 });
 
 describe("summary mode picker and local AI setting", () => {
-  it("disables AI option when local AI is disabled in settings", async () => {
-    const { settingsRepository } = await import("./data");
+  it("disables AI option visually on summaries page", async () => {
     const { renderSummariesV2 } = await import("./main");
-
-    // Disable Ollama in settings
-    await settingsRepository.set("ollama", {
-      enabled: false,
-      endpoint: "http://localhost:11434",
-      model: "llama3.2",
-      temperature: 0.2,
-      timeoutMs: 5000
-    });
 
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -129,43 +119,6 @@ describe("summary mode picker and local AI setting", () => {
     expect(ruleBasedRadio?.disabled).toBe(false);
     expect(ruleBasedRadio?.checked).toBe(true);
 
-    container.remove();
-  });
-
-  it("enables AI option when Ollama is enabled in settings", async () => {
-    const { settingsRepository } = await import("./data");
-    const { renderSummariesV2 } = await import("./main");
-
-    // Enable Ollama in settings
-    await settingsRepository.set("ollama", {
-      enabled: true,
-      endpoint: "http://localhost:11434",
-      model: "llama3.2",
-      temperature: 0.2,
-      timeoutMs: 5000
-    });
-
-    const container = document.createElement("div");
-    document.body.appendChild(container);
-    await renderSummariesV2(container);
-
-    const picker = container.querySelector(".summary-mode-picker");
-    expect(picker).not.toBeNull();
-
-    const ruleBasedRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="rule-based"]');
-    const ollamaRadio = container.querySelector<HTMLInputElement>('input[name="mode"][value="ollama"]');
-    expect(ruleBasedRadio).not.toBeNull();
-    expect(ollamaRadio).not.toBeNull();
-    expect(ollamaRadio?.disabled).toBe(false);
-
-    // Reset settings
-    await settingsRepository.set("ollama", {
-      enabled: false,
-      endpoint: "http://localhost:11434",
-      model: "llama3.2",
-      temperature: 0.2,
-      timeoutMs: 5000
-    });
     container.remove();
   });
 
