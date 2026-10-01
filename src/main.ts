@@ -1645,7 +1645,15 @@ async function start(): Promise<void> { try { setLocale(getLocale()); await init
 
 void start();
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    void navigator.serviceWorker.register(assetUrl("sw.js"), { scope: normalizeBase().prefix });
-  });
+  if (import.meta.env.PROD) {
+    window.addEventListener("load", () => {
+      void navigator.serviceWorker.register(assetUrl("sw.js"), { scope: normalizeBase().prefix });
+    });
+  } else {
+    void navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const registration of registrations) {
+        void registration.unregister();
+      }
+    });
+  }
 }
