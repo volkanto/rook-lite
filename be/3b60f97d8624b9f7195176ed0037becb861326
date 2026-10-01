@@ -1,0 +1,32 @@
+src/tag-autocomplete.ts
+  s_43cfed537fa2a7::t_1f9b5de60b2753 69-85,105
+src/lite.css
+  s_43cfed537fa2a7::t_e4d747480af4cb 2941-2950,2975-2976,3047-3048,3074-3075
+  s_43cfed537fa2a7::t_62cd9fdfc53b44 1145-1146,1154-1156,1159-1161,1175-1177,1181,1191
+  s_43cfed537fa2a7::t_d15995a952b6f0 2889-2891,2897-2898,2900,2904,2912
+  s_43cfed537fa2a7::t_f2ea193f41d746 740-742,744,750-752,754,760,764-765,767,771-772,774,780,784,793-795,814,826-828,830,844,850-852,860
+  s_43cfed537fa2a7::t_a53e13dbfb21c6 6294-6298
+  s_43cfed537fa2a7::t_0929b1f82a190b 1710,1717-1719,1726
+  s_43cfed537fa2a7::t_d4b3408b37971c 1807-1808,1814,1818-1820,1834,1846,1853,1884-1888
+src/app.css
+  s_43cfed537fa2a7::t_68f2572d2b1e7c 4635-4639
+src/tag-autocomplete.test.ts
+  s_43cfed537fa2a7::t_f7b14f843c0819 82-83,96-115
+  s_43cfed537fa2a7::t_dca3a22bc7a295 116-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "be3b60f97d8624b9f7195176ed0037becb861326",
+  "prompts": {},
+  "sessions": {
+    "s_43cfed537fa2a7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "afcde65b-26de-45a8-81ee-00bb26afe2c2",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
