@@ -66,6 +66,23 @@ export function attachTagAutocomplete(
     selectedIndex = 0;
   }
 
+  function positionDropdown(): void {
+    const cursor = textarea.selectionStart ?? 0;
+    const textBeforeCursor = textarea.value.slice(0, cursor);
+    const lineIndex = textBeforeCursor.split("\n").length - 1;
+    const computedStyle = typeof window !== "undefined" ? window.getComputedStyle(textarea) : null;
+    const paddingTop = computedStyle ? parseFloat(computedStyle.paddingTop) || 10 : 10;
+    const paddingLeft = computedStyle ? parseFloat(computedStyle.paddingLeft) || 16 : 16;
+    const lineHeight = computedStyle ? parseFloat(computedStyle.lineHeight) || 24 : 24;
+
+    const baseTop = (textarea.offsetTop || 0) + paddingTop;
+    const caretY = (lineIndex + 1) * lineHeight - (textarea.scrollTop || 0);
+    const topPos = Math.max(textarea.offsetTop || 0, baseTop + caretY + 4);
+
+    dropdown.style.top = `${topPos}px`;
+    dropdown.style.left = `${(textarea.offsetLeft || 0) + paddingLeft}px`;
+  }
+
   function renderSuggestions(): void {
     if (matchingTags.length === 0) {
       hideDropdown();
@@ -85,6 +102,7 @@ export function attachTagAutocomplete(
       });
       dropdown.appendChild(item);
     });
+    positionDropdown();
     dropdown.style.display = "block";
   }
 

@@ -79,6 +79,8 @@ describe("tag autocomplete helpers", () => {
     const dropdown = container.querySelector<HTMLElement>(".tag-autocomplete-dropdown");
     expect(dropdown).not.toBeNull();
     expect(dropdown?.style.display).toBe("block");
+    expect(dropdown?.style.top).toMatch(/^\d+px$/);
+    expect(dropdown?.style.left).toMatch(/^\d+px$/);
 
     const items = dropdown?.querySelectorAll(".tag-autocomplete-item");
     expect(items?.length).toBe(2);
@@ -87,6 +89,30 @@ describe("tag autocomplete helpers", () => {
     textarea.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
     expect(textarea.value).toBe("New note #work ");
     expect(dropdown?.style.display).toBe("none");
+
+    detach();
+    container.remove();
+  });
+
+  it("calculates lower vertical position for multiline notes", async () => {
+    const container = document.createElement("div");
+    const textarea = document.createElement("textarea");
+    container.appendChild(textarea);
+    document.body.appendChild(container);
+
+    const getTags = vi.fn().mockResolvedValue([["ideas", 3]]);
+    const detach = attachTagAutocomplete(textarea, getTags);
+
+    textarea.value = "First line\nSecond line\n#id";
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    textarea.dispatchEvent(new Event("input"));
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    const dropdown = container.querySelector<HTMLElement>(".tag-autocomplete-dropdown");
+    expect(dropdown?.style.display).toBe("block");
+    const topValue = parseInt(dropdown?.style.top ?? "0", 10);
+    expect(topValue).toBeGreaterThan(50);
 
     detach();
     container.remove();

@@ -4632,8 +4632,11 @@ textarea {
         padding: 0.9rem;
     }
 
-    .notes-list .note-header-actions {
-        opacity: 1;
+    @media (hover: none) {
+        .notes-list .note-header-actions {
+            opacity: 0.85;
+            pointer-events: auto;
+        }
     }
 }
 
