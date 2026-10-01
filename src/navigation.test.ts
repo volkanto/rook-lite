@@ -1048,6 +1048,33 @@ describe("Left menu bar icons and navigation", () => {
     container.remove();
   });
 
+  it("applies is-completing animation class when checking a task in todos", async () => {
+    const { renderTodos } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const note = await noteService.create("- [ ] Animate this task completion", "2026-10-01", []);
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    const checkbox = container.querySelector<HTMLInputElement>(".todo-item input[type='checkbox']");
+    expect(checkbox).not.toBeNull();
+    const todoItem = checkbox?.closest(".todo-item");
+
+    checkbox!.checked = true;
+    checkbox!.dispatchEvent(new Event("change"));
+
+    expect(todoItem?.classList.contains("is-completing")).toBe(true);
+    expect(checkbox?.disabled).toBe(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 750));
+
+    await noteService.delete(note.id);
+    container.remove();
+  });
+
   it("calculates task age correctly with formatTaskAge", async () => {
     const { formatTaskAge } = await import("./main");
 

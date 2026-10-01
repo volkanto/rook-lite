@@ -711,10 +711,25 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
   content.querySelectorAll<HTMLInputElement>("[data-task-note]").forEach((input) =>
     input.addEventListener("change", async () => {
       input.disabled = true;
+      const item = input.closest<HTMLElement>(".todo-item");
+      if (item) {
+        item.classList.add("is-completing");
+      }
+      const isReducedMotion = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      const animationWait = isReducedMotion ? 40 : 700;
+
+      const savePromise = notes.setTaskDone(input.dataset.taskNote ?? "", Number(input.dataset.taskLine), input.checked);
+
       try {
-        await notes.setTaskDone(input.dataset.taskNote ?? "", Number(input.dataset.taskLine), input.checked);
+        await Promise.all([
+          savePromise,
+          new Promise((resolve) => setTimeout(resolve, animationWait))
+        ]);
         await renderRoute();
       } catch (error) {
+        if (item) {
+          item.classList.remove("is-completing");
+        }
         input.checked = false;
         input.disabled = false;
         alert(errorMessage(error));
