@@ -1,0 +1,54 @@
+src/command-palette/types.ts
+  s_43cfed537fa2a7::t_54cb9f4d667254 32
+src/main.ts
+  s_43cfed537fa2a7::t_aa308027a97a44 566,569
+  s_43cfed537fa2a7::t_d07a4616260eb1 144
+  s_43cfed537fa2a7::t_7ca466d011b517 291,295
+  s_43cfed537fa2a7::t_5230ed48f527a5 607,611,643
+  s_43cfed537fa2a7::t_6ea44d6a714604 141-143
+  s_43cfed537fa2a7::t_dd52f6aa0559ef 145
+src/services.ts
+  s_43cfed537fa2a7::t_4461cb21ad9ac5 18,37,40-47,66
+src/lite.css
+  s_43cfed537fa2a7::t_9fc86a50202f05 2439,2442-2443,2458,2464,2468,2488,2492,2497,2503,2531,2539,2545,2551,2557-2558,2560,2563,2606-2616,2628-2634,5869-5870,5900,5905
+  s_43cfed537fa2a7::t_08f99060624770 2436-2438
+  s_43cfed537fa2a7::t_92074a4e900e70 2440-2441
+  s_43cfed537fa2a7::t_37829933092df7 2444-2446,2455-2457
+  s_43cfed537fa2a7::t_d9041a6872949f 2459-2463
+  s_43cfed537fa2a7::t_a8b462acd009e9 2465-2467
+  s_43cfed537fa2a7::t_00d013e87abdb5 2469-2471,2485-2487
+  s_43cfed537fa2a7::t_d162d9c41ee288 2489-2491
+  s_43cfed537fa2a7::t_b28f66f58961b3 2493-2496
+  s_43cfed537fa2a7::t_14d588028350f8 2498-2502
+  s_43cfed537fa2a7::t_946418a7177691 2504-2506,2528-2530
+  s_43cfed537fa2a7::t_493c72c6a7015e 2532-2534,2536-2538
+  s_43cfed537fa2a7::t_c747f460039185 2540-2544
+  s_43cfed537fa2a7::t_f68473a170f2b5 2546-2550
+  s_43cfed537fa2a7::t_f4eb58608abc29 2552-2556
+  s_43cfed537fa2a7::t_6ca60f58b093bb 2559
+  s_43cfed537fa2a7::t_0cad0aa820d8c4 2561-2562
+  s_43cfed537fa2a7::t_3466862581f0b8 2564
+  s_43cfed537fa2a7::t_e53de6296beec7 2635
+  s_43cfed537fa2a7::t_008878316a97ce 5871-5873
+  s_43cfed537fa2a7::t_d2e65a18444703 5898-5899
+  s_43cfed537fa2a7::t_658448216c0969 5901-5904
+  s_43cfed537fa2a7::t_a79ef93b47c0a8 5906-5908
+src/navigation.test.ts
+  s_43cfed537fa2a7::t_fc59f5d80de096 209,217-218,249-253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "5750539a1b25b68cbe34e02970e358a3bc3f6747",
+  "prompts": {},
+  "sessions": {
+    "s_43cfed537fa2a7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "afcde65b-26de-45a8-81ee-00bb26afe2c2",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
