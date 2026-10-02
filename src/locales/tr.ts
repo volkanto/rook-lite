@@ -231,6 +231,10 @@ export const locale: LocaleDefinition = {
     clearConfirmMessage: "Bu işlem bu cihazda saklanan tüm notları, kategorileri ve özetleri kalıcı olarak silecektir. Bu işlem geri alınamaz.",
     clearAllAction: "Tüm verileri sil",
 
+    replaceTemplateTitle: "Not şablonla değiştirilsin mi?",
+    replaceTemplateMessage: "Yazdığınız metin kaybolacak ve seçilen şablon ile değiştirilecektir. Bu işlem geri alınamaz.",
+    replaceTemplateBtn: "Şablonu uygula",
+
     dataManagementTitle: "Dışa aktarma ve yedekleme",
     dataManagementSubtitle: "Notlarınız siz açıkça dışa aktarmadıkça bu tarayıcıda kalır.",
     markdownExportTitle: "Markdown dışa aktarma",

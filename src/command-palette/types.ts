@@ -46,6 +46,7 @@ export interface CommandActions {
   regenerateSummary?: () => void;
   copySummary?: () => void;
   downloadSummary?: () => void;
+  insertTemplate?: (templateMarkdown: string) => void;
 }
 
 export interface Command {

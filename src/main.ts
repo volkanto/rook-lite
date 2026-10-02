@@ -9,6 +9,7 @@ import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
 import { CategoryService, initializeLocalData, NoteService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
+import { getTemplateById, PREDEFINED_TEMPLATES } from "./templates";
 import { CommandPaletteController } from "./command-palette/commandPalette";
 import type { CommandActions, CommandContext } from "./command-palette/types";
 
@@ -24,6 +25,7 @@ let paletteController: CommandPaletteController | null = null;
 let currentActiveNote: Note | null = null;
 
 export const icons = {
+  template: '<path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M4 9h16"/><path d="M9 4v5"/>',
   home: '<path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>',
   note: '<path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M13 8l2 0"/><path d="M13 12l2 0"/>',
   todo: '<path d="M3.5 5.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"/><path d="M11 6l9 0"/><path d="M11 12l9 0"/><path d="M11 18l9 0"/>',
@@ -136,6 +138,10 @@ function initCommandPalette(): void {
     },
     openSearch: (query = "") => {
       void openSearch(query);
+    },
+    insertTemplate: (templateMarkdown: string) => {
+      closeSearch();
+      void insertTemplateIntoEditor(templateMarkdown);
     },
     toggleTheme: () => {
       setTheme(document.documentElement.dataset.theme === "dark" ? "LIGHT" : "DARK");
@@ -313,6 +319,42 @@ export function highlightLinkedNote(targetId?: string): void {
   });
 }
 
+export async function insertTemplateIntoEditor(templateMarkdown: string): Promise<void> {
+  if (appPath() !== "/") {
+    history.pushState({}, "", appUrl("/"));
+    await renderRoute();
+  }
+  const form = (document.querySelector("#edit-note-form") ?? document.querySelector("#new-note-form")) as HTMLFormElement | null;
+  if (!form) return;
+  const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+  if (!textarea) return;
+
+  const current = textarea.value.trim();
+  if (current) {
+    const s = currentStrings();
+    showConfirm(
+      s.replaceTemplateTitle,
+      s.replaceTemplateMessage,
+      s.replaceTemplateBtn,
+      async () => {
+        applyTemplateText(form, textarea, templateMarkdown);
+      }
+    );
+  } else {
+    applyTemplateText(form, textarea, templateMarkdown);
+  }
+}
+
+function applyTemplateText(form: HTMLFormElement, textarea: HTMLTextAreaElement, templateMarkdown: string): void {
+  setEditorMode(form, "write", false);
+  textarea.value = templateMarkdown;
+  textarea.focus();
+  resizeEditor(textarea);
+  updateEditorWordCount(form);
+  form.classList.add("has-content");
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 export async function renderToday(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const requested = new URLSearchParams(location.search).get("date"); const today = isoDate(new Date()); const date = validIsoDate(requested) ? requested as string : today; const isToday = date === today;
@@ -330,7 +372,7 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 
 function editorMarkup(id: string, value: string, label: string, isModal = false): string {
   const s = currentStrings();
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-toolbar-actions"><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="Templates" aria-label="Templates">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${PREDEFINED_TEMPLATES.map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
 function noteMarkup(note: Note, selectedDate = note.noteDate): string {
@@ -1300,6 +1342,12 @@ function bindShellEvents(): void {
 
   document.addEventListener("click", async (event) => {
     const target = event.target as Element;
+    if (!target.closest(".editor-template-picker")) {
+      document.querySelectorAll<HTMLDetailsElement>(".editor-template-picker[open]").forEach((details) => {
+        details.removeAttribute("open");
+      });
+    }
+
     const copyCodeBtn = target.closest<HTMLButtonElement>(".copy-code-btn");
     if (copyCodeBtn) {
       const wrapper = copyCodeBtn.closest(".code-block-wrapper");
@@ -1515,6 +1563,17 @@ export function handleSmartListContinuation(event: KeyboardEvent, textarea: HTML
 
 function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): void {
   form.querySelectorAll<HTMLButtonElement>("[data-format]").forEach((button) => button.addEventListener("click", () => formatNote(textarea, button.dataset.format ?? "")));
+  form.querySelectorAll<HTMLButtonElement>("[data-insert-template]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const tmpl = getTemplateById(btn.dataset.insertTemplate ?? "");
+      if (tmpl) {
+        void insertTemplateIntoEditor(tmpl.markdown);
+        btn.closest("details")?.removeAttribute("open");
+      }
+    });
+  });
   textarea.addEventListener("keydown", (event) => {
     handleSmartListContinuation(event, textarea);
   });

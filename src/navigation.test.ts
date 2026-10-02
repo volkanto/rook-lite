@@ -1169,4 +1169,78 @@ describe("Left menu bar icons and navigation", () => {
     const content = document.querySelector("#page-content");
     expect(content?.textContent).toMatch(/404|That page does not exist|Bu sayfa mevcut değil/);
   });
+
+  it("inserts pre-defined template into empty editor directly", async () => {
+    const { renderShell, insertTemplateIntoEditor } = await import("./main");
+    const { getTemplateById } = await import("./templates");
+
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")!;
+    textarea.value = "";
+
+    const standup = getTemplateById("standup");
+    expect(standup).toBeDefined();
+
+    await insertTemplateIntoEditor(standup!.markdown);
+
+    expect(textarea.value).toContain("Daily Standup");
+    expect(textarea.value).toContain("#standup");
+    expect(textarea.closest("#new-note-form")?.classList.contains("has-content")).toBe(true);
+  });
+
+  it("shows confirmation dialog and replaces text when editor already has content", async () => {
+    const { renderShell, insertTemplateIntoEditor } = await import("./main");
+    const { getTemplateById } = await import("./templates");
+
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")!;
+    textarea.value = "My original draft text that should warn before replace";
+
+    const standup = getTemplateById("standup");
+    expect(standup).toBeDefined();
+
+    await insertTemplateIntoEditor(standup!.markdown);
+
+    // Confirmation dialog is displayed
+    const confirmDialog = document.querySelector("#confirm-backdrop");
+    expect(confirmDialog).not.toBeNull();
+    expect(document.querySelector("#confirm-title")?.textContent).toMatch(/Replace note with template\?|Not şablonla değiştirilsin mi\?/);
+
+    // Textarea still has original text before confirming
+    expect(textarea.value).toBe("My original draft text that should warn before replace");
+
+    // Click confirm replace button
+    const confirmBtn = document.querySelector<HTMLButtonElement>("#confirm-action");
+    confirmBtn?.click();
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(textarea.value).toContain("Daily Standup");
+    expect(textarea.value).toContain("#standup");
+    expect(textarea.value).not.toContain("My original draft text");
+  });
+
+  it("opens template picker and inserts template on item click", async () => {
+    const { renderShell } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")!;
+    textarea.value = "";
+
+    const picker = document.querySelector<HTMLDetailsElement>(".editor-template-picker");
+    expect(picker).not.toBeNull();
+
+    // Click standup template item
+    const standupBtn = picker?.querySelector<HTMLButtonElement>("[data-insert-template='standup']");
+    expect(standupBtn).not.toBeNull();
+    standupBtn?.click();
+
+    expect(textarea.value).toContain("Daily Standup");
+    expect(textarea.value).toContain("#standup");
+  });
 });

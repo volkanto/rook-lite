@@ -232,6 +232,11 @@ export interface TranslationStrings {
   clearConfirmMessage: string;
   clearAllAction: string;
 
+  // Templates
+  replaceTemplateTitle: string;
+  replaceTemplateMessage: string;
+  replaceTemplateBtn: string;
+
   // Data management
   dataManagementTitle: string;
   dataManagementSubtitle: string;

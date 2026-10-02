@@ -2417,6 +2417,137 @@
   margin-left: auto;
 }
 
+/* Template Picker in Toolbar */
+.editor-template-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.editor-template-picker > summary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.85rem !important;
+  height: 1.65rem !important;
+  min-height: 1.65rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  cursor: pointer !important;
+  list-style: none !important;
+  user-select: none !important;
+  box-shadow: none !important;
+  transition: all 120ms ease !important;
+}
+
+.editor-template-picker > summary::-webkit-details-marker,
+.editor-template-picker > summary::marker {
+  display: none !important;
+  content: "" !important;
+}
+
+.editor-template-picker:not([open]) .editor-template-menu {
+  display: none !important;
+}
+
+.editor-template-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 500 !important;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  width: 18.5rem;
+  max-width: calc(100vw - 2.5rem);
+  max-height: 22rem;
+  overflow-y: auto;
+  padding: 0.45rem;
+  background: var(--color-bg-surface, #FFFFFF) !important;
+  border: 1px solid var(--color-border-default, var(--border)) !important;
+  border-radius: var(--radius-md, 8px) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  box-sizing: border-box !important;
+}
+
+.editor-template-picker[open] .editor-template-menu {
+  display: flex !important;
+}
+
+.editor-template-picker[open] > summary.editor-template-btn {
+  background: var(--color-bg-hover, var(--surface-sunk)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+}
+
+:root[data-theme="dark"] .editor-template-menu {
+  background: var(--color-bg-raised, #1c1c1f) !important;
+  border-color: var(--color-border-default, #27272b) !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Explicitly override all generic toolbar button styles for template items */
+.simple-editor-toolbar .editor-template-menu button.editor-template-item,
+.copilot-input-container .simple-editor-toolbar .editor-template-menu button.editor-template-item,
+button.editor-template-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 0.2rem !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 3.2rem !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0.55rem 0.75rem !important;
+  border: 1px solid transparent !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  line-height: normal !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+  transition: all 120ms ease !important;
+  white-space: normal !important;
+}
+
+.simple-editor-toolbar .editor-template-menu button.editor-template-item:hover,
+.copilot-input-container .simple-editor-toolbar .editor-template-menu button.editor-template-item:hover,
+button.editor-template-item:hover {
+  background: var(--color-bg-hover, var(--surface-sunk)) !important;
+  border-color: var(--color-border-subtle, var(--border)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+}
+
+.editor-template-item strong,
+.simple-editor-toolbar .editor-template-menu button.editor-template-item strong,
+.copilot-input-container .simple-editor-toolbar .editor-template-menu button.editor-template-item strong {
+  display: block !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+}
+
+.editor-template-item span,
+.simple-editor-toolbar .editor-template-menu button.editor-template-item span,
+.copilot-input-container .simple-editor-toolbar .editor-template-menu button.editor-template-item span {
+  display: block !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.72rem !important;
+  font-weight: 400 !important;
+  color: var(--color-text-tertiary, var(--muted)) !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
 .editor-mode-toggle {
   display: inline-flex;
   align-items: center;
@@ -2458,6 +2589,17 @@
   color: var(--color-text-primary, var(--text)) !important;
 }
 
+.editor-footer-left,
+.editor-footer-meta {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.72rem !important;
+  color: var(--color-text-tertiary, var(--muted)) !important;
+  white-space: nowrap !important;
+}
+
 .editor-word-count {
   display: inline-flex;
   align-items: center;
@@ -2467,6 +2609,14 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-text-tertiary, var(--muted));
   white-space: nowrap;
+}
+
+.editor-word-count:not(:empty) + .editor-save-hint::before {
+  content: "•";
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: var(--color-border-strong, var(--border));
+  opacity: 0.65;
 }
 
 /* Distraction-Free Zen Writing Mode */
@@ -5586,40 +5736,47 @@ mark.palette-highlight {
 }
 
 .btn-danger-confirm {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.2rem;
-  padding: 0.45rem 1.15rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm, 6px);
-  background: var(--color-danger);
-  color: #ffffff;
-  font-family: var(--font-ui);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 120ms ease;
-}
-
-:root[data-theme="dark"] .btn-danger-confirm {
-  color: #09090b;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 2.2rem !important;
+  padding: 0.45rem 1.15rem !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--color-danger, #E25555) !important;
+  color: #ffffff !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: all 120ms ease !important;
 }
 
 .btn-danger-confirm:hover {
-  background: var(--color-danger-hover);
-  transform: none;
-  box-shadow: var(--shadow-sm);
+  background: var(--color-danger-hover, #c93b3b) !important;
+  color: #ffffff !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
 }
 
 .btn-danger-confirm:active {
-  transform: scale(0.98);
+  transform: scale(0.98) !important;
 }
 
 .btn-danger-confirm:disabled {
-  opacity: 0.6;
-  pointer-events: none;
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+}
+
+:root[data-theme="dark"] .btn-danger-confirm {
+  background: #E25555 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .btn-danger-confirm:hover {
+  background: #f87171 !important;
+  color: #09090b !important;
 }
 
 .category-archive-form {
