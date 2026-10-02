@@ -1207,6 +1207,7 @@ body.app .sidebar nav a.is-active .nav-label {
     --color-success-text: #1F7A57;
 
     --color-danger: #E25555;
+    --color-danger-hover: #C93B3B;
     --color-danger-bg: #FDECEC;
     --color-danger-text: #B93838;
 
@@ -2484,7 +2485,7 @@ body.app .sidebar nav a.is-active::before {
     margin-bottom: 0.35rem;
 }
 
-.simple-editor-toolbar button {
+.simple-editor-toolbar button:not(.editor-template-item) {
     display: grid;
     place-items: center;
     flex: 0 0 auto;
@@ -2501,7 +2502,7 @@ body.app .sidebar nav a.is-active::before {
     font-weight: 500;
 }
 
-.simple-editor-toolbar button:hover {
+.simple-editor-toolbar button:not(.editor-template-item):hover {
     color: var(--text);
     background: var(--surface-sunk);
 }
@@ -4676,7 +4677,7 @@ textarea {
     border: 0;
 }
 
-.copilot-input-container .simple-editor-toolbar button {
+.copilot-input-container .simple-editor-toolbar button:not(.editor-template-item) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -4697,7 +4698,7 @@ textarea {
     line-height: 1;
 }
 
-.copilot-input-container .simple-editor-toolbar button:hover {
+.copilot-input-container .simple-editor-toolbar button:not(.editor-template-item):hover {
     color: var(--text);
     background: var(--surface-sunk);
 }

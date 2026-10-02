@@ -1,3 +1,4 @@
+import { PREDEFINED_TEMPLATES } from "../templates";
 import type { Command, CommandActions, CommandContext } from "./types";
 
 export function createCommandRegistry(actions: CommandActions): Command[] {
@@ -115,6 +116,16 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
       group: "notes",
       execute: () => actions.navigateTo("/categories")
     },
+
+    // --- Templates ---
+    ...PREDEFINED_TEMPLATES.map((tmpl) => ({
+      id: `template-${tmpl.id}`,
+      title: `Template: ${tmpl.name}`,
+      description: tmpl.description,
+      keywords: ["template", tmpl.name.toLowerCase(), tmpl.id, ...tmpl.tags, "insert", "snippet", "boilerplate"],
+      group: "notes" as const,
+      execute: () => actions.insertTemplate?.(tmpl.markdown)
+    })),
 
     // --- Summaries ---
     {

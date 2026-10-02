@@ -231,6 +231,10 @@ export const locale: LocaleDefinition = {
     clearConfirmMessage: "This will permanently erase all notes, categories, and summaries stored on this device. This action cannot be undone.",
     clearAllAction: "Clear all data",
 
+    replaceTemplateTitle: "Replace note with template?",
+    replaceTemplateMessage: "The text you have written will be lost and replaced with the selected template. This action cannot be undone.",
+    replaceTemplateBtn: "Replace template",
+
     dataManagementTitle: "Export and backup",
     dataManagementSubtitle: "Your notes stay in this browser unless you explicitly export them.",
     markdownExportTitle: "Markdown export",

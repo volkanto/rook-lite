@@ -9,6 +9,7 @@ import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
 import { CategoryService, initializeLocalData, NoteService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
+import { getTemplateById, PREDEFINED_TEMPLATES } from "./templates";
 import { CommandPaletteController } from "./command-palette/commandPalette";
 import type { CommandActions, CommandContext } from "./command-palette/types";
 
@@ -24,6 +25,7 @@ let paletteController: CommandPaletteController | null = null;
 let currentActiveNote: Note | null = null;
 
 export const icons = {
+  template: '<path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M4 9h16"/><path d="M9 4v5"/>',
   home: '<path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>',
   note: '<path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M13 8l2 0"/><path d="M13 12l2 0"/>',
   todo: '<path d="M3.5 5.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"/><path d="M11 6l9 0"/><path d="M11 12l9 0"/><path d="M11 18l9 0"/>',
@@ -133,6 +135,13 @@ function initCommandPalette(): void {
     },
     openTasks: () => {
       openSearch("has:task");
+    },
+    openSearch: (query = "") => {
+      void openSearch(query);
+    },
+    insertTemplate: (templateMarkdown: string) => {
+      closeSearch();
+      void insertTemplateIntoEditor(templateMarkdown);
     },
     toggleTheme: () => {
       setTheme(document.documentElement.dataset.theme === "dark" ? "LIGHT" : "DARK");
@@ -279,11 +288,11 @@ async function refreshCalendar(): Promise<void> {
   host.innerHTML = `<div class="sidebar-calendar"><div class="calendar-header"><span class="calendar-title">${month}</span></div><div class="calendar-grid"><div class="calendar-days-row"><span class="cal-day-header empty-cell">wk</span>${dayInitials.map((day) => `<span class="cal-day-header">${day}</span>`).join("")}</div>${weeks}</div></div>`;
 }
 
-async function renderRoute(): Promise<void> {
+export async function renderRoute(): Promise<void> {
   const content = requireElement<HTMLElement>("#page-content"); const path = appPath();
   document.querySelectorAll<HTMLElement>("[data-path]").forEach((link) => link.classList.toggle("is-active", link.dataset.path === "/" ? path === "/" : path.startsWith(link.dataset.path ?? "")));
   try {
-    if (path === "/") await renderToday(content); else if (path === "/search") await renderSearch(content); else if (path === "/categories") await renderCategories(content);
+    if (path === "/") await renderToday(content); else if (path === "/search") await renderSearch(content);
     else if (path === "/summaries") await renderSummariesV2(content); else if (path === "/todos") await renderTodos(content); else if (path === "/data") await renderData(content); else if (path === "/settings") await renderSettings(content); else renderNotFound(content);
   } catch (error) { content.innerHTML = `<p class="notice error">${escapeHtml(errorMessage(error))}</p>`; }
   normalizeAppLinks(); document.body.classList.remove("sidebar-drawer-open"); content.focus({ preventScroll: true }); highlightLinkedNote();
@@ -310,31 +319,65 @@ export function highlightLinkedNote(targetId?: string): void {
   });
 }
 
+export async function insertTemplateIntoEditor(templateMarkdown: string): Promise<void> {
+  if (appPath() !== "/") {
+    history.pushState({}, "", appUrl("/"));
+    await renderRoute();
+  }
+  const form = (document.querySelector("#edit-note-form") ?? document.querySelector("#new-note-form")) as HTMLFormElement | null;
+  if (!form) return;
+  const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+  if (!textarea) return;
+
+  const current = textarea.value.trim();
+  if (current) {
+    const s = currentStrings();
+    showConfirm(
+      s.replaceTemplateTitle,
+      s.replaceTemplateMessage,
+      s.replaceTemplateBtn,
+      async () => {
+        applyTemplateText(form, textarea, templateMarkdown);
+      }
+    );
+  } else {
+    applyTemplateText(form, textarea, templateMarkdown);
+  }
+}
+
+function applyTemplateText(form: HTMLFormElement, textarea: HTMLTextAreaElement, templateMarkdown: string): void {
+  setEditorMode(form, "write", false);
+  textarea.value = templateMarkdown;
+  textarea.focus();
+  resizeEditor(textarea);
+  updateEditorWordCount(form);
+  form.classList.add("has-content");
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 export async function renderToday(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const requested = new URLSearchParams(location.search).get("date"); const today = isoDate(new Date()); const date = validIsoDate(requested) ? requested as string : today; const isToday = date === today;
-  const value = new Date(`${date}T12:00:00`); const allCategories = await categories.list(); const allNotes = await notes.listAll(); const dayNotes = await notes.listByDate(date); const draft = await notes.getDraft(date);
+  const value = new Date(`${date}T12:00:00`); const allNotes = await notes.listAll(); const dayNotes = await notes.listByDate(date); const draft = await notes.getDraft(date);
   const heading = formatDateHeading(date); const previous = shiftDate(date, -1); const next = shiftDate(date, 1); const selectedTag = new URLSearchParams(location.search).get("tag") ?? ""; const visibleNotes = selectedTag ? dayNotes.filter((note) => note.tags.includes(selectedTag)) : dayNotes; const frequentTags = tagCounts(dayNotes).slice(0, 6); document.title = `${heading} · Rook Lite`;
 
   const relativeInfo = getRelativeDateInfo(date, today, getLocale());
 
-  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", draft?.categoryIds ?? [], allCategories, s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allCategories, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
+  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
-  bindCreateEditor(date); bindNoteActions(allCategories);
+  bindCreateEditor(date); bindNoteActions();
   updateScrollToTopVisibility();
   requestAnimationFrame(() => updateScrollToTopVisibility());
 }
 
-function editorMarkup(id: string, value: string, selected: string[], allCategories: Category[], label: string, isModal = false): string {
+function editorMarkup(id: string, value: string, label: string, isModal = false): string {
   const s = currentStrings();
-  const active = allCategories.filter((category) => !category.archived);
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-toolbar-actions"><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><details class="footer-category-picker"><summary class="category-picker-trigger" aria-label="${s.navCategories}" title="${s.navCategories}">${svg(icons.category, "nav-svg")}</summary><div class="footer-category-menu">${active.length ? active.map((category) => `<label class="category-pill"><input type="checkbox" name="categoryIds" value="${category.id}" ${selected.includes(category.id) ? "checked" : ""}><span>#${escapeHtml(category.name)}</span></label>`).join("") : `<span class="footer-category-empty">${s.noCategoriesInPicker}</span>`}</div></details><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘</kbd><kbd>Enter</kbd> to save</span>' : (value ? s.draftRestored : s.markdownSupported)}</span><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="Templates" aria-label="Templates">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${PREDEFINED_TEMPLATES.map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
-function noteMarkup(note: Note, allCategories: Category[], selectedDate = note.noteDate): string {
+function noteMarkup(note: Note, selectedDate = note.noteDate): string {
   const s = currentStrings();
-  const assigned = allCategories.filter((category) => note.categoryIds.includes(category.id));
-  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time>${assigned.map((category) => `<span class="note-cat-badge">#${escapeHtml(category.name)}</span>`).join("")}</div><div class="note-header-actions"><button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time></div><div class="note-header-actions"><button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string, allNotes: Note[]): void {
@@ -520,10 +563,10 @@ function bindCreateEditor(date: string): void {
   attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
 }
 
-function bindNoteActions(allCategories: Category[]): void {
+function bindNoteActions(_allCategories?: Category[]): void {
   const s = currentStrings();
   document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => { await notes.delete(button.dataset.deleteNote ?? ""); await refreshCalendar(); await renderRoute(); })));
-  document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note, allCategories); }));
+  document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note); }));
   document.querySelectorAll<HTMLButtonElement>("[data-copy-note]").forEach((button) =>
     button.addEventListener("click", async () => {
       const note = (await notes.listAll()).find((item) => item.id === button.dataset.copyNote);
@@ -561,11 +604,11 @@ function bindNoteActions(allCategories: Category[]): void {
   });
 }
 
-export function showEditDialog(note: Note, allCategories: Category[]): void {
+export function showEditDialog(note: Note, _allCategories?: Category[]): void {
   const s = currentStrings();
   const host = requireElement<HTMLElement>("#dialog-host");
   const formattedDate = formatDateHeading(note.noteDate);
-  host.innerHTML = `<div class="note-edit-backdrop" id="edit-note-backdrop"><section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><span class="note-edit-date-badge">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></span></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, note.categoryIds, allCategories, s.saveChanges, true)}</div></section></div>`;
+  host.innerHTML = `<div class="note-edit-backdrop" id="edit-note-backdrop"><section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><span class="note-edit-date-badge">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></span></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true)}</div></section></div>`;
   document.body.style.overflow = "hidden";
   const backdrop = requireElement<HTMLElement>("#edit-note-backdrop");
   backdrop.addEventListener("click", (event) => {
@@ -597,7 +640,7 @@ export function showEditDialog(note: Note, allCategories: Category[]): void {
     event.preventDefault();
     setBusy(form, true);
     try {
-      await notes.update(note.id, textarea.value, selectedCategories(form));
+      await notes.update(note.id, textarea.value);
       closeDialog();
       await renderRoute();
     } catch (error) {
@@ -628,25 +671,6 @@ export function showShortcutsDialog(): void {
     }
   };
   window.addEventListener("keydown", onKeydown);
-}
-
-async function renderCategories(content: HTMLElement): Promise<void> {
-  const s = currentStrings();
-  const all = await categories.list(); const active = all.filter((category) => !category.archived); const archived = all.filter((category) => category.archived); document.title = `${s.categoriesTitle} · Rook Lite`;
-  content.innerHTML = `<div class="page-head categories-page-head"><div><h1>${s.categoriesTitle}</h1><p class="lede">${s.categoriesLede}</p></div><details class="category-create"><summary class="category-create-trigger">${s.newCategory}</summary><div class="category-create-panel"><form id="category-create-form" class="category-create-form"><div class="category-form-heading"><h2>${s.createCategoryHeading}</h2><p>${s.createCategoryHelp}</p></div><label for="new-category-name">${s.categoryNameLabel}</label><input id="new-category-name" name="name" placeholder="${s.categoryNamePlaceholder}" required><p class="hint" data-category-error></p><button type="submit">${s.createCategoryBtn}</button></form></div></details></div><section class="category-section"><div class="category-section-head"><div><h2>${s.activeCategories}</h2><p>${s.activeCategoriesHelp}</p></div><span class="category-count">${active.length}</span></div>${active.length ? `<div class="category-list">${active.map(categoryRow).join("")}</div>` : `<div class="category-empty"><p>${s.noActiveCategories}</p><span>${s.createOneToStart}</span></div>`}</section>${archived.length ? `<details class="archived-categories"><summary><span>${s.archivedCategories}</span><span class="category-count">${archived.length}</span></summary><p>${s.archivedCategoriesHelp}</p><ul>${archived.map((category) => `<li><span class="category-marker"></span><span>${escapeHtml(category.name)}</span><code>${escapeHtml(category.slug)}</code><button type="button" class="linklike delete-note-action" data-delete-category="${category.id}">${s.deleteAction}</button></li>`).join("")}</ul></details>` : ""}`;
-  const create = requireElement<HTMLFormElement>("#category-create-form"); create.addEventListener("submit", async (event) => { event.preventDefault(); try { await categories.create(new FormData(create).get("name")?.toString() ?? ""); await renderRoute(); } catch (error) { const field = create.querySelector<HTMLElement>("[data-category-error]"); if (field) field.textContent = errorMessage(error); } }); bindCategoryActions();
-}
-
-function categoryRow(category: Category): string {
-  const s = currentStrings();
-  return `<div class="category-item"><input type="checkbox" id="edit-${category.id}" class="edit-row-toggle" hidden><div class="category-summary"><span class="category-marker"></span><div class="category-copy"><strong>${escapeHtml(category.name)}</strong><span><code>${escapeHtml(category.slug)}</code></span></div><label for="edit-${category.id}" class="category-edit-trigger">${s.editAction}</label></div><div class="category-editor"><form class="category-rename-form" data-rename-category="${category.id}"><div class="category-edit-field"><label for="name-${category.id}">${s.categoryNameLabel}</label><input id="name-${category.id}" name="name" value="${escapeHtml(category.name)}" required></div><div class="category-edit-actions"><label for="edit-${category.id}" class="category-cancel">${s.cancel}</label><button type="submit">${s.saveChanges}</button></div></form><div class="category-archive-form"><button type="button" data-archive-category="${category.id}">${s.archiveCategoryBtn}</button><button type="button" class="delete-note-action" data-delete-category="${category.id}">${s.deleteCategoryBtn}</button></div></div></div>`;
-}
-
-function bindCategoryActions(): void {
-  const s = currentStrings();
-  document.querySelectorAll<HTMLFormElement>("[data-rename-category]").forEach((form) => form.addEventListener("submit", async (event) => { event.preventDefault(); try { await categories.rename(form.dataset.renameCategory ?? "", new FormData(form).get("name")?.toString() ?? ""); await renderRoute(); } catch (error) { alert(errorMessage(error)); } }));
-  document.querySelectorAll<HTMLButtonElement>("[data-archive-category]").forEach((button) => button.addEventListener("click", async () => { await categories.archive(button.dataset.archiveCategory ?? ""); await renderRoute(); }));
-  document.querySelectorAll<HTMLButtonElement>("[data-delete-category]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteCategoryConfirmTitle, s.categoryRemovedHelp, s.deleteCategoryBtn, async () => { await categories.delete(button.dataset.deleteCategory ?? ""); await renderRoute(); })));
 }
 
 export async function renderSearch(content: HTMLElement): Promise<void> {
@@ -1319,6 +1343,12 @@ function bindShellEvents(): void {
 
   document.addEventListener("click", async (event) => {
     const target = event.target as Element;
+    if (!target.closest(".editor-template-picker")) {
+      document.querySelectorAll<HTMLDetailsElement>(".editor-template-picker[open]").forEach((details) => {
+        details.removeAttribute("open");
+      });
+    }
+
     const copyCodeBtn = target.closest<HTMLButtonElement>(".copy-code-btn");
     if (copyCodeBtn) {
       const wrapper = copyCodeBtn.closest(".code-block-wrapper");
@@ -1534,6 +1564,17 @@ export function handleSmartListContinuation(event: KeyboardEvent, textarea: HTML
 
 function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): void {
   form.querySelectorAll<HTMLButtonElement>("[data-format]").forEach((button) => button.addEventListener("click", () => formatNote(textarea, button.dataset.format ?? "")));
+  form.querySelectorAll<HTMLButtonElement>("[data-insert-template]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const tmpl = getTemplateById(btn.dataset.insertTemplate ?? "");
+      if (tmpl) {
+        void insertTemplateIntoEditor(tmpl.markdown);
+        btn.closest("details")?.removeAttribute("open");
+      }
+    });
+  });
   textarea.addEventListener("keydown", (event) => {
     handleSmartListContinuation(event, textarea);
   });

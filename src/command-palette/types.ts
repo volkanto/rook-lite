@@ -29,6 +29,7 @@ export interface CommandActions {
   navigateTo: (path: string) => void | Promise<void>;
   createNote: () => void;
   openDatePicker: () => void;
+  openSearch?: (query?: string) => void | Promise<void>;
   shiftDate: (delta: number) => void;
   openTasks: () => void;
   toggleTheme: () => void;
@@ -45,6 +46,7 @@ export interface CommandActions {
   regenerateSummary?: () => void;
   copySummary?: () => void;
   downloadSummary?: () => void;
+  insertTemplate?: (templateMarkdown: string) => void;
 }
 
 export interface Command {
