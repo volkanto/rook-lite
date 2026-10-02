@@ -15,7 +15,7 @@ export class NoteService {
     return this.notes.listByDate(date);
   }
 
-  async create(content: string, noteDate: string, categoryIds: string[]): Promise<Note> {
+  async create(content: string, noteDate: string, categoryIds: string[] = []): Promise<Note> {
     const now = new Date().toISOString();
     const note: Note = {
       id: crypto.randomUUID(),
@@ -34,10 +34,11 @@ export class NoteService {
     return note;
   }
 
-  async update(id: string, content: string, categoryIds: string[]): Promise<Note> {
+  async update(id: string, content: string, categoryIds?: string[]): Promise<Note> {
     const existing = await this.notes.get(id);
     if (!existing) throw new Error("That note no longer exists.");
-    const note = { ...existing, content: content.trim(), title: deriveTitle(content), tags: extractTags(content), categoryIds: [...new Set(categoryIds)], updatedAt: new Date().toISOString() };
+    const finalCategoryIds = categoryIds !== undefined ? [...new Set(categoryIds)] : existing.categoryIds;
+    const note = { ...existing, content: content.trim(), title: deriveTitle(content), tags: extractTags(content), categoryIds: finalCategoryIds, updatedAt: new Date().toISOString() };
     await this.notes.save(note);
     return note;
   }
@@ -56,7 +57,7 @@ export class NoteService {
     return this.update(note.id, lines.join("\n"), note.categoryIds);
   }
 
-  async saveDraft(noteDate: string, content: string, categoryIds: string[]): Promise<void> {
+  async saveDraft(noteDate: string, content: string, categoryIds: string[] = []): Promise<void> {
     const draft: Draft = { id: draftId(noteDate), noteId: null, noteDate, content, categoryIds, updatedAt: new Date().toISOString() };
     if (!content.trim() && categoryIds.length === 0) await this.drafts.delete(draft.id);
     else await this.drafts.save(draft);
