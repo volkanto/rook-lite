@@ -194,7 +194,7 @@ function initCommandPalette(): void {
     },
     editSelectedNote: (note: Note) => {
       closeSearch();
-      void categories.list().then((allCats) => showEditDialog(note, allCats));
+      showEditDialog(note);
     },
     copySelectedNote: async (note: Note) => {
       closeSearch();
@@ -509,7 +509,7 @@ function bindCreateEditor(date: string): void {
     window.clearTimeout(draftTimer);
     status(form, s.savingDraft);
     draftTimer = window.setTimeout(async () => {
-      await notes.saveDraft(date, textarea.value, selectedCategories(form));
+      await notes.saveDraft(date, textarea.value);
       status(form, s.draftSaved);
     }, 450);
   };
@@ -543,11 +543,10 @@ function bindCreateEditor(date: string): void {
     setBusy(form, true);
     try {
       const content = textarea.value;
-      const categoryIds = selectedCategories(form);
       textarea.value = "";
       resizeEditor(textarea);
       updateComposer();
-      await notes.create(content, date, categoryIds);
+      await notes.create(content, date);
       await renderRoute();
     } catch (error) {
       status(form, errorMessage(error), true);
@@ -563,7 +562,7 @@ function bindCreateEditor(date: string): void {
   attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
 }
 
-function bindNoteActions(_allCategories?: Category[]): void {
+function bindNoteActions(): void {
   const s = currentStrings();
   document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => { await notes.delete(button.dataset.deleteNote ?? ""); await refreshCalendar(); await renderRoute(); })));
   document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note); }));
@@ -1581,7 +1580,6 @@ function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): v
 }
 function formatNote(textarea: HTMLTextAreaElement, style: string): void { const start = textarea.selectionStart; const end = textarea.selectionEnd; const selected = textarea.value.slice(start, end); const formats: Record<string, [string, string]> = { heading: ["## ", ""], bold: ["**", "**"], italic: ["_", "_"], strike: ["~~", "~~"], list: ["* ", ""], numbered: ["1. ", ""], task: ["- [ ] ", ""], code: ["```\n", "\n```"] }; const [rawPrefix, suffix] = formats[style] ?? ["", ""]; const before = textarea.value.slice(0, start); const prefix = ["heading", "list", "numbered", "task"].includes(style) && before && !before.endsWith("\n") ? `\n${rawPrefix}` : rawPrefix; textarea.setRangeText(`${prefix}${selected}${suffix}`, start, end, "end"); textarea.focus(); textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length); textarea.dispatchEvent(new Event("input", { bubbles: true })); }
 function resizeEditor(textarea: HTMLTextAreaElement): void { textarea.style.height = "auto"; textarea.style.height = `${textarea.scrollHeight}px`; }
-function selectedCategories(form: HTMLFormElement): string[] { return [...form.querySelectorAll<HTMLInputElement>('input[name="categoryIds"]:checked')].map((input) => input.value); }
 function status(form: HTMLFormElement, message: string, error = false): void { const element = form.querySelector<HTMLElement>("[data-save-status]"); if (element) { element.textContent = message; element.classList.toggle("text-danger", error); } }
 function setBusy(form: HTMLFormElement, busy: boolean): void { form.querySelectorAll<HTMLButtonElement>("button").forEach((button) => { button.disabled = busy; }); }
 function handleKeyboard(event: KeyboardEvent): void {

@@ -37,14 +37,8 @@ export class NoteService {
   async update(id: string, content: string, categoryIds?: string[]): Promise<Note> {
     const existing = await this.notes.get(id);
     if (!existing) throw new Error("That note no longer exists.");
-    const note = {
-      ...existing,
-      content: content.trim(),
-      title: deriveTitle(content),
-      tags: extractTags(content),
-      categoryIds: categoryIds !== undefined ? [...new Set(categoryIds)] : existing.categoryIds,
-      updatedAt: new Date().toISOString()
-    };
+    const finalCategoryIds = categoryIds !== undefined ? [...new Set(categoryIds)] : existing.categoryIds;
+    const note = { ...existing, content: content.trim(), title: deriveTitle(content), tags: extractTags(content), categoryIds: finalCategoryIds, updatedAt: new Date().toISOString() };
     await this.notes.save(note);
     return note;
   }
