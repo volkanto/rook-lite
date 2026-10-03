@@ -237,6 +237,27 @@ export interface TranslationStrings {
   replaceTemplateMessage: string;
   replaceTemplateBtn: string;
 
+  // Wikilinks & Backlinks
+  backlinkSingle: string;
+  backlinkPlural: string;
+  linkedMentionsTitle: string;
+  insertWikilink: string;
+  pickerSectionDates: string;
+  pickerSectionNotes: string;
+  badgeToday: string;
+  badgeYesterday: string;
+  badgeDate: string;
+  pickerNavHint: string;
+
+  // Command Palette
+  paletteNavHint: string;
+  paletteSelectHint: string;
+  paletteCloseHint: string;
+  paletteCommandsHint: string;
+  sectionNotes: string;
+  sectionCommands: string;
+  sectionMoreNotes: string;
+
   // Data management
   dataManagementTitle: string;
   dataManagementSubtitle: string;

@@ -12,6 +12,7 @@ export function stripMarkdown(content: string): string {
     .replace(/\s+/g, " ")
     .trim();
 }
+import { currentStrings } from "../i18n";
 import type { Category, Note } from "../models";
 import { normalize } from "../services";
 import { parseSearchQuery } from "./searchParser";
@@ -366,17 +367,18 @@ function getGeneralSearchSections(
   // Split into strong note matches, commands, and other note matches
   const strongNotes = matchingNotes.filter((m) => m.score >= 60).map((m) => m.note);
   const otherNotes = matchingNotes.filter((m) => m.score < 60).map((m) => m.note);
+  const s = currentStrings();
 
   if (strongNotes.length) {
     sections.push({
-      title: "Notes",
+      title: s.sectionNotes,
       items: strongNotes.slice(0, 8)
     });
   }
 
   if (matchingCommands.length) {
     sections.push({
-      title: "Commands",
+      title: s.sectionCommands,
       items: matchingCommands.slice(0, 5)
     });
   }
@@ -384,12 +386,12 @@ function getGeneralSearchSections(
   if (otherNotes.length) {
     if (!strongNotes.length) {
       sections.push({
-        title: "Notes",
+        title: s.sectionNotes,
         items: otherNotes.slice(0, 8)
       });
     } else {
       sections.push({
-        title: "More Notes",
+        title: s.sectionMoreNotes,
         items: otherNotes.slice(0, 6)
       });
     }

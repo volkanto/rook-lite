@@ -1,6 +1,7 @@
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
 import { marked } from "marked";
+import { renderWikilinkHtml } from "./wikilinks";
 
 const COPY_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-code-svg" aria-hidden="true"><path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666"/><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/></svg>';
 
@@ -24,6 +25,33 @@ function normalizeLanguage(lang: string | undefined): string | null {
 marked.use({
   gfm: true,
   breaks: true,
+  extensions: [
+    {
+      name: "wikilink",
+      level: "inline",
+      start(src: string) {
+        return src.indexOf("[[");
+      },
+      tokenizer(src: string) {
+        const rule = /^\[\[([^[\]\r\n|]+)(?:\|([^[\]\r\n]+))?\]\]/;
+        const match = rule.exec(src);
+        if (match) {
+          const raw = match[0];
+          const target = match[1].trim();
+          const label = (match[2] ?? match[1]).trim();
+          return {
+            type: "wikilink",
+            raw,
+            target,
+            label
+          };
+        }
+      },
+      renderer(token: any) {
+        return renderWikilinkHtml(token.target, token.label);
+      }
+    }
+  ],
   renderer: {
     code({ text, lang }: { text: string; lang?: string }): string {
       const validLang = normalizeLanguage(lang);
@@ -58,7 +86,7 @@ function sanitizeHtml(html: string): string {
     USE_PROFILES: { html: true, svg: true },
     FORBID_TAGS: ["style", "iframe", "object", "embed"],
     FORBID_ATTR: ["style"],
-    ADD_ATTR: ["data-task-index", "aria-label", "aria-hidden"]
+    ADD_ATTR: ["data-task-index", "aria-label", "aria-hidden", "data-link", "data-wikilink-target"]
   });
 }
 
@@ -92,6 +120,12 @@ export function renderMarkdown(markdown: string, interactive = false): string {
   });
 
   return processed;
+}
+
+export function renderInlineMarkdown(markdown: string): string {
+  if (!markdown) return "";
+  const rendered = renderMarkdown(markdown, false).trim();
+  return rendered.replace(/^<p>([\s\S]*)<\/p>$/i, "$1").trim();
 }
 
 export function toggleTaskInMarkdown(markdown: string, targetIndex: number): string {

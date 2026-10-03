@@ -98,4 +98,29 @@ describe("markdown code blocks and syntax highlighting", () => {
     const html = renderMarkdown(markdown);
     expect(html).toContain("First line<br>Second line");
   });
+
+  it("renders date wikilinks as interactive links with data-link and date query", () => {
+    const markdown = "See previous meeting in [[2026-10-02]].";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/?date=2026-10-02"');
+    expect(html).toContain('data-link');
+    expect(html).toContain('class="wikilink wikilink-date"');
+    expect(html).toContain(">2026-10-02</a>");
+  });
+
+  it("renders note wikilinks with custom label linking to note date", () => {
+    const markdown = "Check out [[Project Titan|Titan specs]].";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/?date=Project%20Titan"');
+    expect(html).toContain('class="wikilink wikilink-note"');
+    expect(html).toContain(">Titan specs</a>");
+  });
+
+  it("does not render wikilinks inside code blocks or inline code", () => {
+    const markdown = "Real: [[2026-10-02]]\n`[[2026-10-03]]`\n```\n[[2026-10-04]]\n```";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/?date=2026-10-02"');
+    expect(html).not.toContain('href="/?date=2026-10-03"');
+    expect(html).not.toContain('href="/?date=2026-10-04"');
+  });
 });

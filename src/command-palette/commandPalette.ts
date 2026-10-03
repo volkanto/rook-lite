@@ -1,3 +1,4 @@
+import { currentStrings } from "../i18n";
 import type { Category, Note } from "../models";
 import { normalize } from "../services";
 import { getRecentCommands, recordCommandUse } from "./commandHistory";
@@ -49,6 +50,7 @@ export class CommandPaletteController {
   }
 
   private buildDom(): void {
+    const s = currentStrings();
     this.host.innerHTML = `
       <div class="modal-content command-palette" role="dialog" aria-modal="true" aria-label="Command Palette">
         <div class="palette-header">
@@ -78,12 +80,12 @@ export class CommandPaletteController {
         <div class="palette-body" id="palette-results-list" role="listbox" aria-label="Suggestions and search results"></div>
         <div class="palette-footer">
           <div class="palette-footer-actions">
-            <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> Navigate</span>
-            <span><kbd>&crarr;</kbd> Select</span>
-            <span><kbd>esc</kbd> Close</span>
+            <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> ${s.paletteNavHint}</span>
+            <span><kbd>&crarr;</kbd> ${s.paletteSelectHint}</span>
+            <span><kbd>esc</kbd> ${s.paletteCloseHint}</span>
           </div>
           <div class="palette-footer-mode" id="palette-footer-mode">
-            <span>Type <kbd>&gt;</kbd> for commands</span>
+            <span>${s.paletteCommandsHint}</span>
           </div>
         </div>
       </div>
