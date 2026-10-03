@@ -240,7 +240,8 @@ describe("Left menu bar icons and navigation", () => {
     // Editor formatting tools are inside the card at the top
     const toolbar = editorCard?.querySelector(".simple-editor-toolbar");
     expect(toolbar).not.toBeNull();
-    expect(toolbar?.querySelectorAll("button[data-format]").length).toBe(5);
+    expect(toolbar?.querySelectorAll("button[data-format]").length).toBe(6);
+    expect(toolbar?.querySelector("button[data-format='wikilink']")).not.toBeNull();
 
     // Textarea is inside the card
     const textarea = editorCard?.querySelector("textarea.simple-editor-textarea");
@@ -1242,5 +1243,165 @@ describe("Left menu bar icons and navigation", () => {
 
     expect(textarea.value).toContain("Daily Standup");
     expect(textarea.value).toContain("#standup");
+  });
+
+  it("renders wikilinks inside notes and navigates via SPA link", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const targetDate = "2026-09-15";
+    const sourceDate = "2026-09-16";
+
+    const note = await noteService.create(`Reference to [[${targetDate}|September specs]].`, sourceDate, []);
+
+    const { renderRoute, renderShell } = await import("./main");
+    history.pushState({}, "", `/?date=${sourceDate}`);
+    await renderShell();
+
+    const wikilink = document.querySelector<HTMLAnchorElement>(".wikilink-date");
+    expect(wikilink).not.toBeNull();
+    expect(wikilink?.textContent).toBe("September specs");
+    expect(wikilink?.getAttribute("href")).toContain(targetDate);
+
+    // Clicking the wikilink navigates via SPA to target date
+    wikilink?.click();
+    await renderRoute();
+
+    expect(window.location.search).toContain(`date=${targetDate}`);
+
+    await noteService.delete(note.id);
+  });
+
+  it("displays bidirectional backlinks and day mentions", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const date1 = "2026-08-10";
+    const date2 = "2026-08-11";
+
+    const note1 = await noteService.create("Core architectural design decisions", date1, []);
+    const note2 = await noteService.create(`Continuation of [[${date1}]] architecture`, date2, []);
+
+    const { renderRoute, renderShell } = await import("./main");
+    history.pushState({}, "", `/?date=${date1}`);
+    await renderShell();
+    await renderRoute();
+
+    // Day mentions panel is displayed for date1
+    const mentionsPanel = document.querySelector(".day-mentions-panel");
+    expect(mentionsPanel).not.toBeNull();
+    expect(mentionsPanel?.textContent).toContain("Continuation of");
+    expect(mentionsPanel?.querySelector(".day-mention-snippet-rendered .wikilink")).not.toBeNull();
+
+    await noteService.delete(note1.id);
+    await noteService.delete(note2.id);
+  });
+
+  it("opens link picker modal when clicking toolbar backlink button and inserts selected note", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const note = await noteService.create("Sprint Planning Kickoff", "2026-10-01", []);
+
+    const { renderShell } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")!;
+    textarea.value = "Reviewing ";
+    textarea.setSelectionRange(10, 10);
+
+    const wikilinkBtn = document.querySelector<HTMLButtonElement>("#new-note-form button[data-format='wikilink']");
+    expect(wikilinkBtn).not.toBeNull();
+
+    wikilinkBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker dialog is mounted in #dialog-host
+    const dialog = document.querySelector(".link-picker-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Search input is focused
+    const searchInput = document.querySelector<HTMLInputElement>("#link-picker-search");
+    expect(searchInput).not.toBeNull();
+
+    // Results show the Sprint Planning Kickoff note with rendered inline markdown
+    const item = document.querySelector<HTMLButtonElement>(".link-picker-row[data-target='Sprint Planning Kickoff']");
+    expect(item).not.toBeNull();
+    expect(item?.querySelector(".link-picker-row-text.prose")).not.toBeNull();
+
+    // Click the item to insert
+    item?.click();
+
+    expect(textarea.value).toBe("Reviewing [[Sprint Planning Kickoff]] ");
+    expect(document.querySelector(".link-picker-dialog")).toBeNull();
+
+    await noteService.delete(note.id);
+  });
+
+  it("opens link picker modal when typing [[ inline in the editor", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const note = await noteService.create("Project Alpha Specifications", "2026-10-01", []);
+
+    const { renderShell } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")!;
+    textarea.value = "Working on [[";
+    textarea.setSelectionRange(13, 13);
+    textarea.dispatchEvent(new Event("input"));
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker dialog is mounted in #dialog-host without any blocking floating dropdown
+    const dialog = document.querySelector(".link-picker-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Verify there is no wikilink-autocomplete-dropdown in the DOM
+    expect(document.querySelector(".wikilink-autocomplete-dropdown")).toBeNull();
+
+    // Click the item to insert
+    const item = document.querySelector<HTMLButtonElement>(".link-picker-row[data-target='Project Alpha Specifications']");
+    expect(item).not.toBeNull();
+    item?.click();
+
+    expect(textarea.value).toBe("Working on [[Project Alpha Specifications]] ");
+
+    await noteService.delete(note.id);
+  });
+
+  it("translates link picker badges, sections, and hints into Turkish", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const note = await noteService.create("Mimari Notları", "2026-10-01", []);
+
+    const { renderShell } = await import("./main");
+    const { setLocale } = await import("./i18n");
+    setLocale("tr");
+
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const wikilinkBtn = document.querySelector<HTMLButtonElement>("#new-note-form button[data-format='wikilink']");
+    wikilinkBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const dialog = document.querySelector(".link-picker-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Sections are translated to Turkish
+    const sectionLabels = Array.from(dialog?.querySelectorAll(".link-picker-section-label") ?? []).map((el) => el.textContent);
+    expect(sectionLabels).toContain("Tarihler");
+    expect(sectionLabels).toContain("Notlar");
+
+    // Today badge is translated to Bugün
+    const todayBadge = dialog?.querySelector(".link-picker-row-badge.is-date");
+    expect(todayBadge?.textContent).toBe("Bugün");
+
+    // Footer hint is translated to Turkish
+    const footerHint = dialog?.querySelector(".link-picker-hint");
+    expect(footerHint?.textContent).toContain("gezinmek için");
+    expect(footerHint?.textContent).toContain("eklemek için");
+
+    // Close dialog and reset locale
+    const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-close-dialog]");
+    closeBtn?.click();
+    setLocale("en");
+
+    await noteService.delete(note.id);
   });
 });

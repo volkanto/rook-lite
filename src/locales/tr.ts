@@ -235,6 +235,26 @@ export const locale: LocaleDefinition = {
     replaceTemplateMessage: "Yazdığınız metin kaybolacak ve seçilen şablon ile değiştirilecektir. Bu işlem geri alınamaz.",
     replaceTemplateBtn: "Şablonu uygula",
 
+    backlinkSingle: "bağlantılı anma",
+    backlinkPlural: "bağlantılı anmalar",
+    linkedMentionsTitle: "Bu güne verilen bağlantılar",
+    insertWikilink: "Not veya tarihe bağlantı ver",
+    pickerSectionDates: "Tarihler",
+    pickerSectionNotes: "Notlar",
+    badgeToday: "Bugün",
+    badgeYesterday: "Dün",
+    badgeDate: "Tarih",
+    pickerNavHint: "<kbd>↑</kbd> <kbd>↓</kbd> gezinmek için · <kbd>↵</kbd> eklemek için · <kbd>esc</kbd> kapatmak için",
+
+    // Command Palette
+    paletteNavHint: "Gezin",
+    paletteSelectHint: "Seç",
+    paletteCloseHint: "Kapat",
+    paletteCommandsHint: "Komutlar için <kbd>&gt;</kbd> yazın",
+    sectionNotes: "Notlar",
+    sectionCommands: "Komutlar",
+    sectionMoreNotes: "Diğer Notlar",
+
     dataManagementTitle: "Dışa aktarma ve yedekleme",
     dataManagementSubtitle: "Notlarınız siz açıkça dışa aktarmadıkça bu tarayıcıda kalır.",
     markdownExportTitle: "Markdown dışa aktarma",
