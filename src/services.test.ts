@@ -30,6 +30,19 @@ describe("local repositories", () => {
     expect(await service.listByDate("2026-09-19")).toHaveLength(1);
   });
 
+  it("throws an error when attempting to create a note with empty or whitespace content", async () => {
+    const service = new NoteService(new NoteRepository());
+    await expect(service.create("", "2026-09-19", [])).rejects.toThrow("Note content cannot be empty.");
+    await expect(service.create("   \n\t  ", "2026-09-19", [])).rejects.toThrow("Note content cannot be empty.");
+  });
+
+  it("throws an error when attempting to update a note with empty or whitespace content", async () => {
+    const service = new NoteService(new NoteRepository());
+    const note = await service.create("Valid initial note", "2026-09-19", []);
+    await expect(service.update(note.id, "")).rejects.toThrow("Note content cannot be empty.");
+    await expect(service.update(note.id, "   \n ")).rejects.toThrow("Note content cannot be empty.");
+  });
+
   it("completes exactly the selected Markdown task", async () => {
     const service = new NoteService(new NoteRepository());
     const note = await service.create("- [ ] first\n- [ ] second", "2026-09-19", []);

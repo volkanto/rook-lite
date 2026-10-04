@@ -3391,12 +3391,18 @@ textarea.simple-editor-textarea.is-hidden,
   transition: all 120ms ease;
 }
 
-.editor-modal-actions .save-btn-rect:hover {
+.editor-modal-actions .save-btn-rect:hover:not(:disabled) {
   background: var(--color-brand-hover);
 }
 
-.editor-modal-actions .save-btn-rect:active {
+.editor-modal-actions .save-btn-rect:active:not(:disabled) {
   transform: scale(0.98);
+}
+
+.save-btn-rect:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .save-icon-svg {
