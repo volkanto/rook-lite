@@ -1,0 +1,56 @@
+src/i18n.types.ts
+  s_43cfed537fa2a7::t_5607a474711b41 27-42
+  s_43cfed537fa2a7::t_ef8617860bcd77 269
+src/command-palette/commandRegistry.ts
+  s_43cfed537fa2a7::t_baad866629b416 1-2,5-158,161-162,277,279,281,462-473
+  s_43cfed537fa2a7::t_16a4c7dded324a 474
+src/navigation.test.ts
+  s_43cfed537fa2a7::t_c70a24ec66cd32 1519-1554
+src/locales/en.ts
+  s_43cfed537fa2a7::t_1b183707bedaf2 34-49
+  s_43cfed537fa2a7::t_26e412b5ab08e6 266
+src/locales/tr.ts
+  s_43cfed537fa2a7::t_bf8fb65d5ea8d9 34-49
+  s_43cfed537fa2a7::t_2824a17a76bff6 266
+src/main.ts
+  s_43cfed537fa2a7::t_d301ac34d48679 373
+  s_43cfed537fa2a7::t_b0050909e670fc 383
+  s_43cfed537fa2a7::t_8924d53682b46e 1395-1396
+  s_43cfed537fa2a7::t_a7a8e034ed0321 403
+  s_43cfed537fa2a7::t_82da7f32f2a556 830
+  s_43cfed537fa2a7::t_6cd718e1694805 5
+  s_43cfed537fa2a7::t_2321fd31415159 868
+  s_43cfed537fa2a7::t_83ccbe3628fb98 891,909
+  s_43cfed537fa2a7::t_a8e7c7880a481e 838
+  s_43cfed537fa2a7::t_7aaa9f2cef2b65 1975,1982
+  s_43cfed537fa2a7::t_409c896d8984b2 12
+  s_43cfed537fa2a7::t_17176285dd531b 402
+src/templates.test.ts
+  s_43cfed537fa2a7::t_6dfd97ce3c771f 3,24-39
+  s_43cfed537fa2a7::t_02db8bc84d3806 40-41
+src/command-palette/commandPalette.ts
+  s_43cfed537fa2a7::t_0c72ef13f535da 68
+src/command-palette/commandSearch.ts
+  s_43cfed537fa2a7::t_c5a17df8974c6c 423
+src/link-picker.ts
+  s_43cfed537fa2a7::t_2e2f1f8ceca884 26,38,47
+  s_43cfed537fa2a7::t_0f13e08da18fbc 99
+src/templates.ts
+  s_43cfed537fa2a7::t_8dcb946a9aa297 1-2,94-183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "709a2a51a2d9dd5bac8dd74a909489f9dbdadd83",
+  "prompts": {},
+  "sessions": {
+    "s_43cfed537fa2a7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "afcde65b-26de-45a8-81ee-00bb26afe2c2",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
