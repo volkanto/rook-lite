@@ -24,6 +24,22 @@ export interface TranslationStrings {
   localOnlyTooltip: string;
   languageSelectTooltip: string;
   githubTooltip: string;
+  toolBold: string;
+  toolItalic: string;
+  toolBulletList: string;
+  toolChecklist: string;
+  toolCode: string;
+  toolTemplates: string;
+  markdownFormatting: string;
+  editorViewMode: string;
+  dateNavigation: string;
+  dateRange: string;
+  summaryPeriodAria: string;
+  generatingSummary: string;
+  statusOnline: string;
+  statusOffline: string;
+  somethingWentWrong: string;
+  emptyNote: string;
 
   // Today / Notes View
   today: string;
@@ -250,6 +266,7 @@ export interface TranslationStrings {
   pickerNavHint: string;
 
   // Command Palette
+  palettePlaceholder: string;
   paletteNavHint: string;
   paletteSelectHint: string;
   paletteCloseHint: string;

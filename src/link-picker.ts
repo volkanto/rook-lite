@@ -23,7 +23,7 @@ function shiftIsoDate(iso: string, days: number): string {
 /**
  * Extracts a single clean sentence/summary from note markdown.
  */
-export function extractCleanFirstLine(markdown: string): string {
+export function extractCleanFirstLine(markdown: string, fallback = "Empty note"): string {
   const lines = markdown.split(/\r?\n/);
   for (const rawLine of lines) {
     const cleaned = rawLine
@@ -35,7 +35,7 @@ export function extractCleanFirstLine(markdown: string): string {
       return cleaned.slice(0, 140);
     }
   }
-  return markdown.replace(/^#{1,6}\s+/gm, "").replace(/\s+/g, " ").trim().slice(0, 140) || "Empty note";
+  return markdown.replace(/^#{1,6}\s+/gm, "").replace(/\s+/g, " ").trim().slice(0, 140) || fallback;
 }
 
 export interface LinkPickerLabels {
@@ -44,6 +44,7 @@ export interface LinkPickerLabels {
   dateBadge?: string;
   todayLabel?: string;
   yesterdayLabel?: string;
+  emptyNoteLabel?: string;
 }
 
 /**
@@ -95,7 +96,7 @@ export function getLinkPickerCandidates(
   for (const note of sortedNotes) {
     if (!note.content.trim()) continue;
 
-    const summaryLine = extractCleanFirstLine(note.content);
+    const summaryLine = extractCleanFirstLine(note.content, labels?.emptyNoteLabel);
     const dateFormatted = formatShortDate(note.noteDate);
 
     const matchesQuery =

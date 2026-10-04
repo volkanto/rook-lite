@@ -65,7 +65,7 @@ export class CommandPaletteController {
               type="text"
               class="palette-input"
               id="command-palette-input"
-              placeholder="Search notes or type > for commands"
+              placeholder="${s.palettePlaceholder}"
               autocomplete="off"
               autocorrect="off"
               spellcheck="false"

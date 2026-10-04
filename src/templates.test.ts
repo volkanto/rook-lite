@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { extractTags } from "./markdown";
-import { getTemplateById, PREDEFINED_TEMPLATES } from "./templates";
+import { getPredefinedTemplates, getTemplateById, PREDEFINED_TEMPLATES } from "./templates";
 
 describe("templates", () => {
   it("provides standard pre-defined templates with markdown content and tags", () => {
@@ -19,6 +19,24 @@ describe("templates", () => {
     const reflection = getTemplateById("reflection");
     expect(reflection).toBeDefined();
     expect(reflection?.markdown).toContain("#reflection");
+  });
+
+  it("provides localized templates for Turkish locale", () => {
+    const trTemplates = getPredefinedTemplates("tr");
+    expect(trTemplates.length).toBeGreaterThanOrEqual(4);
+
+    const standup = getTemplateById("standup", "tr");
+    expect(standup).toBeDefined();
+    expect(standup?.name).toBe("Günlük Standup");
+    expect(standup?.description).toBe("Dün, bugün ve engelleyicileri takip edin");
+    expect(standup?.markdown).toContain("**Dün:**");
+    expect(standup?.markdown).toContain("**Bugün:**");
+    expect(standup?.markdown).toContain("#standup");
+
+    const meeting = getTemplateById("meeting", "tr");
+    expect(meeting).toBeDefined();
+    expect(meeting?.name).toBe("Toplantı Notları");
+    expect(meeting?.markdown).toContain("Katılımcılar");
   });
 
   it("places tags at the end of the template after a blank line so extractTags parses them", () => {

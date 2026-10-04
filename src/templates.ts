@@ -1,3 +1,5 @@
+import { getLocale } from "./i18n";
+
 export interface NoteTemplate {
   id: string;
   name: string;
@@ -89,8 +91,96 @@ export const PREDEFINED_TEMPLATES: NoteTemplate[] = [
   }
 ];
 
-export function getTemplateById(id: string): NoteTemplate | undefined {
-  return PREDEFINED_TEMPLATES.find((t) => t.id === id);
+export const TURKISH_TEMPLATES: NoteTemplate[] = [
+  {
+    id: "standup",
+    name: "Günlük Standup",
+    description: "Dün, bugün ve engelleyicileri takip edin",
+    tags: ["standup"],
+    markdown: `### Günlük Standup
+
+**Dün:**
+- [x] 
+
+**Bugün:**
+- [ ] 
+
+**Engelleyenler:**
+- Yok
+
+#standup`
+  },
+  {
+    id: "meeting",
+    name: "Toplantı Notları",
+    description: "Katılımcılar, gündem, tartışma notları ve aksiyonlar",
+    tags: ["meeting"],
+    markdown: `### Toplantı Notları
+- **Katılımcılar:** 
+- **Hedef:** 
+
+#### Gündem
+- 
+
+#### Tartışma Notları
+- 
+
+#### Aksiyon Maddeleri
+- [ ] 
+
+#meeting`
+  },
+  {
+    id: "reflection",
+    name: "Günlük Değerlendirme",
+    description: "Akşam günlüğü: öne çıkanlar, öğrenilenler, yarın",
+    tags: ["reflection", "journal"],
+    markdown: `### Günlük Değerlendirme
+
+- **Öne Çıkanlar:** 
+- **Öğrenilenler:** 
+- **Geliştirilecek Alanlar:** 
+- **Yarının Odağı:** 
+
+#reflection #journal`
+  },
+  {
+    id: "checklist",
+    name: "Görev Listesi",
+    description: "Hızlı odaklı yapılacaklar listesi",
+    tags: ["todos"],
+    markdown: `### Aksiyon Maddeleri
+- [ ] 
+- [ ] 
+- [ ] 
+
+#todos`
+  },
+  {
+    id: "project",
+    name: "Proje Planı",
+    description: "Hedefler, çıktılar ve sıradaki kilometre taşları",
+    tags: ["project"],
+    markdown: `### Proje Planı
+**Hedef:** 
+
+#### Çıktılar
+- [ ] 
+
+#### Sıradaki Adımlar
+- [ ] 
+
+#project`
+  }
+];
+
+export function getPredefinedTemplates(locale = getLocale()): NoteTemplate[] {
+  return locale === "tr" ? TURKISH_TEMPLATES : PREDEFINED_TEMPLATES;
+}
+
+export function getTemplateById(id: string, locale = getLocale()): NoteTemplate | undefined {
+  const templates = getPredefinedTemplates(locale);
+  return templates.find((t) => t.id === id) ?? PREDEFINED_TEMPLATES.find((t) => t.id === id);
 }
 
 export function formatTemplateSnippet(template: NoteTemplate): string {
