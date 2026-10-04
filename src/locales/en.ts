@@ -235,6 +235,26 @@ export const locale: LocaleDefinition = {
     replaceTemplateMessage: "The text you have written will be lost and replaced with the selected template. This action cannot be undone.",
     replaceTemplateBtn: "Replace template",
 
+    backlinkSingle: "linked mention",
+    backlinkPlural: "linked mentions",
+    linkedMentionsTitle: "Mentions of this day",
+    insertWikilink: "Link to note or date",
+    pickerSectionDates: "Dates",
+    pickerSectionNotes: "Notes",
+    badgeToday: "Today",
+    badgeYesterday: "Yday",
+    badgeDate: "Date",
+    pickerNavHint: "<kbd>↑</kbd> <kbd>↓</kbd> to navigate · <kbd>↵</kbd> to insert · <kbd>esc</kbd> to close",
+
+    // Command Palette
+    paletteNavHint: "Navigate",
+    paletteSelectHint: "Select",
+    paletteCloseHint: "Close",
+    paletteCommandsHint: "Type <kbd>&gt;</kbd> for commands",
+    sectionNotes: "Notes",
+    sectionCommands: "Commands",
+    sectionMoreNotes: "More Notes",
+
     dataManagementTitle: "Export and backup",
     dataManagementSubtitle: "Your notes stay in this browser unless you explicitly export them.",
     markdownExportTitle: "Markdown export",

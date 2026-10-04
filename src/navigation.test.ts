@@ -240,7 +240,8 @@ describe("Left menu bar icons and navigation", () => {
     // Editor formatting tools are inside the card at the top
     const toolbar = editorCard?.querySelector(".simple-editor-toolbar");
     expect(toolbar).not.toBeNull();
-    expect(toolbar?.querySelectorAll("button[data-format]").length).toBe(5);
+    expect(toolbar?.querySelectorAll("button[data-format]").length).toBe(6);
+    expect(toolbar?.querySelector("button[data-format='wikilink']")).not.toBeNull();
 
     // Textarea is inside the card
     const textarea = editorCard?.querySelector("textarea.simple-editor-textarea");
@@ -1242,5 +1243,349 @@ describe("Left menu bar icons and navigation", () => {
 
     expect(textarea.value).toContain("Daily Standup");
     expect(textarea.value).toContain("#standup");
+  });
+
+  it("renders wikilinks inside notes and navigates via SPA link", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const targetDate = "2026-09-15";
+    const sourceDate = "2026-09-16";
+
+    const note = await noteService.create(`Reference to [[${targetDate}|September specs]].`, sourceDate, []);
+
+    const { renderRoute, renderShell } = await import("./main");
+    history.pushState({}, "", `/?date=${sourceDate}`);
+    await renderShell();
+
+    const wikilink = document.querySelector<HTMLAnchorElement>(".wikilink-date");
+    expect(wikilink).not.toBeNull();
+    expect(wikilink?.textContent).toBe("September specs");
+    expect(wikilink?.getAttribute("href")).toContain(targetDate);
+
+    // Clicking the wikilink navigates via SPA to target date
+    wikilink?.click();
+    await renderRoute();
+
+    expect(window.location.search).toContain(`date=${targetDate}`);
+
+    await noteService.delete(note.id);
+  });
+
+  it("displays bidirectional backlinks and day mentions", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const date1 = "2026-08-10";
+    const date2 = "2026-08-11";
+
+    const note1 = await noteService.create("Core architectural design decisions", date1, []);
+    const note2 = await noteService.create(`Continuation of [[${date1}]] architecture`, date2, []);
+
+    const { renderRoute, renderShell } = await import("./main");
+    history.pushState({}, "", `/?date=${date1}`);
+    await renderShell();
+    await renderRoute();
+
+    // Day mentions panel is displayed for date1
+    const mentionsPanel = document.querySelector(".day-mentions-panel");
+    expect(mentionsPanel).not.toBeNull();
+    expect(mentionsPanel?.textContent).toContain("Continuation of");
+    expect(mentionsPanel?.querySelector(".day-mention-snippet-rendered .wikilink")).not.toBeNull();
+
+    await noteService.delete(note1.id);
+    await noteService.delete(note2.id);
+  });
+
+  it("opens link picker modal when clicking toolbar backlink button and inserts selected note", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const note = await noteService.create("Sprint Planning Kickoff", "2026-10-01", []);
+
+    const { renderShell } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")!;
+    textarea.value = "Reviewing ";
+    textarea.setSelectionRange(10, 10);
+
+    const wikilinkBtn = document.querySelector<HTMLButtonElement>("#new-note-form button[data-format='wikilink']");
+    expect(wikilinkBtn).not.toBeNull();
+
+    wikilinkBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker dialog is mounted in #dialog-host
+    const dialog = document.querySelector(".link-picker-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Search input is focused
+    const searchInput = document.querySelector<HTMLInputElement>("#link-picker-search");
+    expect(searchInput).not.toBeNull();
+
+    // Results show the Sprint Planning Kickoff note with rendered inline markdown
+    const item = document.querySelector<HTMLButtonElement>(".link-picker-row[data-target='Sprint Planning Kickoff']");
+    expect(item).not.toBeNull();
+    expect(item?.querySelector(".link-picker-row-text.prose")).not.toBeNull();
+
+    // Click the item to insert
+    item?.click();
+
+    expect(textarea.value).toBe("Reviewing [[Sprint Planning Kickoff]] ");
+    expect(document.querySelector(".link-picker-dialog")).toBeNull();
+
+    await noteService.delete(note.id);
+  });
+
+  it("opens link picker modal when typing [[ inline in the editor", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const note = await noteService.create("Project Alpha Specifications", "2026-10-01", []);
+
+    const { renderShell } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea")!;
+    textarea.value = "Working on [[";
+    textarea.setSelectionRange(13, 13);
+    textarea.dispatchEvent(new Event("input"));
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker dialog is mounted in #dialog-host without any blocking floating dropdown
+    const dialog = document.querySelector(".link-picker-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Verify there is no wikilink-autocomplete-dropdown in the DOM
+    expect(document.querySelector(".wikilink-autocomplete-dropdown")).toBeNull();
+
+    // Click the item to insert
+    const item = document.querySelector<HTMLButtonElement>(".link-picker-row[data-target='Project Alpha Specifications']");
+    expect(item).not.toBeNull();
+    item?.click();
+
+    expect(textarea.value).toBe("Working on [[Project Alpha Specifications]] ");
+
+    await noteService.delete(note.id);
+  });
+
+  it("translates link picker badges, sections, and hints into Turkish", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const note = await noteService.create("Mimari Notları", "2026-10-01", []);
+
+    const { renderShell } = await import("./main");
+    const { setLocale } = await import("./i18n");
+    setLocale("tr");
+
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const wikilinkBtn = document.querySelector<HTMLButtonElement>("#new-note-form button[data-format='wikilink']");
+    wikilinkBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const dialog = document.querySelector(".link-picker-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Sections are translated to Turkish
+    const sectionLabels = Array.from(dialog?.querySelectorAll(".link-picker-section-label") ?? []).map((el) => el.textContent);
+    expect(sectionLabels).toContain("Tarihler");
+    expect(sectionLabels).toContain("Notlar");
+
+    // Today badge is translated to Bugün
+    const todayBadge = dialog?.querySelector(".link-picker-row-badge.is-date");
+    expect(todayBadge?.textContent).toBe("Bugün");
+
+    // Footer hint is translated to Turkish
+    const footerHint = dialog?.querySelector(".link-picker-hint");
+    expect(footerHint?.textContent).toContain("gezinmek için");
+    expect(footerHint?.textContent).toContain("eklemek için");
+
+    // Close dialog and reset locale
+    const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-close-dialog]");
+    closeBtn?.click();
+    setLocale("en");
+
+    await noteService.delete(note.id);
+  });
+
+  it("opens link picker modal from edit note dialog toolbar and inserts wikilink without closing edit dialog", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const targetNote = await noteService.create("Reference Target Note", "2026-10-02", []);
+    const editableNote = await noteService.create("Original Edit Content", "2026-10-04", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    // Open edit dialog
+    showEditDialog(editableNote);
+
+    const editDialogBackdrop = document.querySelector("#edit-note-backdrop");
+    expect(editDialogBackdrop).not.toBeNull();
+
+    const form = document.querySelector<HTMLFormElement>("#edit-note-form");
+    expect(form).not.toBeNull();
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    expect(textarea).not.toBeNull();
+    textarea.value = "See ";
+    textarea.setSelectionRange(4, 4);
+
+    // Click wikilink button in the edit dialog toolbar
+    const wikilinkBtn = form?.querySelector<HTMLButtonElement>("button[data-format='wikilink']");
+    expect(wikilinkBtn).not.toBeNull();
+
+    wikilinkBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker dialog is mounted on top of the edit dialog
+    const linkPickerDialog = document.querySelector(".link-picker-dialog");
+    expect(linkPickerDialog).not.toBeNull();
+
+    // Edit dialog backdrop is STILL in the DOM
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+
+    // Select the candidate note
+    const candidateRow = document.querySelector<HTMLButtonElement>(".link-picker-row[data-target='Reference Target Note']");
+    expect(candidateRow).not.toBeNull();
+    candidateRow?.click();
+
+    // Link picker dialog is closed
+    expect(document.querySelector(".link-picker-dialog")).toBeNull();
+
+    // Edit note dialog is STILL open
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+    expect(document.querySelector("#edit-note-form")).not.toBeNull();
+
+    // Textarea has the inserted wikilink
+    expect(textarea.value).toBe("See [[Reference Target Note]] ");
+
+    // Submit edit note form
+    form?.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Now edit dialog is closed
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+
+    // Verify persisted note
+    const updated = (await noteService.listAll()).find((n) => n.id === editableNote.id);
+    expect(updated?.content).toBe("See [[Reference Target Note]]");
+
+    await noteService.delete(targetNote.id);
+    await noteService.delete(editableNote.id);
+  });
+
+  it("opens link picker modal when typing [[ in edit note dialog and preserves edit dialog on cancel", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const editableNote = await noteService.create("Initial note text", "2026-10-04", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    showEditDialog(editableNote);
+    const form = document.querySelector<HTMLFormElement>("#edit-note-form");
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+
+    textarea.value = "Typing [[";
+    textarea.setSelectionRange(9, 9);
+    textarea.dispatchEvent(new Event("input"));
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker is open
+    expect(document.querySelector(".link-picker-dialog")).not.toBeNull();
+    // Edit dialog is still open underneath
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+
+    // Press Escape to cancel link picker
+    const escEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+    window.dispatchEvent(escEvent);
+
+    // Link picker is closed
+    expect(document.querySelector(".link-picker-dialog")).toBeNull();
+
+    // Edit dialog remains open and intact
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+
+    // Clean up
+    const cancelBtn = document.querySelector<HTMLButtonElement>("#edit-note-form [data-close-dialog]");
+    cancelBtn?.click();
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+
+    await noteService.delete(editableNote.id);
+  });
+
+  it("closes edit note dialog and navigates when clicking internal wikilink in preview mode", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const targetNote = await noteService.create("Target Note Description", "2026-10-01", []);
+    const noteWithWikilink = await noteService.create("Reference to [[2026-10-01]].", "2026-10-04", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    showEditDialog(noteWithWikilink);
+    const form = document.querySelector<HTMLFormElement>("#edit-note-form")!;
+
+    // Switch to preview mode
+    const previewBtn = form.querySelector<HTMLButtonElement>("[data-editor-mode='preview']")!;
+    previewBtn.click();
+
+    const previewPane = form.querySelector<HTMLElement>(".editor-preview")!;
+    expect(previewPane.classList.contains("is-hidden")).toBe(false);
+
+    // Wikilink is rendered in preview
+    const wikilink = previewPane.querySelector<HTMLAnchorElement>("a.wikilink");
+    expect(wikilink).not.toBeNull();
+    expect(wikilink?.getAttribute("href")).toContain("2026-10-01");
+
+    // Click the wikilink
+    wikilink?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    // Edit dialog MUST be closed
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+
+    // Route should be on target date
+    expect(location.search).toContain("date=2026-10-01");
+
+    await noteService.delete(targetNote.id);
+    await noteService.delete(noteWithWikilink.id);
+  });
+
+  it("renders external link with target=_blank in preview mode and clicking header date badge navigates", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const noteWithExternal = await noteService.create("Check [Website](https://example.com) for updates.", "2026-05-15", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    showEditDialog(noteWithExternal);
+    const dialog = document.querySelector(".note-edit-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Verify date badge in header is a link with href
+    const dateBadge = dialog?.querySelector<HTMLAnchorElement>(".note-edit-date-badge");
+    expect(dateBadge).not.toBeNull();
+    expect(dateBadge?.tagName).toBe("A");
+    expect(dateBadge?.getAttribute("href")).toContain("2026-05-15");
+
+    // Switch to preview mode
+    const previewBtn = dialog?.querySelector<HTMLButtonElement>("[data-editor-mode='preview']")!;
+    previewBtn.click();
+
+    const previewPane = dialog?.querySelector<HTMLElement>(".editor-preview")!;
+    const externalLink = previewPane.querySelector<HTMLAnchorElement>("a[target='_blank']");
+    expect(externalLink).not.toBeNull();
+    expect(externalLink?.getAttribute("href")).toBe("https://example.com");
+    expect(externalLink?.getAttribute("rel")).toContain("noopener");
+
+    // Click the header date badge
+    dateBadge?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    // Edit dialog closed and navigated
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+    expect(location.search).toContain("date=2026-05-15");
+
+    await noteService.delete(noteWithExternal.id);
   });
 });

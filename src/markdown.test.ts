@@ -98,4 +98,46 @@ describe("markdown code blocks and syntax highlighting", () => {
     const html = renderMarkdown(markdown);
     expect(html).toContain("First line<br>Second line");
   });
+
+  it("renders date wikilinks as interactive links with data-link and date query", () => {
+    const markdown = "See previous meeting in [[2026-10-02]].";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/?date=2026-10-02"');
+    expect(html).toContain('data-link');
+    expect(html).toContain('class="wikilink wikilink-date"');
+    expect(html).toContain(">2026-10-02</a>");
+  });
+
+  it("renders note wikilinks with custom label linking to note date", () => {
+    const markdown = "Check out [[Project Titan|Titan specs]].";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/?date=Project%20Titan"');
+    expect(html).toContain('class="wikilink wikilink-note"');
+    expect(html).toContain(">Titan specs</a>");
+  });
+
+  it("does not render wikilinks inside code blocks or inline code", () => {
+    const markdown = "Real: [[2026-10-02]]\n`[[2026-10-03]]`\n```\n[[2026-10-04]]\n```";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/?date=2026-10-02"');
+    expect(html).not.toContain('href="/?date=2026-10-03"');
+    expect(html).not.toContain('href="/?date=2026-10-04"');
+  });
+
+  it("renders external links with target=_blank and rel=noopener noreferrer", () => {
+    const markdown = "Visit [Google](https://google.com) or https://github.com for details.";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('<a href="https://google.com" target="_blank" rel="noopener noreferrer">Google</a>');
+    expect(html).toContain('<a href="https://github.com" target="_blank" rel="noopener noreferrer">https://github.com</a>');
+  });
+
+  it("renders internal markdown links with data-link attribute for SPA navigation", () => {
+    const markdown = "Go to [All Tasks](/todos) or jump to [Note](#note-123).";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/todos"');
+    expect(html).toContain('href="#note-123"');
+    expect(html).toContain("data-link");
+    expect(html).toContain(">All Tasks</a>");
+    expect(html).toContain(">Note</a>");
+  });
 });

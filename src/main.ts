@@ -3,13 +3,15 @@ import "./lite.css";
 import { clearAllData, storageCounts } from "./db";
 import { createBackup, DEFAULT_OLLAMA_SETTINGS, downloadBlob, downloadJson, downloadMarkdownZip, exportToDirectory, parseBackup, restoreBackup, settingsRepository } from "./data";
 import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, getRelativeDateInfo, setLocale, type SupportedLocale } from "./i18n";
-import { escapeHtml, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
+import { escapeHtml, renderInlineMarkdown, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
 import { attachTagAutocomplete } from "./tag-autocomplete";
 import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
 import { CategoryService, initializeLocalData, NoteService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
 import { getTemplateById, PREDEFINED_TEMPLATES } from "./templates";
+import { findDateBacklinks, findNoteBacklinks, setWikilinkNotesIndex } from "./wikilinks";
+import { buildWikilinkInsertion, getLinkPickerCandidates } from "./link-picker";
 import { CommandPaletteController } from "./command-palette/commandPalette";
 import type { CommandActions, CommandContext } from "./command-palette/types";
 
@@ -25,6 +27,7 @@ let paletteController: CommandPaletteController | null = null;
 let currentActiveNote: Note | null = null;
 
 export const icons = {
+  link: '<path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/>',
   template: '<path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M4 9h16"/><path d="M9 4v5"/>',
   home: '<path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>',
   note: '<path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M13 8l2 0"/><path d="M13 12l2 0"/>',
@@ -249,6 +252,7 @@ function initCommandPalette(): void {
       const isSameDate = (parsed.searchParams.get("date") ?? "") === (new URLSearchParams(location.search).get("date") ?? "");
 
       history.pushState({}, "", appUrl(url));
+      closeAllDialogs();
 
       if (isSamePath && isSameDate && parsed.hash) {
         highlightLinkedNote(parsed.hash);
@@ -358,12 +362,15 @@ function applyTemplateText(form: HTMLFormElement, textarea: HTMLTextAreaElement,
 export async function renderToday(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const requested = new URLSearchParams(location.search).get("date"); const today = isoDate(new Date()); const date = validIsoDate(requested) ? requested as string : today; const isToday = date === today;
-  const value = new Date(`${date}T12:00:00`); const allNotes = await notes.listAll(); const dayNotes = await notes.listByDate(date); const draft = await notes.getDraft(date);
+  const value = new Date(`${date}T12:00:00`); const allNotes = await notes.listAll();
+  setWikilinkNotesIndex(allNotes);
+  const dayNotes = await notes.listByDate(date); const draft = await notes.getDraft(date);
+  const dayBacklinks = findDateBacklinks(date, allNotes);
   const heading = formatDateHeading(date); const previous = shiftDate(date, -1); const next = shiftDate(date, 1); const selectedTag = new URLSearchParams(location.search).get("tag") ?? ""; const visibleNotes = selectedTag ? dayNotes.filter((note) => note.tags.includes(selectedTag)) : dayNotes; const frequentTags = tagCounts(dayNotes).slice(0, 6); document.title = `${heading} · Rook Lite`;
 
   const relativeInfo = getRelativeDateInfo(date, today, getLocale());
 
-  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>`;
+  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="Date navigation"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allNotes, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>${dayBacklinks.length ? `<section class="day-mentions-panel notes-panel" aria-labelledby="day-mentions-title"><div class="section-head"><div class="notes-panel-heading"><h3 id="day-mentions-title" class="panel-subtitle">${svg(icons.link, "backlink-icon-svg")}<span>${s.linkedMentionsTitle}</span></h3><span class="notes-count-badge">${dayBacklinks.length}</span></div></div><div class="day-mentions-list">${dayBacklinks.map((bl) => `<div class="day-mention-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="mention-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="day-mention-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></div>`).join("")}</div></section>` : ""}`;
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
   bindCreateEditor(date); bindNoteActions();
   updateScrollToTopVisibility();
@@ -372,12 +379,13 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 
 function editorMarkup(id: string, value: string, label: string, isModal = false): string {
   const s = currentStrings();
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="Templates" aria-label="Templates">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${PREDEFINED_TEMPLATES.map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button><button type="button" data-format="wikilink" class="editor-tool-wikilink" aria-label="${s.insertWikilink}" title="${s.insertWikilink} ([[)">${svg(icons.link, "editor-tool-svg")}</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="Templates" aria-label="Templates">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${PREDEFINED_TEMPLATES.map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
-function noteMarkup(note: Note, selectedDate = note.noteDate): string {
+function noteMarkup(note: Note, allNotes: Note[] = [], selectedDate = note.noteDate): string {
   const s = currentStrings();
-  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time></div><div class="note-header-actions"><button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  const backlinks = allNotes.length ? findNoteBacklinks(note, allNotes) : [];
+  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time></div><div class="note-header-actions"><button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${backlinks.length ? `<div class="note-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string, allNotes: Note[]): void {
@@ -437,6 +445,7 @@ export function setEditorMode(form: HTMLFormElement, mode: "write" | "preview", 
     const content = textarea.value.trim();
     if (content) {
       previewPane.innerHTML = renderMarkdown(content, true);
+      normalizeAppLinks(previewPane);
     } else {
       const s = currentStrings();
       previewPane.innerHTML = `<p class="editor-preview-empty">${s.editorEmptyPreview}</p>`;
@@ -560,6 +569,13 @@ function bindCreateEditor(date: string): void {
     }
   });
   attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
+  textarea.addEventListener("input", () => {
+    const cursor = textarea.selectionStart;
+    if (cursor >= 2 && textarea.value.slice(cursor - 2, cursor) === "[[") {
+      textarea.setRangeText("", cursor - 2, cursor, "end");
+      void showLinkPickerModal(textarea);
+    }
+  });
 }
 
 function bindNoteActions(): void {
@@ -607,17 +623,32 @@ export function showEditDialog(note: Note, _allCategories?: Category[]): void {
   const s = currentStrings();
   const host = requireElement<HTMLElement>("#dialog-host");
   const formattedDate = formatDateHeading(note.noteDate);
-  host.innerHTML = `<div class="note-edit-backdrop" id="edit-note-backdrop"><section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><span class="note-edit-date-badge">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></span></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true)}</div></section></div>`;
+  void notes.listAll().then((all) => setWikilinkNotesIndex(all));
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "note-edit-backdrop";
+  backdrop.id = "edit-note-backdrop";
+  backdrop.innerHTML = `<section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><a href="${appUrl(`/?date=${note.noteDate}`)}" data-link class="note-edit-date-badge" title="${s.openCalendar}">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></a></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true)}</div></section>`;
+  host.replaceChildren(backdrop);
   document.body.style.overflow = "hidden";
-  const backdrop = requireElement<HTMLElement>("#edit-note-backdrop");
+
+  const cleanup = () => {
+    window.removeEventListener("keydown", onKeydown);
+  };
+
   backdrop.addEventListener("click", (event) => {
     const target = event.target as Element;
-    if (target === backdrop || target.closest("[data-close-dialog]")) closeDialog();
+    if (target === backdrop || target.closest("[data-close-dialog]")) {
+      cleanup();
+      closeDialog(backdrop);
+    }
   });
   const onKeydown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
-      window.removeEventListener("keydown", onKeydown);
-      closeDialog();
+      const currentHost = document.querySelector<HTMLElement>("#dialog-host");
+      if (currentHost && currentHost.lastElementChild !== backdrop) return;
+      cleanup();
+      closeDialog(backdrop);
     }
   };
   window.addEventListener("keydown", onKeydown);
@@ -635,12 +666,20 @@ export function showEditDialog(note: Note, _allCategories?: Category[]): void {
     }
   });
   attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
+  textarea.addEventListener("input", () => {
+    const cursor = textarea.selectionStart;
+    if (cursor >= 2 && textarea.value.slice(cursor - 2, cursor) === "[[") {
+      textarea.setRangeText("", cursor - 2, cursor, "end");
+      void showLinkPickerModal(textarea);
+    }
+  });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     setBusy(form, true);
     try {
       await notes.update(note.id, textarea.value);
-      closeDialog();
+      cleanup();
+      closeDialog(backdrop);
       await renderRoute();
     } catch (error) {
       status(form, errorMessage(error), true);
@@ -655,18 +694,29 @@ export function showShortcutsDialog(): void {
   const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
   const modKey = isMac ? "⌘" : "Ctrl";
 
-  host.innerHTML = `<div class="note-edit-backdrop" id="shortcuts-backdrop"><section class="note-edit-dialog shortcuts-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title"><header class="note-edit-dialog-head"><div class="shortcuts-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.keyboard, "note-edit-icon-svg")}</span><h2 id="shortcuts-dialog-title">${s.keyboardShortcutsTitle}</h2></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="shortcuts-dialog-body"><section class="shortcuts-group"><h3>${s.shortcutsNavTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>${s.shortcutPrevNextDay}</dd></div><div class="shortcut-entry"><dt><kbd>T</kbd></dt><dd>${s.shortcutToday}</dd></div><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>↑</kbd> <span class="shortcut-or">/</span> <kbd>Home</kbd></dt><dd>${s.shortcutScrollTop}</dd></div></dl></section><section class="shortcuts-group"><h3>${s.shortcutsEditorTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>Enter</kbd></dt><dd>${s.shortcutSaveNote}</dd></div><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>D</kbd></dt><dd>${s.shortcutZenMode}</dd></div><div class="shortcut-entry"><dt><kbd>*</kbd><kbd>Space</kbd></dt><dd>${s.shortcutBulletList}</dd></div><div class="shortcut-entry"><dt><kbd>-</kbd><kbd>[</kbd><kbd>]</kbd><kbd>Space</kbd></dt><dd>${s.shortcutChecklist}</dd></div></dl></section><section class="shortcuts-group"><h3>${s.shortcutsGeneralTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>K</kbd> <span class="shortcut-or">/</span> <kbd>/</kbd></dt><dd>${s.shortcutCommandPalette}</dd></div><div class="shortcut-entry"><dt><kbd>?</kbd></dt><dd>${s.shortcutHelp}</dd></div><div class="shortcut-entry"><dt><kbd>Esc</kbd></dt><dd>${s.shortcutEscape}</dd></div></dl></section></div></section></div>`;
+  const backdrop = document.createElement("div");
+  backdrop.className = "note-edit-backdrop shortcuts-backdrop";
+  backdrop.id = "shortcuts-backdrop";
+  backdrop.innerHTML = `<section class="note-edit-dialog shortcuts-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title"><header class="note-edit-dialog-head"><div class="shortcuts-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.keyboard, "note-edit-icon-svg")}</span><h2 id="shortcuts-dialog-title">${s.keyboardShortcutsTitle}</h2></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="shortcuts-dialog-body"><section class="shortcuts-group"><h3>${s.shortcutsNavTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>${s.shortcutPrevNextDay}</dd></div><div class="shortcut-entry"><dt><kbd>T</kbd></dt><dd>${s.shortcutToday}</dd></div><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>↑</kbd> <span class="shortcut-or">/</span> <kbd>Home</kbd></dt><dd>${s.shortcutScrollTop}</dd></div></dl></section><section class="shortcuts-group"><h3>${s.shortcutsEditorTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>Enter</kbd></dt><dd>${s.shortcutSaveNote}</dd></div><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>D</kbd></dt><dd>${s.shortcutZenMode}</dd></div><div class="shortcut-entry"><dt><kbd>*</kbd><kbd>Space</kbd></dt><dd>${s.shortcutBulletList}</dd></div><div class="shortcut-entry"><dt><kbd>-</kbd><kbd>[</kbd><kbd>]</kbd><kbd>Space</kbd></dt><dd>${s.shortcutChecklist}</dd></div></dl></section><section class="shortcuts-group"><h3>${s.shortcutsGeneralTitle}</h3><dl class="shortcuts-grid"><div class="shortcut-entry"><dt><kbd>${modKey}</kbd><kbd>K</kbd> <span class="shortcut-or">/</span> <kbd>/</kbd></dt><dd>${s.shortcutCommandPalette}</dd></div><div class="shortcut-entry"><dt><kbd>?</kbd></dt><dd>${s.shortcutHelp}</dd></div><div class="shortcut-entry"><dt><kbd>Esc</kbd></dt><dd>${s.shortcutEscape}</dd></div></dl></section></div></section>`;
 
+  host.appendChild(backdrop);
   document.body.style.overflow = "hidden";
-  const backdrop = requireElement<HTMLElement>("#shortcuts-backdrop");
+
   backdrop.addEventListener("click", (event) => {
     const target = event.target as Element;
-    if (target === backdrop || target.closest("[data-close-dialog]")) closeDialog();
+    if (target === backdrop || target.closest("[data-close-dialog]")) {
+      event.preventDefault();
+      event.stopPropagation();
+      window.removeEventListener("keydown", onKeydown);
+      closeDialog(backdrop);
+    }
   });
   const onKeydown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
       window.removeEventListener("keydown", onKeydown);
-      closeDialog();
+      closeDialog(backdrop);
     }
   };
   window.addEventListener("keydown", onKeydown);
@@ -1260,32 +1310,220 @@ function dataMessage(message: string, error: boolean): void {
 }
 function formatBytes(bytes: number): string { if (bytes < 1024) return `${bytes} B`; if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`; return `${(bytes / 1024 / 1024).toFixed(1)} MB`; }
 
-function showConfirm(title: string, message: string, actionLabel: string, action: () => Promise<void>): void {
+export async function showLinkPickerModal(textarea: HTMLTextAreaElement): Promise<void> {
   const s = currentStrings();
   const host = requireElement<HTMLElement>("#dialog-host");
-  host.innerHTML = `<div class="note-edit-backdrop" id="confirm-backdrop"><section class="note-edit-dialog lite-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"><header class="note-edit-dialog-head"><div class="confirm-title-group"><span class="confirm-alert-icon-wrap" aria-hidden="true">${svg(icons.alert, "confirm-alert-svg")}</span><h2 id="confirm-title">${escapeHtml(title)}</h2></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}">${svg(icons.close, "dialog-close-svg")}</button></header><div class="confirm-dialog-body"><p class="confirm-dialog-message">${escapeHtml(message)}</p></div><footer class="confirm-dialog-footer"><button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button><button type="button" class="btn-danger-confirm" id="confirm-action">${escapeHtml(actionLabel)}</button></footer></section></div>`;
+
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selectedText = textarea.value.slice(start, end).trim();
+
+  let currentQuery = selectedText;
+  let activeIndex = 0;
+  let allNotes: Note[] = [];
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "note-edit-backdrop link-picker-backdrop";
+  backdrop.id = "link-picker-backdrop";
+  backdrop.innerHTML = `
+    <section class="link-picker-dialog" role="dialog" aria-modal="true" aria-label="${s.insertWikilink}">
+      <header class="link-picker-header">
+        <div class="link-picker-search-field">
+          <span class="link-picker-search-icon" aria-hidden="true">${svg(icons.search, "picker-search-svg")}</span>
+          <input type="text" class="link-picker-input" id="link-picker-search" placeholder="${s.searchPlaceholder}" autocomplete="off" spellcheck="false" value="${escapeHtml(selectedText)}" aria-label="${s.insertWikilink}">
+          <button type="button" class="link-picker-esc-hint" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">esc</button>
+        </div>
+      </header>
+      <div class="link-picker-results" id="link-picker-results" role="listbox"></div>
+      <footer class="link-picker-footer">
+        <span class="link-picker-hint">${s.pickerNavHint}</span>
+      </footer>
+    </section>
+  `;
+
+  host.appendChild(backdrop);
   document.body.style.overflow = "hidden";
 
-  const backdrop = requireElement<HTMLElement>("#confirm-backdrop");
-  backdrop.addEventListener("click", (event) => {
-    const target = event.target as Element;
-    if (target === backdrop || target.closest("[data-close-dialog]")) closeDialog();
-  });
+  const searchInput = backdrop.querySelector<HTMLInputElement>("#link-picker-search")!;
+  const resultsContainer = backdrop.querySelector<HTMLElement>("#link-picker-results")!;
+
+  const closePicker = () => {
+    window.removeEventListener("keydown", onKeydown);
+    closeDialog(backdrop);
+    textarea.focus();
+  };
 
   const onKeydown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
-      window.removeEventListener("keydown", onKeydown);
-      closeDialog();
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closePicker();
     }
   };
   window.addEventListener("keydown", onKeydown);
 
-  requireElement<HTMLButtonElement>("#confirm-action").addEventListener("click", async (event) => {
+  backdrop.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target === backdrop || target.closest("[data-close-dialog]")) {
+      event.preventDefault();
+      event.stopPropagation();
+      closePicker();
+    }
+  });
+
+  const pickerLabels = {
+    todayBadge: s.badgeToday,
+    yesterdayBadge: s.badgeYesterday,
+    dateBadge: s.badgeDate,
+    todayLabel: s.today,
+    yesterdayLabel: s.yesterday
+  };
+
+  function renderList(): void {
+    const { dates, notes: candidateNotes } = getLinkPickerCandidates(currentQuery, allNotes, 30, pickerLabels);
+    const totalItems = [...dates, ...candidateNotes];
+
+    if (totalItems.length === 0) {
+      resultsContainer.innerHTML = `<div class="link-picker-empty"><p>${s.searchNoResults}</p></div>`;
+      return;
+    }
+
+    if (activeIndex >= totalItems.length) activeIndex = 0;
+
+    let html = "";
+    let itemIdx = 0;
+
+    if (dates.length > 0) {
+      html += `<div class="link-picker-section-label">${escapeHtml(s.pickerSectionDates)}</div>`;
+      for (const d of dates) {
+        const isSelected = itemIdx === activeIndex;
+        html += `
+          <button type="button" class="link-picker-row ${isSelected ? "is-selected" : ""}" data-item-idx="${itemIdx}" data-target="${escapeHtml(d.target)}" role="option" aria-selected="${isSelected}">
+            <span class="link-picker-row-badge is-date">${escapeHtml(d.badge)}</span>
+            <span class="link-picker-row-text prose">${renderInlineMarkdown(d.line)}</span>
+          </button>
+        `;
+        itemIdx++;
+      }
+    }
+
+    if (candidateNotes.length > 0) {
+      html += `<div class="link-picker-section-label">${escapeHtml(s.pickerSectionNotes)}</div>`;
+      for (const n of candidateNotes) {
+        const isSelected = itemIdx === activeIndex;
+        html += `
+          <button type="button" class="link-picker-row ${isSelected ? "is-selected" : ""}" data-item-idx="${itemIdx}" data-target="${escapeHtml(n.target)}" role="option" aria-selected="${isSelected}">
+            <span class="link-picker-row-badge">${escapeHtml(n.badge)}</span>
+            <span class="link-picker-row-text prose">${renderInlineMarkdown(n.line)}</span>
+            ${n.tag ? `<span class="link-picker-row-tag">#${escapeHtml(n.tag)}</span>` : ""}
+          </button>
+        `;
+        itemIdx++;
+      }
+    }
+
+    resultsContainer.innerHTML = html;
+
+    resultsContainer.querySelectorAll<HTMLButtonElement>(".link-picker-row").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.target ?? "";
+        applyLinkInsertion(target);
+      });
+    });
+
+    const activeEl = resultsContainer.querySelector<HTMLElement>(".link-picker-row.is-selected");
+    if (typeof activeEl?.scrollIntoView === "function") {
+      activeEl.scrollIntoView({ block: "nearest" });
+    }
+  }
+
+  function applyLinkInsertion(target: string): void {
+    const syntax = `${buildWikilinkInsertion(target, selectedText)} `;
+    textarea.setRangeText(syntax, start, end, "end");
+    closePicker();
+    resizeEditor(textarea);
+    const form = textarea.closest("form");
+    if (form) {
+      updateEditorWordCount(form);
+      form.classList.add("has-content");
+    }
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  searchInput.addEventListener("input", () => {
+    currentQuery = searchInput.value;
+    activeIndex = 0;
+    renderList();
+  });
+
+  searchInput.addEventListener("keydown", (e) => {
+    const { dates, notes: candidateNotes } = getLinkPickerCandidates(currentQuery, allNotes, 30, pickerLabels);
+    const totalItems = [...dates, ...candidateNotes];
+    if (totalItems.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      activeIndex = (activeIndex + 1) % totalItems.length;
+      renderList();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      activeIndex = (activeIndex - 1 + totalItems.length) % totalItems.length;
+      renderList();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const selected = totalItems[activeIndex];
+      if (selected) applyLinkInsertion(selected.target);
+    }
+  });
+
+  allNotes = await notes.listAll();
+  setWikilinkNotesIndex(allNotes);
+  renderList();
+  requestAnimationFrame(() => {
+    searchInput.focus();
+    searchInput.select();
+  });
+}
+
+function showConfirm(title: string, message: string, actionLabel: string, action: () => Promise<void>): void {
+  const s = currentStrings();
+  const host = requireElement<HTMLElement>("#dialog-host");
+  const backdrop = document.createElement("div");
+  backdrop.className = "note-edit-backdrop confirm-backdrop";
+  backdrop.id = "confirm-backdrop";
+  backdrop.innerHTML = `<section class="note-edit-dialog lite-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"><header class="note-edit-dialog-head"><div class="confirm-title-group"><span class="confirm-alert-icon-wrap" aria-hidden="true">${svg(icons.alert, "confirm-alert-svg")}</span><h2 id="confirm-title">${escapeHtml(title)}</h2></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}">${svg(icons.close, "dialog-close-svg")}</button></header><div class="confirm-dialog-body"><p class="confirm-dialog-message">${escapeHtml(message)}</p></div><footer class="confirm-dialog-footer"><button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button><button type="button" class="btn-danger-confirm" id="confirm-action">${escapeHtml(actionLabel)}</button></footer></section>`;
+  host.appendChild(backdrop);
+  document.body.style.overflow = "hidden";
+
+  const closeConfirm = () => {
+    window.removeEventListener("keydown", onKeydown);
+    closeDialog(backdrop);
+  };
+
+  backdrop.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target === backdrop || target.closest("[data-close-dialog]")) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeConfirm();
+    }
+  });
+
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      closeConfirm();
+    }
+  };
+  window.addEventListener("keydown", onKeydown);
+
+  backdrop.querySelector<HTMLButtonElement>("#confirm-action")?.addEventListener("click", async (event) => {
     const button = event.currentTarget as HTMLButtonElement;
     button.disabled = true;
     try {
       await action();
-      closeDialog();
+      closeConfirm();
     } catch (error) {
       button.disabled = false;
       alert(errorMessage(error));
@@ -1293,7 +1531,35 @@ function showConfirm(title: string, message: string, actionLabel: string, action
   });
 }
 
-export function closeDialog(): void {
+export function closeDialog(target?: Element | null): void {
+  const host = document.querySelector<HTMLElement>("#dialog-host");
+  if (!host) return;
+  if (target !== undefined) {
+    if (target && host.contains(target)) {
+      const backdrop = target.classList.contains("note-edit-backdrop")
+        ? target
+        : target.closest(".note-edit-backdrop");
+      if (backdrop) {
+        backdrop.remove();
+      } else {
+        target.remove();
+      }
+    }
+  } else if (host.lastElementChild) {
+    host.lastElementChild.remove();
+  } else {
+    host.replaceChildren();
+  }
+
+  if (host.children.length === 0) {
+    document.body.style.overflow = "";
+    if (document.body.classList.contains("is-zen-mode")) {
+      toggleZenMode();
+    }
+  }
+}
+
+export function closeAllDialogs(): void {
   const host = document.querySelector<HTMLElement>("#dialog-host");
   if (host) host.replaceChildren();
   document.body.style.overflow = "";
@@ -1439,6 +1705,7 @@ function bindShellEvents(): void {
       const targetUrl = rawHref ? appUrl(rawHref) : link.href;
       history.pushState({}, "", targetUrl);
       closeSearch();
+      closeAllDialogs();
       void renderRoute().then(() => {
         if (link.dataset.command === "new-note") {
           const form = document.querySelector<HTMLFormElement>("#new-note-form");
@@ -1481,10 +1748,17 @@ function bindShellEvents(): void {
     if (action === "close-sidebar") closeSidebar();
     if (action === "open-search") openSearch();
     if (action === "toggle-theme") setTheme(document.documentElement.dataset.theme === "dark" ? "LIGHT" : "DARK");
-    if (target.closest("[data-close-dialog]")) closeDialog();
+    const closeBtn = target.closest("[data-close-dialog]");
+    if (closeBtn) {
+      const backdrop = closeBtn.closest(".note-edit-backdrop");
+      closeDialog(backdrop);
+    }
     if (target.id === "search-modal") closeSearch();
   });
-  window.addEventListener("popstate", () => void renderRoute());
+  window.addEventListener("popstate", () => {
+    closeAllDialogs();
+    void renderRoute();
+  });
   window.addEventListener("resize", () => {
     closeSidebar();
     updateScrollToTopVisibility();
@@ -1562,7 +1836,15 @@ export function handleSmartListContinuation(event: KeyboardEvent, textarea: HTML
 }
 
 function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): void {
-  form.querySelectorAll<HTMLButtonElement>("[data-format]").forEach((button) => button.addEventListener("click", () => formatNote(textarea, button.dataset.format ?? "")));
+  form.querySelectorAll<HTMLButtonElement>("[data-format]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.dataset.format === "wikilink") {
+        void showLinkPickerModal(textarea);
+      } else {
+        formatNote(textarea, button.dataset.format ?? "");
+      }
+    });
+  });
   form.querySelectorAll<HTMLButtonElement>("[data-insert-template]").forEach((btn) => {
     btn.addEventListener("click", (event) => {
       event.preventDefault();
@@ -1578,11 +1860,12 @@ function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): v
     handleSmartListContinuation(event, textarea);
   });
 }
-function formatNote(textarea: HTMLTextAreaElement, style: string): void { const start = textarea.selectionStart; const end = textarea.selectionEnd; const selected = textarea.value.slice(start, end); const formats: Record<string, [string, string]> = { heading: ["## ", ""], bold: ["**", "**"], italic: ["_", "_"], strike: ["~~", "~~"], list: ["* ", ""], numbered: ["1. ", ""], task: ["- [ ] ", ""], code: ["```\n", "\n```"] }; const [rawPrefix, suffix] = formats[style] ?? ["", ""]; const before = textarea.value.slice(0, start); const prefix = ["heading", "list", "numbered", "task"].includes(style) && before && !before.endsWith("\n") ? `\n${rawPrefix}` : rawPrefix; textarea.setRangeText(`${prefix}${selected}${suffix}`, start, end, "end"); textarea.focus(); textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length); textarea.dispatchEvent(new Event("input", { bubbles: true })); }
+function formatNote(textarea: HTMLTextAreaElement, style: string): void { const start = textarea.selectionStart; const end = textarea.selectionEnd; const selected = textarea.value.slice(start, end); const formats: Record<string, [string, string]> = { heading: ["## ", ""], bold: ["**", "**"], italic: ["_", "_"], strike: ["~~", "~~"], list: ["* ", ""], numbered: ["1. ", ""], task: ["- [ ] ", ""], code: ["```\n", "\n```"], wikilink: ["[[", "]]"] }; const [rawPrefix, suffix] = formats[style] ?? ["", ""]; const before = textarea.value.slice(0, start); const prefix = ["heading", "list", "numbered", "task"].includes(style) && before && !before.endsWith("\n") ? `\n${rawPrefix}` : rawPrefix; textarea.setRangeText(`${prefix}${selected}${suffix}`, start, end, "end"); textarea.focus(); textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length); textarea.dispatchEvent(new Event("input", { bubbles: true })); }
 function resizeEditor(textarea: HTMLTextAreaElement): void { textarea.style.height = "auto"; textarea.style.height = `${textarea.scrollHeight}px`; }
 function status(form: HTMLFormElement, message: string, error = false): void { const element = form.querySelector<HTMLElement>("[data-save-status]"); if (element) { element.textContent = message; element.classList.toggle("text-danger", error); } }
 function setBusy(form: HTMLFormElement, busy: boolean): void { form.querySelectorAll<HTMLButtonElement>("button").forEach((button) => { button.disabled = busy; }); }
 function handleKeyboard(event: KeyboardEvent): void {
+  if (event.defaultPrevented) return;
   const modal = document.querySelector<HTMLElement>("#search-modal");
   if (modal?.classList.contains("is-open")) {
     if (event.key === "Escape") {
@@ -1682,7 +1965,9 @@ function requireElement<T extends Element>(selector: string): T { const element 
 
 async function start(): Promise<void> { try { setLocale(getLocale()); await initializeLocalData(); await renderShell(); } catch (error) { requireElement<HTMLDivElement>("#app").innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`; } }
 
-void start();
+if (import.meta.env.MODE !== "test") {
+  void start();
+}
 if ("serviceWorker" in navigator) {
   if (import.meta.env.PROD) {
     window.addEventListener("load", () => {
