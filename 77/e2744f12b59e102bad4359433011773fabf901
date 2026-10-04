@@ -1,0 +1,14 @@
+package.json
+  h_d04970b9e4de74 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "77e2744f12b59e102bad4359433011773fabf901",
+  "prompts": {},
+  "humans": {
+    "h_d04970b9e4de74": {
+      "author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
