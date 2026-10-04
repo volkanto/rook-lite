@@ -1404,4 +1404,188 @@ describe("Left menu bar icons and navigation", () => {
 
     await noteService.delete(note.id);
   });
+
+  it("opens link picker modal from edit note dialog toolbar and inserts wikilink without closing edit dialog", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const targetNote = await noteService.create("Reference Target Note", "2026-10-02", []);
+    const editableNote = await noteService.create("Original Edit Content", "2026-10-04", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    // Open edit dialog
+    showEditDialog(editableNote);
+
+    const editDialogBackdrop = document.querySelector("#edit-note-backdrop");
+    expect(editDialogBackdrop).not.toBeNull();
+
+    const form = document.querySelector<HTMLFormElement>("#edit-note-form");
+    expect(form).not.toBeNull();
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    expect(textarea).not.toBeNull();
+    textarea.value = "See ";
+    textarea.setSelectionRange(4, 4);
+
+    // Click wikilink button in the edit dialog toolbar
+    const wikilinkBtn = form?.querySelector<HTMLButtonElement>("button[data-format='wikilink']");
+    expect(wikilinkBtn).not.toBeNull();
+
+    wikilinkBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker dialog is mounted on top of the edit dialog
+    const linkPickerDialog = document.querySelector(".link-picker-dialog");
+    expect(linkPickerDialog).not.toBeNull();
+
+    // Edit dialog backdrop is STILL in the DOM
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+
+    // Select the candidate note
+    const candidateRow = document.querySelector<HTMLButtonElement>(".link-picker-row[data-target='Reference Target Note']");
+    expect(candidateRow).not.toBeNull();
+    candidateRow?.click();
+
+    // Link picker dialog is closed
+    expect(document.querySelector(".link-picker-dialog")).toBeNull();
+
+    // Edit note dialog is STILL open
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+    expect(document.querySelector("#edit-note-form")).not.toBeNull();
+
+    // Textarea has the inserted wikilink
+    expect(textarea.value).toBe("See [[Reference Target Note]] ");
+
+    // Submit edit note form
+    form?.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Now edit dialog is closed
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+
+    // Verify persisted note
+    const updated = (await noteService.listAll()).find((n) => n.id === editableNote.id);
+    expect(updated?.content).toBe("See [[Reference Target Note]]");
+
+    await noteService.delete(targetNote.id);
+    await noteService.delete(editableNote.id);
+  });
+
+  it("opens link picker modal when typing [[ in edit note dialog and preserves edit dialog on cancel", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const editableNote = await noteService.create("Initial note text", "2026-10-04", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    showEditDialog(editableNote);
+    const form = document.querySelector<HTMLFormElement>("#edit-note-form");
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+
+    textarea.value = "Typing [[";
+    textarea.setSelectionRange(9, 9);
+    textarea.dispatchEvent(new Event("input"));
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Link picker is open
+    expect(document.querySelector(".link-picker-dialog")).not.toBeNull();
+    // Edit dialog is still open underneath
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+
+    // Press Escape to cancel link picker
+    const escEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+    window.dispatchEvent(escEvent);
+
+    // Link picker is closed
+    expect(document.querySelector(".link-picker-dialog")).toBeNull();
+
+    // Edit dialog remains open and intact
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
+
+    // Clean up
+    const cancelBtn = document.querySelector<HTMLButtonElement>("#edit-note-form [data-close-dialog]");
+    cancelBtn?.click();
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+
+    await noteService.delete(editableNote.id);
+  });
+
+  it("closes edit note dialog and navigates when clicking internal wikilink in preview mode", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const targetNote = await noteService.create("Target Note Description", "2026-10-01", []);
+    const noteWithWikilink = await noteService.create("Reference to [[2026-10-01]].", "2026-10-04", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    showEditDialog(noteWithWikilink);
+    const form = document.querySelector<HTMLFormElement>("#edit-note-form")!;
+
+    // Switch to preview mode
+    const previewBtn = form.querySelector<HTMLButtonElement>("[data-editor-mode='preview']")!;
+    previewBtn.click();
+
+    const previewPane = form.querySelector<HTMLElement>(".editor-preview")!;
+    expect(previewPane.classList.contains("is-hidden")).toBe(false);
+
+    // Wikilink is rendered in preview
+    const wikilink = previewPane.querySelector<HTMLAnchorElement>("a.wikilink");
+    expect(wikilink).not.toBeNull();
+    expect(wikilink?.getAttribute("href")).toContain("2026-10-01");
+
+    // Click the wikilink
+    wikilink?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    // Edit dialog MUST be closed
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+
+    // Route should be on target date
+    expect(location.search).toContain("date=2026-10-01");
+
+    await noteService.delete(targetNote.id);
+    await noteService.delete(noteWithWikilink.id);
+  });
+
+  it("renders external link with target=_blank in preview mode and clicking header date badge navigates", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const noteWithExternal = await noteService.create("Check [Website](https://example.com) for updates.", "2026-05-15", []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    showEditDialog(noteWithExternal);
+    const dialog = document.querySelector(".note-edit-dialog");
+    expect(dialog).not.toBeNull();
+
+    // Verify date badge in header is a link with href
+    const dateBadge = dialog?.querySelector<HTMLAnchorElement>(".note-edit-date-badge");
+    expect(dateBadge).not.toBeNull();
+    expect(dateBadge?.tagName).toBe("A");
+    expect(dateBadge?.getAttribute("href")).toContain("2026-05-15");
+
+    // Switch to preview mode
+    const previewBtn = dialog?.querySelector<HTMLButtonElement>("[data-editor-mode='preview']")!;
+    previewBtn.click();
+
+    const previewPane = dialog?.querySelector<HTMLElement>(".editor-preview")!;
+    const externalLink = previewPane.querySelector<HTMLAnchorElement>("a[target='_blank']");
+    expect(externalLink).not.toBeNull();
+    expect(externalLink?.getAttribute("href")).toBe("https://example.com");
+    expect(externalLink?.getAttribute("rel")).toContain("noopener");
+
+    // Click the header date badge
+    dateBadge?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    // Edit dialog closed and navigated
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+    expect(location.search).toContain("date=2026-05-15");
+
+    await noteService.delete(noteWithExternal.id);
+  });
 });

@@ -123,4 +123,21 @@ describe("markdown code blocks and syntax highlighting", () => {
     expect(html).not.toContain('href="/?date=2026-10-03"');
     expect(html).not.toContain('href="/?date=2026-10-04"');
   });
+
+  it("renders external links with target=_blank and rel=noopener noreferrer", () => {
+    const markdown = "Visit [Google](https://google.com) or https://github.com for details.";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('<a href="https://google.com" target="_blank" rel="noopener noreferrer">Google</a>');
+    expect(html).toContain('<a href="https://github.com" target="_blank" rel="noopener noreferrer">https://github.com</a>');
+  });
+
+  it("renders internal markdown links with data-link attribute for SPA navigation", () => {
+    const markdown = "Go to [All Tasks](/todos) or jump to [Note](#note-123).";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('href="/todos"');
+    expect(html).toContain('href="#note-123"');
+    expect(html).toContain("data-link");
+    expect(html).toContain(">All Tasks</a>");
+    expect(html).toContain(">Note</a>");
+  });
 });

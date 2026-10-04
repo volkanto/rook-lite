@@ -2160,6 +2160,15 @@
   animation: modal-fade-in 140ms ease-out;
 }
 
+.note-edit-backdrop.link-picker-backdrop {
+  z-index: 1200;
+}
+
+.note-edit-backdrop.confirm-backdrop,
+#confirm-backdrop {
+  z-index: 1300;
+}
+
 @keyframes modal-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -2246,6 +2255,15 @@
   font-size: 0.74rem;
   font-weight: 500;
   line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.note-edit-date-badge:hover {
+  background: var(--color-bg-surface-raised, var(--surface));
+  color: var(--color-text-primary, var(--text));
+  border-color: var(--color-border-default, var(--border));
 }
 
 .badge-calendar-svg {
@@ -2646,6 +2664,17 @@ button.editor-template-item:hover {
 
 .wikilink.wikilink-date {
   font-variant-numeric: tabular-nums;
+}
+
+.prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge) {
+  color: var(--color-brand, #2563eb);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 120ms ease;
+}
+
+.prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge):hover {
+  color: var(--color-brand-hover, #1d4ed8);
 }
 
 /* Note Backlinks Section inside note cards */

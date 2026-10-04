@@ -71,9 +71,24 @@ marked.use({
       const codeClass = validLang ? `hljs language-${validLang}` : "hljs raw-code";
 
       return `<div class="code-block-wrapper"><div class="code-block-header">${langLabelHtml}<button type="button" class="copy-code-btn" aria-label="Copy code">${COPY_ICON_SVG}<span class="copy-code-text">Copy</span></button></div><pre><code class="${codeClass}">${highlighted}</code></pre></div>`;
+    },
+    link({ href, title, tokens }: any): string {
+      const cleanHref = (href || "").trim();
+      const titleAttr = title ? ` title="${escapeHtml(title)}"` : "";
+      const text = this.parser.parseInline(tokens ?? []);
+
+      if (isExternalHref(cleanHref)) {
+        return `<a href="${escapeHtml(cleanHref)}"${titleAttr} target="_blank" rel="noopener noreferrer">${text}</a>`;
+      }
+      return `<a href="${escapeHtml(cleanHref)}"${titleAttr} data-link>${text}</a>`;
     }
   }
 });
+
+function isExternalHref(href: string): boolean {
+  if (!href) return false;
+  return /^(?:https?:|\/\/|mailto:)/i.test(href.trim());
+}
 
 function sanitizeHtml(html: string): string {
   const purify = typeof (DOMPurify as any).sanitize === "function"
@@ -86,7 +101,7 @@ function sanitizeHtml(html: string): string {
     USE_PROFILES: { html: true, svg: true },
     FORBID_TAGS: ["style", "iframe", "object", "embed"],
     FORBID_ATTR: ["style"],
-    ADD_ATTR: ["data-task-index", "aria-label", "aria-hidden", "data-link", "data-wikilink-target"]
+    ADD_ATTR: ["data-task-index", "aria-label", "aria-hidden", "data-link", "data-wikilink-target", "target", "rel"]
   });
 }
 
