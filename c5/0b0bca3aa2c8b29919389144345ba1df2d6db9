@@ -1,0 +1,25 @@
+package.json
+  s_8835fcbff989d9::t_925c73242d1635 12-15
+.github/workflows/release.yml
+  s_8835fcbff989d9::t_726c1d0c44c781 8-17,24-55,58,63-64,81,84-90,93,98-99,120-124,140-141,143-179
+README.md
+  s_8835fcbff989d9::t_e4f6f3bd80dba5 191,193,195-197,200-210
+.github/workflows/ci.yml
+  s_8835fcbff989d9::t_836bc8337d70fc 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "c50b0bca3aa2c8b29919389144345ba1df2d6db9",
+  "prompts": {},
+  "sessions": {
+    "s_8835fcbff989d9": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "758a24e2-4340-4809-bc24-d098f1799d45",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
