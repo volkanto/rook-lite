@@ -1516,6 +1516,42 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(note.id);
   });
 
+  it("translates formatting toolbar, templates, calendar, and command palette into Turkish", async () => {
+    const { renderShell } = await import("./main");
+    const { setLocale } = await import("./i18n");
+    setLocale("tr");
+
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    // Toolbar buttons are localized into Turkish
+    const boldBtn = document.querySelector<HTMLButtonElement>("button[data-format='bold']");
+    expect(boldBtn?.getAttribute("aria-label")).toBe("Kalın");
+    expect(boldBtn?.getAttribute("title")).toBe("Kalın");
+
+    const italicBtn = document.querySelector<HTMLButtonElement>("button[data-format='italic']");
+    expect(italicBtn?.getAttribute("aria-label")).toBe("İtalik");
+
+    const templateTrigger = document.querySelector<HTMLElement>(".editor-template-btn");
+    expect(templateTrigger?.getAttribute("aria-label")).toBe("Şablonlar");
+
+    // Template menu shows Turkish template items
+    const standupTmpl = document.querySelector<HTMLButtonElement>("button[data-insert-template='standup']");
+    expect(standupTmpl?.textContent).toContain("Günlük Standup");
+    expect(standupTmpl?.textContent).toContain("Dün, bugün ve engelleyicileri takip edin");
+
+    // Calendar legend is localized
+    const legend = document.querySelector(".calendar-legend");
+    expect(legend?.textContent).toContain("Notu olan gün");
+    expect(legend?.textContent).toContain("Haftalık toplamlar sağda");
+
+    // Command palette placeholder is localized
+    const paletteInput = document.querySelector<HTMLInputElement>("#command-palette-input");
+    expect(paletteInput?.placeholder).toBe("Notlarda arayın veya komutlar için > yazın");
+
+    setLocale("en");
+  });
+
   it("opens link picker modal from edit note dialog toolbar and inserts wikilink without closing edit dialog", async () => {
     const noteService = new NoteService(new NoteRepository());
     const targetNote = await noteService.create("Reference Target Note", "2026-10-02", []);

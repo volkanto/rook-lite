@@ -1,9 +1,165 @@
-import { PREDEFINED_TEMPLATES } from "../templates";
+import { getLocale } from "../i18n";
+import { getPredefinedTemplates } from "../templates";
 import type { Command, CommandActions, CommandContext } from "./types";
 
-export function createCommandRegistry(actions: CommandActions): Command[] {
+const TURKISH_COMMAND_TEXT: Record<string, { title: string; description: string; keywords?: string[] }> = {
+  "contextual-edit-note": {
+    title: "Notu düzenle",
+    description: "Etkin veya seçili notu düzenleyin",
+    keywords: ["düzenle", "not", "yaz", "değiştir"]
+  },
+  "contextual-copy-note": {
+    title: "Notun Markdown'ını kopyala",
+    description: "Seçili notun içeriğini panoya kopyalayın",
+    keywords: ["kopyala", "pano", "markdown", "metin"]
+  },
+  "contextual-delete-note": {
+    title: "Notu sil",
+    description: "Seçili notu silin",
+    keywords: ["sil", "kaldır", "çöp"]
+  },
+  "contextual-regenerate-summary": {
+    title: "Özeti yeniden oluştur",
+    description: "Geçerli dönem için özeti tekrar oluşturun",
+    keywords: ["özet", "yeniden", "yapay zeka", "tazele"]
+  },
+  "contextual-copy-summary": {
+    title: "Özeti kopyala",
+    description: "Oluşturulan özeti panoya kopyalayın",
+    keywords: ["kopyala", "pano", "özet"]
+  },
+  "contextual-download-summary": {
+    title: "Özet Markdown'ını indir",
+    description: "Özeti Markdown dosyası olarak dışa aktarın",
+    keywords: ["indir", "kaydet", "özet", "dışa aktar"]
+  },
+  "new-note": {
+    title: "Yeni not",
+    description: "Yeni bir not yazın",
+    keywords: ["yeni", "oluştur", "yaz", "not", "taslak"]
+  },
+  "today": {
+    title: "Bugüne git",
+    description: "Bugünün not akışına geçin",
+    keywords: ["bugün", "şimdi", "günlük", "ana sayfa"]
+  },
+  "open-tasks": {
+    title: "Açık görevler",
+    description: "Notlarınızdaki tüm tamamlanmamış kontrol listesi maddelerini görün",
+    keywords: ["görev", "yapılacaklar", "kontrol listesi", "açık görevler"]
+  },
+  "filter-tags": {
+    title: "Etikete göre filtrele",
+    description: "Notları etikete göre arayın",
+    keywords: ["etiket", "kategori", "filtrele", "konu"]
+  },
+  "review-this-week": {
+    title: "Bu haftayı incele",
+    description: "Bu hafta için haftalık özet oluşturun veya görüntüleyin",
+    keywords: ["özet", "haftalık", "bu hafta", "incele"]
+  },
+  "review-this-month": {
+    title: "Bu ayı incele",
+    description: "Bu ay için aylık özet oluşturun veya görüntüleyin",
+    keywords: ["özet", "aylık", "bu ay", "incele"]
+  },
+  "open-latest-summary": {
+    title: "En son özeti aç",
+    description: "Özetler paneline gidin",
+    keywords: ["son özet", "özetler", "genel bakış"]
+  },
+  "custom-review": {
+    title: "Özel dönem incelemesi",
+    description: "Özel bir tarih aralığı için özet oluşturun",
+    keywords: ["özel özet", "tarih aralığı", "özel inceleme"]
+  },
+  "go-to-date": {
+    title: "Tarihe git",
+    description: "Belirli bir takvim tarihine geçin",
+    keywords: ["tarihe git", "takvim", "gün", "tarih seç"]
+  },
+  "previous-day": {
+    title: "Önceki gün",
+    description: "Düne veya önceki güne gidin",
+    keywords: ["önceki gün", "dün", "geri", "önce"]
+  },
+  "next-day": {
+    title: "Sonraki gün",
+    description: "Yarına veya sonraki güne gidin",
+    keywords: ["sonraki gün", "yarın", "ileri", "sonra"]
+  },
+  "export-markdown-zip": {
+    title: "Markdown dışa aktar (ZIP)",
+    description: "Tüm notları ön bilgilerle birlikte ZIP arşivi olarak indirin",
+    keywords: ["dışa aktar", "markdown", "indir", "zip", "yedekle"]
+  },
+  "create-json-backup": {
+    title: "JSON yedeği oluştur",
+    description: "Notların, kategorilerin ve özetlerin tam bir JSON anlık görüntüsünü kaydedin",
+    keywords: ["yedek", "json", "dışa aktar", "veriyi kaydet"]
+  },
+  "restore-backup": {
+    title: "Yedeği geri yükle",
+    description: "Bir JSON yedek dosyasını içe aktarın ve geri yükleyin",
+    keywords: ["geri yükle", "içe aktar", "yükle", "yedek yükle"]
+  },
+  "toggle-theme": {
+    title: "Temayı değiştir",
+    description: "Açık ve koyu görünüm arasında geçiş yapın",
+    keywords: ["tema", "koyu", "açık", "mod"]
+  },
+  "set-theme-light": {
+    title: "Temayı ayarla: Açık",
+    description: "Açık arayüz modunu kullanın",
+    keywords: ["tema", "açık", "gündüz", "beyaz"]
+  },
+  "set-theme-dark": {
+    title: "Temayı ayarla: Koyu",
+    description: "Koyu arayüz modunu kullanın",
+    keywords: ["tema", "koyu", "gece", "siyah"]
+  },
+  "set-theme-system": {
+    title: "Temayı ayarla: Sistem",
+    description: "İşletim sistemi açık/koyu tercihine uyun",
+    keywords: ["tema", "sistem", "otomatik"]
+  },
+  "toggle-zen-mode": {
+    title: "Zen modunu aç/kapat",
+    description: "Yazma alanını genişletin ve gezinmeyi gizleyin",
+    keywords: ["zen", "odak", "tam ekran", "dikkat dağıtmayan"]
+  },
+  "keyboard-shortcuts": {
+    title: "Klavye Kısayolları",
+    description: "Tüm klavye gezintisi ve düzenleme kısayollarını görüntüleyin",
+    keywords: ["kısayollar", "yardım", "tuşlar", "klavye"]
+  },
+  "open-settings": {
+    title: "Ayarları Aç",
+    description: "Tercihleri ve görünümü yapılandırın",
+    keywords: ["ayarlar", "tercihler", "seçenekler"]
+  },
+  "ai-settings": {
+    title: "Yapay Zeka ve Ollama ayarları",
+    description: "Yerel Ollama ayarlarını görüntüleyin",
+    keywords: ["yapay zeka", "ai", "ollama", "model"]
+  },
+  "data-management": {
+    title: "Veri yönetimi",
+    description: "Dışa aktarma, yedekleme ve depolama bilgileri",
+    keywords: ["depolama", "veri", "yedek", "dışa aktar"]
+  },
+  "export-markdown-dir": {
+    title: "Klasöre dışa aktar",
+    description: "Markdown dosyalarını doğrudan yerel bir klasöre aktarın",
+    keywords: ["dışa aktar", "klasör", "dizin", "yerel dosyalar"]
+  }
+};
+
+export function createCommandRegistry(actions: CommandActions, locale = getLocale()): Command[] {
   const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
   const modKey = isMac ? "⌘" : "Ctrl+";
+  const templates = getPredefinedTemplates(locale);
+  const templatePrefix = locale === "tr" ? "Şablon" : "Template";
 
   const commands: Command[] = [
     // --- Contextual: Current Note ---
@@ -118,11 +274,11 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
     },
 
     // --- Templates ---
-    ...PREDEFINED_TEMPLATES.map((tmpl) => ({
+    ...templates.map((tmpl) => ({
       id: `template-${tmpl.id}`,
-      title: `Template: ${tmpl.name}`,
+      title: `${templatePrefix}: ${tmpl.name}`,
       description: tmpl.description,
-      keywords: ["template", tmpl.name.toLowerCase(), tmpl.id, ...tmpl.tags, "insert", "snippet", "boilerplate"],
+      keywords: [templatePrefix.toLowerCase(), "template", tmpl.name.toLowerCase(), tmpl.id, ...tmpl.tags, "insert", "snippet", "boilerplate"],
       group: "notes" as const,
       execute: () => actions.insertTemplate?.(tmpl.markdown)
     })),
@@ -301,6 +457,19 @@ export function createCommandRegistry(actions: CommandActions): Command[] {
       group: "data",
       execute: () => actions.exportMarkdownDirectory?.()
     });
+  }
+
+  if (locale === "tr") {
+    for (const cmd of commands) {
+      const tr = TURKISH_COMMAND_TEXT[cmd.id];
+      if (tr) {
+        cmd.title = tr.title;
+        cmd.description = tr.description;
+        if (tr.keywords) {
+          cmd.keywords = [...(cmd.keywords ?? []), ...tr.keywords];
+        }
+      }
+    }
   }
 
   return commands;

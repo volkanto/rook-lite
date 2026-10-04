@@ -420,7 +420,7 @@ function toNoteItem(note: Note, categoryMap: Map<string, string>, searchTerm: st
   return {
     type: "note",
     id: note.id,
-    title: note.title || "Untitled note",
+    title: note.title || currentStrings().untitledNote,
     contentExcerpt: extractSnippet(note.content, searchTerm),
     noteDate: note.noteDate,
     categoryName,
