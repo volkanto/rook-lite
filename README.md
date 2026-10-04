@@ -188,15 +188,26 @@ npx vitest run --reporter=verbose
 
 ---
 
-## Deployment
+## Deployment & Releases
 
-Production deployments happen when a version tag is pushed.
+Production releases and deployments happen when a version tag (`v*`) is pushed. The unified pipeline automatically runs tests, builds and publishes the multi-arch Docker image to GHCR, publishes the GitHub Release, and deploys to Cloudflare Pages.
 
-Example:
+### Automated Releases from Terminal
+
+Use the built-in release scripts to bump the version in `package.json`, commit, tag, and push in one step:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+npm run release:patch   # e.g. v1.2.0 -> v1.2.1
+npm run release:minor   # e.g. v1.2.0 -> v1.3.0
+npm run release:major   # e.g. v1.2.0 -> v2.0.0
+```
+
+### Manual Release from GitHub
+
+Deployments can also be triggered manually directly from GitHub:
+
+```text
+GitHub → Actions → Release & Docker Publish → Run workflow (select patch, minor, or major)
 ```
 
 Required GitHub repository secrets:
@@ -216,12 +227,6 @@ Production domain:
 
 ```text
 https://lite.rooknotes.com
-```
-
-Deployments can also be started manually from:
-
-```text
-GitHub → Actions → Deploy to Cloudflare Pages → Run workflow
 ```
 
 ### Subpath & Alternative Deployments

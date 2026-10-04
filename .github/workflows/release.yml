@@ -4,20 +4,64 @@ on:
   push:
     tags:
       - 'v*'
-      - '[0-9]+.[0-9]+.[0-9]+*'
   workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type (when running manually without pre-existing tag)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: write
   packages: write
 
 jobs:
+  prepare-version:
+    name: Prepare Version & Tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
+      commit_sha: ${{ steps.set_tag.outputs.commit_sha }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Determine or bump version
+        id: set_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            NEW_TAG=$(npm version ${{ inputs.bump }} -m "chore(release): %s [skip ci]")
+            git push origin HEAD:main --follow-tags
+            echo "tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+            echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "commit_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
   test:
     name: Run Tests & Verification
+    needs: prepare-version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-version.outputs.tag }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,19 +78,25 @@ jobs:
       - name: Run test suite
         run: npm test
 
-      - name: Build check
+      - name: Build application
         run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-dist
+          path: dist
+          retention-days: 1
 
   docker-release:
     name: Build & Push Docker Image
-    needs: test
+    needs: [prepare-version, test]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-version.outputs.tag }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -67,11 +117,11 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,event=tag
-            type=raw,value=latest,enable=${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+            type=semver,pattern={{version}},value=${{ needs.prepare-version.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.prepare-version.outputs.tag }}
+            type=semver,pattern={{major}},value=${{ needs.prepare-version.outputs.tag }}
+            type=raw,value=${{ needs.prepare-version.outputs.tag }}
+            type=raw,value=latest,enable=${{ !contains(needs.prepare-version.outputs.tag, 'alpha') && !contains(needs.prepare-version.outputs.tag, 'beta') && !contains(needs.prepare-version.outputs.tag, 'rc') }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -86,7 +136,44 @@ jobs:
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ needs.prepare-version.outputs.tag }}
+          name: Release ${{ needs.prepare-version.outputs.tag }}
           generate_release_notes: true
-          name: Release ${{ github.ref_name }}
+
+  cloudflare-deploy:
+    name: Deploy to Cloudflare Pages
+    needs: [prepare-version, docker-release]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cloudflare-pages
+      cancel-in-progress: false
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-dist
+          path: dist
+
+      - name: Verify build directory
+        run: |
+          if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then
+            echo "Error: dist/ directory or dist/index.html does not exist!"
+            exit 1
+          fi
+          echo "Verified dist/ directory exists."
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=rook-lite --branch=main --commit-hash=${{ needs.prepare-version.outputs.commit_sha }}
+
+      - name: Print deployment URL
+        run: |
+          echo "Cloudflare Pages Deployment URL: ${{ steps.deploy.outputs.deployment-url }}"
+          if [ -n "${{ steps.deploy.outputs.pages-deployment-alias-url }}" ]; then
+            echo "Cloudflare Pages Alias URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}"
+          fi
