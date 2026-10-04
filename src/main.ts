@@ -379,7 +379,8 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 
 function editorMarkup(id: string, value: string, label: string, isModal = false): string {
   const s = currentStrings();
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}"><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button><button type="button" data-format="wikilink" class="editor-tool-wikilink" aria-label="${s.insertWikilink}" title="${s.insertWikilink} ([[)">${svg(icons.link, "editor-tool-svg")}</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="Templates" aria-label="Templates">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${PREDEFINED_TEMPLATES.map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" required aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect">${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  const isSubmitDisabled = !isModal && !value.trim();
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}" novalidate><div class="simple-editor-toolbar" aria-label="Markdown formatting"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="Bullet list" title="Bullet list">• ≡</button><button type="button" data-format="task" aria-label="Checklist" title="Checklist">✓ ≡</button><button type="button" data-format="code" aria-label="Code" title="Code">&lt;&gt;</button><button type="button" data-format="wikilink" class="editor-tool-wikilink" aria-label="${s.insertWikilink}" title="${s.insertWikilink} ([[)">${svg(icons.link, "editor-tool-svg")}</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="Templates" aria-label="Templates">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${PREDEFINED_TEMPLATES.map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="Editor view mode"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect"${isSubmitDisabled ? " disabled" : ""}>${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
 function noteMarkup(note: Note, allNotes: Note[] = [], selectedDate = note.noteDate): string {
@@ -508,10 +509,14 @@ function bindCreateEditor(date: string): void {
   resizeEditor(textarea);
   updateEditorWordCount(form);
   const updateComposer = () => {
-    const hasText = Boolean(textarea.value.trim()) || textarea.value.includes("\n");
+    const hasText = Boolean(textarea.value.trim());
     const isFocused = form.contains(document.activeElement);
     const isPreview = form.classList.contains("is-preview");
-    form.classList.toggle("has-content", hasText || isFocused || isPreview);
+    form.classList.toggle("has-content", hasText || textarea.value.includes("\n") || isFocused || isPreview);
+    const submitBtn = form.querySelector<HTMLButtonElement>("button[type='submit']");
+    if (submitBtn) {
+      submitBtn.disabled = !hasText;
+    }
   };
   updateComposer();
   const saveDraft = () => {
@@ -565,6 +570,7 @@ function bindCreateEditor(date: string): void {
   textarea.addEventListener("keydown", (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       event.preventDefault();
+      if (!textarea.value.trim()) return;
       form.requestSubmit();
     }
   });
@@ -675,6 +681,15 @@ export function showEditDialog(note: Note, _allCategories?: Category[]): void {
   });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!textarea.value.trim()) {
+      showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
+        await notes.delete(note.id);
+        closeDialog();
+        await refreshCalendar();
+        await renderRoute();
+      });
+      return;
+    }
     setBusy(form, true);
     try {
       await notes.update(note.id, textarea.value);
@@ -1663,6 +1678,8 @@ function bindShellEvents(): void {
       const ta = newNoteForm.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
       const hasContent = Boolean(ta?.value.trim());
       newNoteForm.classList.toggle("has-content", hasContent);
+      const submitBtn = newNoteForm.querySelector<HTMLButtonElement>("button[type='submit']");
+      if (submitBtn) submitBtn.disabled = !hasContent;
     }
 
     const clickPath = event.composedPath();

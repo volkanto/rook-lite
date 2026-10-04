@@ -4373,22 +4373,28 @@ a.buttonlike {
     box-shadow: var(--shadow-sm);
 }
 
-button:hover,
-.save-btn-rect:hover,
-.flat-add-btn:hover,
-.settings-save-btn:hover,
-.import-submit-btn:hover,
-.new-label-btn:hover,
+button:hover:not(:disabled),
+.save-btn-rect:hover:not(:disabled),
+.flat-add-btn:hover:not(:disabled),
+.settings-save-btn:hover:not(:disabled),
+.import-submit-btn:hover:not(:disabled),
+.new-label-btn:hover:not(:disabled),
 a.buttonlike:hover {
     background: var(--button-hover);
     filter: none;
     transform: none;
 }
 
-button:active,
-.save-btn-rect:active,
+button:active:not(:disabled),
+.save-btn-rect:active:not(:disabled),
 a.buttonlike:active {
     transform: scale(0.98);
+}
+
+.save-btn-rect:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 input[type="text"],

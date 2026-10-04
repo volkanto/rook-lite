@@ -529,6 +529,117 @@ describe("Left menu bar icons and navigation", () => {
     form?.dispatchEvent(new Event("focusout", { bubbles: true }));
     await new Promise((r) => setTimeout(r, 80));
     expect(form?.classList.contains("has-content")).toBe(false);
+    expect(form?.querySelector<HTMLButtonElement>("button[type='submit']")?.disabled).toBe(true);
+  });
+
+  it("disables note creation button when editor is empty and prevents blank note creation via submit and shortcut", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const noteService = new NoteService(new NoteRepository());
+    const initialNotes = await noteService.listAll();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    const submitBtn = form?.querySelector<HTMLButtonElement>("button[type='submit']")!;
+
+    expect(form).not.toBeNull();
+    expect(textarea).not.toBeNull();
+    expect(submitBtn).not.toBeNull();
+
+    // Initially empty editor has disabled submit button
+    expect(submitBtn.disabled).toBe(true);
+
+    // Whitespace only remains disabled
+    textarea.value = "   \n\t  ";
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(submitBtn.disabled).toBe(true);
+
+    // Pressing Cmd+Enter with whitespace does not create a note
+    textarea.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", metaKey: true, bubbles: true }));
+    await new Promise((r) => setTimeout(r, 60));
+    expect(await noteService.listAll()).toHaveLength(initialNotes.length);
+
+    // Submitting form directly while empty does not create a note
+    form?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((r) => setTimeout(r, 60));
+    expect(await noteService.listAll()).toHaveLength(initialNotes.length);
+
+    // Entering non-whitespace text enables the submit button
+    textarea.value = "A valid note content";
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(submitBtn.disabled).toBe(false);
+
+    // Submitting creates the note
+    form?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((r) => setTimeout(r, 100));
+
+    const updatedNotes = await noteService.listAll();
+    expect(updatedNotes).toHaveLength(initialNotes.length + 1);
+    const createdNote = updatedNotes.find((n) => n.content === "A valid note content");
+    expect(createdNote).toBeDefined();
+
+    // Clean up
+    if (createdNote) await noteService.delete(createdNote.id);
+  });
+
+  it("prompts to delete note when saving an existing note with empty content in edit dialog", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Original note before clearing", today, []);
+
+    const { renderShell, showEditDialog } = await import("./main");
+    await renderShell();
+
+    showEditDialog(createdNote, []);
+
+    const editForm = document.querySelector<HTMLFormElement>("#edit-note-form");
+    const textarea = editForm?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    const saveBtn = editForm?.querySelector<HTMLButtonElement>(".editor-modal-actions .save-btn-rect")!;
+
+    expect(editForm).not.toBeNull();
+    expect(textarea).not.toBeNull();
+    expect(saveBtn).not.toBeNull();
+    expect(textarea.value).toBe("Original note before clearing");
+
+    // Clear content completely
+    textarea.value = "   ";
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+
+    // Submit the edit form with empty content
+    editForm?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    // Confirm dialog should appear
+    const confirmDialog = document.querySelector(".lite-confirm-dialog");
+    expect(confirmDialog).not.toBeNull();
+    expect(confirmDialog?.querySelector("#confirm-title")?.textContent).toBe("Delete note?");
+
+    // Clicking cancel should not delete the note
+    const cancelBtn = confirmDialog?.querySelector<HTMLButtonElement>(".btn-secondary");
+    cancelBtn?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    const noteStillExists = (await noteService.listAll()).find((n) => n.id === createdNote.id);
+    expect(noteStillExists).toBeDefined();
+
+    // Open edit dialog again and confirm deletion
+    showEditDialog(createdNote, []);
+    const editForm2 = document.querySelector<HTMLFormElement>("#edit-note-form");
+    const textarea2 = editForm2?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    textarea2.value = "";
+    editForm2?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    const confirmDialog2 = document.querySelector(".lite-confirm-dialog");
+    expect(confirmDialog2).not.toBeNull();
+    const confirmActionBtn = confirmDialog2?.querySelector<HTMLButtonElement>("#confirm-action");
+    confirmActionBtn?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 80));
+
+    // Note should now be permanently deleted
+    const deletedNote = (await noteService.listAll()).find((n) => n.id === createdNote.id);
+    expect(deletedNote).toBeUndefined();
   });
 
   it("auto-expands textarea height when multiple lines are entered and shrinks on clear", async () => {

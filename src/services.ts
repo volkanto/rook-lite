@@ -16,11 +16,13 @@ export class NoteService {
   }
 
   async create(content: string, noteDate: string, categoryIds: string[] = []): Promise<Note> {
+    const trimmed = content.trim();
+    if (!trimmed) throw new Error("Note content cannot be empty.");
     const now = new Date().toISOString();
     const note: Note = {
       id: crypto.randomUUID(),
       title: deriveTitle(content),
-      content: content.trim(),
+      content: trimmed,
       categoryIds: [...new Set(categoryIds)],
       tags: extractTags(content),
       noteDate,
@@ -37,8 +39,10 @@ export class NoteService {
   async update(id: string, content: string, categoryIds?: string[]): Promise<Note> {
     const existing = await this.notes.get(id);
     if (!existing) throw new Error("That note no longer exists.");
+    const trimmed = content.trim();
+    if (!trimmed) throw new Error("Note content cannot be empty.");
     const finalCategoryIds = categoryIds !== undefined ? [...new Set(categoryIds)] : existing.categoryIds;
-    const note = { ...existing, content: content.trim(), title: deriveTitle(content), tags: extractTags(content), categoryIds: finalCategoryIds, updatedAt: new Date().toISOString() };
+    const note = { ...existing, content: trimmed, title: deriveTitle(content), tags: extractTags(content), categoryIds: finalCategoryIds, updatedAt: new Date().toISOString() };
     await this.notes.save(note);
     return note;
   }
