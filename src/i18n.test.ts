@@ -2,6 +2,7 @@
 import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, setLocale, translations } from "./i18n";
+import { APP_VERSION } from "./version";
 
 // Ensure JSDOM environment has required globals before importing main.ts
 document.body.innerHTML = '<div id="app"></div>';
@@ -251,5 +252,10 @@ describe("i18n internationalization and language support", () => {
     expect(container.textContent).toContain("Dışa aktarma ve yedekleme");
     expect(container.textContent).toContain("Tehlikeli bölge");
     expect(container.textContent).toContain("Tüm verileri temizle");
+
+    const versionBadge = container.querySelector(".version-badge");
+    expect(versionBadge).not.toBeNull();
+    expect(versionBadge?.textContent).toBe(`v${APP_VERSION}`);
+    expect(container.textContent).toContain(`Rook Lite v${APP_VERSION}`);
   });
 });
