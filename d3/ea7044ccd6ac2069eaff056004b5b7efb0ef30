@@ -1,0 +1,46 @@
+.github/workflows/pages.yml
+  s_a173b1f0787dd1::t_1352bc04142c4a 41
+src/lite.css
+  s_a173b1f0787dd1::t_e07d5ac0224895 610-617
+  s_a173b1f0787dd1::t_a9cf25e6641f1b 3971-3984
+  s_a173b1f0787dd1::t_d124cf2a98af27 157-172
+src/version.test.ts
+  s_a173b1f0787dd1::t_23327f11afdfdd 1-9
+src/vite-env.d.ts
+  s_a173b1f0787dd1::t_146bb0cef5eda1 2-3
+vite.config.ts
+  s_a173b1f0787dd1::t_d219ffcf4ae6ee 2-7,21,23
+  s_a173b1f0787dd1::t_4c1f2645c81e00 8-17,22
+src/data.ts
+  s_a173b1f0787dd1::t_2b15a557736f15 5,20
+src/data.test.ts
+  s_a173b1f0787dd1::t_ad96c1e6a63211 2,5-6,19-25
+src/main.ts
+  s_a173b1f0787dd1::t_a06f2906428200 17
+  s_a173b1f0787dd1::t_b77973eee24edc 90
+  s_a173b1f0787dd1::t_aa2be97284642a 1090-1094
+src/navigation.test.ts
+  s_a173b1f0787dd1::t_bfb2477905fdba 92
+  s_a173b1f0787dd1::t_f288794172376d 89,104,110,114-115
+src/i18n.test.ts
+  s_a173b1f0787dd1::t_ae61891b7f2bdc 5
+  s_a173b1f0787dd1::t_bb6012feed5dc3 255-259
+src/version.ts
+  s_a173b1f0787dd1::t_fb3e82987d45a9 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d3ea7044ccd6ac2069eaff056004b5b7efb0ef30",
+  "prompts": {},
+  "sessions": {
+    "s_a173b1f0787dd1": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "a0b1e0a6-ce89-4704-b8f0-a4f73ce2ce81",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
