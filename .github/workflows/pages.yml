@@ -38,6 +38,7 @@ jobs:
       - name: Build
         env:
           VITE_BASE_PATH: /
+          VITE_APP_COMMIT_SHA: ${{ github.sha }}
         run: npm run build
 
       - name: Upload artifact

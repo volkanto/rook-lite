@@ -86,10 +86,10 @@ describe("Left menu bar icons and navigation", () => {
     const sidebar = document.querySelector("#app-sidebar");
     expect(sidebar).not.toBeNull();
 
-    // Brand row contains logo with tooltip
+    // Brand row contains logo with tooltip including app version
     const brand = sidebar?.querySelector(".sidebar-brand");
     expect(brand).not.toBeNull();
-    expect(brand?.getAttribute("data-sidebar-tooltip")).toBe("Rook Notes Lite");
+    expect(brand?.getAttribute("data-sidebar-tooltip")).toMatch(/^Rook Notes Lite · v\d+\.\d+\.\d+/);
 
     // Nav has 4 links with nav-svg icons
     const navLinks = sidebar?.querySelectorAll("nav a");
@@ -101,15 +101,18 @@ describe("Left menu bar icons and navigation", () => {
       expect(link.hasAttribute("data-sidebar-tooltip")).toBe(true);
     });
 
-    // Footer contains theme toggle and language picker
+    // Footer contains theme toggle, language picker, and version
     const footer = sidebar?.querySelector(".sidebar-footer");
     expect(footer).not.toBeNull();
 
     const themeToggle = footer?.querySelector(".sidebar-theme-toggle");
     const langPicker = footer?.querySelector(".sidebar-lang-picker");
+    const versionEl = footer?.querySelector(".sidebar-version");
 
     expect(themeToggle).not.toBeNull();
     expect(langPicker).not.toBeNull();
+    expect(versionEl).not.toBeNull();
+    expect(versionEl?.textContent).toMatch(/^v\d+\.\d+\.\d+/);
 
     // Verify ordering: theme toggle -> lang picker
     const footerChildren = Array.from(footer?.children ?? []);

@@ -2,6 +2,7 @@ import { strToU8, zipSync } from "fflate";
 import { dataSnapshot, restoreSnapshot, SettingsRepository } from "./db";
 import type { Category, Note, OllamaSettings, RookBackupV1, Setting, Summary } from "./models";
 import { DEFAULT_OLLAMA_PROMPT } from "./summaries";
+import { APP_VERSION } from "./version";
 
 export const DEFAULT_OLLAMA_SETTINGS: OllamaSettings = {
   enabled: false,
@@ -16,7 +17,7 @@ export const settingsRepository = new SettingsRepository();
 export async function createBackup(): Promise<RookBackupV1> {
   const snapshot = await dataSnapshot();
   const allowedSettings = snapshot.settings.filter((setting) => ["ollama", "theme", "lastExportAt"].includes(setting.key));
-  return { schemaVersion: 1, exportedAt: new Date().toISOString(), application: { name: "rook-lite", version: "0.1.0" }, notes: snapshot.notes, categories: snapshot.categories, summaries: snapshot.summaries, settings: allowedSettings };
+  return { schemaVersion: 1, exportedAt: new Date().toISOString(), application: { name: "rook-lite", version: APP_VERSION }, notes: snapshot.notes, categories: snapshot.categories, summaries: snapshot.summaries, settings: allowedSettings };
 }
 
 export function parseBackup(value: string): RookBackupV1 {
