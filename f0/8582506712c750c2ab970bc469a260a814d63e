@@ -1,0 +1,24 @@
+.github/scripts/generate-release-summary.test.mjs
+  s_70de23096a3eb5::t_eb77e40aac05aa 197-198,210
+.github/scripts/generate-release-summary.mjs
+  s_70de23096a3eb5::t_e1d75b93466273 375,379,390,404,407-412,449,466,487,489,491-493,495,504-518,520
+  s_70de23096a3eb5::t_15cb1d791a46fc 519
+.github/workflows/release.yml
+  s_70de23096a3eb5::t_36443131df92c6 159-161,163-167,177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "f08582506712c750c2ab970bc469a260a814d63e",
+  "prompts": {},
+  "sessions": {
+    "s_70de23096a3eb5": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ce6e3244-d8a3-431d-9eba-505df98383ef",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": null
+    }
+  }
+}
