@@ -15,10 +15,16 @@ on:
           - patch
           - minor
           - major
+      dry_run:
+        description: 'Dry run (generate and display release summary without publishing release, Docker image, or Cloudflare deploy)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
   packages: write
+  pull-requests: read
 
 jobs:
   prepare-version:
@@ -42,12 +48,18 @@ jobs:
         id: set_tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            NEW_TAG=$(npm version ${{ inputs.bump }} -m "chore(release): %s [skip ci]")
-            git push origin HEAD:main --follow-tags
-            echo "tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
-            echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            if [ "${{ inputs.dry_run }}" = "true" ]; then
+              echo "Dry run mode active. Skipping version bump & tag push."
+              echo "tag=dry-run" >> "$GITHUB_OUTPUT"
+              echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            else
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              NEW_TAG=$(npm version ${{ inputs.bump }} -m "chore(release): %s [skip ci]")
+              git push origin HEAD:main --follow-tags
+              echo "tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+              echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            fi
           else
             echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
             echo "commit_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
@@ -61,7 +73,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.prepare-version.outputs.tag }}
+          ref: ${{ needs.prepare-version.outputs.commit_sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -88,15 +100,115 @@ jobs:
           path: dist
           retention-days: 1
 
+  publish-release:
+    name: Generate Release Notes & Publish
+    needs: [prepare-version, test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    env:
+      LLAMA_VERSION: "b11408"
+      MODEL_FILE: "qwen2.5-0.5b-instruct-q4_k_m.gguf"
+      MODEL_URL: "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-version.outputs.commit_sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache llama.cpp binary
+        id: cache-llama
+        uses: actions/cache@v4
+        with:
+          path: ~/llama
+          key: llama-${{ env.LLAMA_VERSION }}-ubuntu-x64
+
+      - name: Download llama.cpp binary
+        if: steps.cache-llama.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/llama
+          curl -fSL "https://github.com/ggml-org/llama.cpp/releases/download/${{ env.LLAMA_VERSION }}/llama-${{ env.LLAMA_VERSION }}-bin-ubuntu-x64.tar.gz" \
+            | tar -xz -C ~/llama
+
+      - name: Cache GGUF model
+        id: cache-model
+        uses: actions/cache@v4
+        with:
+          path: ~/models
+          key: model-${{ env.MODEL_FILE }}
+
+      - name: Download GGUF model
+        if: steps.cache-model.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/models
+          curl -fSL "${{ env.MODEL_URL }}" -o ~/models/${{ env.MODEL_FILE }}
+
+      - name: Generate AI Release Summary
+        id: release_notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          LLAMA_CLI_PATH="$(find $HOME/llama -name 'llama-cli' -type f | head -n 1)"
+          if [ -z "$LLAMA_CLI_PATH" ] && [ -x "$HOME/llama/build/bin/llama-cli" ]; then
+            LLAMA_CLI_PATH="$HOME/llama/build/bin/llama-cli"
+          fi
+          if [ -n "$LLAMA_CLI_PATH" ]; then
+            chmod +x "$LLAMA_CLI_PATH" || true
+          fi
+
+          DRY_RUN_FLAG=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+
+          node .github/scripts/generate-release-summary.mjs \
+            --current-tag "${{ needs.prepare-version.outputs.tag }}" \
+            --llama-cli "$LLAMA_CLI_PATH" \
+            --model "$HOME/models/${{ env.MODEL_FILE }}" \
+            --output release-notes.md \
+            $DRY_RUN_FLAG
+
+      - name: Publish GitHub Release
+        if: ${{ !inputs.dry_run }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare-version.outputs.tag }}
+          name: Release ${{ needs.prepare-version.outputs.tag }}
+          body_path: release-notes.md
+
+      - name: Display Release Notes (Dry Run)
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "=========================================================="
+          echo "DRY RUN RELEASE NOTES:"
+          echo "=========================================================="
+          cat release-notes.md
+
+      - name: Upload Release Notes Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes.md
+          retention-days: 7
+
   docker-release:
     name: Build & Push Docker Image
     needs: [prepare-version, test]
+    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.prepare-version.outputs.tag }}
+          ref: ${{ needs.prepare-version.outputs.commit_sha }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -134,16 +246,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.prepare-version.outputs.tag }}
-          name: Release ${{ needs.prepare-version.outputs.tag }}
-          generate_release_notes: true
-
   cloudflare-deploy:
     name: Deploy to Cloudflare Pages
-    needs: [prepare-version, docker-release]
+    needs: [prepare-version, docker-release, publish-release]
+    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     concurrency:
       group: cloudflare-pages
