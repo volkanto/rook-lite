@@ -72,7 +72,7 @@ export const navItems: readonly NavigationItem[] = [
   { path: "/", label: "Notes", icon: icons.note },
   { path: "/todos", label: "Tasks", icon: icons.todo },
   { path: "/summaries", label: "Summaries", icon: icons.summary },
-  { path: "/settings", label: "Settings", icon: icons.settings, divider: true }
+  { path: "/settings", label: "Settings", icon: icons.settings }
 ];
 
 export function svg(content: string, className = "nav-svg"): string {
@@ -122,6 +122,8 @@ function initCommandPalette(): void {
       const datePicker = document.querySelector<HTMLDetailsElement>(".date-picker");
       if (datePicker) {
         datePicker.setAttribute("open", "");
+        const summary = datePicker.querySelector<HTMLElement>("summary");
+        summary?.focus();
       } else {
         const date = window.prompt("Jump to date (YYYY-MM-DD):", isoDate(new Date()));
         if (date && validIsoDate(date)) {
@@ -270,7 +272,7 @@ export function renderNavigation(): string {
     { path: "/", label: s.navNotes, icon: icons.note },
     { path: "/todos", label: s.navTodos, icon: icons.todo },
     { path: "/summaries", label: s.navSummaries, icon: icons.summary },
-    { path: "/settings", label: s.navSettings, icon: icons.settings, divider: true }
+    { path: "/settings", label: s.navSettings, icon: icons.settings }
   ];
   return items.map((item) => `${item.divider ? '<div class="sidebar-nav-divider"></div>' : ""}<a href="${appUrl(item.path)}" data-link data-path="${item.path}" data-sidebar-tooltip="${item.label}">${svg(item.icon)}<span class="nav-label">${item.label}</span></a>`).join("");
 }
