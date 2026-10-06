@@ -3,7 +3,7 @@ import "./lite.css";
 import { clearAllData, storageCounts } from "./db";
 import { createBackup, DEFAULT_OLLAMA_SETTINGS, downloadBlob, downloadJson, downloadMarkdownZip, exportToDirectory, parseBackup, restoreBackup, settingsRepository } from "./data";
 import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, getLocaleDefinition, getRelativeDateInfo, setLocale, type SupportedLocale } from "./i18n";
-import { escapeHtml, renderInlineMarkdown, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
+import { escapeHtml, extractTags, renderInlineMarkdown, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
 import { attachTagAutocomplete } from "./tag-autocomplete";
 import type { Category, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
@@ -768,34 +768,195 @@ export function formatTaskAge(noteDate: string, todayIso = isoDate(new Date())):
   return { label: s.taskAgeMonths(months), ageClass: "stale" };
 }
 
+export type TodoGrouping = "date" | "tag" | "all";
+
+export interface TaskItem {
+  note: Note;
+  line: string;
+  lineIndex: number;
+}
+
+export interface TodoGroup {
+  id: string;
+  title: string;
+  count: number;
+  tasks: TaskItem[];
+}
+
+export function groupTasks(
+  tasks: TaskItem[],
+  grouping: TodoGrouping,
+  todayIso = isoDate(new Date())
+): TodoGroup[] {
+  const s = currentStrings();
+  if (grouping === "all") {
+    return [{ id: "all", title: "", count: tasks.length, tasks }];
+  }
+
+  if (grouping === "date") {
+    const todayTasks: TaskItem[] = [];
+    const yesterdayTasks: TaskItem[] = [];
+    const thisWeekTasks: TaskItem[] = [];
+    const earlierTasks: TaskItem[] = [];
+
+    const todayTime = new Date(`${todayIso}T12:00:00`).getTime();
+    const sorted = [...tasks].sort((a, b) => b.note.noteDate.localeCompare(a.note.noteDate));
+
+    for (const item of sorted) {
+      const noteTime = new Date(`${item.note.noteDate}T12:00:00`).getTime();
+      const days = Math.round((todayTime - noteTime) / (1000 * 60 * 60 * 24));
+      if (days <= 0) {
+        todayTasks.push(item);
+      } else if (days === 1) {
+        yesterdayTasks.push(item);
+      } else if (days <= 7) {
+        thisWeekTasks.push(item);
+      } else {
+        earlierTasks.push(item);
+      }
+    }
+
+    const groups: TodoGroup[] = [];
+    if (todayTasks.length > 0) {
+      groups.push({ id: "today", title: s.todoGroupToday, count: todayTasks.length, tasks: todayTasks });
+    }
+    if (yesterdayTasks.length > 0) {
+      groups.push({ id: "yesterday", title: s.todoGroupYesterday, count: yesterdayTasks.length, tasks: yesterdayTasks });
+    }
+    if (thisWeekTasks.length > 0) {
+      groups.push({ id: "this-week", title: s.todoGroupThisWeek, count: thisWeekTasks.length, tasks: thisWeekTasks });
+    }
+    if (earlierTasks.length > 0) {
+      groups.push({ id: "earlier", title: s.todoGroupEarlier, count: earlierTasks.length, tasks: earlierTasks });
+    }
+    return groups;
+  }
+
+  if (grouping === "tag") {
+    const tagBuckets = new Map<string, TaskItem[]>();
+    const untaggedTasks: TaskItem[] = [];
+
+    for (const item of tasks) {
+      const lineTags = extractTags(item.line);
+      const tags = lineTags.length > 0 ? lineTags : item.note.tags;
+      const primaryTag = tags?.[0];
+
+      if (primaryTag) {
+        const bucket = tagBuckets.get(primaryTag) ?? [];
+        bucket.push(item);
+        tagBuckets.set(primaryTag, bucket);
+      } else {
+        untaggedTasks.push(item);
+      }
+    }
+
+    const sortedTags = [...tagBuckets.keys()].sort((a, b) => a.localeCompare(b));
+    const groups: TodoGroup[] = [];
+
+    for (const tag of sortedTags) {
+      const tagTasks = tagBuckets.get(tag) ?? [];
+      if (tagTasks.length > 0) {
+        groups.push({
+          id: `tag-${tag}`,
+          title: `#${tag}`,
+          count: tagTasks.length,
+          tasks: tagTasks
+        });
+      }
+    }
+
+    if (untaggedTasks.length > 0) {
+      groups.push({
+        id: "untagged",
+        title: s.todoGroupUntagged,
+        count: untaggedTasks.length,
+        tasks: untaggedTasks
+      });
+    }
+
+    return groups;
+  }
+
+  return [{ id: "all", title: "", count: tasks.length, tasks }];
+}
+
+function todoItemMarkup(item: TaskItem): string {
+  const s = currentStrings();
+  const { note, line, lineIndex } = item;
+  const age = formatTaskAge(note.noteDate);
+  const noteHeading = note.title?.trim()
+    ? `${s.goToNote}: ${note.title.trim()} · ${formatShortDate(note.noteDate)}`
+    : `${s.goToNote} · ${formatShortDate(note.noteDate)}`;
+  return `<li class="todo-item"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(
+    line.replace(/^\s*[-*+]\s+\[ \]\s+/, "")
+  )}</span></label><div class="todo-item-meta"><span class="todo-age-chip age-${age.ageClass}">${age.label}</span><a href="${appUrl(
+    `/?date=${note.noteDate}#note-${note.id}`
+  )}" data-link class="todo-note-link todo-note-jump" data-tooltip="${escapeHtml(noteHeading)}" aria-label="${escapeHtml(noteHeading)}"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="todo-jump-svg" aria-hidden="true"><path d="M4 12L12 4M12 4H6M12 4V10"/></svg></a></div></li>`;
+}
+
 export async function renderTodos(content: HTMLElement): Promise<void> {
   const s = currentStrings();
-  const tasks = (await notes.listAll()).flatMap((note) =>
-    note.content
-      .split(/\r?\n/)
-      .map((line, lineIndex) => ({ note, line, lineIndex }))
-      .filter(({ line }) => /^\s*[-*+]\s+\[ \]\s+/.test(line))
-  );
+  const allNotes = await notes.listAll();
+  const tasks: TaskItem[] = allNotes
+    .filter((note) => !note.archived)
+    .flatMap((note) =>
+      note.content
+        .split(/\r?\n/)
+        .map((line, lineIndex) => ({ note, line, lineIndex }))
+        .filter(({ line }) => /^\s*[-*+]\s+\[ \]\s+/.test(line))
+    );
 
   document.title = `${s.todosTitle} · Rook Lite`;
 
-  content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div>${
-    tasks.length
-      ? `<ul class="todo-list">${tasks
-          .map(({ note, line, lineIndex }) => {
-            const age = formatTaskAge(note.noteDate);
-            const noteHeading = note.title?.trim()
-              ? `${s.goToNote}: ${note.title.trim()} · ${formatShortDate(note.noteDate)}`
-              : `${s.goToNote} · ${formatShortDate(note.noteDate)}`;
-            return `<li class="todo-item"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(
-              line.replace(/^\s*[-*+]\s+\[ \]\s+/, "")
-            )}</span></label><div class="todo-item-meta"><span class="todo-age-chip age-${age.ageClass}">${age.label}</span><a href="${appUrl(
-              `/?date=${note.noteDate}#note-${note.id}`
-            )}" data-link class="todo-note-link todo-note-jump" data-tooltip="${escapeHtml(noteHeading)}" aria-label="${escapeHtml(noteHeading)}"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="todo-jump-svg" aria-hidden="true"><path d="M4 12L12 4M12 4H6M12 4V10"/></svg></a></div></li>`;
-          })
-          .join("")}</ul>`
-      : `<div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`
-  }`;
+  if (!tasks.length) {
+    content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div><div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`;
+    return;
+  }
+
+  const params = new URLSearchParams(location.search);
+  const paramGroup = params.get("group");
+  let storedGroup: string | null = null;
+  try {
+    storedGroup = localStorage.getItem("rook_todos_grouping");
+  } catch {
+    // ignore
+  }
+
+  const validGroupings: TodoGrouping[] = ["date", "tag", "all"];
+  const grouping: TodoGrouping = validGroupings.includes(paramGroup as TodoGrouping)
+    ? (paramGroup as TodoGrouping)
+    : validGroupings.includes(storedGroup as TodoGrouping)
+    ? (storedGroup as TodoGrouping)
+    : "date";
+
+  const groups = groupTasks(tasks, grouping);
+
+  content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div><div class="todo-group-tabs" role="tablist" aria-label="${escapeHtml(s.todoGroupBy)}"><button type="button" role="tab" data-todo-group="date" class="${grouping === "date" ? "is-active" : ""}" aria-selected="${grouping === "date"}">${s.todoGroupDate}</button><button type="button" role="tab" data-todo-group="tag" class="${grouping === "tag" ? "is-active" : ""}" aria-selected="${grouping === "tag"}">${s.todoGroupTag}</button><button type="button" role="tab" data-todo-group="all" class="${grouping === "all" ? "is-active" : ""}" aria-selected="${grouping === "all"}">${s.todoGroupAll}</button></div></div><div class="todo-groups-container">${groups
+    .map(
+      (group) => `<section class="todo-group" data-group-id="${group.id}">${group.title ? `<header class="todo-group-header"><h2 class="todo-group-title"><span>${escapeHtml(group.title)}</span><span class="todo-group-count">${group.count}</span></h2></header>` : ""}<ul class="todo-list">${group.tasks
+        .map((task) => todoItemMarkup(task))
+        .join("")}</ul></section>`
+    )
+    .join("")}</div>`;
+
+  content.querySelectorAll<HTMLButtonElement>("[data-todo-group]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const nextGroup = (btn.dataset.todoGroup as TodoGrouping) || "date";
+      try {
+        localStorage.setItem("rook_todos_grouping", nextGroup);
+      } catch {
+        // ignore
+      }
+      const nextUrl = new URL(location.href);
+      if (nextGroup === "date") {
+        nextUrl.searchParams.delete("group");
+      } else {
+        nextUrl.searchParams.set("group", nextGroup);
+      }
+      history.replaceState({}, "", nextUrl.pathname + nextUrl.search);
+      void renderTodos(content);
+    });
+  });
 
   content.querySelectorAll<HTMLInputElement>("[data-task-note]").forEach((input) =>
     input.addEventListener("change", async () => {

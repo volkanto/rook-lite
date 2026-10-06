@@ -1204,6 +1204,109 @@ describe("Left menu bar icons and navigation", () => {
     expect(formatTaskAge("2026-08-01", today).ageClass).toBe("stale");
   });
 
+  it("groups tasks correctly by date, tag, and all using groupTasks", async () => {
+    const { groupTasks } = await import("./main");
+    const today = "2026-10-05";
+
+    const noteToday: any = { id: "n1", noteDate: "2026-10-05", tags: ["work"], content: "" };
+    const noteYesterday: any = { id: "n2", noteDate: "2026-10-04", tags: [], content: "" };
+    const noteThisWeek: any = { id: "n3", noteDate: "2026-10-02", tags: ["personal"], content: "" };
+    const noteEarlier: any = { id: "n4", noteDate: "2026-09-15", tags: ["work"], content: "" };
+
+    const tasks = [
+      { note: noteToday, line: "- [ ] Task 1", lineIndex: 0 },
+      { note: noteYesterday, line: "- [ ] Task 2 #urgent", lineIndex: 0 },
+      { note: noteThisWeek, line: "- [ ] Task 3", lineIndex: 0 },
+      { note: noteEarlier, line: "- [ ] Task 4", lineIndex: 0 }
+    ];
+
+    // 1. Group by Date
+    const dateGroups = groupTasks(tasks, "date", today);
+    expect(dateGroups.map((g) => g.id)).toEqual(["today", "yesterday", "this-week", "earlier"]);
+    expect(dateGroups.find((g) => g.id === "today")?.count).toBe(1);
+    expect(dateGroups.find((g) => g.id === "yesterday")?.count).toBe(1);
+    expect(dateGroups.find((g) => g.id === "this-week")?.count).toBe(1);
+    expect(dateGroups.find((g) => g.id === "earlier")?.count).toBe(1);
+
+    // 2. Group by Tag
+    const tagGroups = groupTasks(tasks, "tag", today);
+    expect(tagGroups.map((g) => g.id)).toEqual(["tag-personal", "tag-urgent", "tag-work"]);
+    expect(tagGroups[0].title).toBe("#personal");
+    expect(tagGroups[0].count).toBe(1);
+    expect(tagGroups[1].title).toBe("#urgent");
+    expect(tagGroups[1].count).toBe(1);
+    expect(tagGroups[2].title).toBe("#work");
+    expect(tagGroups[2].count).toBe(2);
+
+    // 3. Test Untagged when tasks have neither note tag nor inline tag
+    const untaggedNote: any = { id: "n5", noteDate: "2026-10-05", tags: [], content: "" };
+    const mixedTasks = [
+      { note: noteToday, line: "- [ ] Work task", lineIndex: 0 },
+      { note: untaggedNote, line: "- [ ] Raw task", lineIndex: 0 }
+    ];
+    const mixedGroups = groupTasks(mixedTasks, "tag", today);
+    expect(mixedGroups.map((g) => g.id)).toEqual(["tag-work", "untagged"]);
+    expect(mixedGroups.find((g) => g.id === "untagged")?.title).toBe("Untagged");
+    expect(mixedGroups.find((g) => g.id === "untagged")?.count).toBe(1);
+
+    // 4. Group by All (Flat)
+    const allGroups = groupTasks(tasks, "all", today);
+    expect(allGroups).toHaveLength(1);
+    expect(allGroups[0].title).toBe("");
+    expect(allGroups[0].count).toBe(4);
+  });
+
+  it("renders todo grouping tabs and allows switching views with persistence", async () => {
+    const { renderTodos } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const noteUntagged = await noteService.create("- [ ] Buy coffee beans", "2026-10-05", []);
+    const noteTagged = await noteService.create("- [ ] Finish grouping pull request\n#dev", "2026-10-05", []);
+
+    localStorage.removeItem("rook_todos_grouping");
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    // Verify tabs exist
+    const tabs = container.querySelectorAll<HTMLButtonElement>(".todo-group-tabs button");
+    expect(tabs.length).toBe(3);
+    expect(tabs[0].textContent).toBe("Date");
+    expect(tabs[1].textContent).toBe("Tag");
+    expect(tabs[2].textContent).toBe("All");
+
+    // Default tab is Date
+    expect(tabs[0].classList.contains("is-active")).toBe(true);
+    expect(container.querySelector(".todo-group[data-group-id='today']")).not.toBeNull();
+
+    // Switch to Tag grouping
+    tabs[1].dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(localStorage.getItem("rook_todos_grouping")).toBe("tag");
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const activeTabsAfterClick = container.querySelectorAll<HTMLButtonElement>(".todo-group-tabs button");
+    expect(activeTabsAfterClick[1].classList.contains("is-active")).toBe(true);
+    expect(container.querySelector(".todo-group[data-group-id='tag-dev']")).not.toBeNull();
+    expect(container.querySelector(".todo-group[data-group-id='untagged']")).not.toBeNull();
+
+    // Switch to All grouping
+    activeTabsAfterClick[2].dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(localStorage.getItem("rook_todos_grouping")).toBe("all");
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(container.querySelector(".todo-group[data-group-id='all']")).not.toBeNull();
+    expect(container.querySelector(".todo-group-header")).toBeNull();
+
+    // Clean up
+    await noteService.delete(noteUntagged.id);
+    await noteService.delete(noteTagged.id);
+    localStorage.removeItem("rook_todos_grouping");
+    container.remove();
+  });
+
   it("keeps calendar popover open when navigating months", async () => {
     const { renderShell, renderToday } = await import("./main");
 

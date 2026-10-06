@@ -175,6 +175,15 @@ export interface TranslationStrings {
   taskAgeMonths: (months: number) => string;
   openNote: string;
   goToNote: string;
+  todoGroupBy: string;
+  todoGroupDate: string;
+  todoGroupTag: string;
+  todoGroupAll: string;
+  todoGroupToday: string;
+  todoGroupYesterday: string;
+  todoGroupThisWeek: string;
+  todoGroupEarlier: string;
+  todoGroupUntagged: string;
 
   // Common UI
   editAction: string;

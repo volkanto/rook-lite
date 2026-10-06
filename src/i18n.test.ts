@@ -67,6 +67,13 @@ describe("i18n internationalization and language support", () => {
     expect(en.navSettings).toBe("Settings");
     expect(en.today).toBe("Today");
     expect(en.languageTitle).toBe("Language");
+    expect(en.todoGroupDate).toBe("Date");
+    expect(en.todoGroupTag).toBe("Tag");
+    expect(en.todoGroupAll).toBe("All");
+    expect(en.todoGroupToday).toBe("Today");
+    expect(en.todoGroupYesterday).toBe("Yesterday");
+    expect(en.todoGroupThisWeek).toBe("This week");
+    expect(en.todoGroupEarlier).toBe("Earlier");
 
     setLocale("tr");
     const tr = currentStrings();
@@ -76,6 +83,13 @@ describe("i18n internationalization and language support", () => {
     expect(tr.navSettings).toBe("Ayarlar");
     expect(tr.today).toBe("Bugün");
     expect(tr.languageTitle).toBe("Dil");
+    expect(tr.todoGroupDate).toBe("Tarih");
+    expect(tr.todoGroupTag).toBe("Etiket");
+    expect(tr.todoGroupAll).toBe("Tümü");
+    expect(tr.todoGroupToday).toBe("Bugün");
+    expect(tr.todoGroupYesterday).toBe("Dün");
+    expect(tr.todoGroupThisWeek).toBe("Bu hafta");
+    expect(tr.todoGroupEarlier).toBe("Daha önce");
   });
 
   it("formats dates according to selected locale", () => {
