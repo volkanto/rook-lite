@@ -35,7 +35,7 @@
   align-items: center !important;
   justify-content: center !important;
   width: 44px !important;
-  margin: 0 auto 8px auto !important;
+  margin: 0 auto 4px auto !important;
 }
 
 .sidebar-search-btn {
@@ -140,7 +140,17 @@
 
 .sidebar nav a[data-path="/settings"],
 .sidebar nav a[href$="/settings"] {
-  margin-top: 0.5rem;
+  margin-top: 0 !important;
+}
+
+.sidebar-nav-divider,
+body.app .sidebar-nav-divider,
+:root.sidebar-collapsed body.app .sidebar-nav-divider {
+  display: none !important;
+  margin: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
 }
 
 .sidebar-footer {
@@ -172,38 +182,51 @@
 
 .sidebar-lang-toggle,
 .sidebar-theme-toggle {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  min-height: 44px;
-  margin: 0 auto;
-  padding: 0;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  box-shadow: none;
-  color: var(--color-icon-secondary, var(--text-soft));
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 120ms ease, color 120ms ease;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--color-icon-secondary, var(--text-soft)) !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease !important;
 }
 
+body.app .sidebar-lang-toggle:hover,
+body.app .sidebar-lang-picker[open] .sidebar-lang-toggle,
+body.app .sidebar-theme-toggle:hover,
 .sidebar-lang-toggle:hover,
 .sidebar-lang-picker[open] .sidebar-lang-toggle,
 .sidebar-theme-toggle:hover {
-  background: var(--color-bg-hover);
-  color: var(--color-text-primary);
-  box-shadow: none;
+  background: var(--color-bg-hover) !important;
+  color: var(--color-text-primary) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+body.app .sidebar-theme-toggle:hover .nav-svg,
+body.app .sidebar-lang-toggle:hover .nav-svg,
+.sidebar-theme-toggle:hover .nav-svg,
+.sidebar-lang-toggle:hover .nav-svg {
+  color: var(--color-text-primary) !important;
 }
 
 .sidebar-theme-toggle,
 .sidebar-theme-toggle:hover,
 .sidebar-theme-toggle:focus,
 .sidebar-theme-toggle:active {
-  box-shadow: none;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .sidebar-theme-toggle .theme-light-icon,
@@ -356,7 +379,7 @@
     justify-content: center !important;
     width: 44px !important;
     height: 44px !important;
-    margin: 0 auto 8px auto !important;
+    margin: 0 auto 4px auto !important;
   }
 
   body.app .sidebar-brand,
@@ -742,6 +765,11 @@
   text-align: left;
 }
 
+.notes-day-header.minimal-date-header:has(.date-picker[open]) {
+  position: relative;
+  z-index: 100;
+}
+
 .minimal-date-bar {
   display: flex;
   align-items: center;
@@ -963,6 +991,11 @@
   position: relative;
 }
 
+.date-picker[open] {
+  position: relative;
+  z-index: 100;
+}
+
 .date-picker > summary {
   list-style: none;
 }
@@ -977,7 +1010,7 @@
 
 .date-picker-popover {
   position: absolute;
-  z-index: 10;
+  z-index: 100;
   top: calc(100% + 0.5rem);
   right: 0;
   width: min(25rem, calc(100vw - 2rem));
@@ -1076,8 +1109,40 @@
 
 .calendar-day.is-selected {
   background: var(--color-brand, var(--accent));
-  color: var(--color-brand-on-primary, white);
+  color: var(--color-on-brand, var(--accent-text, #ffffff));
   font-weight: 700;
+  opacity: 1;
+}
+
+.calendar-day.is-selected span {
+  color: inherit;
+}
+
+.calendar-day.is-selected:hover {
+  background: var(--color-brand-hover, var(--color-brand));
+  color: var(--color-on-brand, var(--accent-text, #ffffff));
+}
+
+:root[data-theme="dark"] .calendar-day.is-selected,
+:root:not([data-theme="light"]) .calendar-day.is-selected {
+  background: #FFFFFF !important;
+  color: #09090b !important;
+}
+
+:root[data-theme="dark"] .calendar-day.is-selected:hover,
+:root:not([data-theme="light"]) .calendar-day.is-selected:hover {
+  background: #F4F4F5 !important;
+  color: #09090b !important;
+}
+
+:root[data-theme="dark"] .calendar-day.is-selected span,
+:root:not([data-theme="light"]) .calendar-day.is-selected span {
+  color: #09090b !important;
+}
+
+:root[data-theme="dark"] .calendar-day.is-selected i,
+:root:not([data-theme="light"]) .calendar-day.is-selected i {
+  background: #09090b !important;
 }
 
 .calendar-day i {
@@ -6704,6 +6769,7 @@ body.app .todo-group-tabs button.is-active,
     left: 0.75rem;
     width: auto;
     overflow-x: auto;
+    z-index: 100;
   }
 
   .day-notes .section-head {

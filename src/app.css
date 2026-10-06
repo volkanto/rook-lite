@@ -5325,9 +5325,16 @@ body.app .copilot-input-container .editor-card:focus-within {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 18%, transparent);
 }
 
-body.app .sidebar nav > a:hover {
+body.app .sidebar nav > a:hover,
+body.app .sidebar-search-btn:hover,
+body.app .sidebar-theme-toggle:hover,
+body.app .sidebar-lang-toggle:hover,
+body.app .sidebar-lang-picker[open] .sidebar-lang-toggle {
     color: var(--color-text-primary) !important;
     background: var(--color-bg-hover) !important;
+    border-color: transparent !important;
+    filter: none !important;
+    box-shadow: none !important;
 }
 
 body.app .sidebar nav > a.is-active,

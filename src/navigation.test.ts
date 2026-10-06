@@ -136,6 +136,52 @@ describe("Left menu bar icons and navigation", () => {
     // Theme toggle is a clean sidebar-theme-toggle button
     expect(themeToggle?.tagName).toBe("BUTTON");
     expect(themeToggle?.className).toBe("sidebar-theme-toggle");
+    expect(themeToggle?.getAttribute("data-action")).toBe("toggle-theme");
+    expect(themeToggle?.hasAttribute("data-sidebar-tooltip")).toBe(true);
+  });
+
+  it("harmonizes hover attributes and classes across menu bar items", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const sidebar = document.querySelector("#app-sidebar");
+    expect(sidebar).not.toBeNull();
+
+    const navLinks = sidebar?.querySelectorAll("nav a");
+    const searchBtn = sidebar?.querySelector(".sidebar-search-btn");
+    const themeToggle = sidebar?.querySelector(".sidebar-theme-toggle");
+    const langToggle = sidebar?.querySelector(".sidebar-lang-toggle");
+
+    expect(navLinks?.length).toBeGreaterThan(0);
+    expect(searchBtn).not.toBeNull();
+    expect(themeToggle).not.toBeNull();
+    expect(langToggle).not.toBeNull();
+
+    // All interactive menu items must feature consistent data-sidebar-tooltip
+    expect(searchBtn?.hasAttribute("data-sidebar-tooltip")).toBe(true);
+    expect(themeToggle?.hasAttribute("data-sidebar-tooltip")).toBe(true);
+    expect(langToggle?.hasAttribute("data-sidebar-tooltip")).toBe(true);
+    navLinks?.forEach((link) => {
+      expect(link.hasAttribute("data-sidebar-tooltip")).toBe(true);
+    });
+  });
+
+  it("renders left menu navigation items with identical spacing and without dividers", async () => {
+    const { renderShell, renderNavigation, navItems } = await import("./main");
+    await renderShell();
+
+    // Verify navItems has no dividers
+    expect(navItems.every((item) => !item.divider)).toBe(true);
+
+    const navHtml = renderNavigation();
+    expect(navHtml).not.toContain("sidebar-nav-divider");
+
+    const sidebar = document.querySelector("#app-sidebar");
+    expect(sidebar?.querySelector(".sidebar-nav-divider")).toBeNull();
+
+    // Verify all 4 navigation destinations exist
+    const navLinks = sidebar?.querySelectorAll("nav a");
+    expect(navLinks?.length).toBe(4);
   });
 
   it("eliminates the persistent global-header and provides search trigger in the sidebar", async () => {
@@ -1335,6 +1381,79 @@ describe("Left menu bar icons and navigation", () => {
 
     // Verify calendar details element remains open
     expect(datePicker?.hasAttribute("open")).toBe(true);
+  });
+
+  it("renders calendar popover within date-picker alongside note composer without falling back to editor", async () => {
+    const { renderShell, renderToday } = await import("./main");
+
+    const app = document.querySelector("#app");
+    expect(app).not.toBeNull();
+    await renderShell();
+
+    const container = document.querySelector("#page-content") as HTMLElement;
+    expect(container).not.toBeNull();
+    await renderToday(container);
+
+    const datePicker = container.querySelector<HTMLDetailsElement>(".date-picker.minimal-picker");
+    expect(datePicker).not.toBeNull();
+
+    const popover = datePicker?.querySelector<HTMLElement>(".date-picker-popover#notes-calendar");
+    expect(popover).not.toBeNull();
+
+    const composer = container.querySelector<HTMLElement>(".copilot-input-container");
+    expect(composer).not.toBeNull();
+
+    // Opening date picker keeps details open and popover visible
+    datePicker?.setAttribute("open", "");
+    expect(datePicker?.hasAttribute("open")).toBe(true);
+
+    // Clicking inside the popover (e.g. legend or calendar grid) does not dismiss the picker
+    const legend = popover?.querySelector(".calendar-legend");
+    expect(legend).not.toBeNull();
+    legend?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(datePicker?.hasAttribute("open")).toBe(true);
+
+    // Verify currently selected date day element exists and is marked is-selected
+    const selectedDay = popover?.querySelector<HTMLAnchorElement>(".calendar-day.is-selected");
+    expect(selectedDay).not.toBeNull();
+    expect(selectedDay?.hasAttribute("aria-current")).toBe(true);
+    expect(selectedDay?.querySelector("span")?.textContent).toBeTruthy();
+  });
+
+  it("shifts focus to calendar summary when opening date picker via palette command", async () => {
+    const { renderShell, renderToday, openSearch } = await import("./main");
+
+    const app = document.querySelector("#app");
+    expect(app).not.toBeNull();
+    await renderShell();
+
+    const container = document.querySelector("#page-content") as HTMLElement;
+    expect(container).not.toBeNull();
+    await renderToday(container);
+
+    const datePicker = container.querySelector<HTMLDetailsElement>(".date-picker");
+    expect(datePicker).not.toBeNull();
+    const summary = datePicker?.querySelector("summary");
+    expect(summary).not.toBeNull();
+
+    // Focus composer textarea first as if user was typing a note
+    const textarea = container.querySelector<HTMLTextAreaElement>("#new-note-form textarea");
+    expect(textarea).not.toBeNull();
+    textarea?.focus();
+    expect(document.activeElement).toBe(textarea);
+
+    // Trigger go-to-date command via command palette
+    await openSearch(">go to date");
+    const input = document.querySelector<HTMLInputElement>("#command-palette-input");
+    expect(input).not.toBeNull();
+    await new Promise((r) => setTimeout(r, 20));
+
+    input?.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await new Promise((r) => setTimeout(r, 20));
+
+    // Date picker should now be open and summary focused instead of remaining in note editor
+    expect(datePicker?.hasAttribute("open")).toBe(true);
+    expect(document.activeElement).toBe(summary);
   });
 
   it("embeds data management export and backup directly into Settings and handles /data redirect", async () => {
