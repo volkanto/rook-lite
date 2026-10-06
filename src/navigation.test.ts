@@ -1257,13 +1257,14 @@ describe("Left menu bar icons and navigation", () => {
   });
 
   it("renders todo grouping tabs and allows switching views with persistence", async () => {
-    const { renderTodos } = await import("./main");
+    const { renderTodos, isoDate } = await import("./main");
     const { NoteService } = await import("./services");
     const { NoteRepository } = await import("./db");
     const noteService = new NoteService(new NoteRepository());
 
-    const noteUntagged = await noteService.create("- [ ] Buy coffee beans", "2026-10-05", []);
-    const noteTagged = await noteService.create("- [ ] Finish grouping pull request\n#dev", "2026-10-05", []);
+    const today = isoDate();
+    const noteUntagged = await noteService.create("- [ ] Buy coffee beans", today, []);
+    const noteTagged = await noteService.create("- [ ] Finish grouping pull request\n#dev", today, []);
 
     localStorage.removeItem("rook_todos_grouping");
 
