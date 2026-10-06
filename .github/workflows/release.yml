@@ -156,12 +156,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          LLAMA_CLI_PATH="$(find $HOME/llama -name 'llama-cli' -type f | head -n 1)"
-          if [ -z "$LLAMA_CLI_PATH" ] && [ -x "$HOME/llama/build/bin/llama-cli" ]; then
-            LLAMA_CLI_PATH="$HOME/llama/build/bin/llama-cli"
+          LLAMA_BIN_PATH="$(find $HOME/llama -name 'llama-completion' -type f | head -n 1)"
+          if [ -z "$LLAMA_BIN_PATH" ]; then
+            LLAMA_BIN_PATH="$(find $HOME/llama -name 'llama-cli' -type f | head -n 1)"
           fi
-          if [ -n "$LLAMA_CLI_PATH" ]; then
-            chmod +x "$LLAMA_CLI_PATH" || true
+          if [ -z "$LLAMA_BIN_PATH" ] && [ -x "$HOME/llama/build/bin/llama-cli" ]; then
+            LLAMA_BIN_PATH="$HOME/llama/build/bin/llama-cli"
+          fi
+          if [ -n "$LLAMA_BIN_PATH" ]; then
+            chmod +x "$LLAMA_BIN_PATH" || true
           fi
 
           DRY_RUN_FLAG=""
@@ -171,7 +174,7 @@ jobs:
 
           node .github/scripts/generate-release-summary.mjs \
             --current-tag "${{ needs.prepare-version.outputs.tag }}" \
-            --llama-cli "$LLAMA_CLI_PATH" \
+            --llama-bin "$LLAMA_BIN_PATH" \
             --model "$HOME/models/${{ env.MODEL_FILE }}" \
             --output release-notes.md \
             $DRY_RUN_FLAG
