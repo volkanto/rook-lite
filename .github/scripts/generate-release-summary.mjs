@@ -100,48 +100,66 @@ Generate the release notes now:<|im_end|>
 }
 
 /**
- * Sanitizes llama.cpp output by stripping timing headers, turn tokens, and code fences.
+ * Sanitizes llama.cpp output by stripping timing headers, echoed prompts, turn tokens, and code fences.
  */
 export function sanitizeLlamaOutput(raw) {
   if (!raw) return '';
 
-  return (
-    raw
-      // Strip llama.cpp timing headers (e.g. "[ Prompt: ... | Generation: ... ]")
-      .replace(/^\[\s*Prompt:[\s\S]*?Generation:[\s\S]*?\]\r?\n?/gm, '')
-      // Strip model turn markers & EOS tokens
-      .replace(/<\|im_start\|>|<\|im_end\|>|<\|endoftext\|>|\[end of text\]/gi, '')
-      // Strip leading/trailing code fences
-      .replace(/^\s*```(?:markdown)?\s*/i, '')
-      .replace(/\s*```\s*$/i, '')
-      .trim()
-  );
+  let text = raw;
+
+  // Strip llama.cpp timing headers (e.g. "[ Prompt: ... | Generation: ... ]")
+  text = text.replace(/^\[\s*Prompt:[\s\S]*?Generation:[\s\S]*?\]\r?\n?/gm, '');
+
+  // If the prompt was echoed in stdout, isolate only the assistant's reply
+  const assistantMarker = '<|im_start|>assistant';
+  const assistantIdx = text.lastIndexOf(assistantMarker);
+  if (assistantIdx !== -1) {
+    text = text.slice(assistantIdx + assistantMarker.length);
+  }
+
+  // Stop at the first end-of-turn or start-of-next-turn marker
+  const stopMatch = text.search(/<\|im_end\|>|<\|im_start\|>|\[end of text\]/i);
+  if (stopMatch !== -1) {
+    text = text.slice(0, stopMatch);
+  }
+
+  // Strip leftover turn markers, EOS tokens, or code fences
+  text = text
+    .replace(/<\|im_start\|>|<\|im_end\|>|<\|endoftext\|>|\[end of text\]/gi, '')
+    .replace(/^\s*```(?:markdown)?\s*/i, '')
+    .replace(/\s*```\s*$/i, '')
+    .trim();
+
+  return text;
 }
 
 /**
  * Validates that AI output contains meaningful release notes.
+ * Returns an object { valid: boolean, reason?: string }.
  */
 export function validateSummary(sanitized, prs = []) {
-  if (!sanitized || sanitized.length < 25) {
-    return false;
+  if (!sanitized || typeof sanitized !== 'string') {
+    return { valid: false, reason: 'Output is empty' };
   }
 
-  // Must have at least one header or bullet
-  const hasBullet = /^[-*]\s+/m.test(sanitized);
-  const hasHeader = /^#{1,4}\s+/m.test(sanitized);
+  const trimmed = sanitized.trim();
+  if (trimmed.length < 25) {
+    return { valid: false, reason: `Output too short (${trimmed.length} characters)` };
+  }
+
+  // Check if output is accidentally an echo of system prompt instructions
+  if (/^system\b/i.test(trimmed) || /You are a software release note assistant/i.test(trimmed)) {
+    return { valid: false, reason: 'Output appears to be echoed system instructions rather than release notes' };
+  }
+
+  // Must have at least one header or bullet (- * + • or 1.)
+  const hasBullet = /^(\s*[-*+•]|\s*\d+\.)\s+/m.test(trimmed);
+  const hasHeader = /^#{1,4}\s+/m.test(trimmed);
   if (!hasBullet && !hasHeader) {
-    return false;
+    return { valid: false, reason: 'Output does not contain markdown headers or bullet points' };
   }
 
-  // If we had PRs, output should ideally mention at least one (#<num>)
-  if (prs.length > 0) {
-    const hasPrRef = /\(#[0-9]+\)/.test(sanitized);
-    if (!hasPrRef) {
-      return false;
-    }
-  }
-
-  return true;
+  return { valid: true };
 }
 
 /**
@@ -401,7 +419,11 @@ export function runLlamaInference({ llamaCliPath, modelPath, prompt, timeoutMs =
       '2',
       '--temp',
       '0.1',
-      '--no-display-prompt'
+      '--no-display-prompt',
+      '-r',
+      '<|im_end|>',
+      '-r',
+      '<|im_start|>'
     ];
 
     // Modern llama-cli requires --single-turn for non-interactive chat
@@ -597,15 +619,20 @@ export async function main() {
       });
 
       const sanitized = sanitizeLlamaOutput(rawOutput);
-      const isValid = validateSummary(sanitized, meaningfulPRs);
+      const validation = validateSummary(sanitized, meaningfulPRs);
 
-      if (isValid) {
+      if (validation.valid) {
         finalNotesBody = sanitized;
         generatorMethod = 'llm';
         executionStats = `Generated in ${(durationMs / 1000).toFixed(1)}s via local Qwen2.5-0.5B-Instruct`;
         console.log(`[AI Summary] ✅ Local LLM generation succeeded (${executionStats}).`);
       } else {
-        console.warn('[AI Summary] ⚠️ LLM output failed validation checks. Falling back to deterministic generator.');
+        console.warn(`[AI Summary] ⚠️ LLM output failed validation checks: ${validation.reason}. Falling back to deterministic generator.`);
+        console.warn('[AI Summary] --- Raw LLM Output ---');
+        console.warn(rawOutput);
+        console.warn('[AI Summary] --- Sanitized LLM Output ---');
+        console.warn(sanitized);
+        console.warn('[AI Summary] ------------------------');
       }
     } catch (err) {
       console.warn(`[AI Summary] ⚠️ LLM inference failed: ${err.message}. Falling back to deterministic generator.`);

@@ -99,29 +99,42 @@ describe('generate-release-summary', () => {
       expect(sanitized).toBe(`### ✨ What's New\n- Added pre-defined note templates (#14)`);
       expect(sanitized).not.toContain('```');
     });
+
+    it('isolates assistant reply if the prompt was echoed to stdout', () => {
+      const raw = `<|im_start|>system\nYou are a software release note assistant...<|im_end|>\n<|im_start|>user\nHere are PRs...<|im_end|>\n<|im_start|>assistant\n### ✨ What's New\n- Added note grouping (#10)<|im_end|>`;
+      const sanitized = sanitizeLlamaOutput(raw);
+      expect(sanitized).toBe(`### ✨ What's New\n- Added note grouping (#10)`);
+      expect(sanitized).not.toContain('system');
+      expect(sanitized).not.toContain('Here are PRs');
+    });
   });
 
   describe('validateSummary', () => {
     const prs = [{ number: 10, title: 'feat: something' }];
 
-    it('validates good release notes with headers, bullets, and PR refs', () => {
+    it('validates good release notes with headers and bullets', () => {
       const good = `### ✨ What's New\n- Added note templates and link picker (#10)`;
-      expect(validateSummary(good, prs)).toBe(true);
+      expect(validateSummary(good, prs).valid).toBe(true);
+    });
+
+    it('validates notes with unicode bullets (•)', () => {
+      const unicodeBullet = `### ✨ What's New\n• Added date and tag grouping in tasks (#10)`;
+      expect(validateSummary(unicodeBullet, prs).valid).toBe(true);
     });
 
     it('rejects short or empty outputs', () => {
-      expect(validateSummary('', prs)).toBe(false);
-      expect(validateSummary('Too short', prs)).toBe(false);
+      expect(validateSummary('', prs).valid).toBe(false);
+      expect(validateSummary('Too short', prs).valid).toBe(false);
     });
 
     it('rejects output without bullets or headers', () => {
-      const noMarkdown = `This is just a plain paragraph talking about changes (#10).`;
-      expect(validateSummary(noMarkdown, prs)).toBe(false);
+      const noMarkdown = `This is just a plain paragraph talking about changes without markdown bullets or headers.`;
+      expect(validateSummary(noMarkdown, prs).valid).toBe(false);
     });
 
-    it('rejects output missing PR reference when PRs were present', () => {
-      const missingPrRef = `### ✨ What's New\n- Added note templates and link picker`;
-      expect(validateSummary(missingPrRef, prs)).toBe(false);
+    it('rejects echoed system prompt instructions', () => {
+      const echo = `You are a software release note assistant for Rook Lite. Summarize the provided PRs.`;
+      expect(validateSummary(echo, prs).valid).toBe(false);
     });
   });
 
