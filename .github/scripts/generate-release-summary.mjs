@@ -372,11 +372,11 @@ export function extractCommitsAndPRs({ prevTag, currentTag, gitRef, repo }) {
 }
 
 /**
- * Runs local inference via llama-cli.
+ * Runs local inference via llama-completion or llama-cli.
  */
 export function runLlamaInference({ llamaCliPath, modelPath, prompt, timeoutMs = 60000 }) {
   if (!llamaCliPath || !fs.existsSync(llamaCliPath)) {
-    throw new Error(`llama-cli executable not found at: ${llamaCliPath}`);
+    throw new Error(`llama executable not found at: ${llamaCliPath}`);
   }
   if (!modelPath || !fs.existsSync(modelPath)) {
     throw new Error(`GGUF model file not found at: ${modelPath}`);
@@ -387,6 +387,7 @@ export function runLlamaInference({ llamaCliPath, modelPath, prompt, timeoutMs =
 
   try {
     const startTime = Date.now();
+    const isCli = path.basename(llamaCliPath).includes('llama-cli');
     const args = [
       '--model',
       modelPath,
@@ -400,9 +401,14 @@ export function runLlamaInference({ llamaCliPath, modelPath, prompt, timeoutMs =
       '2',
       '--temp',
       '0.1',
-      '--no-display-prompt',
-      '-no-cnv'
+      '--no-display-prompt'
     ];
+
+    // Modern llama-cli requires --single-turn for non-interactive chat
+    // llama-completion is already dedicated to non-interactive completion
+    if (isCli) {
+      args.push('--single-turn');
+    }
 
     const cliDir = path.dirname(llamaCliPath);
     const ldLibPath = [cliDir, path.join(cliDir, '..', 'lib'), process.env.LD_LIBRARY_PATH]
@@ -440,7 +446,7 @@ export function parseArgs(argv) {
     currentTag: '',
     prevTag: '',
     repo: process.env.GITHUB_REPOSITORY || '',
-    llamaCli: process.env.LLAMA_CLI_PATH || '',
+    llamaCli: process.env.LLAMA_BIN_PATH || process.env.LLAMA_CLI_PATH || '',
     model: process.env.LLAMA_MODEL_PATH || '',
     output: 'release-notes.md',
     contextOutput: 'release-context.json',
@@ -457,7 +463,7 @@ export function parseArgs(argv) {
       args.prevTag = argv[++i];
     } else if (arg === '--repo' && argv[i + 1]) {
       args.repo = argv[++i];
-    } else if (arg === '--llama-cli' && argv[i + 1]) {
+    } else if ((arg === '--llama-cli' || arg === '--llama-bin') && argv[i + 1]) {
       args.llamaCli = argv[++i];
     } else if (arg === '--model' && argv[i + 1]) {
       args.model = argv[++i];
@@ -478,15 +484,38 @@ export function parseArgs(argv) {
   if (!args.llamaCli) {
     const homeDir = os.homedir();
     const candidatePaths = [
+      path.join(homeDir, 'llama', 'llama-completion'),
       path.join(homeDir, 'llama', 'llama-cli'),
+      path.join(homeDir, 'llama', 'build', 'bin', 'llama-completion'),
       path.join(homeDir, 'llama', 'build', 'bin', 'llama-cli'),
+      path.join(homeDir, 'llama', 'bin', 'llama-completion'),
+      path.join(homeDir, 'llama', 'bin', 'llama-cli'),
+      '/usr/local/bin/llama-completion',
       '/usr/local/bin/llama-cli',
+      'llama-completion',
       'llama-cli'
     ];
     for (const p of candidatePaths) {
       if (fs.existsSync(p)) {
         args.llamaCli = p;
         break;
+      }
+    }
+
+    if (!args.llamaCli && fs.existsSync(path.join(homeDir, 'llama'))) {
+      try {
+        const found = execSync(
+          `find "${path.join(homeDir, 'llama')}" \\( -name 'llama-completion' -o -name 'llama-cli' \\) -type f 2>/dev/null`,
+          { encoding: 'utf-8' }
+        )
+          .trim()
+          .split('\n')
+          .filter(Boolean)[0];
+        if (found && fs.existsSync(found)) {
+          args.llamaCli = found;
+        }
+      } catch {
+        // ignore
       }
     }
   }

@@ -194,6 +194,8 @@ describe('generate-release-summary', () => {
         'v1.3.0',
         '--prev-tag',
         'v1.2.0',
+        '--llama-bin',
+        '/path/to/llama-completion',
         '--dry-run',
         '--fallback-only',
         '--repo',
@@ -205,6 +207,7 @@ describe('generate-release-summary', () => {
 
       expect(parsed.currentTag).toBe('v1.3.0');
       expect(parsed.prevTag).toBe('v1.2.0');
+      expect(parsed.llamaCli).toBe('/path/to/llama-completion');
       expect(parsed.dryRun).toBe(true);
       expect(parsed.fallbackOnly).toBe(true);
       expect(parsed.repo).toBe('volkanto/rook-lite');
