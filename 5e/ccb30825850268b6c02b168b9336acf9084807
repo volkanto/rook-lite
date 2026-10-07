@@ -1,0 +1,53 @@
+src/locales/en.ts
+  s_a3bc289a0ceeea::t_dc68410d8d49ca 36
+src/main.ts
+  s_a3bc289a0ceeea::t_6848e6296b9d97 520,534,542-544,568-571,573-575
+  s_a3bc289a0ceeea::t_aae1f01e44f364 545-553
+  s_a3bc289a0ceeea::t_a6713fec88b8ef 499,503-504,506-516
+  s_a3bc289a0ceeea::t_8d30ac49bc1b3b 32
+  s_a3bc289a0ceeea::t_ef2211528ae893 580
+  s_a3bc289a0ceeea::t_71f8f38697e253 2072
+  s_a3bc289a0ceeea::t_042d2e26d5775d 2074,2079
+  s_a3bc289a0ceeea::t_ebce8a0abbc5ca 436-437,451
+  s_a3bc289a0ceeea::t_3883833c69915f 469
+  s_a3bc289a0ceeea::t_c485cae8c57e26 521,2073,2075-2078,2080
+  s_a3bc289a0ceeea::t_30338065b733e7 505,517-519
+src/locales/tr.ts
+  s_a3bc289a0ceeea::t_380b26ec0ae6b1 36
+src/i18n.types.ts
+  s_a3bc289a0ceeea::t_082971e5391458 29
+src/navigation.test.ts
+  s_a3bc289a0ceeea::t_16cb89d64949d5 841-843,845-848,850-858
+  s_a3bc289a0ceeea::t_9b89166009b557 809-814,820-830,832-833,835,837-838,840,865-866
+  s_a3bc289a0ceeea::t_e405ac72668233 859-864
+  s_a3bc289a0ceeea::t_faaaef9cb1bfac 1021-1024,1026-1028,1032-1033
+  s_a3bc289a0ceeea::t_2f891f7532ef28 1030
+  s_a3bc289a0ceeea::t_2e3bc70ee21502 903,917,919-924,931,947,950-955
+  s_a3bc289a0ceeea::t_bb5822ad9a02e1 294-295,297,300-301
+  s_a3bc289a0ceeea::t_2fd7b5c1ebf0ce 292-293,296,299
+  s_a3bc289a0ceeea::t_c25a88fdffb1be 808,815-819,831,834,836,839,844,849
+  s_a3bc289a0ceeea::t_773a18fc99e732 1025,1029,1031
+src/lite.css
+  s_a3bc289a0ceeea::t_823901a1c5ba3d 3718-3719
+  s_a3bc289a0ceeea::t_a380679f2f4473 3696-3697,3711-3712
+  s_a3bc289a0ceeea::t_e9b0ed00e31b0a 3694-3695
+  s_a3bc289a0ceeea::t_26b843f6f50e41 3698-3700,3708-3710
+  s_a3bc289a0ceeea::t_8496cab0927119 3713-3717
+  s_a3bc289a0ceeea::t_96858e4e2bacad 3720-3722
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "5eccb30825850268b6c02b168b9336acf9084807",
+  "prompts": {},
+  "sessions": {
+    "s_a3bc289a0ceeea": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "3dd006b6-b9ba-44af-b4ba-d0393ef61bd1",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
