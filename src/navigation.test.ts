@@ -289,8 +289,16 @@ describe("Left menu bar icons and navigation", () => {
     // Editor formatting tools are inside the card at the top
     const toolbar = editorCard?.querySelector(".simple-editor-toolbar");
     expect(toolbar).not.toBeNull();
-    expect(toolbar?.querySelectorAll("button[data-format]").length).toBe(6);
+    expect(toolbar?.querySelectorAll("button[data-format]").length).toBe(9);
+    expect(toolbar?.querySelector("button[data-format='heading']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='bold']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='italic']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='quote']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='code']")).not.toBeNull();
     expect(toolbar?.querySelector("button[data-format='wikilink']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='numbered']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='list']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='task']")).not.toBeNull();
 
     // Textarea is inside the card
     const textarea = editorCard?.querySelector("textarea.simple-editor-textarea");
@@ -797,6 +805,65 @@ describe("Left menu bar icons and navigation", () => {
     expect(previewPane?.classList.contains("is-hidden")).toBe(true);
   });
 
+  it("renders note editor with eye icon preview toggle and Finish note button", async () => {
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form");
+    expect(form).not.toBeNull();
+
+    // Mode toggle with eye/edit icons
+    const writeBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
+    const previewBtn = form?.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
+    expect(writeBtn?.querySelector("svg")).not.toBeNull();
+    expect(previewBtn?.querySelector("svg")).not.toBeNull();
+
+    // Formatting tools
+    const toolbar = form?.querySelector(".simple-editor-toolbar");
+    expect(toolbar).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='bold']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='italic']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='code']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='wikilink']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='list']")).not.toBeNull();
+    expect(toolbar?.querySelector("button[data-format='task']")).not.toBeNull();
+
+    // Textarea with placeholder
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    expect(textarea).not.toBeNull();
+    expect(textarea?.placeholder).toContain("⌘Enter to save");
+
+    // Single Finish note submit button (no separate cancel button in new-note-form)
+    const submitBtn = form?.querySelector<HTMLButtonElement>("button[type='submit']");
+    expect(submitBtn).not.toBeNull();
+    expect(submitBtn?.textContent).toBe("Finish note");
+
+    // Preview mode stability: switching to preview stays in preview mode even after focusout
+    textarea!.value = "Preview content";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    previewBtn?.click();
+    expect(form?.classList.contains("is-preview")).toBe(true);
+    form?.dispatchEvent(new Event("focusout", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 60));
+    expect(form?.classList.contains("is-preview")).toBe(true);
+    expect(previewBtn?.classList.contains("is-active")).toBe(true);
+
+    // Template picker stability: opening template details keeps form expanded
+    const picker = form?.querySelector<HTMLDetailsElement>(".editor-template-picker");
+    expect(picker).not.toBeNull();
+    picker?.setAttribute("open", "");
+    picker?.dispatchEvent(new Event("toggle"));
+    form?.dispatchEvent(new Event("focusout", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 60));
+    expect(form?.classList.contains("has-content")).toBe(true);
+
+    // Clean up
+    picker?.removeAttribute("open");
+    writeBtn?.click();
+    textarea!.value = "";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+
   it("toggles between write and preview modes in edit note popup", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
@@ -833,7 +900,7 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(createdNote.id);
   });
 
-  it("switches from preview back to write mode when clicking preview pane in composer", async () => {
+  it("keeps preview mode active when clicking preview pane in composer until explicitly toggled", async () => {
     const { renderShell } = await import("./main");
     await renderShell();
 
@@ -847,15 +914,21 @@ describe("Left menu bar icons and navigation", () => {
     previewBtn?.click();
     expect(previewPane?.classList.contains("is-hidden")).toBe(false);
 
-    // Clicking the preview pane switches back to write mode
+    // Clicking the preview pane stays in preview mode
     previewPane?.click();
+    expect(form?.classList.contains("is-preview")).toBe(true);
+    expect(previewBtn?.classList.contains("is-active")).toBe(true);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(false);
+
+    // Explicitly clicking the write toggle button switches back to write mode
+    writeBtn?.click();
     expect(writeBtn?.classList.contains("is-active")).toBe(true);
     expect(previewBtn?.classList.contains("is-active")).toBe(false);
     expect(textarea?.classList.contains("is-hidden")).toBe(false);
     expect(previewPane?.classList.contains("is-hidden")).toBe(true);
   });
 
-  it("resets note composer preview mode when clicking outside the panel", async () => {
+  it("keeps note composer in preview mode when clicking outside the panel", async () => {
     const { renderShell } = await import("./main");
     await renderShell();
 
@@ -871,12 +944,17 @@ describe("Left menu bar icons and navigation", () => {
     expect(previewPane?.classList.contains("is-hidden")).toBe(false);
     expect(textarea?.classList.contains("is-hidden")).toBe(true);
 
-    // Click outside of the form
+    // Click outside of the form does NOT reset preview mode
     document.body.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
+    expect(form?.classList.contains("is-preview")).toBe(true);
+    expect(previewBtn?.classList.contains("is-active")).toBe(true);
+    expect(previewPane?.classList.contains("is-hidden")).toBe(false);
+
+    // Explicitly toggle back to write
+    writeBtn?.click();
     expect(form?.classList.contains("is-preview")).toBe(false);
     expect(writeBtn?.classList.contains("is-active")).toBe(true);
-    expect(previewBtn?.classList.contains("is-active")).toBe(false);
     expect(textarea?.classList.contains("is-hidden")).toBe(false);
     expect(previewPane?.classList.contains("is-hidden")).toBe(true);
   });
@@ -940,6 +1018,19 @@ describe("Left menu bar icons and navigation", () => {
     // Press Cmd+D again to exit Zen mode
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "d", metaKey: true, bubbles: true }));
     expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+
+    // Clear textarea and verify leaving zen mode restores empty composer size and collapses has-content
+    textarea!.value = "";
+    textarea!.dispatchEvent(new Event("input", { bubbles: true }));
+    (document.activeElement as HTMLElement)?.blur();
+    zenBtn?.click();
+    expect(document.body.classList.contains("is-zen-mode")).toBe(true);
+
+    // Leave zen mode via Escape
+    (document.activeElement as HTMLElement)?.blur();
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(document.body.classList.contains("is-zen-mode")).toBe(false);
+    expect(form?.classList.contains("has-content")).toBe(false);
   });
 
   it("toggles Zen mode inside the edit note dialog and resets on close", async () => {

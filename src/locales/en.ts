@@ -33,6 +33,7 @@ export const locale: LocaleDefinition = {
     githubTooltip: "Source code on GitHub",
     toolBold: "Bold",
     toolItalic: "Italic",
+    toolQuote: "Quote",
     toolBulletList: "Bullet list",
     toolChecklist: "Checklist",
     toolCode: "Code",
