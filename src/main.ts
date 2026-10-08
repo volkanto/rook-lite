@@ -29,6 +29,7 @@ let currentActiveNote: Note | null = null;
 
 export const icons = {
   link: '<path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/>',
+  quote: '<path d="M10 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"/><path d="M19 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"/>',
   template: '<path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M4 9h16"/><path d="M9 4v5"/>',
   home: '<path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>',
   note: '<path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"/><path d="M13 8l2 0"/><path d="M13 12l2 0"/>',
@@ -383,7 +384,7 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 function editorMarkup(id: string, value: string, label: string, isModal = false): string {
   const s = currentStrings();
   const isSubmitDisabled = !isModal && !value.trim();
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}" novalidate><div class="simple-editor-toolbar" aria-label="${s.markdownFormatting}"><div class="editor-tools-cluster"><button type="button" data-format="bold" aria-label="${s.toolBold}" title="${s.toolBold}"><strong>B</strong></button><button type="button" data-format="italic" aria-label="${s.toolItalic}" title="${s.toolItalic}"><em>I</em></button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="list" aria-label="${s.toolBulletList}" title="${s.toolBulletList}">• ≡</button><button type="button" data-format="task" aria-label="${s.toolChecklist}" title="${s.toolChecklist}">✓ ≡</button><button type="button" data-format="code" aria-label="${s.toolCode}" title="${s.toolCode}">&lt;&gt;</button><button type="button" data-format="wikilink" class="editor-tool-wikilink" aria-label="${s.insertWikilink}" title="${s.insertWikilink} ([[)">${svg(icons.link, "editor-tool-svg")}</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="${s.toolTemplates}" aria-label="${s.toolTemplates}">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${getPredefinedTemplates(getLocale()).map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="${s.editorViewMode}"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect"${isSubmitDisabled ? " disabled" : ""}>${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}" novalidate><div class="simple-editor-toolbar" aria-label="${s.markdownFormatting}"><div class="editor-tools-cluster"><button type="button" data-format="heading" aria-label="Heading" title="Add heading"><strong>H</strong></button><button type="button" data-format="bold" aria-label="${s.toolBold}" title="${s.toolBold}"><strong>B</strong></button><button type="button" data-format="italic" aria-label="${s.toolItalic}" title="${s.toolItalic}"><em>I</em></button><button type="button" data-format="quote" class="editor-tool-quote" aria-label="${s.toolQuote}" title="${s.toolQuote}">${svg(icons.quote, "editor-tool-svg")}</button><button type="button" data-format="code" aria-label="${s.toolCode}" title="${s.toolCode}">&lt;&gt;</button><button type="button" data-format="wikilink" class="editor-tool-wikilink" aria-label="${s.insertWikilink}" title="${s.insertWikilink} ([[)">${svg(icons.link, "editor-tool-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="numbered" aria-label="Numbered list" title="Add a numbered list"><span class="tool-num-icon">1. ≡</span></button><button type="button" data-format="list" aria-label="${s.toolBulletList}" title="${s.toolBulletList}">• ≡</button><button type="button" data-format="task" aria-label="${s.toolChecklist}" title="${s.toolChecklist}">✓ ≡</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="${s.toolTemplates}" aria-label="${s.toolTemplates}">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${getPredefinedTemplates(getLocale()).map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="${s.editorViewMode}"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect"${isSubmitDisabled ? " disabled" : ""}>${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
 function noteMarkup(note: Note, allNotes: Note[] = [], selectedDate = note.noteDate): string {
@@ -432,6 +433,8 @@ export function setEditorMode(form: HTMLFormElement, mode: "write" | "preview", 
     toolsCluster?.classList.remove("is-hidden");
     if (hintEl) hintEl.classList.remove("is-hidden");
     form.classList.remove("is-preview");
+    const hasText = Boolean(textarea.value.trim());
+    form.classList.toggle("has-content", hasText || textarea.value.includes("\n") || form.contains(document.activeElement));
     if (shouldFocus) {
       textarea.focus();
     }
@@ -445,6 +448,7 @@ export function setEditorMode(form: HTMLFormElement, mode: "write" | "preview", 
     toolsCluster?.classList.add("is-hidden");
     if (hintEl) hintEl.classList.add("is-hidden");
     form.classList.add("is-preview");
+    form.classList.add("has-content");
 
     const content = textarea.value.trim();
     if (content) {
@@ -460,15 +464,9 @@ export function setEditorMode(form: HTMLFormElement, mode: "write" | "preview", 
 function bindEditorPreview(form: HTMLFormElement): void {
   const writeBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
   const previewBtn = form.querySelector<HTMLButtonElement>('[data-editor-mode="preview"]');
-  const previewPane = form.querySelector<HTMLElement>(".editor-preview");
 
   writeBtn?.addEventListener("click", () => setEditorMode(form, "write", true));
-  previewBtn?.addEventListener("click", () => setEditorMode(form, "preview", true));
-  previewPane?.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-    if (target.closest("a, button, input")) return;
-    setEditorMode(form, "write", true);
-  });
+  previewBtn?.addEventListener("click", () => setEditorMode(form, "preview", false));
 }
 
 function countWords(text: string): number {
@@ -498,7 +496,27 @@ function toggleZenMode(targetForm?: HTMLFormElement): void {
   if (formToFocus) {
     const textarea = formToFocus.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
     if (isZen) {
+      if (textarea) textarea.style.height = "";
       textarea?.focus();
+    }
+  }
+  if (!isZen) {
+    document.querySelectorAll<HTMLTextAreaElement>("textarea.simple-editor-textarea").forEach((ta) => {
+      ta.style.height = "auto";
+      resizeEditor(ta);
+    });
+    const composer = document.querySelector<HTMLFormElement>("#new-note-form");
+    if (composer) {
+      const compTa = composer.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+      const hasText = Boolean(compTa?.value.trim());
+      const isFocused = composer.contains(document.activeElement) || Boolean(composer.querySelector(".editor-template-picker[open]"));
+      const isPreview = composer.classList.contains("is-preview");
+      composer.classList.toggle("has-content", hasText || Boolean(compTa?.value.includes("\n")) || isFocused || isPreview);
+      const submitBtn = composer.querySelector<HTMLButtonElement>("button[type='submit']");
+      if (submitBtn) submitBtn.disabled = !hasText;
+      if (!hasText && !compTa?.value.includes("\n") && !isFocused && !isPreview) {
+        if (compTa) compTa.style.height = "";
+      }
     }
   }
 }
@@ -513,7 +531,7 @@ function bindCreateEditor(date: string): void {
   updateEditorWordCount(form);
   const updateComposer = () => {
     const hasText = Boolean(textarea.value.trim());
-    const isFocused = form.contains(document.activeElement);
+    const isFocused = form.contains(document.activeElement) || Boolean(form.querySelector(".editor-template-picker[open]"));
     const isPreview = form.classList.contains("is-preview");
     form.classList.toggle("has-content", hasText || textarea.value.includes("\n") || isFocused || isPreview);
     const submitBtn = form.querySelector<HTMLButtonElement>("button[type='submit']");
@@ -521,6 +539,18 @@ function bindCreateEditor(date: string): void {
       submitBtn.disabled = !hasText;
     }
   };
+  form.querySelector(".editor-template-picker")?.addEventListener("toggle", () => {
+    updateComposer();
+  });
+  const cancelBtn = form.querySelector<HTMLButtonElement>("[data-cancel-editor]");
+  cancelBtn?.addEventListener("click", (event) => {
+    event.preventDefault();
+    textarea.value = "";
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    setEditorMode(form, "write", false);
+    form.classList.remove("has-content");
+    updateComposer();
+  });
   updateComposer();
   const saveDraft = () => {
     window.clearTimeout(draftTimer);
@@ -535,16 +565,19 @@ function bindCreateEditor(date: string): void {
     updateComposer();
   });
   form.addEventListener("focusin", updateComposer);
-  form.addEventListener("focusout", () => {
+  form.addEventListener("focusout", (event) => {
+    if (event.relatedTarget && form.contains(event.relatedTarget as Node)) {
+      return;
+    }
     window.setTimeout(() => {
+      if (form.classList.contains("is-preview") || Boolean(form.querySelector(".editor-template-picker[open]"))) {
+        return;
+      }
       if (!form.contains(document.activeElement)) {
-        if (form.classList.contains("is-preview")) {
-          setEditorMode(form, "write", false);
-        }
         resizeEditor(textarea);
         updateComposer();
       }
-    }, 50);
+    }, 45);
   });
   textarea.addEventListener("input", () => {
     resizeEditor(textarea);
@@ -1841,16 +1874,6 @@ function bindShellEvents(): void {
       return;
     }
 
-    const newNoteForm = document.querySelector<HTMLFormElement>("#new-note-form");
-    if (newNoteForm && newNoteForm.classList.contains("is-preview") && !newNoteForm.contains(target)) {
-      setEditorMode(newNoteForm, "write", false);
-      const ta = newNoteForm.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
-      const hasContent = Boolean(ta?.value.trim());
-      newNoteForm.classList.toggle("has-content", hasContent);
-      const submitBtn = newNoteForm.querySelector<HTMLButtonElement>("button[type='submit']");
-      if (submitBtn) submitBtn.disabled = !hasContent;
-    }
-
     const clickPath = event.composedPath();
     document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => {
       if (!details.contains(target) && !clickPath.includes(details)) details.removeAttribute("open");
@@ -2046,8 +2069,15 @@ function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): v
     handleSmartListContinuation(event, textarea);
   });
 }
-function formatNote(textarea: HTMLTextAreaElement, style: string): void { const start = textarea.selectionStart; const end = textarea.selectionEnd; const selected = textarea.value.slice(start, end); const formats: Record<string, [string, string]> = { heading: ["## ", ""], bold: ["**", "**"], italic: ["_", "_"], strike: ["~~", "~~"], list: ["* ", ""], numbered: ["1. ", ""], task: ["- [ ] ", ""], code: ["```\n", "\n```"], wikilink: ["[[", "]]"] }; const [rawPrefix, suffix] = formats[style] ?? ["", ""]; const before = textarea.value.slice(0, start); const prefix = ["heading", "list", "numbered", "task"].includes(style) && before && !before.endsWith("\n") ? `\n${rawPrefix}` : rawPrefix; textarea.setRangeText(`${prefix}${selected}${suffix}`, start, end, "end"); textarea.focus(); textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length); textarea.dispatchEvent(new Event("input", { bubbles: true })); }
-function resizeEditor(textarea: HTMLTextAreaElement): void { textarea.style.height = "auto"; textarea.style.height = `${textarea.scrollHeight}px`; }
+function formatNote(textarea: HTMLTextAreaElement, style: string): void { const start = textarea.selectionStart; const end = textarea.selectionEnd; const selected = textarea.value.slice(start, end); const formats: Record<string, [string, string]> = { heading: ["### ", ""], bold: ["**", "**"], italic: ["_", "_"], strike: ["~~", "~~"], list: ["* ", ""], numbered: ["1. ", ""], task: ["- [ ] ", ""], code: ["```\n", "\n```"], wikilink: ["[[", "]]"], quote: ["> ", ""] }; const [rawPrefix, suffix] = formats[style] ?? ["", ""]; const before = textarea.value.slice(0, start); const prefix = ["heading", "list", "numbered", "task", "quote"].includes(style) && before && !before.endsWith("\n") ? `\n${rawPrefix}` : rawPrefix; textarea.setRangeText(`${prefix}${selected}${suffix}`, start, end, "end"); textarea.focus(); textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length); textarea.dispatchEvent(new Event("input", { bubbles: true })); }
+function resizeEditor(textarea: HTMLTextAreaElement): void {
+  if (document.body.classList.contains("is-zen-mode")) {
+    textarea.style.height = "";
+    return;
+  }
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+}
 function status(form: HTMLFormElement, message: string, error = false): void { const element = form.querySelector<HTMLElement>("[data-save-status]"); if (element) { element.textContent = message; element.classList.toggle("text-danger", error); } }
 function setBusy(form: HTMLFormElement, busy: boolean): void { form.querySelectorAll<HTMLButtonElement>("button").forEach((button) => { button.disabled = busy; }); }
 function handleKeyboard(event: KeyboardEvent): void {

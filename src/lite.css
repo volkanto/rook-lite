@@ -3691,6 +3691,35 @@ textarea.simple-editor-textarea.is-hidden,
   padding: 0.65rem 0.95rem;
   margin: 0;
   overflow-y: auto;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.editor-preview * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.editor-preview pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border: 1px solid var(--color-border-subtle, var(--border));
+}
+
+.editor-preview table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.editor-preview img {
+  max-width: 100%;
+  height: auto;
 }
 
 #new-note-form .editor-preview.is-hidden,

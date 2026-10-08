@@ -26,6 +26,7 @@ export interface TranslationStrings {
   githubTooltip: string;
   toolBold: string;
   toolItalic: string;
+  toolQuote: string;
   toolBulletList: string;
   toolChecklist: string;
   toolCode: string;
