@@ -894,6 +894,123 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     padding: 0.5rem 1.1rem !important;
     background: transparent !important;
   }
+
+  /* 2-Line Compact Note Cards in Middle Panel */
+  .mac-stream-pane .notes-list .note {
+    cursor: pointer;
+    padding: 0.95rem 1.25rem !important;
+    border-radius: var(--radius-md, 8px) !important;
+    transition: all 120ms ease !important;
+    margin: 0 !important;
+    user-select: none;
+  }
+
+  .mac-stream-pane .notes-list .note:hover {
+    border-color: var(--color-border-default) !important;
+    background: var(--color-bg-hover) !important;
+  }
+
+  .mac-stream-pane .notes-list .note-list-item.is-selected .note {
+    border-color: var(--color-brand) !important;
+    background: var(--color-bg-hover) !important;
+    box-shadow: 0 0 0 1px var(--color-brand), var(--shadow-sm) !important;
+  }
+
+  /* Restrict middle panel note prose to strictly 2 lines */
+  .mac-stream-pane .notes-list .note .prose {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-height: 3.4em !important;
+    line-height: 1.7 !important;
+    font-size: 0.94rem !important;
+    margin: 0.25rem 0 0 !important;
+  }
+
+  .mac-stream-pane .notes-list .note .prose > * {
+    margin: 0 !important;
+  }
+
+  .mac-stream-pane .notes-list .note .note-backlinks {
+    display: none !important;
+  }
+
+  /* Active Note Detail View in Right Panel */
+  .mac-active-note-section {
+    width: 100%;
+    animation: detailFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mac-active-note-section.is-hidden,
+  .mac-composer-section.is-hidden {
+    display: none !important;
+  }
+
+  .mac-detail-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md, 8px);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem 1.75rem 2.5rem;
+    box-sizing: border-box;
+  }
+
+  .mac-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .mac-detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .mac-detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .mac-detail-actions .note-quick-action-btn {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .mac-detail-actions .mac-detail-close {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: 0.4rem !important;
+  }
+
+  .mac-detail-prose {
+    font-size: 1.05rem !important;
+    line-height: 1.75 !important;
+    color: var(--color-text-primary) !important;
+    max-width: 100% !important;
+  }
+}
+
+@keyframes detailFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 60rem) {

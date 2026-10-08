@@ -2082,4 +2082,43 @@ describe("Left menu bar icons and navigation", () => {
 
     metaEl.remove();
   });
+
+  it("toggles note detail in right panel on click and restores editor on second click", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const testNote = await noteService.create("Full detailed note content for master detail test", today);
+
+    history.pushState({}, "", `/?date=${today}`);
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    const noteEl = document.querySelector<HTMLElement>(`#note-${testNote.id}`);
+    expect(noteEl).not.toBeNull();
+
+    const composerSec = document.querySelector<HTMLElement>("#mac-composer-section");
+    const detailSec = document.querySelector<HTMLElement>("#mac-active-note-section");
+    expect(composerSec).not.toBeNull();
+    expect(detailSec).not.toBeNull();
+
+    // Initially, composer is visible, detail is hidden
+    expect(composerSec?.classList.contains("is-hidden")).toBe(false);
+    expect(detailSec?.classList.contains("is-hidden")).toBe(true);
+
+    // Click note -> opens detail in right panel, hides composer
+    noteEl?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    expect(composerSec?.classList.contains("is-hidden")).toBe(true);
+    expect(detailSec?.classList.contains("is-hidden")).toBe(false);
+    expect(detailSec?.querySelector(".mac-detail-prose")?.textContent).toContain("Full detailed note content");
+
+    // Click note once again -> hides detail, restores composer
+    noteEl?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    expect(composerSec?.classList.contains("is-hidden")).toBe(false);
+    expect(detailSec?.classList.contains("is-hidden")).toBe(true);
+
+    await noteService.delete(testNote.id);
+  });
 });
