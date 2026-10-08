@@ -760,48 +760,141 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 }
 
 #page-content {
-  max-width: 90rem;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#page-content > :not(.mac-workspace) {
+  max-width: 52rem;
   margin: 1.5rem auto 3rem;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
 }
 
 /* ==========================================================================
-   Mac-Style 3-Pane Desktop Workspace (Sidebar | Stream | Editor)
+   Mac-Style 3-Pane Desktop Workspace (Rail | Notes Stream | Writing Desk)
    ========================================================================== */
 
-.mac-workspace {
-  display: flex;
-  gap: 2.5rem;
-  align-items: flex-start;
-  width: 100%;
+@media (min-width: 60.001rem) {
+  .mac-workspace {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    align-items: stretch;
+  }
+
+  .mac-stream-pane {
+    flex: 0 0 clamp(380px, 34vw, 460px);
+    width: clamp(380px, 34vw, 460px);
+    min-width: 360px;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--color-border-subtle);
+    background: var(--color-bg-app);
+    padding: 1.5rem 1.4rem 4rem;
+    box-sizing: border-box;
+  }
+
+  .mac-editor-pane {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--color-bg-surface);
+    padding: 2.5rem 3rem 4rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mac-editor-sticky {
+    width: 100%;
+    max-width: 46rem;
+    margin: 0 auto;
+  }
+
+  .mac-editor-sticky .copilot-input-container {
+    margin-bottom: 0 !important;
+  }
+
+  .mac-editor-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+    padding: 0 0.25rem;
+  }
+
+  .mac-editor-title {
+    margin: 0;
+    font-family: var(--font-editorial, var(--font-prose));
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .mac-editor-shortcut-hint {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    padding: 2px 6px;
+    background: var(--color-bg-surface-sunken);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 4px;
+    line-height: 1;
+  }
+
+  /* In 3-pane mode, the writing desk is open and welcoming */
+  .mac-editor-sticky #new-note-form {
+    border-radius: var(--radius-md, 8px) !important;
+    border: 1px solid var(--color-border-subtle) !important;
+    box-shadow: var(--shadow-sm) !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-toolbar,
+  .mac-editor-sticky #new-note-form .simple-editor-footer {
+    display: flex !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-toolbar {
+    order: 1 !important;
+    border-bottom: 1px solid var(--color-border-subtle) !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top-left-radius: 7px !important;
+    border-top-right-radius: 7px !important;
+    padding: 0.45rem 1rem !important;
+    background: var(--color-bg-surface-sunken) !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-textarea {
+    order: 2 !important;
+    min-height: 14rem !important;
+    padding: 1.25rem 1.4rem !important;
+    font-size: 1rem !important;
+    line-height: 1.72 !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-footer {
+    order: 3 !important;
+    border-top: 1px solid var(--color-border-subtle) !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom-left-radius: 7px !important;
+    border-bottom-right-radius: 7px !important;
+    padding: 0.5rem 1.1rem !important;
+    background: transparent !important;
+  }
 }
 
-.mac-stream-pane {
-  flex: 1 1 56%;
-  min-width: 0;
-  max-width: 46rem;
-}
-
-.mac-editor-pane {
-  flex: 1 1 44%;
-  min-width: 320px;
-  max-width: 38rem;
-  position: sticky;
-  top: 1.5rem;
-  z-index: 20;
-}
-
-.mac-editor-sticky {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.mac-editor-sticky .copilot-input-container {
-  margin-bottom: 0 !important;
-}
-
-@media (max-width: 68rem) {
+@media (max-width: 60rem) {
   #page-content {
     max-width: 52rem;
     padding: 0 1rem;
@@ -809,19 +902,18 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   }
 
   .mac-workspace {
+    display: flex;
     flex-direction: column;
     gap: 1.5rem;
   }
 
   .mac-stream-pane {
     width: 100%;
-    max-width: 100%;
     order: 2;
   }
 
   .mac-editor-pane {
     width: 100%;
-    max-width: 100%;
     position: static;
     order: 1;
   }
@@ -3906,7 +3998,7 @@ textarea.simple-editor-textarea.is-hidden,
 
 .lite-shell-main {
   width: 100%;
-  max-width: 58rem;
+  max-width: 100%;
 }
 
 .page-head h1,
