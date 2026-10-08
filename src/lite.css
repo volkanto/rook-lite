@@ -1068,6 +1068,149 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     margin-top: auto !important;
     border-top: 1px solid var(--color-border-subtle) !important;
   }
+
+  /* Mac-Style Tasks Workspace (/todos) */
+  .mac-todos-workspace .mac-todos-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .mac-todos-workspace .mac-todos-sidebar .page-head {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mac-todos-workspace .todo-group-tabs {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 4px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .mac-todos-workspace .todo-group-tabs button {
+    width: 100% !important;
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    justify-content: flex-start !important;
+    padding: 0 1rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    border-radius: var(--radius-sm, 6px) !important;
+    border: 1px solid transparent !important;
+    transition: all 120ms ease !important;
+  }
+
+  .mac-todos-workspace .todo-group-tabs button:hover {
+    background: var(--color-bg-hover) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .mac-todos-workspace .todo-group-tabs button.is-active {
+    background: var(--color-bg-surface) !important;
+    border-color: var(--color-border-subtle) !important;
+    color: var(--color-text-primary) !important;
+    font-weight: 600 !important;
+    box-shadow: var(--shadow-sm) !important;
+  }
+
+  .mac-todos-stats-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-surface-sunken);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 4px;
+    width: fit-content;
+  }
+
+  .mac-todos-workspace .mac-todos-content {
+    padding: 2.5rem 3rem 4rem !important;
+  }
+
+  .mac-todos-workspace .todo-groups-container {
+    max-width: 52rem;
+    width: 100%;
+    margin: 0;
+  }
+
+  /* Mac-Style Summaries Workspace (/summaries) */
+  .mac-summaries-workspace .mac-summaries-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .mac-summaries-workspace .mac-summaries-sidebar .page-head {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mac-summaries-workspace .mac-summaries-sidebar .summary-control-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .mac-summaries-workspace .mac-summaries-sidebar .summary-toolbar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .mac-summaries-workspace .summary-period-tabs {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 4px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .mac-summaries-workspace .summary-period-tabs button {
+    width: 100% !important;
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    justify-content: flex-start !important;
+    padding: 0 1rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    border-radius: var(--radius-sm, 6px) !important;
+    border: 1px solid transparent !important;
+    transition: all 120ms ease !important;
+  }
+
+  .mac-summaries-workspace .summary-period-tabs button:hover {
+    background: var(--color-bg-hover) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .mac-summaries-workspace .summary-period-tabs button.is-active {
+    background: var(--color-bg-surface) !important;
+    border-color: var(--color-border-subtle) !important;
+    color: var(--color-text-primary) !important;
+    font-weight: 600 !important;
+    box-shadow: var(--shadow-sm) !important;
+  }
+
+  .mac-summaries-workspace .mac-summaries-content {
+    padding: 2.5rem 3rem 4rem !important;
+  }
+
+  .mac-summaries-workspace .summary-document {
+    max-width: 52rem;
+    width: 100%;
+    margin: 0;
+  }
 }
 
 @keyframes detailFadeIn {
