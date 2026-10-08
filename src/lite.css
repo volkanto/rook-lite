@@ -791,6 +791,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     min-width: 360px;
     height: 100vh;
     overflow-y: auto;
+    scroll-behavior: smooth !important;
     border-right: 1px solid var(--color-border-subtle);
     background: var(--color-bg-app);
     padding: 1.5rem 1.4rem 4rem;
@@ -802,6 +803,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     min-width: 0;
     height: 100vh;
     overflow-y: auto;
+    scroll-behavior: smooth;
     background: var(--color-bg-surface);
     padding: 2.5rem 3rem 4rem;
     box-sizing: border-box;
@@ -2179,6 +2181,23 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   color: var(--color-text-primary, var(--text)) !important;
   border-color: var(--color-border-default, var(--border)) !important;
   transform: translateY(-1px) !important;
+}
+
+.back-to-top-link:active {
+  transform: translateY(1px) scale(0.96) !important;
+}
+
+.back-to-top-link.is-scrolling .back-to-top-icon {
+  animation: backToTopGlide 300ms ease infinite alternate;
+}
+
+@keyframes backToTopGlide {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-4px);
+  }
 }
 
 .back-to-top-link .back-to-top-icon {

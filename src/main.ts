@@ -1782,6 +1782,12 @@ export function closeAllDialogs(): void {
 
 export function scrollToTop(): void {
   const behavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  const btn = document.querySelector<HTMLElement>(".back-to-top-link");
+  if (btn) {
+    btn.classList.add("is-scrolling");
+    setTimeout(() => btn.classList.remove("is-scrolling"), 800);
+  }
+
   if (typeof window.scrollTo === "function") {
     window.scrollTo({
       top: 0,
@@ -1792,22 +1798,25 @@ export function scrollToTop(): void {
   if (streamPane) {
     if (typeof streamPane.scrollTo === "function") {
       streamPane.scrollTo({ top: 0, behavior });
+    } else {
+      streamPane.scrollTop = 0;
     }
-    streamPane.scrollTop = 0;
   }
   const shell = document.querySelector<HTMLElement>(".shell");
   if (shell) {
     if (typeof shell.scrollTo === "function") {
       shell.scrollTo({ top: 0, behavior });
+    } else {
+      shell.scrollTop = 0;
     }
-    shell.scrollTop = 0;
   }
   const pageContent = document.querySelector<HTMLElement>("#page-content");
   if (pageContent) {
     if (typeof pageContent.scrollTo === "function") {
       pageContent.scrollTo({ top: 0, behavior });
+    } else {
+      pageContent.scrollTop = 0;
     }
-    pageContent.scrollTop = 0;
   }
 }
 
