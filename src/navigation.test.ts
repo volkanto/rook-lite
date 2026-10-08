@@ -1120,9 +1120,18 @@ describe("Left menu bar icons and navigation", () => {
 
     const backToTopLink = document.querySelector<HTMLButtonElement>(".back-to-top-link");
     expect(backToTopLink).not.toBeNull();
+
+    const streamPane = document.querySelector<HTMLElement>(".mac-stream-pane");
+    if (streamPane) {
+      streamPane.scrollTo = vi.fn();
+    }
+
     backToTopLink?.click();
 
     expect(window.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
+    if (streamPane) {
+      expect(streamPane.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
+    }
 
     await noteService.delete(createdNote.id);
   });

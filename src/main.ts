@@ -1780,6 +1780,37 @@ export function closeAllDialogs(): void {
   }
 }
 
+export function scrollToTop(): void {
+  const behavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  if (typeof window.scrollTo === "function") {
+    window.scrollTo({
+      top: 0,
+      behavior
+    });
+  }
+  const streamPane = document.querySelector<HTMLElement>(".mac-stream-pane");
+  if (streamPane) {
+    if (typeof streamPane.scrollTo === "function") {
+      streamPane.scrollTo({ top: 0, behavior });
+    }
+    streamPane.scrollTop = 0;
+  }
+  const shell = document.querySelector<HTMLElement>(".shell");
+  if (shell) {
+    if (typeof shell.scrollTo === "function") {
+      shell.scrollTo({ top: 0, behavior });
+    }
+    shell.scrollTop = 0;
+  }
+  const pageContent = document.querySelector<HTMLElement>("#page-content");
+  if (pageContent) {
+    if (typeof pageContent.scrollTo === "function") {
+      pageContent.scrollTo({ top: 0, behavior });
+    }
+    pageContent.scrollTop = 0;
+  }
+}
+
 export function updateScrollToTopVisibility(): void {
   const footer = document.querySelector<HTMLElement>(".notes-stream-footer");
   if (!footer) return;
@@ -1789,13 +1820,15 @@ export function updateScrollToTopVisibility(): void {
     footer.setAttribute("hidden", "");
     return;
   }
+  const streamPane = document.querySelector<HTMLElement>(".mac-stream-pane");
   const shell = document.querySelector<HTMLElement>(".shell");
   const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
   const docOverflows = document.documentElement.scrollHeight > viewportHeight + 40;
   const shellOverflows = shell ? shell.scrollHeight > shell.clientHeight + 40 : false;
+  const streamOverflows = streamPane ? streamPane.scrollHeight > streamPane.clientHeight + 40 : false;
   const listRect = notesList.getBoundingClientRect();
   const listOverflows = listRect.bottom > viewportHeight + 40;
-  const isScrollable = docOverflows || shellOverflows || listOverflows;
+  const isScrollable = docOverflows || shellOverflows || streamOverflows || listOverflows;
 
   if (isScrollable) {
     footer.classList.remove("is-hidden");
@@ -1921,19 +1954,7 @@ function bindShellEvents(): void {
     }
     if (target.closest('[data-action="scroll-to-top"]')) {
       event.preventDefault();
-      if (typeof window.scrollTo === "function") {
-        window.scrollTo({
-          top: 0,
-          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-        });
-      }
-      const shell = document.querySelector<HTMLElement>(".shell");
-      if (typeof shell?.scrollTo === "function") {
-        shell.scrollTo({
-          top: 0,
-          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-        });
-      }
+      scrollToTop();
       return;
     }
     const action = target.closest<HTMLElement>("[data-action]")?.dataset.action;
@@ -1967,6 +1988,9 @@ function bindShellEvents(): void {
     closeSidebar();
     updateScrollToTopVisibility();
   });
+  document.addEventListener("scroll", () => {
+    updateScrollToTopVisibility();
+  }, { capture: true, passive: true });
   document.addEventListener("keydown", handleKeyboard);
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
   window.addEventListener("online", updateNetworkStatus);
@@ -2092,6 +2116,11 @@ function handleKeyboard(event: KeyboardEvent): void {
   if (event.key === "?" && !editing) {
     event.preventDefault();
     showShortcutsDialog();
+    return;
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key === "ArrowUp" && !editing) {
+    event.preventDefault();
+    scrollToTop();
     return;
   }
   if ((event.key === "t" || event.key === "T") && !editing && appPath() === "/") {
