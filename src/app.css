@@ -258,8 +258,7 @@ body.app {
 .main-layout {
     display: flex;
     flex: 1;
-    height: 100vh;
-    overflow: hidden;
+    min-height: calc(100vh - 3.5rem);
 }
 
 .sidebar {
@@ -2729,9 +2728,6 @@ input[type="checkbox"]:not([hidden]):disabled {
 .shell {
     width: 0;
     flex: 1 1 auto;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
 }
 
 img,
