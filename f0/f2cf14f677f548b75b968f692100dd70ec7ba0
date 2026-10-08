@@ -1,0 +1,54 @@
+src/command-palette/commandPaletteIntegration.test.ts
+  s_a3bc289a0ceeea::t_dc63be4d74847f 41,95,112,134
+src/command-palette/searchParser.test.ts
+  s_a3bc289a0ceeea::t_0c87059760cf52 45
+src/locales/en.ts
+  s_a3bc289a0ceeea::t_33b4825b04cbe8 239,249,252
+src/main.ts
+  s_a3bc289a0ceeea::t_41a361c835589d 1087
+  s_a3bc289a0ceeea::t_58f6444cd32d67 8,10
+  s_a3bc289a0ceeea::t_584dc6d3606a85 1465,1470,1486
+  s_a3bc289a0ceeea::t_d51016c2a08f6c 1873
+  s_a3bc289a0ceeea::t_7e55a2d3b10724 651,661
+  s_a3bc289a0ceeea::t_558eef998f5edd 165-166,170-171,189
+  s_a3bc289a0ceeea::t_d454c0fb0ebbb8 1027,1031
+  s_a3bc289a0ceeea::t_21516d022ac19b 1390
+  s_a3bc289a0ceeea::t_cbad71f7f623e1 1263
+src/command-palette/commandRegistry.ts
+  s_a3bc289a0ceeea::t_1dec8f77ea7737 358
+  s_a3bc289a0ceeea::t_b1a1b01063dbed 271
+src/command-palette/commandSearch.test.ts
+  s_a3bc289a0ceeea::t_f0733f4cc05ec2 3,72,84,91,98-99,106,114
+src/summaries.ts
+  s_a3bc289a0ceeea::t_936510d281dbb0 4,23,32-33,37,48,87,91,103,105-106,123
+src/summaries.test.ts
+  s_a3bc289a0ceeea::t_887d1771f967ad 4,23,26,28-30,35,75,97
+src/command-palette/commandSearch.ts
+  s_a3bc289a0ceeea::t_c708b524471001 16,52-53,59,71,75,80,84-87,89,91-93,95,97-101,104,107,199,242,258,298,379
+src/data.test.ts
+  s_a3bc289a0ceeea::t_5aecb31feca3e9 8,12,27
+src/command-palette/commandPalette.ts
+  s_a3bc289a0ceeea::t_2a1a0e36a6692a 2
+src/command-palette/commandPalette.test.ts
+  s_a3bc289a0ceeea::t_84e63124c4bf08 3
+src/app.css
+  s_a3bc289a0ceeea::t_252083e26f0700 3072
+src/services.test.ts
+  s_a3bc289a0ceeea::t_eeb0b8046a05ae 3,5,27,35-36,41,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "f0f2cf14f677f548b75b968f692100dd70ec7ba0",
+  "prompts": {},
+  "sessions": {
+    "s_a3bc289a0ceeea": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "3dd006b6-b9ba-44af-b4ba-d0393ef61bd1",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
