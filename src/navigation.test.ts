@@ -216,7 +216,7 @@ describe("Left menu bar icons and navigation", () => {
   it("renders complete edit and delete buttons in single item note action popup", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Single note item for action menu test", today, []);
+    const createdNote = await noteService.create("Single note item for action menu test", today);
 
     const { renderShell } = await import("./main");
     await renderShell();
@@ -258,7 +258,7 @@ describe("Left menu bar icons and navigation", () => {
   it("opens redesigned edit note popup dialog with editor tools inside card", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Testing edit modal redesign", today, []);
+    const createdNote = await noteService.create("Testing edit modal redesign", today);
 
     const { renderShell, showEditDialog } = await import("./main");
     await renderShell();
@@ -330,12 +330,12 @@ describe("Left menu bar icons and navigation", () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
     const longContent = Array.from({ length: 80 }, (_, i) => `Line ${i + 1}: Detailed notes about project progress and milestones.`).join("\n");
-    const longNote = await noteService.create(longContent, today, []);
+    const longNote = await noteService.create(longContent, today);
 
     const { renderShell, showEditDialog } = await import("./main");
     await renderShell();
 
-    showEditDialog(longNote, []);
+    showEditDialog(longNote);
 
     const dialog = document.querySelector(".note-edit-dialog");
     expect(dialog).not.toBeNull();
@@ -418,7 +418,7 @@ describe("Left menu bar icons and navigation", () => {
   it("renders minimal typographic date anchor header without pulse dot or week badge", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Checking note time badge icon", today, []);
+    const createdNote = await noteService.create("Checking note time badge icon", today);
 
     const { renderToday } = await import("./main");
     const container = document.createElement("div");
@@ -486,7 +486,7 @@ describe("Left menu bar icons and navigation", () => {
   it("toggles task checkbox directly in note card and updates content", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Task checklist:\n- [ ] Initial task", today, []);
+    const createdNote = await noteService.create("Task checklist:\n- [ ] Initial task", today);
 
     const { renderToday } = await import("./main");
     const container = document.createElement("div");
@@ -512,7 +512,7 @@ describe("Left menu bar icons and navigation", () => {
   it("opens redesigned delete confirmation popup dialog with alert badge, message, and buttons", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Note to test delete confirm modal", today, []);
+    const createdNote = await noteService.create("Note to test delete confirm modal", today);
 
     const { renderToday } = await import("./main");
     const container = document.createElement("div");
@@ -643,12 +643,12 @@ describe("Left menu bar icons and navigation", () => {
   it("prompts to delete note when saving an existing note with empty content in edit dialog", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Original note before clearing", today, []);
+    const createdNote = await noteService.create("Original note before clearing", today);
 
     const { renderShell, showEditDialog } = await import("./main");
     await renderShell();
 
-    showEditDialog(createdNote, []);
+    showEditDialog(createdNote);
 
     const editForm = document.querySelector<HTMLFormElement>("#edit-note-form");
     const textarea = editForm?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
@@ -681,7 +681,7 @@ describe("Left menu bar icons and navigation", () => {
     expect(noteStillExists).toBeDefined();
 
     // Open edit dialog again and confirm deletion
-    showEditDialog(createdNote, []);
+    showEditDialog(createdNote);
     const editForm2 = document.querySelector<HTMLFormElement>("#edit-note-form");
     const textarea2 = editForm2?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
     textarea2.value = "";
@@ -733,7 +733,7 @@ describe("Left menu bar icons and navigation", () => {
   it("copies code block to clipboard and updates button state on copy click", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create('```java\nSystem.out.println("Hello from code block");\n```', today, []);
+    const createdNote = await noteService.create('```java\nSystem.out.println("Hello from code block");\n```', today);
 
     const { renderShell } = await import("./main");
     await renderShell();
@@ -867,12 +867,12 @@ describe("Left menu bar icons and navigation", () => {
   it("toggles between write and preview modes in edit note popup", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("## Header\n- [ ] Task item", today, []);
+    const createdNote = await noteService.create("## Header\n- [ ] Task item", today);
 
     const { renderShell, showEditDialog } = await import("./main");
     await renderShell();
 
-    showEditDialog(createdNote, []);
+    showEditDialog(createdNote);
 
     const dialog = document.querySelector(".note-edit-dialog");
     const writeBtn = dialog?.querySelector<HTMLButtonElement>('[data-editor-mode="write"]');
@@ -1036,12 +1036,12 @@ describe("Left menu bar icons and navigation", () => {
   it("toggles Zen mode inside the edit note dialog and resets on close", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Testing zen mode in dialog", today, []);
+    const createdNote = await noteService.create("Testing zen mode in dialog", today);
 
     const { renderShell, showEditDialog, closeDialog } = await import("./main");
     await renderShell();
 
-    showEditDialog(createdNote, []);
+    showEditDialog(createdNote);
 
     const dialog = document.querySelector(".note-edit-dialog");
     const zenBtn = dialog?.querySelector<HTMLButtonElement>('[data-action="toggle-zen"]');
@@ -1098,7 +1098,7 @@ describe("Left menu bar icons and navigation", () => {
   it("shows scroll-to-top button only when note list is long/scrollable and scrolls to top when clicked", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Note for testing back to top scroll link", today, []);
+    const createdNote = await noteService.create("Note for testing back to top scroll link", today);
 
     window.scrollTo = vi.fn();
     const { renderShell, updateScrollToTopVisibility } = await import("./main");
@@ -1214,12 +1214,12 @@ describe("Left menu bar icons and navigation", () => {
   it("handles smart list continuation in the edit note dialog", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("- [ ] Edit dialog task", today, []);
+    const createdNote = await noteService.create("- [ ] Edit dialog task", today);
 
     const { renderShell, showEditDialog, closeDialog } = await import("./main");
     await renderShell();
 
-    showEditDialog(createdNote, []);
+    showEditDialog(createdNote);
 
     const dialog = document.querySelector(".note-edit-dialog");
     const textarea = dialog?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
@@ -1266,7 +1266,7 @@ describe("Left menu bar icons and navigation", () => {
     const { NoteRepository } = await import("./db");
     const noteService = new NoteService(new NoteRepository());
 
-    const note = await noteService.create("- [ ] Buy fresh groceries\n- [ ] Call Dr. Smith", "2026-10-01", []);
+    const note = await noteService.create("- [ ] Buy fresh groceries\n- [ ] Call Dr. Smith", "2026-10-01");
 
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -1300,7 +1300,7 @@ describe("Left menu bar icons and navigation", () => {
     const { NoteRepository } = await import("./db");
     const noteService = new NoteService(new NoteRepository());
 
-    const note = await noteService.create("- [ ] Animate this task completion", "2026-10-01", []);
+    const note = await noteService.create("- [ ] Animate this task completion", "2026-10-01");
     const container = document.createElement("div");
     document.body.appendChild(container);
     await renderTodos(container);
@@ -1400,8 +1400,8 @@ describe("Left menu bar icons and navigation", () => {
     const noteService = new NoteService(new NoteRepository());
 
     const today = isoDate();
-    const noteUntagged = await noteService.create("- [ ] Buy coffee beans", today, []);
-    const noteTagged = await noteService.create("- [ ] Finish grouping pull request\n#dev", today, []);
+    const noteUntagged = await noteService.create("- [ ] Buy coffee beans", today);
+    const noteTagged = await noteService.create("- [ ] Finish grouping pull request\n#dev", today);
 
     localStorage.removeItem("rook_todos_grouping");
 
@@ -1678,7 +1678,7 @@ describe("Left menu bar icons and navigation", () => {
     const targetDate = "2026-09-15";
     const sourceDate = "2026-09-16";
 
-    const note = await noteService.create(`Reference to [[${targetDate}|September specs]].`, sourceDate, []);
+    const note = await noteService.create(`Reference to [[${targetDate}|September specs]].`, sourceDate);
 
     const { renderRoute, renderShell } = await import("./main");
     history.pushState({}, "", `/?date=${sourceDate}`);
@@ -1703,8 +1703,8 @@ describe("Left menu bar icons and navigation", () => {
     const date1 = "2026-08-10";
     const date2 = "2026-08-11";
 
-    const note1 = await noteService.create("Core architectural design decisions", date1, []);
-    const note2 = await noteService.create(`Continuation of [[${date1}]] architecture`, date2, []);
+    const note1 = await noteService.create("Core architectural design decisions", date1);
+    const note2 = await noteService.create(`Continuation of [[${date1}]] architecture`, date2);
 
     const { renderRoute, renderShell } = await import("./main");
     history.pushState({}, "", `/?date=${date1}`);
@@ -1723,7 +1723,7 @@ describe("Left menu bar icons and navigation", () => {
 
   it("opens link picker modal when clicking toolbar backlink button and inserts selected note", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const note = await noteService.create("Sprint Planning Kickoff", "2026-10-01", []);
+    const note = await noteService.create("Sprint Planning Kickoff", "2026-10-01");
 
     const { renderShell } = await import("./main");
     history.pushState({}, "", "/");
@@ -1763,7 +1763,7 @@ describe("Left menu bar icons and navigation", () => {
 
   it("opens link picker modal when typing [[ inline in the editor", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const note = await noteService.create("Project Alpha Specifications", "2026-10-01", []);
+    const note = await noteService.create("Project Alpha Specifications", "2026-10-01");
 
     const { renderShell } = await import("./main");
     history.pushState({}, "", "/");
@@ -1795,7 +1795,7 @@ describe("Left menu bar icons and navigation", () => {
 
   it("translates link picker badges, sections, and hints into Turkish", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const note = await noteService.create("Mimari Notları", "2026-10-01", []);
+    const note = await noteService.create("Mimari Notları", "2026-10-01");
 
     const { renderShell } = await import("./main");
     const { setLocale } = await import("./i18n");
@@ -1871,8 +1871,8 @@ describe("Left menu bar icons and navigation", () => {
 
   it("opens link picker modal from edit note dialog toolbar and inserts wikilink without closing edit dialog", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const targetNote = await noteService.create("Reference Target Note", "2026-10-02", []);
-    const editableNote = await noteService.create("Original Edit Content", "2026-10-04", []);
+    const targetNote = await noteService.create("Reference Target Note", "2026-10-02");
+    const editableNote = await noteService.create("Original Edit Content", "2026-10-04");
 
     const { renderShell, showEditDialog } = await import("./main");
     history.pushState({}, "", "/");
@@ -1937,7 +1937,7 @@ describe("Left menu bar icons and navigation", () => {
 
   it("opens link picker modal when typing [[ in edit note dialog and preserves edit dialog on cancel", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const editableNote = await noteService.create("Initial note text", "2026-10-04", []);
+    const editableNote = await noteService.create("Initial note text", "2026-10-04");
 
     const { renderShell, showEditDialog } = await import("./main");
     history.pushState({}, "", "/");
@@ -1978,8 +1978,8 @@ describe("Left menu bar icons and navigation", () => {
 
   it("closes edit note dialog and navigates when clicking internal wikilink in preview mode", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const targetNote = await noteService.create("Target Note Description", "2026-10-01", []);
-    const noteWithWikilink = await noteService.create("Reference to [[2026-10-01]].", "2026-10-04", []);
+    const targetNote = await noteService.create("Target Note Description", "2026-10-01");
+    const noteWithWikilink = await noteService.create("Reference to [[2026-10-01]].", "2026-10-04");
 
     const { renderShell, showEditDialog } = await import("./main");
     history.pushState({}, "", "/");
@@ -2016,7 +2016,7 @@ describe("Left menu bar icons and navigation", () => {
 
   it("renders external link with target=_blank in preview mode and clicking header date badge navigates", async () => {
     const noteService = new NoteService(new NoteRepository());
-    const noteWithExternal = await noteService.create("Check [Website](https://example.com) for updates.", "2026-05-15", []);
+    const noteWithExternal = await noteService.create("Check [Website](https://example.com) for updates.", "2026-05-15");
 
     const { renderShell, showEditDialog } = await import("./main");
     history.pushState({}, "", "/");

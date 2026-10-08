@@ -6345,12 +6345,6 @@ mark.palette-highlight {
   color: #09090b !important;
 }
 
-.category-archive-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
 .todo-group-tabs {
   display: inline-flex;
   align-items: center;

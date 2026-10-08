@@ -13,7 +13,7 @@ export function stripMarkdown(content: string): string {
     .trim();
 }
 import { currentStrings } from "../i18n";
-import type { Category, Note } from "../models";
+import type { Note } from "../models";
 import { normalize } from "../services";
 import { parseSearchQuery } from "./searchParser";
 import type {
@@ -34,11 +34,9 @@ export function searchPalette(
   commands: Command[],
   recentCommands: RecentCommand[],
   notes: Note[],
-  categories: Category[],
   context: CommandContext
 ): PaletteSection[] {
   const trimmed = query.trim();
-  const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
   const availableCommands = commands.filter((cmd) => (cmd.isAvailable ? cmd.isAvailable(context) : true));
   const recentMap = new Map(recentCommands.map((rc) => [rc.id, rc]));
 
@@ -46,23 +44,19 @@ export function searchPalette(
   const parsed = parseSearchQuery(query);
   if (parsed.activeFilter) {
     const val = normalize(parsed.activeFilter.value);
-    const isExactCategory =
-      parsed.activeFilter.type === "category" &&
-      val.length > 0 &&
-      categories.some((c) => normalize(c.name) === val || c.slug === val);
     const isExactTag =
       parsed.activeFilter.type === "tag" &&
       val.length > 0 &&
       notes.some((n) => n.tags.some((t) => normalize(t) === val));
 
-    if (!isExactCategory && !isExactTag) {
-      return [getAutocompleteSection(parsed.activeFilter, notes, categories)];
+    if (!isExactTag) {
+      return [getAutocompleteSection(parsed.activeFilter, notes)];
     }
   }
 
   // Branch 2: Explicit open tasks query
   if (trimmed === "> Open tasks" || trimmed === "has:task" || trimmed === "has:todo") {
-    const tasks = getOpenTasks(notes, categoryMap);
+    const tasks = getOpenTasks(notes);
     return [{ title: "Open Tasks", items: tasks }];
   }
 
@@ -74,60 +68,43 @@ export function searchPalette(
 
   // Branch 4: Empty search query (Default layout)
   if (!trimmed) {
-    return getEmptyQuerySections(availableCommands, recentMap, notes, categoryMap);
+    return getEmptyQuerySections(availableCommands, recentMap, notes);
   }
 
   // Branch 5: General search query (searches notes & commands)
-  return getGeneralSearchSections(query, availableCommands, recentMap, notes, categoryMap);
+  return getGeneralSearchSections(query, availableCommands, recentMap, notes);
 }
 
 function getAutocompleteSection(
   filter: NonNullable<ReturnType<typeof parseSearchQuery>["activeFilter"]>,
-  notes: Note[],
-  categories: Category[]
+  notes: Note[]
 ): PaletteSection {
   const filterVal = normalize(filter.value);
 
-  if (filter.type === "tag") {
-    const tagCounts = new Map<string, number>();
-    notes.forEach((n) => {
-      n.tags.forEach((tag) => {
-        tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
-      });
+  const tagCounts = new Map<string, number>();
+  notes.forEach((n) => {
+    n.tags.forEach((tag) => {
+      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
     });
+  });
 
-    const suggestions: PaletteSuggestionItem[] = Array.from(tagCounts.entries())
-      .filter(([tag]) => !filterVal || normalize(tag).includes(filterVal))
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .slice(0, 8)
-      .map(([tag, count]) => ({
-        type: "suggestion",
-        id: `tag-${tag}`,
-        filterType: "tag",
-        value: tag,
-        label: `#${tag}`,
-        count
-      }));
-
-    return { title: "Tags", items: suggestions };
-  }
-
-  const suggestions: PaletteSuggestionItem[] = categories
-    .filter((c) => !c.archived && (!filterVal || normalize(c.name).includes(filterVal) || c.slug.includes(filterVal)))
-    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name))
+  const suggestions: PaletteSuggestionItem[] = Array.from(tagCounts.entries())
+    .filter(([tag]) => !filterVal || normalize(tag).includes(filterVal))
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, 8)
-    .map((category) => ({
+    .map(([tag, count]) => ({
       type: "suggestion",
-      id: `category-${category.id}`,
-      filterType: "category",
-      value: category.name,
-      label: category.name
+      id: `tag-${tag}`,
+      filterType: "tag",
+      value: tag,
+      label: `#${tag}`,
+      count
     }));
 
-  return { title: "Categories", items: suggestions };
+  return { title: "Tags", items: suggestions };
 }
 
-function getOpenTasks(notes: Note[], categoryMap: Map<string, string>): PaletteTaskItem[] {
+function getOpenTasks(notes: Note[]): PaletteTaskItem[] {
   const taskItems: PaletteTaskItem[] = [];
   const unarchived = notes
     .filter((n) => !n.archived)
@@ -138,14 +115,12 @@ function getOpenTasks(notes: Note[], categoryMap: Map<string, string>): PaletteT
     lines.forEach((line, lineIndex) => {
       if (/^\s*[-*+]\s+\[ \]\s+/.test(line)) {
         const taskText = line.replace(/^\s*[-*+]\s+\[ \]\s+/, "").trim();
-        const categoryName = note.categoryIds.map((id) => categoryMap.get(id)).filter(Boolean)[0];
         taskItems.push({
           type: "task",
           id: `task-${note.id}-${lineIndex}`,
           noteId: note.id,
           taskText,
           noteDate: note.noteDate,
-          categoryName,
           lineIndex,
           href: `/?date=${note.noteDate}#note-${note.id}`
         });
@@ -162,7 +137,6 @@ function getCommandModeSections(
   recentMap: Map<string, RecentCommand>
 ): PaletteSection[] {
   if (!commandText) {
-    // Show quick actions + remaining commands grouped
     const contextual = availableCommands.filter((c) => c.group === "contextual");
     const other = availableCommands.filter((c) => c.group !== "contextual");
 
@@ -222,8 +196,7 @@ function getCommandModeSections(
 function getEmptyQuerySections(
   availableCommands: Command[],
   recentMap: Map<string, RecentCommand>,
-  notes: Note[],
-  categoryMap: Map<string, string>
+  notes: Note[]
 ): PaletteSection[] {
   const sections: PaletteSection[] = [];
 
@@ -266,7 +239,7 @@ function getEmptyQuerySections(
     .filter((n) => !n.archived)
     .sort((a, b) => b.noteDate.localeCompare(a.noteDate) || b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, 5)
-    .map((note) => toNoteItem(note, categoryMap, ""));
+    .map((note) => toNoteItem(note, ""));
 
   if (recentNotes.length) {
     sections.push({
@@ -282,8 +255,7 @@ function getGeneralSearchSections(
   query: string,
   availableCommands: Command[],
   recentMap: Map<string, RecentCommand>,
-  notes: Note[],
-  categoryMap: Map<string, string>
+  notes: Note[]
 ): PaletteSection[] {
   const parsed = parseSearchQuery(query);
   const textNorm = normalize(parsed.text);
@@ -298,11 +270,6 @@ function getGeneralSearchSections(
     if (parsed.before && note.noteDate > parsed.before) continue;
     if (parsed.tags.length && !parsed.tags.every((t) => note.tags.some((nt) => normalize(nt) === t))) continue;
 
-    if (parsed.categories.length) {
-      const noteCatNames = note.categoryIds.map((id) => normalize(categoryMap.get(id) ?? ""));
-      if (!parsed.categories.some((c) => noteCatNames.includes(c))) continue;
-    }
-
     const openTasks = note.content.split(/\r?\n/).filter((line) => /^\s*[-*+]\s+\[ \]\s+/.test(line));
     if (parsed.hasTask && openTasks.length === 0) continue;
 
@@ -311,16 +278,12 @@ function getGeneralSearchSections(
       const titleNorm = normalize(note.title ?? "");
       const contentNorm = normalize(note.content);
       const tagsNorm = note.tags.map(normalize).join(" ");
-      const catNorm = note.categoryIds.map((id) => normalize(categoryMap.get(id) ?? "")).join(" ");
 
       if (titleNorm.includes(textNorm)) {
         score += titleNorm.startsWith(textNorm) ? 100 : 80;
       }
       if (tagsNorm.includes(textNorm)) {
         score += 60;
-      }
-      if (catNorm.includes(textNorm)) {
-        score += 50;
       }
       if (contentNorm.includes(textNorm)) {
         score += 40;
@@ -332,7 +295,7 @@ function getGeneralSearchSections(
     }
 
     matchingNotes.push({
-      note: toNoteItem(note, categoryMap, parsed.text),
+      note: toNoteItem(note, parsed.text),
       score
     });
   }
@@ -413,8 +376,7 @@ function toCommandItem(cmd: Command): PaletteCommandItem {
   };
 }
 
-function toNoteItem(note: Note, categoryMap: Map<string, string>, searchTerm: string): PaletteNoteItem {
-  const categoryName = note.categoryIds.map((id) => categoryMap.get(id)).filter(Boolean)[0];
+function toNoteItem(note: Note, searchTerm: string): PaletteNoteItem {
   const openTasks = note.content.split(/\r?\n/).filter((l) => /^\s*[-*+]\s+\[ \]\s+/.test(l));
 
   return {
@@ -423,7 +385,6 @@ function toNoteItem(note: Note, categoryMap: Map<string, string>, searchTerm: st
     title: note.title || currentStrings().untitledNote,
     contentExcerpt: extractSnippet(note.content, searchTerm),
     noteDate: note.noteDate,
-    categoryName,
     tags: note.tags,
     openTaskCount: openTasks.length,
     href: `/?date=${note.noteDate}#note-${note.id}`,

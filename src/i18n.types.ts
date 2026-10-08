@@ -4,7 +4,6 @@ export interface TranslationStrings {
   navTodos: string;
   navSummaries: string;
   navSettings: string;
-  navCategories: string;
   navData: string;
 
   // Tooltips & Accessibility
@@ -91,7 +90,7 @@ export interface TranslationStrings {
   deleteConfirmTitle: string;
   deleteConfirmMessage: string;
   replaceDataTitle: string;
-  replaceDataMessage: (notes: number, cats: number, sums: number) => string;
+  replaceDataMessage: (notes: number, sums: number) => string;
   restoreBackupBtn: string;
 
   // Search Modal & Page
@@ -99,7 +98,6 @@ export interface TranslationStrings {
   searchLede: string;
   searchFromLabel: string;
   searchToLabel: string;
-  searchAllCategories: string;
   searchContentTagged: string;
   searchContentUntagged: string;
   clearSearchBtn: string;
@@ -127,7 +125,6 @@ export interface TranslationStrings {
   searchHintClose: string;
   searchQueryLabel: string;
   searchQueryPlaceholder: string;
-  searchCategoryLabel: string;
   searchContentLabel: string;
   searchContentAll: string;
   searchContentOnlyTodos: string;
@@ -189,7 +186,6 @@ export interface TranslationStrings {
   // Common UI
   editAction: string;
   deleteAction: string;
-  categoryRemovedHelp: string;
   estimatedUsage: string;
   dayHasNotes: string;
   weeklyTotalsRight: string;
@@ -243,7 +239,6 @@ export interface TranslationStrings {
   storageTitle: string;
   storageSubtitle: string;
   metricNotes: string;
-  metricCategories: string;
   metricSummaries: string;
   metricDrafts: string;
   persistenceTitle: string;
@@ -299,27 +294,6 @@ export interface TranslationStrings {
   createJsonBackupBtn: string;
   restoreJsonBackupLabel: string;
   exportedNotesCount: (count: number) => string;
-
-  // Categories View
-  categoriesTitle: string;
-  categoriesLede: string;
-  newCategory: string;
-  createCategoryHeading: string;
-  createCategoryHelp: string;
-  categoryNameLabel: string;
-  categoryNamePlaceholder: string;
-  createCategoryBtn: string;
-  activeCategories: string;
-  activeCategoriesHelp: string;
-  noActiveCategories: string;
-  createOneToStart: string;
-  archivedCategories: string;
-  archivedCategoriesHelp: string;
-  archiveCategoryBtn: string;
-  deleteCategoryBtn: string;
-  deleteCategoryConfirmTitle: string;
-  deleteCategoryConfirmMessage: string;
-  noCategoriesInPicker: string;
 
   // General & Not Found
   aboutTitle: string;

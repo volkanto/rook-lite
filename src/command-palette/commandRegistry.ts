@@ -268,7 +268,7 @@ export function createCommandRegistry(actions: CommandActions, locale = getLocal
       id: "filter-tags",
       title: "Filter notes by tag",
       description: "Search notes by hashtag",
-      keywords: ["tags", "topics", "hashtags", "filter tags", "categories"],
+      keywords: ["tags", "topics", "hashtags", "filter tags"],
       group: "notes",
       execute: () => actions.openSearch?.("tag:")
     },
@@ -355,7 +355,7 @@ export function createCommandRegistry(actions: CommandActions, locale = getLocal
     {
       id: "create-json-backup",
       title: "Create JSON backup",
-      description: "Save a full JSON snapshot of notes, categories, and summaries",
+      description: "Save a full JSON snapshot of notes and summaries",
       keywords: ["backup", "json", "export backup", "save data", "download data", "snapshot"],
       group: "data",
       execute: () => actions.createBackup()

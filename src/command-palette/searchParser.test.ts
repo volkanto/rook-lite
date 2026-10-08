@@ -6,7 +6,6 @@ describe("searchParser", () => {
     const parsed = parseSearchQuery("retry payment strategy");
     expect(parsed.text).toBe("retry payment strategy");
     expect(parsed.tags).toEqual([]);
-    expect(parsed.categories).toEqual([]);
     expect(parsed.hasTask).toBeUndefined();
     expect(parsed.after).toBeUndefined();
     expect(parsed.before).toBeUndefined();
@@ -17,12 +16,6 @@ describe("searchParser", () => {
     const parsed = parseSearchQuery("retry tag:java tag:#spring");
     expect(parsed.text).toBe("retry");
     expect(parsed.tags).toEqual(["java", "spring"]);
-  });
-
-  it("parses category filters", () => {
-    const parsed = parseSearchQuery("category:work architecture notes");
-    expect(parsed.text).toBe("architecture notes");
-    expect(parsed.categories).toEqual(["work"]);
   });
 
   it("parses task filters with has:task and has:todo", () => {
@@ -49,10 +42,9 @@ describe("searchParser", () => {
   });
 
   it("combines multiple filters correctly", () => {
-    const parsed = parseSearchQuery("retry tag:java category:work has:task after:2026-09-01");
+    const parsed = parseSearchQuery("retry tag:java has:task after:2026-09-01");
     expect(parsed.text).toBe("retry");
     expect(parsed.tags).toEqual(["java"]);
-    expect(parsed.categories).toEqual(["work"]);
     expect(parsed.hasTask).toBe(true);
     expect(parsed.after).toBe("2026-09-01");
   });
@@ -76,18 +68,10 @@ describe("searchParser", () => {
       value: "jav",
       startIndex: 6
     });
-
-    const parsedCategory = parseSearchQuery("category:wo");
-    expect(parsedCategory.activeFilter).toEqual({
-      type: "category",
-      value: "wo",
-      startIndex: 0
-    });
   });
 
   it("inserts filter value replacing active token or appending", () => {
     expect(insertFilterValue("notes tag:jav", "tag", "java")).toBe("notes tag:java ");
-    expect(insertFilterValue("category:", "category", "work")).toBe("category:work ");
     expect(insertFilterValue("notes", "tag", "learning")).toBe("notes tag:learning ");
   });
 });

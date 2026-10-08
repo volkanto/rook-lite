@@ -30,7 +30,6 @@ describe("Command Palette Integration", () => {
     const db = await database();
     await db.clear("notes");
     await db.clear("drafts");
-    await db.clear("categories");
     await db.clear("settings");
     document.body.innerHTML = '<div id="app"></div>';
   });
@@ -39,7 +38,7 @@ describe("Command Palette Integration", () => {
     const { renderShell, openSearch } = await import("../main");
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    await noteService.create("First roadmap note\n- [ ] Ship unified command palette\n#roadmap #rook", today, []);
+    await noteService.create("First roadmap note\n- [ ] Ship unified command palette\n#roadmap #rook", today);
 
     await renderShell();
     await openSearch();
@@ -93,7 +92,7 @@ describe("Command Palette Integration", () => {
     const { renderShell, openSearch } = await import("../main");
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    await noteService.create("Sprint tasks\n- [ ] Finish palette UI\n- [x] Write parser", today, []);
+    await noteService.create("Sprint tasks\n- [ ] Finish palette UI\n- [x] Write parser", today);
 
     await renderShell();
     await openSearch("has:task");
@@ -110,7 +109,7 @@ describe("Command Palette Integration", () => {
     const { renderShell, openSearch } = await import("../main");
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    await noteService.create("Tagged note\n#productivity", today, []);
+    await noteService.create("Tagged note\n#productivity", today);
 
     await renderShell();
     await openSearch("tag:");
@@ -132,7 +131,7 @@ describe("Command Palette Integration", () => {
     const { renderShell, openSearch } = await import("../main");
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const createdNote = await noteService.create("Blinking search target note\n#search", today, []);
+    const createdNote = await noteService.create("Blinking search target note\n#search", today);
 
     await renderShell();
     await openSearch("Blinking search");
