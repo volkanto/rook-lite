@@ -1,8 +1,8 @@
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
-import type { Category, Draft, Note, Setting, Summary } from "./models";
+import type { Draft, Note, Setting, Summary } from "./models";
 
 const DATABASE_NAME = "rook-lite";
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 
 interface RookLiteSchema extends DBSchema {
   notes: {
@@ -12,14 +12,6 @@ interface RookLiteSchema extends DBSchema {
       noteDate: string;
       createdAt: string;
       updatedAt: string;
-    };
-  };
-  categories: {
-    key: string;
-    value: Category;
-    indexes: {
-      slug: string;
-      sortOrder: number;
     };
   };
   summaries: {
@@ -39,8 +31,13 @@ let databasePromise: Promise<IDBPDatabase<RookLiteSchema>> | undefined;
 
 export function database(): Promise<IDBPDatabase<RookLiteSchema>> {
   databasePromise ??= openDB<RookLiteSchema>(DATABASE_NAME, DATABASE_VERSION, {
-    upgrade(db, oldVersion) {
-      if (oldVersion < 1) migrateToV1(db);
+    upgrade(db, oldVersion, _newVersion, transaction) {
+      if (oldVersion < 1) {
+        migrateToV1(db);
+      }
+      if (oldVersion < 2) {
+        migrateToV2(db, transaction);
+      }
     },
     blocked() {
       window.dispatchEvent(new CustomEvent("rook:database-blocked"));
@@ -55,10 +52,6 @@ function migrateToV1(db: IDBPDatabase<RookLiteSchema>): void {
   notes.createIndex("createdAt", "createdAt");
   notes.createIndex("updatedAt", "updatedAt");
 
-  const categories = db.createObjectStore("categories", { keyPath: "id" });
-  categories.createIndex("slug", "slug", { unique: true });
-  categories.createIndex("sortOrder", "sortOrder");
-
   const summaries = db.createObjectStore("summaries", { keyPath: "id" });
   summaries.createIndex("periodStart", "periodStart");
   summaries.createIndex("generatedAt", "generatedAt");
@@ -67,6 +60,25 @@ function migrateToV1(db: IDBPDatabase<RookLiteSchema>): void {
   const drafts = db.createObjectStore("drafts", { keyPath: "id" });
   drafts.createIndex("noteId", "noteId");
   drafts.createIndex("updatedAt", "updatedAt");
+}
+
+function migrateToV2(db: IDBPDatabase<RookLiteSchema>, transaction: any): void {
+  if (db.objectStoreNames.contains("categories" as any)) {
+    db.deleteObjectStore("categories" as any);
+  }
+  // Strip categoryIds from existing notes
+  if (transaction && db.objectStoreNames.contains("notes")) {
+    const notesStore = transaction.objectStore("notes");
+    notesStore.openCursor().then(function stripCategories(cursor: any): Promise<void> | void {
+      if (!cursor) return;
+      const note = cursor.value;
+      if ("categoryIds" in note) {
+        delete note.categoryIds;
+        cursor.update(note);
+      }
+      return cursor.continue().then(stripCategories);
+    });
+  }
 }
 
 export class NoteRepository {
@@ -89,30 +101,6 @@ export class NoteRepository {
 
   async delete(id: string): Promise<void> {
     await (await database()).delete("notes", id);
-  }
-}
-
-export class CategoryRepository {
-  async list(): Promise<Category[]> {
-    const categories = await (await database()).getAll("categories");
-    return categories.sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
-  }
-
-  async save(category: Category): Promise<void> {
-    await (await database()).put("categories", category);
-  }
-
-  async deleteAndDetach(id: string): Promise<void> {
-    const db = await database();
-    const transaction = db.transaction(["categories", "notes"], "readwrite");
-    const notes = await transaction.objectStore("notes").getAll();
-    await Promise.all(notes.filter((note) => note.categoryIds.includes(id)).map((note) => transaction.objectStore("notes").put({
-      ...note,
-      categoryIds: note.categoryIds.filter((categoryId) => categoryId !== id),
-      updatedAt: new Date().toISOString()
-    })));
-    await transaction.objectStore("categories").delete(id);
-    await transaction.done;
   }
 }
 
@@ -158,43 +146,43 @@ export class SettingsRepository {
   }
 }
 
-export async function dataSnapshot(): Promise<{ notes: Note[]; categories: Category[]; summaries: Summary[]; settings: Setting[] }> {
+export async function dataSnapshot(): Promise<{ notes: Note[]; summaries: Summary[]; settings: Setting[] }> {
   const db = await database();
-  const transaction = db.transaction(["notes", "categories", "summaries", "settings"]);
-  const [notes, categories, summaries, settings] = await Promise.all([
-    transaction.objectStore("notes").getAll(), transaction.objectStore("categories").getAll(),
-    transaction.objectStore("summaries").getAll(), transaction.objectStore("settings").getAll()
+  const transaction = db.transaction(["notes", "summaries", "settings"]);
+  const [notes, summaries, settings] = await Promise.all([
+    transaction.objectStore("notes").getAll(),
+    transaction.objectStore("summaries").getAll(),
+    transaction.objectStore("settings").getAll()
   ]);
-  return { notes, categories, summaries, settings };
+  return { notes, summaries, settings };
 }
 
-export async function restoreSnapshot(snapshot: { notes: Note[]; categories: Category[]; summaries: Summary[]; settings: Setting[] }): Promise<void> {
+export async function restoreSnapshot(snapshot: { notes: Note[]; summaries: Summary[]; settings: Setting[] }): Promise<void> {
   const db = await database();
-  const transaction = db.transaction(["notes", "categories", "summaries", "settings", "drafts"], "readwrite");
-  const notes = transaction.objectStore("notes"); const categories = transaction.objectStore("categories");
-  const summaries = transaction.objectStore("summaries"); const settings = transaction.objectStore("settings");
-  await Promise.all([notes.clear(), categories.clear(), summaries.clear(), settings.clear(), transaction.objectStore("drafts").clear()]);
+  const transaction = db.transaction(["notes", "summaries", "settings", "drafts"], "readwrite");
+  const notes = transaction.objectStore("notes");
+  const summaries = transaction.objectStore("summaries");
+  const settings = transaction.objectStore("settings");
+  await Promise.all([notes.clear(), summaries.clear(), settings.clear(), transaction.objectStore("drafts").clear()]);
   await Promise.all(snapshot.notes.map((item) => notes.put(item)));
-  await Promise.all(snapshot.categories.map((item) => categories.put(item)));
   await Promise.all(snapshot.summaries.map((item) => summaries.put(item)));
   await Promise.all(snapshot.settings.map((item) => settings.put(item)));
   await transaction.done;
 }
 
-export async function storageCounts(): Promise<{ notes: number; categories: number; summaries: number }> {
+export async function storageCounts(): Promise<{ notes: number; summaries: number }> {
   const db = await database();
-  const transaction = db.transaction(["notes", "categories", "summaries"]);
-  const [notes, categories, summaries] = await Promise.all([
+  const transaction = db.transaction(["notes", "summaries"]);
+  const [notes, summaries] = await Promise.all([
     transaction.objectStore("notes").count(),
-    transaction.objectStore("categories").count(),
     transaction.objectStore("summaries").count()
   ]);
-  return { notes, categories, summaries };
+  return { notes, summaries };
 }
 
 export async function clearAllData(): Promise<void> {
   const db = await database();
-  const stores = ["notes", "categories", "summaries", "settings", "drafts"] as const;
+  const stores = ["notes", "summaries", "settings", "drafts"] as const;
   const transaction = db.transaction(stores, "readwrite");
   await Promise.all(stores.map((store) => transaction.objectStore(store).clear()));
   await transaction.done;

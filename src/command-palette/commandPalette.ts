@@ -1,5 +1,5 @@
 import { currentStrings } from "../i18n";
-import type { Category, Note } from "../models";
+import type { Note } from "../models";
 import { normalize } from "../services";
 import { getRecentCommands, recordCommandUse } from "./commandHistory";
 import { createCommandRegistry } from "./commandRegistry";
@@ -20,7 +20,6 @@ import type {
 export interface CommandPaletteOptions {
   hostElement: HTMLElement;
   getNotes: () => Promise<Note[]>;
-  getCategories: () => Promise<Category[]>;
   getContext: () => CommandContext;
   actions: CommandActions;
   onNavigate?: (url: string) => void;
@@ -39,7 +38,6 @@ export class CommandPaletteController {
   private previousActiveElement: HTMLElement | null = null;
   private options: CommandPaletteOptions;
   private cachedNotes: Note[] = [];
-  private cachedCategories: Category[] = [];
 
   constructor(options: CommandPaletteOptions) {
     this.options = options;
@@ -207,12 +205,7 @@ export class CommandPaletteController {
 
     // Refresh data in background
     try {
-      const [notes, categories] = await Promise.all([
-        this.options.getNotes(),
-        this.options.getCategories()
-      ]);
-      this.cachedNotes = notes;
-      this.cachedCategories = categories;
+      this.cachedNotes = await this.options.getNotes();
     } catch {
       // Continue with current cache if error
     }
@@ -256,7 +249,6 @@ export class CommandPaletteController {
       this.commands,
       recent,
       this.cachedNotes,
-      this.cachedCategories,
       context
     );
 
@@ -345,9 +337,6 @@ export class CommandPaletteController {
         const tagsHtml = noteItem.tags.length
           ? `<span class="palette-note-tags">${noteItem.tags.slice(0, 3).map((t) => `#${escapeHtml(t)}`).join(" ")}</span>`
           : "";
-        const catHtml = noteItem.categoryName
-          ? `<span class="palette-note-cat">${escapeHtml(noteItem.categoryName)}</span>`
-          : "";
         const taskBadgeHtml = noteItem.openTaskCount > 0
           ? `<span class="palette-task-count-badge">${noteItem.openTaskCount} ${noteItem.openTaskCount === 1 ? "task" : "tasks"}</span>`
           : "";
@@ -371,7 +360,7 @@ export class CommandPaletteController {
             <div class="palette-item-content">
               <div class="palette-note-head">
                 <span class="palette-note-title">${highlightText(noteItem.title, highlightTerm)}</span>
-                <span class="palette-note-meta">${formatDisplayDate(noteItem.noteDate)}${catHtml ? ` · ${catHtml}` : ""}${tagsHtml ? ` · ${tagsHtml}` : ""}</span>
+                <span class="palette-note-meta">${formatDisplayDate(noteItem.noteDate)}${tagsHtml ? ` · ${tagsHtml}` : ""}</span>
               </div>
               ${noteItem.contentExcerpt ? `<p class="palette-note-excerpt">${highlightText(noteItem.contentExcerpt, highlightTerm)}</p>` : ""}
             </div>
@@ -382,9 +371,6 @@ export class CommandPaletteController {
 
       case "task": {
         const taskItem = item as PaletteTaskItem;
-        const catHtml = taskItem.categoryName
-          ? `<span class="palette-note-cat">${escapeHtml(taskItem.categoryName)}</span>`
-          : "";
         return `
           <div
             class="palette-item palette-task-item ${activeClass}"
@@ -400,7 +386,7 @@ export class CommandPaletteController {
             </div>
             <div class="palette-item-content">
               <span class="palette-item-title">${highlightText(taskItem.taskText, highlightTerm)}</span>
-              <span class="palette-note-meta">${formatDisplayDate(taskItem.noteDate)}${catHtml ? ` · ${catHtml}` : ""}</span>
+              <span class="palette-note-meta">${formatDisplayDate(taskItem.noteDate)}</span>
             </div>
           </div>
         `;
@@ -486,7 +472,7 @@ export class CommandPaletteController {
 }
 
 function parsedHasFilter(query: string): boolean {
-  return /(?:tag|category|has|after|before):/i.test(query);
+  return /(?:tag|has|after|before):/i.test(query);
 }
 
 function highlightText(text: string, term: string): string {

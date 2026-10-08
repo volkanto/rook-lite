@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Category, Note } from "../models";
+import type { Note } from "../models";
 import { CommandPaletteController } from "./commandPalette";
 import type { CommandActions, CommandContext } from "./types";
 
@@ -15,26 +15,12 @@ describe("CommandPaletteController", () => {
       id: "note-1",
       title: "Rook Lite roadmap",
       content: "Roadmap details for local-first markdown note taking.\n- [ ] Task 1",
-      categoryIds: ["cat-work"],
       tags: ["roadmap", "rook"],
       noteDate: "2026-09-28",
       language: null,
       createdAt: "2026-09-28T10:00:00Z",
       updatedAt: "2026-09-28T10:00:00Z",
       archived: false
-    }
-  ];
-
-  const mockCategories: Category[] = [
-    {
-      id: "cat-work",
-      name: "Work",
-      slug: "work",
-      color: "#6366F1",
-      sortOrder: 0,
-      archived: false,
-      createdAt: "2026-09-01T00:00:00Z",
-      updatedAt: "2026-09-01T00:00:00Z"
     }
   ];
 
@@ -64,7 +50,6 @@ describe("CommandPaletteController", () => {
     controller = new CommandPaletteController({
       hostElement: host,
       getNotes: async () => mockNotes,
-      getCategories: async () => mockCategories,
       getContext: () => mockContext,
       actions
     });

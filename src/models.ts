@@ -2,24 +2,12 @@ export interface Note {
   id: string;
   title: string | null;
   content: string;
-  categoryIds: string[];
   tags: string[];
   noteDate: string;
   language: "tr" | "en" | null;
   createdAt: string;
   updatedAt: string;
   archived: boolean;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  color: string;
-  sortOrder: number;
-  archived: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface Summary {
@@ -49,7 +37,6 @@ export interface Draft {
   noteId: string | null;
   noteDate: string;
   content: string;
-  categoryIds: string[];
   updatedAt: string;
 }
 
@@ -67,7 +54,7 @@ export interface RookBackupV1 {
   exportedAt: string;
   application: { name: "rook-lite"; version: string };
   notes: Note[];
-  categories: Category[];
+  categories?: unknown[];
   summaries: Summary[];
   settings: Setting[];
 }

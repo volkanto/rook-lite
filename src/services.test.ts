@@ -1,8 +1,8 @@
 import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it } from "vitest";
-import { CategoryRepository, clearAllData, NoteRepository } from "./db";
+import { clearAllData, NoteRepository } from "./db";
 import { deriveTitle, extractTags } from "./markdown";
-import { CategoryService, normalize, NoteService, slugify } from "./services";
+import { normalize, NoteService, slugify } from "./services";
 
 beforeEach(async () => clearAllData());
 
@@ -24,7 +24,7 @@ describe("normalization", () => {
 describe("local repositories", () => {
   it("creates and retrieves a note by date", async () => {
     const service = new NoteService(new NoteRepository());
-    const note = await service.create("## Retry improvements\n#engineering", "2026-09-19", []);
+    const note = await service.create("## Retry improvements\n#engineering", "2026-09-19");
     expect(note.title).toBe("Retry improvements");
     expect(note.tags).toEqual(["engineering"]);
     expect(await service.listByDate("2026-09-19")).toHaveLength(1);
@@ -32,30 +32,21 @@ describe("local repositories", () => {
 
   it("throws an error when attempting to create a note with empty or whitespace content", async () => {
     const service = new NoteService(new NoteRepository());
-    await expect(service.create("", "2026-09-19", [])).rejects.toThrow("Note content cannot be empty.");
-    await expect(service.create("   \n\t  ", "2026-09-19", [])).rejects.toThrow("Note content cannot be empty.");
+    await expect(service.create("", "2026-09-19")).rejects.toThrow("Note content cannot be empty.");
+    await expect(service.create("   \n\t  ", "2026-09-19")).rejects.toThrow("Note content cannot be empty.");
   });
 
   it("throws an error when attempting to update a note with empty or whitespace content", async () => {
     const service = new NoteService(new NoteRepository());
-    const note = await service.create("Valid initial note", "2026-09-19", []);
+    const note = await service.create("Valid initial note", "2026-09-19");
     await expect(service.update(note.id, "")).rejects.toThrow("Note content cannot be empty.");
     await expect(service.update(note.id, "   \n ")).rejects.toThrow("Note content cannot be empty.");
   });
 
   it("completes exactly the selected Markdown task", async () => {
     const service = new NoteService(new NoteRepository());
-    const note = await service.create("- [ ] first\n- [ ] second", "2026-09-19", []);
+    const note = await service.create("- [ ] first\n- [ ] second", "2026-09-19");
     const updated = await service.setTaskDone(note.id, 1, true);
     expect(updated.content).toBe("- [ ] first\n- [x] second");
-  });
-
-  it("deletes a category and detaches it from notes", async () => {
-    const categoryService = new CategoryService(new CategoryRepository());
-    const category = await categoryService.create("Engineering");
-    const noteService = new NoteService(new NoteRepository());
-    const note = await noteService.create("Work", "2026-09-19", [category.id]);
-    await categoryService.delete(category.id);
-    expect((await noteService.listAll()).find((item) => item.id === note.id)?.categoryIds).toEqual([]);
   });
 });

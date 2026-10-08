@@ -5,9 +5,9 @@ import { createBackup, DEFAULT_OLLAMA_SETTINGS, downloadBlob, downloadJson, down
 import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, getLocaleDefinition, getRelativeDateInfo, setLocale, type SupportedLocale } from "./i18n";
 import { escapeHtml, extractTags, renderInlineMarkdown, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
 import { attachTagAutocomplete } from "./tag-autocomplete";
-import type { Category, Note, OllamaSettings } from "./models";
+import type { Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
-import { CategoryService, initializeLocalData, NoteService } from "./services";
+import { initializeLocalData, NoteService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
 import { getPredefinedTemplates, getTemplateById } from "./templates";
 import { findDateBacklinks, findNoteBacklinks, setWikilinkNotesIndex } from "./wikilinks";
@@ -21,7 +21,6 @@ type ThemePreference = "SYSTEM" | "LIGHT" | "DARK";
 interface NavigationItem { path: string; label: string; icon: string; divider?: boolean }
 
 const notes = new NoteService();
-const categories = new CategoryService();
 const summaries = new SummaryService();
 let draftTimer: number | undefined;
 let paletteController: CommandPaletteController | null = null;
@@ -36,7 +35,6 @@ export const icons = {
   todo: '<path d="M3.5 5.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"/><path d="M11 6l9 0"/><path d="M11 12l9 0"/><path d="M11 18l9 0"/>',
   summary: '<path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"/>',
   search: '<path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/>',
-  category: '<path d="M6.5 7.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3"/>',
   export: '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v5m-5 6h7m-3 -3l3 3l-3 3"/>',
   settings: '<path d="M12 6a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M4 6l8 0"/><path d="M16 6l4 0"/><path d="M6 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M4 12l2 0"/><path d="M10 12l10 0"/><path d="M15 18a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M4 18l11 0"/><path d="M19 18l1 0"/>',
   calendar: '<path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M8 15h2v2h-2v-2"/>',
@@ -164,13 +162,13 @@ function initCommandPalette(): void {
       showShortcutsDialog();
     },
     exportMarkdownZip: async () => {
-      const [allNotes, allCats] = await Promise.all([notes.listAll(), categories.list()]);
-      downloadMarkdownZip(allNotes, allCats);
+      const allNotes = await notes.listAll();
+      downloadMarkdownZip(allNotes);
     },
     exportMarkdownDirectory: async () => {
       try {
-        const [allNotes, allCats] = await Promise.all([notes.listAll(), categories.list()]);
-        await exportToDirectory(allNotes, allCats);
+        const allNotes = await notes.listAll();
+        await exportToDirectory(allNotes);
       } catch (err) {
         alert(errorMessage(err));
       }
@@ -188,7 +186,7 @@ function initCommandPalette(): void {
         try {
           const backup = parseBackup(await file.text());
           const s = currentStrings();
-          showConfirm(s.replaceDataTitle, s.replaceDataMessage(backup.notes.length, backup.categories.length, backup.summaries.length), s.restoreBackupBtn, async () => {
+          showConfirm(s.replaceDataTitle, s.replaceDataMessage(backup.notes.length, backup.summaries.length), s.restoreBackupBtn, async () => {
             await restoreBackup(backup);
             await refreshCalendar();
             await renderRoute();
@@ -247,7 +245,6 @@ function initCommandPalette(): void {
   paletteController = new CommandPaletteController({
     hostElement: host,
     getNotes: () => notes.listAll(),
-    getCategories: () => categories.list(),
     getContext,
     actions,
     onNavigate: (url) => {
@@ -651,7 +648,7 @@ function bindNoteActions(): void {
         const note = all.find((item) => item.id === noteId);
         if (!note) return;
         const updatedContent = toggleTaskInMarkdown(note.content, taskIndex);
-        await notes.update(note.id, updatedContent, note.categoryIds);
+        await notes.update(note.id, updatedContent);
         const listItem = cb.closest("li");
         if (listItem) {
           listItem.classList.toggle("is-task-completed", cb.checked);
@@ -661,7 +658,7 @@ function bindNoteActions(): void {
   });
 }
 
-export function showEditDialog(note: Note, _allCategories?: Category[]): void {
+export function showEditDialog(note: Note): void {
   const s = currentStrings();
   const host = requireElement<HTMLElement>("#dialog-host");
   const formattedDate = formatDateHeading(note.noteDate);
@@ -1027,11 +1024,11 @@ export async function renderSummaries(content: HTMLElement): Promise<void> {
   const s = currentStrings();
   const params = new URLSearchParams(location.search); const type = (["weekly", "monthly", "yearly", "custom"].includes(params.get("type") ?? "") ? params.get("type") : "weekly") as "weekly" | "monthly" | "yearly" | "custom"; const anchor = validIsoDate(params.get("start")) ? params.get("start") as string : isoDate(new Date()); const end = validIsoDate(params.get("end")) ? params.get("end") as string : anchor;
   let period; try { period = summaryPeriod(type, anchor, end); } catch { period = summaryPeriod("weekly", isoDate(new Date())); }
-  const stored = await summaries.list(); const allNotes = await notes.listAll(); const allCategories = await categories.list(); const current = stored.find((summary) => summary.id === `${period.type}:${period.start}:${period.end}`);
+  const stored = await summaries.list(); const allNotes = await notes.listAll(); const current = stored.find((summary) => summary.id === `${period.type}:${period.start}:${period.end}`);
   document.title = "Summaries · Rook Lite";
-  content.innerHTML = `<div class="page-head"><div><h1>Summaries</h1><p class="lede">Turn your local notes into an overview without sending them anywhere.</p></div></div><form id="summary-period-form" class="search-page-form lite-summary-controls"><div class="search-page-controls"><div class="search-filter"><label for="summary-type">Period</label><select id="summary-type" name="type">${["weekly", "monthly", "yearly", "custom"].map((option) => `<option value="${option}" ${option === period.type ? "selected" : ""}>${option[0].toUpperCase() + option.slice(1)}</option>`).join("")}</select></div><div class="search-filter"><label for="summary-start">${period.type === "custom" ? "Start" : "Date in period"}</label><input id="summary-start" name="start" type="date" value="${period.type === "custom" ? period.start : anchor}"></div><div class="search-filter" id="summary-end-wrap" ${period.type === "custom" ? "" : "hidden"}><label for="summary-end">End</label><input id="summary-end" name="end" type="date" value="${period.end}"></div></div><button type="submit">Show period</button></form><section id="summary-block" class="summary"><div class="summary-heading"><div><p class="summary-kicker">${period.start} to ${period.end}</p><h2>${period.type[0].toUpperCase() + period.type.slice(1)} summary</h2></div>${current ? '<span class="summary-status">Ready</span>' : ""}</div>${current ? `<p class="muted summary-meta"><span>${current.engine}</span>${current.model ? `<span> · ${escapeHtml(current.model)}</span>` : ""}${current.editedMarkdown ? '<span class="pill">edited</span>' : ""}</p><div class="prose">${renderMarkdown(current.editedMarkdown ?? current.generatedMarkdown)}</div><details class="summary-edit"><summary>Edit</summary><form id="summary-edit-form"><textarea name="text" rows="10">${escapeHtml(current.editedMarkdown ?? current.generatedMarkdown)}</textarea><p class="hint">Your edit is stored separately from regenerated text.</p><button type="submit">Save</button></form></details><button type="button" class="linklike" id="generate-summary">Write it again</button>` : '<p class="muted">No summary for this period yet. Rule-based generation works entirely offline.</p><button type="button" id="generate-summary">Write it</button>'}<p class="notice error" id="summary-error" hidden></p></section>${stored.length > (current ? 1 : 0) ? `<section class="category-section"><div class="category-section-head"><div><h2>Previous summaries</h2></div><span class="category-count">${stored.length - (current ? 1 : 0)}</span></div><div class="category-list">${stored.filter((summary) => summary.id !== current?.id).map((summary) => `<div class="category-item"><div class="category-summary"><div class="category-copy"><strong>${summary.periodStart} to ${summary.periodEnd}</strong><span>${summary.type} · ${summary.engine} · ${summary.noteCount} notes</span></div></div></div>`).join("")}</div></section>` : ""}`;
+  content.innerHTML = `<div class="page-head"><div><h1>Summaries</h1><p class="lede">Turn your local notes into an overview without sending them anywhere.</p></div></div><form id="summary-period-form" class="search-page-form lite-summary-controls"><div class="search-page-controls"><div class="search-filter"><label for="summary-type">Period</label><select id="summary-type" name="type">${["weekly", "monthly", "yearly", "custom"].map((option) => `<option value="${option}" ${option === period.type ? "selected" : ""}>${option[0].toUpperCase() + option.slice(1)}</option>`).join("")}</select></div><div class="search-filter"><label for="summary-start">${period.type === "custom" ? "Start" : "Date in period"}</label><input id="summary-start" name="start" type="date" value="${period.type === "custom" ? period.start : anchor}"></div><div class="search-filter" id="summary-end-wrap" ${period.type === "custom" ? "" : "hidden"}><label for="summary-end">End</label><input id="summary-end" name="end" type="date" value="${period.end}"></div></div><button type="submit">Show period</button></form><section id="summary-block" class="summary"><div class="summary-heading"><div><p class="summary-kicker">${period.start} to ${period.end}</p><h2>${period.type[0].toUpperCase() + period.type.slice(1)} summary</h2></div>${current ? '<span class="summary-status">Ready</span>' : ""}</div>${current ? `<p class="muted summary-meta"><span>${current.engine}</span>${current.model ? `<span> · ${escapeHtml(current.model)}</span>` : ""}${current.editedMarkdown ? '<span class="pill">edited</span>' : ""}</p><div class="prose">${renderMarkdown(current.editedMarkdown ?? current.generatedMarkdown)}</div><details class="summary-edit"><summary>Edit</summary><form id="summary-edit-form"><textarea name="text" rows="10">${escapeHtml(current.editedMarkdown ?? current.generatedMarkdown)}</textarea><p class="hint">Your edit is stored separately from regenerated text.</p><button type="submit">Save</button></form></details><button type="button" class="linklike" id="generate-summary">Write it again</button>` : '<p class="muted">No summary for this period yet. Rule-based generation works entirely offline.</p><button type="button" id="generate-summary">Write it</button>'}<p class="notice error" id="summary-error" hidden></p></section>${stored.length > (current ? 1 : 0) ? `<section class="summary-history-section"><div class="summary-history-head"><div><h2>Previous summaries</h2></div><span class="summary-history-count">${stored.length - (current ? 1 : 0)}</span></div><div class="summary-history-list">${stored.filter((summary) => summary.id !== current?.id).map((summary) => `<div class="summary-history-item"><div class="summary-history-summary"><div class="summary-history-copy"><strong>${summary.periodStart} to ${summary.periodEnd}</strong><span>${summary.type} · ${summary.engine} · ${summary.noteCount} notes</span></div></div></div>`).join("")}</div></section>` : ""}`;
   const periodForm = requireElement<HTMLFormElement>("#summary-period-form"); requireElement<HTMLSelectElement>("#summary-type").addEventListener("change", (event) => { requireElement<HTMLElement>("#summary-end-wrap").hidden = (event.currentTarget as HTMLSelectElement).value !== "custom"; }); periodForm.addEventListener("submit", (event) => { event.preventDefault(); const data = new FormData(periodForm); const next = new URLSearchParams({ type: data.get("type")?.toString() ?? "weekly", start: data.get("start")?.toString() ?? isoDate(new Date()) }); if (data.get("type") === "custom") next.set("end", data.get("end")?.toString() ?? ""); history.replaceState({}, "", appUrl(`/summaries?${next}`)); void renderRoute(); });
-  requireElement<HTMLButtonElement>("#generate-summary").addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; const settings = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS; const source = allNotes.filter((note) => note.noteDate >= period.start && note.noteDate <= period.end); const engine = settings.enabled ? new OllamaSummaryEngine(settings) : new RuleBasedSummaryEngine(); try { const result = await summaries.generate(source, allCategories, period, engine); if (result.fallbackError) sessionStorage.setItem("summary-fallback", result.fallbackError); await renderRoute(); } catch (error) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = errorMessage(error); button.disabled = false; } });
+  requireElement<HTMLButtonElement>("#generate-summary").addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; const settings = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS; const source = allNotes.filter((note) => note.noteDate >= period.start && note.noteDate <= period.end); const engine = settings.enabled ? new OllamaSummaryEngine(settings) : new RuleBasedSummaryEngine(); try { const result = await summaries.generate(source, period, engine); if (result.fallbackError) sessionStorage.setItem("summary-fallback", result.fallbackError); await renderRoute(); } catch (error) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = errorMessage(error); button.disabled = false; } });
   const fallback = sessionStorage.getItem("summary-fallback"); if (fallback) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = s.ollamaFallbackNotice(fallback); sessionStorage.removeItem("summary-fallback"); }
   const editForm = document.querySelector<HTMLFormElement>("#summary-edit-form"); editForm?.addEventListener("submit", async (event) => { event.preventDefault(); if (!current) return; await summaries.edit(current.id, new FormData(editForm).get("text")?.toString() ?? ""); await renderRoute(); });
 }
@@ -1053,7 +1050,6 @@ export async function renderSummariesV2(content: HTMLElement): Promise<void> {
 
   const stored = await summaries.list();
   const allNotes = await notes.listAll();
-  const allCategories = await categories.list();
   const source = allNotes.filter((note) => note.noteDate >= period.start && note.noteDate <= period.end && !note.archived);
   const current = stored.find((summary) => summary.id === `${period.type}:${period.start}:${period.end}`);
   const range = `${formatShortDate(period.start)} – ${formatShortDate(period.end)}`;
@@ -1088,7 +1084,7 @@ export async function renderSummariesV2(content: HTMLElement): Promise<void> {
     button.textContent = s.generatingSummary;
     const engine = new RuleBasedSummaryEngine();
     try {
-      const result = await summaries.generate(source, allCategories, period, engine);
+      const result = await summaries.generate(source, period, engine);
       if (result.fallbackError) sessionStorage.setItem("summary-fallback", result.fallbackError);
       await renderRoute();
     } catch (error) {
@@ -1264,7 +1260,7 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
         <div class="settings-row">
           <div class="settings-row-info">
             <span class="settings-row-label">${s.storageTitle}</span>
-            <span class="settings-row-desc">${counts.notes} ${counts.notes === 1 ? s.entrySingle : s.entryPlural} · ${counts.categories} ${s.navCategories.toLowerCase()} · ${counts.summaries} ${s.navSummaries.toLowerCase()}${estimate?.usage ? ` · ${formatBytes(estimate.usage)}` : ""}</span>
+            <span class="settings-row-desc">${counts.notes} ${counts.notes === 1 ? s.entrySingle : s.entryPlural} · ${counts.summaries} ${s.navSummaries.toLowerCase()}${estimate?.usage ? ` · ${formatBytes(estimate.usage)}` : ""}</span>
           </div>
           <div class="settings-row-action">
             ${persisted ? `<span class="persistence-status-badge">✓ ${s.persistencePersisted}</span>` : `<button type="button" id="request-persistence" class="secondary-button icon-action-btn" title="${s.requestPersistenceBtn}" aria-label="${s.requestPersistenceBtn}">${svg(icons.shield, "btn-action-icon")}<span class="visually-hidden">${s.requestPersistenceBtn}</span></button>`}
@@ -1391,7 +1387,7 @@ function bindSettingsEvents(content: HTMLElement): void {
       if (select && models.length > 0) {
         const selected = select.value || current.model;
         select.innerHTML = models
-          .map((m) => `<option value="${escapeHtml(m)}" ${m === selected ? "selected" : ""}>${escapeHtml(m)}</option>`)
+          .map((m: string) => `<option value="${escapeHtml(m)}" ${m === selected ? "selected" : ""}>${escapeHtml(m)}</option>`)
           .join("");
         if (!models.includes(selected) && selected) {
           select.insertAdjacentHTML("afterbegin", `<option value="${escapeHtml(selected)}" selected>${escapeHtml(selected)}</option>`);
@@ -1466,13 +1462,12 @@ function bindSettingsEvents(content: HTMLElement): void {
   }
 
   content.querySelector<HTMLButtonElement>("#zip-export")?.addEventListener("click", () => {
-    void notes.listAll().then((allN) => categories.list().then((allC) => downloadMarkdownZip(allN, allC)));
+    void notes.listAll().then((allN) => downloadMarkdownZip(allN));
   });
   content.querySelector<HTMLButtonElement>("#directory-export")?.addEventListener("click", async () => {
     try {
       const allN = await notes.listAll();
-      const allC = await categories.list();
-      const count = await exportToDirectory(allN, allC);
+      const count = await exportToDirectory(allN);
       dataMessage(s.exportedNotesCount(count), false);
     } catch (error) {
       dataMessage(errorMessage(error), true);
@@ -1488,7 +1483,7 @@ function bindSettingsEvents(content: HTMLElement): void {
       const backup = parseBackup(await file.text());
       showConfirm(
         s.replaceDataTitle,
-        s.replaceDataMessage(backup.notes.length, backup.categories.length, backup.summaries.length),
+        s.replaceDataMessage(backup.notes.length, backup.summaries.length),
         s.restoreBackupBtn,
         async () => {
           await restoreBackup(backup);
@@ -1875,7 +1870,7 @@ function bindShellEvents(): void {
     }
 
     const clickPath = event.composedPath();
-    document.querySelectorAll<HTMLDetailsElement>(".footer-category-picker[open], .date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => {
+    document.querySelectorAll<HTMLDetailsElement>(".date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open]").forEach((details) => {
       if (!details.contains(target) && !clickPath.includes(details)) details.removeAttribute("open");
     });
 

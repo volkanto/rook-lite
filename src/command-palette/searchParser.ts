@@ -8,7 +8,6 @@ export function parseSearchQuery(query: string, cursorIndex?: number): ParsedSea
   let working = raw;
 
   const tags: string[] = [];
-  const categories: string[] = [];
   let hasTask: boolean | undefined = undefined;
   let after: string | undefined = undefined;
   let before: string | undefined = undefined;
@@ -16,11 +15,11 @@ export function parseSearchQuery(query: string, cursorIndex?: number): ParsedSea
   // Check for active filter at cursor/end for autocomplete suggestions
   const pos = typeof cursorIndex === "number" && cursorIndex >= 0 ? cursorIndex : raw.length;
   const beforeCursor = raw.slice(0, pos);
-  const activeMatch = beforeCursor.match(/(?:^|\s)(tag|category):([^\s]*)$/i);
+  const activeMatch = beforeCursor.match(/(?:^|\s)(tag):([^\s]*)$/i);
   let activeFilter: ParsedSearch["activeFilter"] = null;
 
   if (activeMatch) {
-    const type = activeMatch[1].toLowerCase() as "tag" | "category";
+    const type = "tag" as const;
     const value = activeMatch[2];
     const startIndex = (activeMatch.index ?? 0) + (activeMatch[0].startsWith(" ") ? 1 : 0);
     activeFilter = { type, value, startIndex };
@@ -30,13 +29,6 @@ export function parseSearchQuery(query: string, cursorIndex?: number): ParsedSea
   working = working.replace(/(?:^|\s)tag:([^\s]+)/gi, (_, val) => {
     const clean = normalize(val.replace(/^#/, ""));
     if (clean) tags.push(clean);
-    return " ";
-  });
-
-  // Extract category: filters
-  working = working.replace(/(?:^|\s)category:([^\s]+)/gi, (_, val) => {
-    const clean = normalize(val);
-    if (clean) categories.push(clean);
     return " ";
   });
 
@@ -64,7 +56,6 @@ export function parseSearchQuery(query: string, cursorIndex?: number): ParsedSea
     raw,
     text,
     tags,
-    categories,
     hasTask,
     after,
     before,
@@ -74,7 +65,7 @@ export function parseSearchQuery(query: string, cursorIndex?: number): ParsedSea
 
 export function insertFilterValue(
   query: string,
-  filterType: "tag" | "category",
+  filterType: "tag",
   value: string
 ): string {
   // If active filter is at the end, replace it

@@ -1,4 +1,4 @@
-import type { Category, Note } from "../models";
+import type { Note } from "../models";
 
 export type CommandGroup =
   | "notes"
@@ -14,7 +14,6 @@ export interface CommandContext {
   currentDate?: string;
   selectedNote?: Note | null;
   activeNotes?: Note[];
-  allCategories?: Category[];
   isZenMode?: boolean;
   currentTheme?: string;
   hasSummary?: boolean;
@@ -65,12 +64,11 @@ export interface ParsedSearch {
   raw: string;
   text: string;
   tags: string[];
-  categories: string[];
   hasTask?: boolean;
   after?: string;
   before?: string;
   activeFilter?: {
-    type: "tag" | "category";
+    type: "tag";
     value: string;
     startIndex: number;
   } | null;
@@ -99,7 +97,6 @@ export interface PaletteNoteItem {
   title: string;
   contentExcerpt: string;
   noteDate: string;
-  categoryName?: string;
   tags: string[];
   openTaskCount: number;
   href: string;
@@ -112,7 +109,6 @@ export interface PaletteTaskItem {
   noteId: string;
   taskText: string;
   noteDate: string;
-  categoryName?: string;
   lineIndex: number;
   href: string;
 }
@@ -120,7 +116,7 @@ export interface PaletteTaskItem {
 export interface PaletteSuggestionItem {
   type: "suggestion";
   id: string;
-  filterType: "tag" | "category";
+  filterType: "tag";
   value: string;
   label: string;
   count?: number;
