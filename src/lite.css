@@ -1,14 +1,15 @@
 :root {
-  --font-app: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Geist Sans", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-app: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Geist Sans", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-ui: var(--font-app);
   --font-prose: var(--font-app);
+  --font-editorial: "Newsreader", "Charter", "Lyon Text", "Iowan Old Style", "Playfair Display", "Times New Roman", "Georgia", "Cambria", serif;
   --font-mono: "SFMono-Regular", ui-monospace, "Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
 }
 
 /* Two-Tone Dark Theme: Pitch black left panel, soft matte main reading canvas */
 :root[data-theme="dark"] body.app .sidebar,
 :root:not([data-theme="light"]) body.app .sidebar {
-  background: #000000 !important;
+  background: #09090b !important;
   border-right: 1px solid var(--color-border-subtle, #1e1e22) !important;
 }
 
@@ -20,7 +21,7 @@
 }
 
 :root[data-theme="dark"] .mobile-top-bar {
-  background: #000000 !important;
+  background: #09090b !important;
   border-bottom: 1px solid var(--color-border-subtle, #1e1e22) !important;
 }
 
@@ -84,8 +85,8 @@
   font-size: 0.68rem !important;
   font-weight: 500 !important;
   color: var(--color-text-secondary, var(--text-soft)) !important;
-  background: var(--color-bg-surface, var(--surface)) !important;
-  border: 1px solid var(--color-border-default, var(--border)) !important;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
   border-radius: 4px !important;
   padding: 0.1rem 0.35rem !important;
   line-height: 1 !important;
@@ -802,8 +803,9 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
 .minimal-date-title {
   margin: 0 !important;
-  font-size: clamp(1.25rem, 2.2vw, 1.45rem) !important;
-  font-weight: 650 !important;
+  font-family: var(--font-editorial, var(--font-app)) !important;
+  font-size: clamp(1.35rem, 2.5vw, 1.65rem) !important;
+  font-weight: 600 !important;
   line-height: 1.25 !important;
   color: var(--color-text-primary, var(--text)) !important;
   letter-spacing: -0.025em !important;
@@ -814,10 +816,11 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   align-items: center !important;
   height: 1.4rem !important;
   padding: 0 0.65rem !important;
-  border-radius: 999px !important;
-  font-size: 0.74rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.01em !important;
+  border-radius: var(--radius-xs, 4px) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.72rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
   background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
   border: 1px solid var(--color-border-subtle, var(--border)) !important;
   color: var(--color-text-secondary, var(--text-soft)) !important;
@@ -826,16 +829,17 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 }
 
 .minimal-date-badge.is-today {
-  background: var(--color-brand-soft, #ECECFF) !important;
-  border-color: color-mix(in srgb, var(--color-brand) 28%, transparent) !important;
-  color: var(--color-brand, #5B5BD6) !important;
+  background: var(--color-brand-soft, rgba(24, 24, 27, 0.06)) !important;
+  border-color: var(--color-border-default, var(--border)) !important;
+  color: var(--color-text-primary) !important;
+  font-weight: 600 !important;
   box-shadow: none !important;
 }
 
 :root[data-theme="dark"] .minimal-date-badge.is-today {
-  background: var(--color-brand-soft, #202028) !important;
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent) !important;
-  color: var(--color-brand, #7C7CF8) !important;
+  background: var(--color-brand-soft, rgba(255, 255, 255, 0.08)) !important;
+  border-color: var(--color-border-default, var(--border)) !important;
+  color: var(--color-text-primary) !important;
   box-shadow: none !important;
 }
 
@@ -846,7 +850,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   padding: 2px;
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: 999px;
+  border-radius: var(--radius-sm, 6px);
   flex: 0 0 auto;
 }
 
@@ -857,7 +861,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   justify-content: center !important;
   width: 1.8rem !important;
   height: 1.8rem !important;
-  border-radius: 999px !important;
+  border-radius: var(--radius-xs, 4px) !important;
   color: var(--color-text-secondary, var(--text-soft)) !important;
   background: transparent !important;
   border: none !important;
@@ -890,7 +894,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   justify-content: center !important;
   height: 1.8rem !important;
   padding: 0 0.75rem !important;
-  border-radius: 999px !important;
+  border-radius: var(--radius-xs, 4px) !important;
   font-size: 0.75rem !important;
   font-weight: 550 !important;
   color: var(--color-text-secondary, var(--text-soft)) !important;
@@ -1217,7 +1221,52 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   text-transform: none;
 }
 
-/* Split Notes Stream Layout */
+/* Workspace 3-Pane Layout */
+.workspace-grid {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-bg-app);
+}
+
+.middle-pane {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-surface-sunken);
+  overflow-y: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.right-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  background: var(--color-bg-surface);
+  overflow-y: auto;
+  position: relative;
+}
+
+@media (max-width: 48rem) {
+  .middle-pane {
+    width: 100%;
+  }
+  .right-pane {
+    display: none;
+  }
+  .workspace-grid.show-editor .middle-pane {
+    display: none;
+  }
+  .workspace-grid.show-editor .right-pane {
+    display: flex;
+  }
+}
+
 .day-notes.notes-panel {
   margin-top: 2rem;
   overflow: visible;
@@ -1274,12 +1323,13 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 .tag-filters a {
   display: inline-flex;
   align-items: center;
-  min-height: 1.65rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: 4px;
+  min-height: 1.55rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-xs, 4px);
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   border: 1px solid var(--color-border-subtle, var(--border));
   color: var(--color-text-secondary, var(--text-soft));
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 500;
   text-decoration: none;
@@ -1289,9 +1339,9 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
 .tag-filters a:hover,
 .tag-filters a.is-active {
-  background: var(--color-bg-selected);
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  color: var(--color-brand);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary);
 }
 
 /* Individual Decoupled Note Cards */
@@ -1299,23 +1349,23 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 .notes-list {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 1.25rem;
   margin: 0;
 }
 
 .notes-list .note-list-item {
   border: 0;
-  border-radius: var(--radius-md, 10px);
+  border-radius: var(--radius-md, 8px);
 }
 
 .notes-list .note {
   margin: 0;
-  padding: 1.25rem 1.5rem;
+  padding: 1.35rem 1.6rem;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md, 10px);
-  box-shadow: none;
-  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1), border-color 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
   scroll-margin-top: 5rem;
   box-sizing: border-box;
   overflow: visible;
@@ -1324,14 +1374,18 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 .notes-list .note:hover {
   background: var(--color-bg-surface);
   border-color: var(--color-border-default);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   transform: none;
+}
+
+:root[data-theme="dark"] .notes-list .note {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 :root[data-theme="dark"] .notes-list .note:hover {
   background: var(--color-bg-raised);
   border-color: var(--color-border-hover);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1387,11 +1441,12 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 }
 
 .notes-list .note .prose {
-  max-width: 74ch;
+  max-width: 72ch;
   overflow-wrap: anywhere;
   color: var(--color-text-primary, var(--text));
-  font-size: 0.94rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.72;
+  letter-spacing: -0.011em;
 }
 
 /* Dribbble-Style Animated Interactive Markdown Task Items */
@@ -1923,7 +1978,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   min-height: 28px;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-xs, 4px);
   background: transparent;
   color: var(--color-icon-secondary, var(--text-soft));
   cursor: pointer;
@@ -1932,18 +1987,21 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Individual button style is visible ONLY when hovering that specific button */
 .note-quick-action-btn:hover {
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
-  border-color: var(--color-border-subtle, var(--border));
-  color: var(--color-text-primary, var(--text));
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-subtle);
+  color: var(--color-text-primary);
   box-shadow: none;
+}
+
+.note-quick-action-btn:active {
+  transform: scale(0.92);
 }
 
 .note-quick-action-btn.copy-btn:hover,
 .note-quick-action-btn.edit-btn:hover {
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  color: var(--color-brand);
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary);
 }
 
 .note-quick-action-btn.delete-btn:hover {
@@ -3597,14 +3655,14 @@ textarea.simple-editor-textarea.is-hidden,
 .notes-list .tag-pill {
   display: inline-flex;
   align-items: center;
-  height: 1.45rem;
-  padding: 0 0.65rem;
+  height: 1.35rem;
+  padding: 0 0.55rem;
   border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: 999px;
+  border-radius: var(--radius-xs, 4px);
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   color: var(--color-text-secondary, var(--text-soft));
-  font-family: var(--font-app);
-  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 500;
   line-height: 1;
   text-decoration: none;
@@ -3612,9 +3670,9 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .notes-list a.tag-pill:hover {
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  background: var(--color-bg-selected);
-  color: var(--color-brand);
+  border-color: var(--color-border-default, var(--border));
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
   text-decoration: none;
 }
 
@@ -3671,18 +3729,18 @@ textarea.simple-editor-textarea.is-hidden,
   margin: 0 !important;
   padding: 0 !important;
   box-sizing: border-box !important;
-  border-radius: 12px !important;
+  border-radius: var(--radius-md, 8px) !important;
   background: var(--color-bg-surface, var(--surface)) !important;
   border: 1px solid var(--color-border-subtle, var(--border)) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
   transition: border-color 150ms ease, box-shadow 150ms ease !important;
   overflow: visible !important;
   position: relative !important;
 }
 
 #new-note-form:focus-within {
-  border-color: var(--color-brand) !important;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 18%, transparent), 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+  border-color: var(--color-border-default, var(--border)) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus-ring) 25%, transparent), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
 #new-note-form:has(.editor-template-picker[open]),
@@ -3703,14 +3761,16 @@ textarea.simple-editor-textarea.is-hidden,
   display: block !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  min-height: 2.65rem !important;
+  min-height: 3rem !important;
   max-height: 32rem !important; /* extends with Enter till 20 rows, then scrolls */
-  padding: 0.65rem 0.95rem !important;
+  padding: 0.85rem 1.15rem !important;
   margin: 0 !important;
   resize: none !important;
   font-family: var(--font-app) !important;
-  font-size: 0.95rem !important;
-  line-height: 1.6 !important;
+  font-size: 1rem !important;
+  line-height: 1.65 !important;
+  letter-spacing: -0.01em !important;
+  color: var(--color-text-primary) !important;
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -3718,13 +3778,18 @@ textarea.simple-editor-textarea.is-hidden,
   transition: border-color 150ms ease !important;
 }
 
+#new-note-form .simple-editor-textarea::placeholder {
+  color: var(--color-text-muted, var(--muted)) !important;
+  font-size: 0.95rem !important;
+}
+
 #new-note-form .editor-preview {
   order: 2;
   width: 100%;
   box-sizing: border-box;
-  min-height: 2.65rem;
+  min-height: 3rem;
   max-height: 32rem;
-  padding: 0.65rem 0.95rem;
+  padding: 0.85rem 1.15rem;
   margin: 0;
   overflow-y: auto;
   overflow-wrap: anywhere;
@@ -3790,8 +3855,8 @@ textarea.simple-editor-textarea.is-hidden,
   border-top: none !important;
   border-left: none !important;
   border-right: none !important;
-  border-top-left-radius: 11px !important;
-  border-top-right-radius: 11px !important;
+  border-top-left-radius: 7px !important;
+  border-top-right-radius: 7px !important;
 }
 
 :root[data-theme="dark"] #new-note-form:focus-within .simple-editor-toolbar,
@@ -3811,14 +3876,14 @@ textarea.simple-editor-textarea.is-hidden,
   margin: 0 !important;
   box-sizing: border-box !important;
   min-height: 2.65rem !important;
-  padding: 0.4rem 0.95rem !important;
+  padding: 0.45rem 1rem !important;
   border-top: 1px solid var(--color-border-subtle, var(--border)) !important;
   border-bottom: none !important;
   border-left: none !important;
   border-right: none !important;
   background: transparent !important;
-  border-bottom-left-radius: 11px !important;
-  border-bottom-right-radius: 11px !important;
+  border-bottom-left-radius: 7px !important;
+  border-bottom-right-radius: 7px !important;
 }
 
 .copilot-input-container .editor-card:focus-within {
@@ -3859,7 +3924,7 @@ textarea.simple-editor-textarea.is-hidden,
 .settings-section {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: border-color 160ms ease;
@@ -4879,7 +4944,7 @@ textarea.simple-editor-textarea.is-hidden,
   width: fit-content;
   padding: 3px;
   border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: 999px;
+  border-radius: var(--radius-sm, 6px);
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   gap: 2px;
   flex: 0 0 auto;
@@ -4894,7 +4959,7 @@ body.app .summary-period-tabs button,
   min-height: 1.85rem;
   padding: 0 0.85rem;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-xs, 4px);
   background: transparent;
   color: var(--color-text-secondary, var(--text-soft));
   font-family: var(--font-ui);
@@ -5354,16 +5419,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .command-palette,
 .search-palette {
-  width: min(44rem, calc(100vw - 2rem));
-  max-width: 44rem;
+  width: min(42rem, calc(100vw - 2rem));
+  max-width: 42rem;
   max-height: min(38rem, calc(85vh - 2rem));
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: 14px;
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: var(--radius-lg, 10px);
   background: var(--color-bg-surface, var(--surface));
-  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--color-border-subtle, var(--border));
+  box-shadow: 0 16px 48px -8px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--color-border-subtle, var(--border));
   animation: palette-enter 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -5479,7 +5544,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .palette-item.is-active,
 .palette-item:hover {
-  background: var(--color-bg-hover, rgba(99, 102, 241, 0.09));
+  background: var(--color-bg-hover);
 }
 
 .palette-item-icon {
@@ -5497,7 +5562,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .palette-item.is-active .palette-item-icon {
   background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-brand, var(--accent));
+  color: var(--color-text-primary);
 }
 
 .palette-item-content {
@@ -5630,13 +5695,13 @@ mark.palette-highlight {
   justify-content: center;
   min-width: 1.1rem;
   padding: 1px 4px;
-  border: 1px solid var(--color-border-default, var(--border));
-  border-radius: 3px;
-  background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-muted, var(--muted));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: 4px;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  color: var(--color-text-secondary, var(--text-soft));
   font-family: var(--font-mono, monospace);
-  font-size: 0.62rem;
-  font-weight: 600;
+  font-size: 0.65rem;
+  font-weight: 500;
 }
 
 .palette-footer-mode span {
@@ -6387,7 +6452,7 @@ mark.palette-highlight {
   width: fit-content;
   padding: 3px;
   border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: 999px;
+  border-radius: var(--radius-sm, 6px);
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   gap: 2px;
   flex: 0 0 auto;
@@ -6402,7 +6467,7 @@ body.app .todo-group-tabs button,
   min-height: 1.85rem;
   padding: 0 0.85rem;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-xs, 4px);
   background: transparent;
   color: var(--color-text-secondary, var(--text-soft));
   font-family: var(--font-ui);
@@ -6484,11 +6549,11 @@ body.app .todo-group-tabs button.is-active,
   align-items: center;
   justify-content: center;
   padding: 0.1rem 0.45rem;
-  border-radius: 999px;
+  border-radius: var(--radius-xs, 4px);
   background: var(--color-bg-surface-sunken, var(--surface-sunk));
   border: 1px solid var(--color-border-subtle, var(--border));
   color: var(--color-text-secondary, var(--text-soft));
-  font-family: var(--font-app);
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 600;
   line-height: 1;
@@ -6608,14 +6673,14 @@ body.app .todo-group-tabs button.is-active,
   justify-content: center;
   height: 1.35rem;
   padding: 0 0.55rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
+  border-radius: var(--radius-xs, 4px);
+  font-size: 0.68rem;
   font-weight: 500;
-  font-family: var(--font-app);
+  font-family: var(--font-mono);
   line-height: 1;
   user-select: none;
   white-space: nowrap;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
 .todo-age-chip.age-fresh {

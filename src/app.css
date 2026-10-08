@@ -15,10 +15,11 @@
     color-scheme: light dark;
 
     /* ---- type ------------------------------------------------------------ */
-    --font-app: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-app: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Geist Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-prose: var(--font-app);
     --font-ui: var(--font-app);
-    --font-mono: "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    --font-editorial: "Newsreader", "Charter", "Lyon Text", "Iowan Old Style", "Playfair Display", "Times New Roman", "Georgia", "Cambria", serif;
+    --font-mono: "SFMono-Regular", ui-monospace, "Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
     --text-xs: 0.75rem;
     --text-sm: 0.85rem;
@@ -43,25 +44,25 @@
     --measure: 68ch;      /* comfortable line length for reading notes */
 
     /* ---- light: Rook fallback palette ----------------------------------- */
-    --bg: #F7F7FA;
+    --bg: #FBFBFA;
     --surface: #FFFFFF;
-    --surface-sunk: #F2F4F7;
+    --surface-sunk: #F5F4F0;
     --surface-lift: #FFFFFF;
-    --text: #1F2937;
-    --text-soft: #667085;
-    --muted: #98A2B3;
-    --border: #E5E7EB;
-    --border-strong: #D0D5DD;
+    --text: #242426;
+    --text-soft: #5F6368;
+    --muted: #8A8D91;
+    --border: #EAE8E3;
+    --border-strong: #D5D2CA;
 
-    --accent: #5B5BD6;
-    --accent-soft: #ECECFF;
+    --accent: #18181B;
+    --accent-soft: #F0EFEB;
     --accent-text: #FFFFFF;
 
-    --danger: #E25555;
-    --danger-soft: #FDECEC;
+    --danger: #9F2F2D;
+    --danger-soft: #FDEBEC;
 
-    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-lift: 0 4px 12px rgba(16, 24, 40, 0.08);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    --shadow-lift: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /*
@@ -81,52 +82,52 @@
     :root:not([data-theme="light"]) {
         /* ---- dark: pitch black sidebar + soft matte canvas -------------------- */
         --bg: #121214;
-        --surface: #18181b;
-        --surface-sunk: #0c0c0e;
+        --surface: #18181B;
+        --surface-sunk: #0C0C0E;
         --surface-lift: #202024;
 
         --text: #F4F4F5;
         --text-soft: #A1A1AA;
         --muted: #71717A;
 
-        --border: #222226;
-        --border-strong: #2e2e33;
+        --border: #1E1E22;
+        --border-strong: #2A2A30;
 
         --accent: #FFFFFF;
         --accent-soft: #202024;
         --accent-text: #121214;
 
-        --danger: #f87171;
-        --danger-soft: #2a1215;
+        --danger: #F87171;
+        --danger-soft: #2A1215;
 
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-        --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.6);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        --shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.35);
     }
 }
 
 :root[data-theme="dark"] {
         /* ---- dark: pitch black sidebar + soft matte canvas -------------------- */
         --bg: #121214;
-        --surface: #18181b;
-        --surface-sunk: #0c0c0e;
+        --surface: #18181B;
+        --surface-sunk: #0C0C0E;
         --surface-lift: #202024;
 
         --text: #F4F4F5;
         --text-soft: #A1A1AA;
         --muted: #71717A;
 
-        --border: #222226;
-        --border-strong: #2e2e33;
+        --border: #1E1E22;
+        --border-strong: #2A2A30;
 
         --accent: #FFFFFF;
         --accent-soft: #202024;
         --accent-text: #121214;
 
-        --danger: #f87171;
-        --danger-soft: #2a1215;
+        --danger: #F87171;
+        --danger-soft: #2A1215;
 
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-        --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.6);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        --shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 *,
@@ -257,7 +258,8 @@ body.app {
 .main-layout {
     display: flex;
     flex: 1;
-    min-height: calc(100vh - 3.5rem);
+    height: 100vh;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -453,20 +455,25 @@ textarea:focus {
 
 button {
     align-self: flex-start;
-    padding: 0.5rem 1rem;
+    padding: 0.45rem 0.9rem;
     font-family: var(--font-ui);
     font-size: var(--text-sm);
-    font-weight: 600;
+    font-weight: 550;
     color: var(--accent-text);
     background: var(--accent);
     border: 1px solid transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-sm, 6px);
     cursor: pointer;
-    transition: filter 0.12s ease;
+    box-shadow: none;
+    transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 button:hover {
-    filter: brightness(1.07);
+    filter: brightness(1.08);
+}
+
+button:active {
+    transform: scale(0.98);
 }
 
 button.linklike {
@@ -582,7 +589,7 @@ input[type="checkbox"] {
 .editor-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-md, 8px);
     padding: var(--sp-4);
     display: flex;
     flex-direction: column;
@@ -593,7 +600,7 @@ input[type="checkbox"] {
 
 .editor-card:focus-within {
     border-color: var(--color-focus);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 18%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus-ring) 25%, transparent);
 }
 
 .editor-textarea {
@@ -602,9 +609,10 @@ input[type="checkbox"] {
     background: transparent;
     border: none;
     resize: vertical;
-    font-family: inherit;
-    font-size: var(--text-sm);
-    line-height: 1.6;
+    font-family: var(--font-app);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    letter-spacing: -0.01em;
     color: var(--text);
     padding: 0;
 }
@@ -614,21 +622,25 @@ input[type="checkbox"] {
 }
 
 .save-btn {
-    background: var(--accent);
-    color: var(--accent-text);
-    border: none;
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    border: 1px solid transparent;
     width: 2rem;
     height: 2rem;
-    border-radius: 50%;
+    border-radius: var(--radius-sm, 6px);
     cursor: pointer;
     display: grid;
     place-items: center;
-    transition: transform 0.1s ease, filter 0.1s ease;
+    transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), background-color 120ms ease;
 }
 
 .save-btn:hover {
-    transform: scale(1.05);
-    filter: brightness(110%);
+    background: var(--color-brand-hover);
+    transform: none;
+}
+
+.save-btn:active {
+    transform: scale(0.96);
 }
 
 .save-icon {
@@ -643,7 +655,7 @@ input[type="checkbox"] {
     margin-bottom: var(--sp-4);
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-md, 8px);
     box-shadow: var(--shadow);
 }
 
@@ -723,8 +735,8 @@ input[type="checkbox"] {
     max-width: var(--measure);
     font-family: var(--font-prose);
     font-size: var(--text-md);
-    line-height: 1.7;
-    color: var(--text-soft);
+    line-height: 1.72;
+    color: var(--color-text-primary);
 }
 
 .prose > :first-child {
@@ -738,15 +750,16 @@ input[type="checkbox"] {
 .prose h1,
 .prose h2,
 .prose h3 {
-    font-family: var(--font-prose);
+    font-family: var(--font-editorial, var(--font-prose));
     color: var(--text);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.025em;
     text-transform: none;
+    line-height: 1.25;
 }
 
-.prose h1 { font-size: var(--text-lg); margin: var(--sp-5) 0 var(--sp-2); }
-.prose h2 { font-size: var(--text-md); margin: var(--sp-5) 0 var(--sp-2); }
-.prose h3 { font-size: var(--text-base); margin: var(--sp-4) 0 var(--sp-2); }
+.prose h1 { font-size: var(--text-xl); margin: var(--sp-5) 0 var(--sp-2); font-weight: 600; }
+.prose h2 { font-size: var(--text-lg); margin: var(--sp-5) 0 var(--sp-2); font-weight: 600; }
+.prose h3 { font-size: var(--text-md); margin: var(--sp-4) 0 var(--sp-2); font-weight: 600; }
 
 .prose strong {
     color: var(--text);
@@ -1105,88 +1118,88 @@ body.app .sidebar nav a.is-active .nav-label {
 :root {
 
     /* -----------------------------------------------------------------------
-       Application surfaces
+       Application surfaces - Warm Monochrome
        ----------------------------------------------------------------------- */
 
-    --color-bg-app: #F7F7F8;
-    --color-bg-page: #F7F7F8;
+    --color-bg-app: #FBFBFA;
+    --color-bg-page: #FBFBFA;
     --color-bg-surface: #FFFFFF;
     --color-bg-raised: #FFFFFF;
-    --color-bg-sunken: #F1F1F3;
-    --color-bg-hover: #EFEFEF;
-    --color-bg-active: #E8E8EC;
-    --color-bg-selected: #EFF6FF;
-    --color-bg-overlay: rgba(15, 23, 42, 0.48);
+    --color-bg-sunken: #F5F4F0;
+    --color-bg-hover: #EFECE6;
+    --color-bg-active: #E5E2D9;
+    --color-bg-selected: rgba(24, 24, 27, 0.05);
+    --color-bg-overlay: rgba(24, 24, 27, 0.45);
 
     /* -----------------------------------------------------------------------
        Typography
        ----------------------------------------------------------------------- */
 
-    --color-text-primary: #191919;
-    --color-text-secondary: #5A5A5A;
-    --color-text-tertiary: #787878;
+    --color-text-primary: #242426;
+    --color-text-secondary: #5F6368;
+    --color-text-tertiary: #7D8085;
     --color-text-muted: #9E9E9E;
     --color-text-disabled: #C7C7CE;
     --color-text-inverse: #FFFFFF;
 
-    --color-text-link: #2563EB;
-    --color-text-link-hover: #1D4ED8;
+    --color-text-link: #18181B;
+    --color-text-link-hover: #000000;
 
     /* -----------------------------------------------------------------------
        Icons
        ----------------------------------------------------------------------- */
 
-    --color-icon-primary: #191919;
-    --color-icon-secondary: #5A5A5A;
+    --color-icon-primary: #242426;
+    --color-icon-secondary: #5F6368;
     --color-icon-muted: #9E9E9E;
 
     /* -----------------------------------------------------------------------
        Borders
        ----------------------------------------------------------------------- */
 
-    --color-border-subtle: #E8E8EC;
-    --color-border-default: #DFDFE4;
-    --color-border-strong: #C7C7CE;
-    --color-border-hover: #A8A8B2;
+    --color-border-subtle: #EAE8E3;
+    --color-border-default: #DFDCD6;
+    --color-border-strong: #C4C0B6;
+    --color-border-hover: #A8A59E;
 
     /* -----------------------------------------------------------------------
        Focus
        ----------------------------------------------------------------------- */
 
-    --color-focus: #3B82F6;
-    --color-focus-ring: #BFDBFE;
+    --color-focus: #18181B;
+    --color-focus-ring: rgba(24, 24, 27, 0.15);
 
     /* -----------------------------------------------------------------------
-       Brand
+       Brand - Confident Charcoal & Monochrome
        ----------------------------------------------------------------------- */
 
-    --color-brand: #2563EB;
-    --color-brand-hover: #1D4ED8;
-    --color-brand-active: #1E40AF;
-    --color-brand-soft: #EFF6FF;
-    --color-brand-softer: #F8FAFC;
+    --color-brand: #18181B;
+    --color-brand-hover: #27272A;
+    --color-brand-active: #09090B;
+    --color-brand-soft: rgba(24, 24, 27, 0.06);
+    --color-brand-softer: rgba(24, 24, 27, 0.03);
     --color-on-brand: #FFFFFF;
 
     /* -----------------------------------------------------------------------
-       Semantic states
+       Semantic states - Washed-out Muted Pastels
        ----------------------------------------------------------------------- */
 
-    --color-success: #2F9E74;
-    --color-success-bg: #E7F6EF;
-    --color-success-text: #1F7A57;
+    --color-success: #346538;
+    --color-success-bg: #EDF3EC;
+    --color-success-text: #346538;
 
-    --color-danger: #E25555;
-    --color-danger-hover: #C93B3B;
-    --color-danger-bg: #FDECEC;
-    --color-danger-text: #B93838;
+    --color-danger: #9F2F2D;
+    --color-danger-hover: #B93838;
+    --color-danger-bg: #FDEBEC;
+    --color-danger-text: #9F2F2D;
 
-    --color-warning: #D4A72C;
-    --color-warning-bg: #FFF7E0;
-    --color-warning-text: #8A6500;
+    --color-warning: #956400;
+    --color-warning-bg: #FBF3DB;
+    --color-warning-text: #956400;
 
-    --color-info: #5B8DEF;
-    --color-info-bg: #EEF4FF;
-    --color-info-text: #3457B1;
+    --color-info: #1F6C9F;
+    --color-info-bg: #E1F3FE;
+    --color-info-text: #1F6C9F;
 
     --color-evidence-bg: #F5F3FF;
     --color-evidence-text: #6D28D9;
@@ -1195,27 +1208,27 @@ body.app .sidebar nav a.is-active .nav-label {
        Rook product semantics
        ----------------------------------------------------------------------- */
 
-    --color-ai: #2F9E74;
-    --color-ai-bg: #E7F6EF;
-    --color-ai-text: #1F7A57;
+    --color-ai: #346538;
+    --color-ai-bg: #EDF3EC;
+    --color-ai-text: #346538;
 
-    --color-local: #2F9E74;
-    --color-local-bg: #E7F6EF;
+    --color-local: #346538;
+    --color-local-bg: #EDF3EC;
 
-    --color-private: #2F9E74;
-    --color-private-bg: #E7F6EF;
+    --color-private: #346538;
+    --color-private-bg: #EDF3EC;
 
-    --color-export: #5B5BD6;
-    --color-markdown: #5B5BD6;
+    --color-export: #18181B;
+    --color-markdown: #18181B;
 
-    --color-highlight: #D4A72C;
-    --color-highlight-bg: #FFF7E0;
+    --color-highlight: #956400;
+    --color-highlight-bg: #FBF3DB;
 
     /* Component-specific semantic colors */
-    --color-auth-story-bg: #3F3FB4;
+    --color-auth-story-bg: #18181B;
     --color-auth-story-text: #FFFFFF;
-    --color-auth-story-text-soft: #D9DCFF;
-    --color-auth-story-accent: #A5B4FC;
+    --color-auth-story-text-soft: #A1A1AA;
+    --color-auth-story-accent: #FFFFFF;
 
     /* -----------------------------------------------------------------------
        Geometry, Motion & Shadows
@@ -1224,18 +1237,18 @@ body.app .sidebar nav a.is-active .nav-label {
     --radius-xs: 4px;
     --radius-sm: 6px;
     --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
+    --radius-lg: 10px;
+    --radius-xl: 14px;
     --radius-full: 999px;
 
     --motion-duration-fast: 120ms;
     --motion-duration-normal: 180ms;
     --motion-duration-slow: 280ms;
-    --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --motion-easing-standard: cubic-bezier(0.16, 1, 0.3, 1);
 
-    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
-    --shadow-lg: 0 10px 28px rgba(16, 24, 40, 0.12);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
 
     /* -----------------------------------------------------------------------
        Legacy/component aliases
@@ -1286,18 +1299,18 @@ body.app .sidebar nav a.is-active .nav-label {
 
         /* surfaces - Pitch black sidebar + Soft matte dark canvas */
 
-        --color-bg-sidebar: #000000;
+        --color-bg-sidebar: #09090B;
         --color-bg-app: #121214;
         --color-bg-page: #121214;
 
-        --color-bg-surface: #18181b;
+        --color-bg-surface: #18181B;
         --color-bg-raised: #202024;
 
-        --color-bg-sunken: #0c0c0e;
+        --color-bg-sunken: #0C0C0E;
         --color-bg-hover: #222226;
-        --color-bg-active: #2a2a2f;
+        --color-bg-active: #2A2A30;
 
-        --color-bg-selected: #26262b;
+        --color-bg-selected: rgba(255, 255, 255, 0.08);
 
         --color-bg-overlay: rgba(0, 0, 0, 0.78);
 
@@ -1305,9 +1318,9 @@ body.app .sidebar nav a.is-active .nav-label {
 
         --color-text-primary: #F4F4F5;
         --color-text-secondary: #A1A1AA;
-        --color-text-tertiary: #85858f;
-        --color-text-muted: #71717A;
-        --color-text-disabled: #52525B;
+        --color-text-tertiary: #71717A;
+        --color-text-muted: #52525B;
+        --color-text-disabled: #3F3F46;
 
         --color-text-inverse: #000000;
 
@@ -1322,15 +1335,15 @@ body.app .sidebar nav a.is-active .nav-label {
 
         /* borders - soft, refined neutral charcoal */
 
-        --color-border-subtle: #1e1e22;
-        --color-border-default: #27272b;
-        --color-border-strong: #36363c;
-        --color-border-hover: #45454d;
+        --color-border-subtle: #1E1E22;
+        --color-border-default: #27272B;
+        --color-border-strong: #36363C;
+        --color-border-hover: #45454D;
 
         /* focus - calm neutral off-white */
 
         --color-focus: #FFFFFF;
-        --color-focus-ring: rgba(255, 255, 255, 0.25);
+        --color-focus-ring: rgba(255, 255, 255, 0.2);
 
         /* brand - calm clean monochrome contrast */
 
@@ -1338,62 +1351,62 @@ body.app .sidebar nav a.is-active .nav-label {
         --color-brand-hover: #F4F4F5;
         --color-brand-active: #E4E4E7;
 
-        --color-brand-soft: #202024;
-        --color-brand-softer: #161619;
+        --color-brand-soft: rgba(255, 255, 255, 0.08);
+        --color-brand-softer: rgba(255, 255, 255, 0.04);
 
-        --color-on-brand: #09090b;
+        --color-on-brand: #09090B;
 
         /* semantic states */
 
-        --color-success: #34d399;
-        --color-success-bg: #06281c;
-        --color-success-text: #6ee7b7;
+        --color-success: #7EE0A2;
+        --color-success-bg: #142B1D;
+        --color-success-text: #7EE0A2;
 
-        --color-danger: #f87171;
-        --color-danger-hover: #fca5a5;
-        --color-danger-bg: #2a1215;
-        --color-danger-text: #fecaca;
+        --color-danger: #F88587;
+        --color-danger-hover: #FCA5A5;
+        --color-danger-bg: #311718;
+        --color-danger-text: #F88587;
 
-        --color-warning: #fbbf24;
-        --color-warning-bg: #2a2008;
-        --color-warning-text: #fde68a;
+        --color-warning: #F5CE70;
+        --color-warning-bg: #2D2511;
+        --color-warning-text: #F5CE70;
 
-        --color-info: #a1a1aa;
-        --color-info-bg: #18181b;
-        --color-info-text: #e4e4e7;
+        --color-info: #7AC5F8;
+        --color-info-bg: #162838;
+        --color-info-text: #7AC5F8;
 
-        --color-evidence-bg: #242429;
-        --color-evidence-text: #C4B5FD;
+        --color-evidence-bg: #241838;
+        --color-evidence-text: #C5A5FA;
 
         /* Rook semantics */
 
-        --color-ai: #63C69D;
-        --color-ai-bg: #173328;
-        --color-ai-text: #8BE0B7;
+        --color-ai: #7EE0A2;
+        --color-ai-bg: #142B1D;
+        --color-ai-text: #7EE0A2;
 
-        --color-local: #63C69D;
-        --color-local-bg: #173328;
+        --color-local: #7EE0A2;
+        --color-local-bg: #142B1D;
 
-        --color-private: #63C69D;
-        --color-private-bg: #173328;
+        --color-private: #7EE0A2;
+        --color-private-bg: #142B1D;
 
-        --color-export: #8B93FF;
-        --color-markdown: #8B93FF;
+        --color-export: #FFFFFF;
+        --color-markdown: #FFFFFF;
 
-        --color-highlight: #E5BE57;
-        --color-highlight-bg: #3A3118;
+        --color-highlight: #F5CE70;
+        --color-highlight-bg: #2D2511;
 
         /* Component-specific semantic colors */
-        --color-auth-story-bg: #1C2440;
+        --color-auth-story-bg: #18181B;
         --color-auth-story-text: #F4F5FF;
         --color-auth-story-text-soft: #B7C0CF;
-        --color-auth-story-accent: #8B93FF;
+        --color-auth-story-accent: #FFFFFF;
 
         /* shadows */
 
-        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18);
-        --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.24);
-        --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.32);
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+        --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
     }
 }
 
@@ -1408,114 +1421,114 @@ body.app .sidebar nav a.is-active .nav-label {
 
     /* surfaces - Notion Dark Obsidian Canvas + Things 3 Blue */
 
-    --color-bg-sidebar: #131315;
-    --color-bg-app: #19191D;
-    --color-bg-page: #19191D;
+    --color-bg-sidebar: #09090B;
+    --color-bg-app: #121214;
+    --color-bg-page: #121214;
 
-    --color-bg-surface: #202024;
-    --color-bg-raised: #28282D;
+    --color-bg-surface: #18181B;
+    --color-bg-raised: #202024;
 
-    --color-bg-sunken: #131315;
-    --color-bg-hover: #2A2A30;
-    --color-bg-active: #32323A;
+    --color-bg-sunken: #0C0C0E;
+    --color-bg-hover: #222226;
+    --color-bg-active: #2A2A30;
 
-    --color-bg-selected: rgba(59, 130, 246, 0.16);
+    --color-bg-selected: rgba(255, 255, 255, 0.08);
 
     --color-bg-overlay: rgba(0, 0, 0, 0.78);
 
     /* typography */
 
-    --color-text-primary: #F5F5F7;
-    --color-text-secondary: #A0A0A8;
-    --color-text-tertiary: #84848E;
-    --color-text-muted: #6E6E78;
-    --color-text-disabled: #52525B;
+    --color-text-primary: #F4F4F5;
+    --color-text-secondary: #A1A1AA;
+    --color-text-tertiary: #71717A;
+    --color-text-muted: #52525B;
+    --color-text-disabled: #3F3F46;
 
     --color-text-inverse: #000000;
 
-    --color-text-link: #60A5FA;
-    --color-text-link-hover: #93C5FD;
+    --color-text-link: #E4E4E7;
+    --color-text-link-hover: #FFFFFF;
 
     /* icons */
 
-    --color-icon-primary: #F5F5F7;
-    --color-icon-secondary: #A0A0A8;
-    --color-icon-muted: #6E6E78;
+    --color-icon-primary: #F4F4F5;
+    --color-icon-secondary: #A1A1AA;
+    --color-icon-muted: #71717A;
 
     /* borders - soft, refined neutral charcoal */
 
-    --color-border-subtle: #2C2C32;
-    --color-border-default: #383840;
-    --color-border-strong: #484852;
-    --color-border-hover: #585864;
+    --color-border-subtle: #1E1E22;
+    --color-border-default: #27272B;
+    --color-border-strong: #36363C;
+    --color-border-hover: #45454D;
 
     /* focus - calm neutral off-white */
 
-    --color-focus: #60A5FA;
-    --color-focus-ring: rgba(96, 165, 250, 0.28);
+    --color-focus: #FFFFFF;
+    --color-focus-ring: rgba(255, 255, 255, 0.2);
 
     /* brand - calm clean contrast */
 
-    --color-brand: #60A5FA;
-    --color-brand-hover: #93C5FD;
-    --color-brand-active: #3B82F6;
+    --color-brand: #FFFFFF;
+    --color-brand-hover: #F4F4F5;
+    --color-brand-active: #E4E4E7;
 
-    --color-brand-soft: rgba(59, 130, 246, 0.16);
-    --color-brand-softer: rgba(59, 130, 246, 0.08);
+    --color-brand-soft: rgba(255, 255, 255, 0.08);
+    --color-brand-softer: rgba(255, 255, 255, 0.04);
 
-    --color-on-brand: #09090b;
+    --color-on-brand: #09090B;
 
     /* semantic states */
 
-    --color-success: #34d399;
-    --color-success-bg: #06281c;
-    --color-success-text: #6ee7b7;
+    --color-success: #7EE0A2;
+    --color-success-bg: #142B1D;
+    --color-success-text: #7EE0A2;
 
-    --color-danger: #f87171;
-    --color-danger-hover: #fca5a5;
-    --color-danger-bg: #2a1215;
-    --color-danger-text: #fecaca;
+    --color-danger: #F88587;
+    --color-danger-hover: #FCA5A5;
+    --color-danger-bg: #311718;
+    --color-danger-text: #F88587;
 
-    --color-warning: #E5BE57;
-    --color-warning-bg: #3A3118;
-    --color-warning-text: #F7DA8A;
+    --color-warning: #F5CE70;
+    --color-warning-bg: #2D2511;
+    --color-warning-text: #F5CE70;
 
-    --color-info: #7CA7FF;
-    --color-info-bg: #16233E;
-    --color-info-text: #B7CBFF;
+    --color-info: #7AC5F8;
+    --color-info-bg: #162838;
+    --color-info-text: #7AC5F8;
 
-    --color-evidence-bg: #2E1065;
-    --color-evidence-text: #C4B5FD;
+    --color-evidence-bg: #241838;
+    --color-evidence-text: #C5A5FA;
 
     /* Rook semantics */
 
-    --color-ai: #63C69D;
-    --color-ai-bg: #173328;
-    --color-ai-text: #8BE0B7;
+    --color-ai: #7EE0A2;
+    --color-ai-bg: #142B1D;
+    --color-ai-text: #7EE0A2;
 
-    --color-local: #63C69D;
-    --color-local-bg: #173328;
+    --color-local: #7EE0A2;
+    --color-local-bg: #142B1D;
 
-    --color-private: #63C69D;
-    --color-private-bg: #173328;
+    --color-private: #7EE0A2;
+    --color-private-bg: #142B1D;
 
-    --color-export: #8B93FF;
-    --color-markdown: #8B93FF;
+    --color-export: #FFFFFF;
+    --color-markdown: #FFFFFF;
 
-    --color-highlight: #E5BE57;
-    --color-highlight-bg: #3A3118;
+    --color-highlight: #F5CE70;
+    --color-highlight-bg: #2D2511;
 
     /* Component-specific semantic colors */
-    --color-auth-story-bg: #1C2440;
+    --color-auth-story-bg: #18181B;
     --color-auth-story-text: #F4F5FF;
     --color-auth-story-text-soft: #B7C0CF;
-    --color-auth-story-accent: #8B93FF;
+    --color-auth-story-accent: #FFFFFF;
 
     /* shadows */
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18);
-    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.24);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.32);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
 body.app {
@@ -2716,6 +2729,9 @@ input[type="checkbox"]:not([hidden]):disabled {
 .shell {
     width: 0;
     flex: 1 1 auto;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
 }
 
 img,
@@ -3729,16 +3745,19 @@ main {
 }
 
 h1 {
-    font-size: 1.5rem;
+    font-family: var(--font-editorial, var(--font-prose));
+    font-size: 1.65rem;
     font-weight: 600;
     line-height: 1.25;
     letter-spacing: -0.025em;
 }
 
 h2 {
+    font-family: var(--font-editorial, var(--font-prose));
     color: var(--text);
     text-transform: none;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    font-weight: 600;
 }
 
 .page-head {

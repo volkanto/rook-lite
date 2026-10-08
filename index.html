@@ -10,7 +10,7 @@
         document.documentElement.setAttribute('data-theme', resolved);
         document.documentElement.style.colorScheme = resolved;
         var metaTheme = document.querySelector('meta[name="theme-color"]');
-        if (metaTheme) metaTheme.setAttribute('content', resolved === 'dark' ? '#121214' : '#F7F7FA');
+        if (metaTheme) metaTheme.setAttribute('content', resolved === 'dark' ? '#121214' : '#FBFBFA');
         if (window.matchMedia('(min-width: 60.001rem)').matches &&
             localStorage.getItem('sidebar-collapsed') === 'true') {
           document.documentElement.classList.add('sidebar-collapsed');
@@ -19,7 +19,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#F7F7FA">
+    <meta name="theme-color" content="#FBFBFA">
     <meta name="description" content="Rook Lite, a private local notebook.">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./logo.png">

@@ -2052,4 +2052,25 @@ describe("Left menu bar icons and navigation", () => {
 
     await noteService.delete(noteWithExternal.id);
   });
+
+  it("applies the v2 warm monochrome theme-color meta tag on shell render", async () => {
+    const metaEl = document.createElement("meta");
+    metaEl.name = "theme-color";
+    metaEl.content = "#FFFFFF";
+    document.head.appendChild(metaEl);
+
+    localStorage.setItem("theme-preference", "LIGHT");
+    const { renderShell } = await import("./main");
+    await renderShell();
+
+    expect(metaEl.getAttribute("content")).toBe("#FBFBFA");
+    expect(document.documentElement.dataset.theme).toBe("light");
+
+    localStorage.setItem("theme-preference", "DARK");
+    await renderShell();
+    expect(metaEl.getAttribute("content")).toBe("#121214");
+    expect(document.documentElement.dataset.theme).toBe("dark");
+
+    metaEl.remove();
+  });
 });
