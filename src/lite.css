@@ -1443,12 +1443,12 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   margin: 0 !important;
   align-self: center !important;
   border: 1.5px solid var(--color-border-strong, #D0D5DD) !important;
-  border-radius: 4px !important;
+  border-radius: 50% !important;
   background-color: transparent !important;
   cursor: pointer;
   display: inline-grid !important;
   place-content: center !important;
-  transition: border-color 140ms ease, background-color 140ms ease;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   position: relative;
   box-sizing: border-box;
 }
@@ -1459,7 +1459,8 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 .editor-preview input[type="checkbox"]:hover,
 .prose input[type="checkbox"].interactive-task-checkbox:hover,
 .prose input[type="checkbox"]:hover {
-  border-color: var(--color-text-primary, var(--text)) !important;
+  border-color: var(--color-brand) !important;
+  transform: scale(1.08);
 }
 
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox:focus-visible,
@@ -1472,17 +1473,17 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   outline-offset: 2px;
 }
 
-/* When checked: crisp filled box with white checkmark */
+/* When checked: crisp filled circle with white checkmark */
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox:checked,
 .notes-list .prose input[type="checkbox"]:checked,
 .editor-preview input[type="checkbox"].interactive-task-checkbox:checked,
 .editor-preview input[type="checkbox"]:checked,
 .prose input[type="checkbox"].interactive-task-checkbox:checked,
 .prose input[type="checkbox"]:checked {
-  border-color: var(--color-text-primary, var(--text)) !important;
-  background-color: var(--color-text-primary, var(--text)) !important;
+  border-color: var(--color-brand) !important;
+  background-color: var(--color-brand) !important;
   box-shadow: none !important;
-  transform: none;
+  transform: scale(1);
 }
 
 .notes-list .prose input[type="checkbox"].interactive-task-checkbox::before,
@@ -1494,8 +1495,8 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   content: "";
   width: 0.55rem;
   height: 0.32rem;
-  border-left: 2px solid var(--color-bg-surface, #FFFFFF) !important;
-  border-bottom: 2px solid var(--color-bg-surface, #FFFFFF) !important;
+  border-left: 2px solid #FFFFFF !important;
+  border-bottom: 2px solid #FFFFFF !important;
   border-radius: 1px;
   transform: rotate(-45deg) translate(0.02rem, -0.04rem) scale(0);
   opacity: 0;
@@ -2576,11 +2577,16 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   display: none !important;
 }
 
+.editor-template-picker[open] {
+  z-index: 650 !important;
+  position: relative !important;
+}
+
 .editor-template-menu {
   position: absolute;
   top: calc(100% + 0.4rem);
   right: 0;
-  z-index: 500 !important;
+  z-index: 1000 !important;
   display: none;
   flex-direction: column;
   gap: 4px;
@@ -2592,7 +2598,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   background: var(--color-bg-surface, #FFFFFF) !important;
   border: 1px solid var(--color-border-default, var(--border)) !important;
   border-radius: var(--radius-md, 8px) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
   box-sizing: border-box !important;
 }
 
@@ -2606,9 +2612,9 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 }
 
 :root[data-theme="dark"] .editor-template-menu {
-  background: var(--color-bg-raised, #1c1c1f) !important;
-  border-color: var(--color-border-default, #27272b) !important;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55) !important;
+  background: var(--color-bg-raised, #28282D) !important;
+  border-color: var(--color-border-default, #383840) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Explicitly override all generic toolbar button styles for template items */
@@ -3665,12 +3671,26 @@ textarea.simple-editor-textarea.is-hidden,
   margin: 0 !important;
   padding: 0 !important;
   box-sizing: border-box !important;
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   background: var(--color-bg-surface, var(--surface)) !important;
   border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   transition: border-color 150ms ease, box-shadow 150ms ease !important;
   overflow: visible !important;
   position: relative !important;
+}
+
+#new-note-form:focus-within {
+  border-color: var(--color-brand) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 18%, transparent), 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+}
+
+#new-note-form:has(.editor-template-picker[open]),
+.editor-card:has(.editor-template-picker[open]),
+.copilot-input-container:has(.editor-template-picker[open]) {
+  z-index: 600 !important;
+  position: relative !important;
+  overflow: visible !important;
 }
 
 #new-note-form .simple-editor-toolbar,
@@ -3770,8 +3790,8 @@ textarea.simple-editor-textarea.is-hidden,
   border-top: none !important;
   border-left: none !important;
   border-right: none !important;
-  border-top-left-radius: 7px !important;
-  border-top-right-radius: 7px !important;
+  border-top-left-radius: 11px !important;
+  border-top-right-radius: 11px !important;
 }
 
 :root[data-theme="dark"] #new-note-form:focus-within .simple-editor-toolbar,
@@ -3797,8 +3817,8 @@ textarea.simple-editor-textarea.is-hidden,
   border-left: none !important;
   border-right: none !important;
   background: transparent !important;
-  border-bottom-left-radius: 7px !important;
-  border-bottom-right-radius: 7px !important;
+  border-bottom-left-radius: 11px !important;
+  border-bottom-right-radius: 11px !important;
 }
 
 .copilot-input-container .editor-card:focus-within {
