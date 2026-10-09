@@ -2,7 +2,7 @@
   --font-app: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Geist Sans", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-ui: var(--font-app);
   --font-prose: var(--font-app);
-  --font-editorial: "Newsreader", "Charter", "Lyon Text", "Iowan Old Style", "Playfair Display", "Times New Roman", "Georgia", "Cambria", serif;
+  --font-editorial: var(--font-app);
   --font-mono: "SFMono-Regular", ui-monospace, "Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
 }
 
@@ -864,7 +864,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
   .mac-editor-title {
     margin: 0;
-    font-family: var(--font-editorial, var(--font-prose));
+    font-family: var(--font-app);
     font-size: 1.18rem;
     font-weight: 600;
     color: var(--color-text-primary);
@@ -1513,7 +1513,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
 .minimal-date-title {
   margin: 0 !important;
-  font-family: var(--font-editorial, var(--font-app)) !important;
+  font-family: var(--font-app) !important;
   font-size: clamp(1.35rem, 2.5vw, 1.65rem) !important;
   font-weight: 600 !important;
   line-height: 1.25 !important;
@@ -1527,7 +1527,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   height: 1.4rem !important;
   padding: 0 0.65rem !important;
   border-radius: var(--radius-xs, 4px) !important;
-  font-family: var(--font-mono) !important;
+  font-family: var(--font-app) !important;
   font-size: 0.72rem !important;
   font-weight: 500 !important;
   letter-spacing: 0.02em !important;

@@ -18,7 +18,7 @@
     --font-app: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Geist Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-prose: var(--font-app);
     --font-ui: var(--font-app);
-    --font-editorial: "Newsreader", "Charter", "Lyon Text", "Iowan Old Style", "Playfair Display", "Times New Roman", "Georgia", "Cambria", serif;
+    --font-editorial: var(--font-app);
     --font-mono: "SFMono-Regular", ui-monospace, "Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
     --text-xs: 0.75rem;
@@ -749,7 +749,7 @@ input[type="checkbox"] {
 .prose h1,
 .prose h2,
 .prose h3 {
-    font-family: var(--font-editorial, var(--font-prose));
+    font-family: var(--font-app);
     color: var(--text);
     letter-spacing: -0.025em;
     text-transform: none;
