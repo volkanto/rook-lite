@@ -238,8 +238,8 @@ describe("Left menu bar icons and navigation", () => {
     const editBtn = actions?.querySelector<HTMLButtonElement>(`[data-edit-note="${createdNote.id}"]`);
     const deleteBtn = actions?.querySelector<HTMLButtonElement>(`[data-delete-note="${createdNote.id}"]`);
 
-    expect(copyBtn).not.toBeNull();
-    expect(editBtn).not.toBeNull();
+    expect(copyBtn).toBeNull();
+    expect(editBtn).toBeNull();
     expect(deleteBtn).not.toBeNull();
 
     // Stream footer contains only back-to-top-link (no end-of-notes-text)

@@ -998,14 +998,27 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     box-sizing: border-box !important;
   }
 
-  /* 2-Line Compact Note Cards in Middle Panel */
+  /* Compact 2-Line Note Cards in Middle Panel */
+  .mac-stream-pane .notes-list {
+    gap: 0.45rem !important;
+  }
+
   .mac-stream-pane .notes-list .note {
     cursor: pointer;
-    padding: 0.95rem 1.25rem !important;
-    border-radius: var(--radius-md, 8px) !important;
+    padding: 0.65rem 0.95rem !important;
+    border-radius: var(--radius-xs, 4px) !important;
     transition: all 120ms ease !important;
     margin: 0 !important;
     user-select: none;
+  }
+
+  .mac-stream-pane .notes-list .note-header {
+    margin-bottom: 0.2rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mac-stream-pane .notes-list .note-time-text {
+    font-size: 0.68rem !important;
   }
 
   .mac-stream-pane .notes-list .note:hover {
@@ -1019,21 +1032,34 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     box-shadow: 0 0 0 1px var(--color-brand), var(--shadow-sm) !important;
   }
 
-  /* Restrict middle panel note prose to strictly 2 lines */
+  /* Restrict middle panel note prose to strictly 2 lines with tight line-height */
   .mac-stream-pane .notes-list .note .prose {
     display: -webkit-box !important;
     -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-height: 3.4em !important;
-    line-height: 1.7 !important;
-    font-size: 0.94rem !important;
-    margin: 0.25rem 0 0 !important;
+    max-height: 2.85em !important;
+    line-height: 1.45 !important;
+    font-size: 0.88rem !important;
+    margin: 0 !important;
   }
 
   .mac-stream-pane .notes-list .note .prose > * {
     margin: 0 !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
+  .mac-stream-pane .notes-list .note .note-tags {
+    margin-top: 0.3rem !important;
+    gap: 0.25rem !important;
+  }
+
+  .mac-stream-pane .notes-list .note .tag-pill {
+    height: 1.2rem !important;
+    padding: 0 0.4rem !important;
+    font-size: 0.68rem !important;
   }
 
   .mac-stream-pane .notes-list .note .note-backlinks {
