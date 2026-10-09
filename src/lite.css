@@ -1000,16 +1000,16 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
   /* Compact 2-Line Note Cards in Middle Panel */
   .mac-stream-pane {
-    padding: 1rem 0.75rem 3rem !important;
+    padding: 0.75rem 0.55rem 3rem !important;
   }
 
   .mac-stream-pane .notes-list {
-    gap: 0.3rem !important;
+    gap: 0.2rem !important;
   }
 
   .mac-stream-pane .notes-list .note {
     cursor: pointer;
-    padding: 0.45rem 0.75rem !important;
+    padding: 0.28rem 0.55rem !important;
     border-radius: var(--radius-xs, 4px) !important;
     transition: all 120ms ease !important;
     margin: 0 !important;
@@ -1017,13 +1017,13 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   }
 
   .mac-stream-pane .notes-list .note-header {
-    margin-bottom: 0.15rem !important;
+    margin-bottom: 0.1rem !important;
     padding-bottom: 0 !important;
     min-height: auto !important;
   }
 
   .mac-stream-pane .notes-list .note-time-text {
-    font-size: 0.68rem !important;
+    font-size: 0.65rem !important;
     line-height: 1 !important;
   }
 
@@ -1045,9 +1045,9 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-height: 2.7em !important;
-    line-height: 1.35 !important;
-    font-size: 0.86rem !important;
+    max-height: 2.5em !important;
+    line-height: 1.25 !important;
+    font-size: 0.84rem !important;
     margin: 0 !important;
   }
 
@@ -1058,16 +1058,17 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   }
 
   .mac-stream-pane .notes-list .note .note-tags {
-    margin-top: 0.2rem !important;
+    margin-top: 0.15rem !important;
     padding-top: 0 !important;
     border-top: none !important;
-    gap: 0.2rem !important;
+    gap: 0.15rem !important;
   }
 
   .mac-stream-pane .notes-list .note .tag-pill {
-    height: 1.15rem !important;
-    padding: 0 0.35rem !important;
-    font-size: 0.65rem !important;
+    height: 1.05rem !important;
+    padding: 0 0.3rem !important;
+    font-size: 0.62rem !important;
+    line-height: 1 !important;
   }
 
   .mac-stream-pane .notes-list .note .note-backlinks {
@@ -1868,7 +1869,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 .notes-list {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.25rem;
   margin: 0;
 }
 
@@ -1879,7 +1880,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
 .notes-list .note {
   margin: 0;
-  padding: 0.5rem 0.75rem;
+  padding: 0.28rem 0.55rem;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xs, 4px);

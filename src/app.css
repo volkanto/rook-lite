@@ -650,8 +650,8 @@ input[type="checkbox"] {
 /* ================================================================ notes === */
 
 .note {
-    padding: 0.5rem 0.75rem;
-    margin-bottom: var(--sp-2);
+    padding: 0.28rem 0.55rem;
+    margin-bottom: 0.25rem;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xs, 4px);
@@ -3956,7 +3956,7 @@ textarea {
 
 .notes-list .note {
     margin: 0;
-    padding: 0.5rem 0.75rem;
+    padding: 0.28rem 0.55rem;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xs, 4px);
