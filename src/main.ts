@@ -1085,43 +1085,51 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
     });
   }
 
-  content.querySelectorAll<HTMLAnchorElement>(".todo-note-link").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      if (event.metaKey || event.ctrlKey) return;
-      event.preventDefault();
+  const openTodoNote = (noteId: string, itemEl?: HTMLElement | null) => {
+    if (activeTodoNoteId === noteId) {
+      activeTodoNoteId = null;
+      workspace?.classList.remove("has-active-note");
+      editorPane?.classList.add("is-hidden");
+      content.querySelectorAll<HTMLElement>(".todo-item.is-selected").forEach((el) => el.classList.remove("is-selected"));
+      return;
+    }
 
-      const href = link.getAttribute("href") || "";
-      const noteIdMatch = href.match(/#note-([a-zA-Z0-9_-]+)/);
-      const noteId = noteIdMatch ? noteIdMatch[1] : null;
-      if (!noteId) return;
+    void notes.listAll().then((all) => {
+      const note = all.find((n) => n.id === noteId);
+      if (!note || !todoForm || !todoTextarea) return;
 
-      if (activeTodoNoteId === noteId) {
-        activeTodoNoteId = null;
-        workspace?.classList.remove("has-active-note");
-        editorPane?.classList.add("is-hidden");
-        content.querySelectorAll<HTMLElement>(".todo-item.is-selected").forEach((el) => el.classList.remove("is-selected"));
+      activeTodoNoteId = noteId;
+      workspace?.classList.add("has-active-note");
+      editorPane?.classList.remove("is-hidden");
+
+      content.querySelectorAll<HTMLElement>(".todo-item.is-selected").forEach((el) => el.classList.remove("is-selected"));
+      if (itemEl) itemEl.classList.add("is-selected");
+
+      if (titleEl) {
+        titleEl.innerHTML = `<span>Note</span><time class="mac-editor-time">${formatShortDate(note.noteDate)}</time>`;
+      }
+      todoTextarea.value = note.content;
+      todoTextarea.dispatchEvent(new Event("input", { bubbles: true }));
+      setEditorMode(todoForm, "write", false);
+      todoTextarea.focus();
+    });
+  };
+
+  content.querySelectorAll<HTMLElement>(".todo-item").forEach((item) => {
+    item.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest("input[type='checkbox'], label.lite-task-check")) {
         return;
       }
-
-      void notes.listAll().then((all) => {
-        const note = all.find((n) => n.id === noteId);
-        if (!note || !todoForm || !todoTextarea) return;
-
-        activeTodoNoteId = noteId;
-        workspace?.classList.add("has-active-note");
-        editorPane?.classList.remove("is-hidden");
-
-        content.querySelectorAll<HTMLElement>(".todo-item.is-selected").forEach((el) => el.classList.remove("is-selected"));
-        link.closest<HTMLElement>(".todo-item")?.classList.add("is-selected");
-
-        if (titleEl) {
-          titleEl.innerHTML = `<span>Note</span><time class="mac-editor-time">${formatShortDate(note.noteDate)}</time>`;
-        }
-        todoTextarea.value = note.content;
-        todoTextarea.dispatchEvent(new Event("input", { bubbles: true }));
-        setEditorMode(todoForm, "write", false);
-        todoTextarea.focus();
-      });
+      event.preventDefault();
+      event.stopPropagation();
+      const noteLink = item.querySelector<HTMLAnchorElement>(".todo-note-link");
+      const href = noteLink?.getAttribute("href") || "";
+      const noteIdMatch = href.match(/#note-([a-zA-Z0-9_-]+)/);
+      const noteId = noteIdMatch ? noteIdMatch[1] : null;
+      if (noteId) {
+        openTodoNote(noteId, item);
+      }
     });
   });
 
@@ -2106,7 +2114,7 @@ function bindShellEvents(): void {
       return;
     }
     const link = target.closest<HTMLAnchorElement>("a[data-link]");
-    if (link && link.origin === location.origin && !event.metaKey && !event.ctrlKey) {
+    if (link && !link.classList.contains("todo-note-link") && link.origin === location.origin && !event.metaKey && !event.ctrlKey) {
       event.preventDefault();
       const rawHref = link.getAttribute("href");
       const targetUrl = rawHref ? appUrl(rawHref) : link.href;
