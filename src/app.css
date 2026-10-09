@@ -651,7 +651,7 @@ input[type="checkbox"] {
 
 .note {
     padding: 0.28rem 0.55rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.65rem;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xs, 4px);
