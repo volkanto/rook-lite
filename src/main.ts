@@ -1030,7 +1030,7 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
   document.title = `${s.todosTitle} · Rook Lite`;
 
   if (!tasks.length) {
-    content.innerHTML = `<div class="mac-workspace mac-todos-workspace"><aside class="mac-stream-pane mac-todos-sidebar"><div class="page-head mac-todos-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div></aside><main class="mac-editor-pane mac-todos-content"><div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div></main></div>`;
+    content.innerHTML = `<div class="mac-workspace mac-todos-workspace" id="mac-todos-workspace"><div class="mac-todos-list-pane" id="mac-todos-list-pane"><div class="page-head mac-todos-head"><div class="mac-todos-header-top"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div></div><div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div></div></div>`;
     return;
   }
 
@@ -1052,13 +1052,85 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
 
   const groups = groupTasks(tasks, grouping);
 
-  content.innerHTML = `<div class="mac-workspace mac-todos-workspace"><aside class="mac-stream-pane mac-todos-sidebar"><div class="page-head mac-todos-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div><div class="todo-group-tabs" role="tablist" aria-label="${escapeHtml(s.todoGroupBy)}"><button type="button" role="tab" data-todo-group="date" class="${grouping === "date" ? "is-active" : ""}" aria-selected="${grouping === "date"}">${s.todoGroupDate}</button><button type="button" role="tab" data-todo-group="tag" class="${grouping === "tag" ? "is-active" : ""}" aria-selected="${grouping === "tag"}">${s.todoGroupTag}</button><button type="button" role="tab" data-todo-group="all" class="${grouping === "all" ? "is-active" : ""}" aria-selected="${grouping === "all"}">${s.todoGroupAll}</button></div><div class="mac-todos-stats-badge"><span>${tasks.length} ${tasks.length === 1 ? s.entrySingle : s.entryPlural}</span></div></div></aside><main class="mac-editor-pane mac-todos-content"><div class="todo-groups-container">${groups
+  content.innerHTML = `<div class="mac-workspace mac-todos-workspace" id="mac-todos-workspace"><div class="mac-todos-list-pane" id="mac-todos-list-pane"><div class="page-head mac-todos-head"><div class="mac-todos-header-top"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div><div class="mac-todos-stats-badge"><span>${tasks.length} ${tasks.length === 1 ? s.entrySingle : s.entryPlural}</span></div></div><div class="todo-group-tabs" role="tablist" aria-label="${escapeHtml(s.todoGroupBy)}"><button type="button" role="tab" data-todo-group="date" class="${grouping === "date" ? "is-active" : ""}" aria-selected="${grouping === "date"}">${s.todoGroupDate}</button><button type="button" role="tab" data-todo-group="tag" class="${grouping === "tag" ? "is-active" : ""}" aria-selected="${grouping === "tag"}">${s.todoGroupTag}</button><button type="button" role="tab" data-todo-group="all" class="${grouping === "all" ? "is-active" : ""}" aria-selected="${grouping === "all"}">${s.todoGroupAll}</button></div></div><div class="todo-groups-container">${groups
     .map(
       (group) => `<section class="todo-group" data-group-id="${group.id}">${group.title ? `<header class="todo-group-header"><h2 class="todo-group-title"><span>${escapeHtml(group.title)}</span><span class="todo-group-count">${group.count}</span></h2></header>` : ""}<ul class="todo-list">${group.tasks
         .map((task) => todoItemMarkup(task))
         .join("")}</ul></section>`
     )
-    .join("")}</div></main></div>`;
+    .join("")}</div></div><aside class="mac-todos-editor-pane is-hidden" id="mac-todos-editor-pane"><div class="mac-editor-sticky"><div class="mac-composer-section"><div class="mac-editor-heading"><div class="mac-editor-title-wrap"><h2 class="mac-editor-title" id="mac-todo-editor-title">Note</h2></div><div class="mac-editor-actions"><button type="button" class="note-quick-action-btn close-btn" id="mac-todo-editor-close" title="Close note">${svg(icons.close, "action-icon-svg")}</button><span class="mac-editor-shortcut-hint">⌘Enter</span></div></div><div class="copilot-input-container">${editorMarkup("todo-note-edit-form", "", s.saveChanges, true)}</div></div></div></aside></div>`;
+
+  let activeTodoNoteId: string | null = null;
+  const workspace = content.querySelector<HTMLElement>("#mac-todos-workspace");
+  const editorPane = content.querySelector<HTMLElement>("#mac-todos-editor-pane");
+  const todoForm = content.querySelector<HTMLFormElement>("#todo-note-edit-form");
+  const todoTextarea = todoForm?.querySelector<HTMLTextAreaElement>("textarea");
+  const titleEl = content.querySelector<HTMLElement>("#mac-todo-editor-title");
+
+  if (todoForm && todoTextarea) {
+    bindFormatting(todoForm, todoTextarea);
+    bindEditorPreview(todoForm);
+    attachTagAutocomplete(todoTextarea, async () => tagCounts(await notes.listAll()));
+    todoTextarea.addEventListener("keydown", (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+        event.preventDefault();
+        todoForm.requestSubmit();
+      }
+    });
+    todoForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!todoTextarea.value.trim() || !activeTodoNoteId) return;
+      await notes.update(activeTodoNoteId, todoTextarea.value);
+      await renderTodos(content);
+    });
+  }
+
+  content.querySelectorAll<HTMLAnchorElement>(".todo-note-link").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (event.metaKey || event.ctrlKey) return;
+      event.preventDefault();
+
+      const href = link.getAttribute("href") || "";
+      const noteIdMatch = href.match(/#note-([a-zA-Z0-9_-]+)/);
+      const noteId = noteIdMatch ? noteIdMatch[1] : null;
+      if (!noteId) return;
+
+      if (activeTodoNoteId === noteId) {
+        activeTodoNoteId = null;
+        workspace?.classList.remove("has-active-note");
+        editorPane?.classList.add("is-hidden");
+        content.querySelectorAll<HTMLElement>(".todo-item.is-selected").forEach((el) => el.classList.remove("is-selected"));
+        return;
+      }
+
+      void notes.listAll().then((all) => {
+        const note = all.find((n) => n.id === noteId);
+        if (!note || !todoForm || !todoTextarea) return;
+
+        activeTodoNoteId = noteId;
+        workspace?.classList.add("has-active-note");
+        editorPane?.classList.remove("is-hidden");
+
+        content.querySelectorAll<HTMLElement>(".todo-item.is-selected").forEach((el) => el.classList.remove("is-selected"));
+        link.closest<HTMLElement>(".todo-item")?.classList.add("is-selected");
+
+        if (titleEl) {
+          titleEl.innerHTML = `<span>Note</span><time class="mac-editor-time">${formatShortDate(note.noteDate)}</time>`;
+        }
+        todoTextarea.value = note.content;
+        todoTextarea.dispatchEvent(new Event("input", { bubbles: true }));
+        setEditorMode(todoForm, "write", false);
+        todoTextarea.focus();
+      });
+    });
+  });
+
+  content.querySelector<HTMLButtonElement>("#mac-todo-editor-close")?.addEventListener("click", () => {
+    activeTodoNoteId = null;
+    workspace?.classList.remove("has-active-note");
+    editorPane?.classList.add("is-hidden");
+    content.querySelectorAll<HTMLElement>(".todo-item.is-selected").forEach((el) => el.classList.remove("is-selected"));
+  });
 
   content.querySelectorAll<HTMLButtonElement>("[data-todo-group]").forEach((btn) => {
     btn.addEventListener("click", () => {

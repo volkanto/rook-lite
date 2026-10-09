@@ -1330,6 +1330,50 @@ describe("Left menu bar icons and navigation", () => {
     container.remove();
   });
 
+  it("opens note editor panel on the right side and animates todo list when clicking note link in todos", async () => {
+    const { renderTodos } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const note = await noteService.create("- [ ] Task with connected note", "2026-10-02");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    const workspace = container.querySelector("#mac-todos-workspace");
+    const editorPane = container.querySelector("#mac-todos-editor-pane");
+    const noteLink = container.querySelector<HTMLAnchorElement>(".todo-item .todo-note-link");
+
+    expect(workspace).not.toBeNull();
+    expect(editorPane).not.toBeNull();
+    expect(workspace?.classList.contains("has-active-note")).toBe(false);
+    expect(editorPane?.classList.contains("is-hidden")).toBe(true);
+
+    // Filters are at the top in .mac-todos-head
+    const topFilters = container.querySelector(".mac-todos-head .todo-group-tabs");
+    expect(topFilters).not.toBeNull();
+
+    // Click note link -> opens right editor panel and sets has-active-note on workspace
+    noteLink?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    expect(workspace?.classList.contains("has-active-note")).toBe(true);
+    expect(editorPane?.classList.contains("is-hidden")).toBe(false);
+
+    const textarea = container.querySelector<HTMLTextAreaElement>("#todo-note-edit-form textarea");
+    expect(textarea?.value).toContain("Task with connected note");
+
+    // Close editor panel
+    const closeBtn = container.querySelector<HTMLButtonElement>("#mac-todo-editor-close");
+    closeBtn?.click();
+    expect(workspace?.classList.contains("has-active-note")).toBe(false);
+    expect(editorPane?.classList.contains("is-hidden")).toBe(true);
+
+    await noteService.delete(note.id);
+    container.remove();
+  });
+
   it("calculates task age correctly with formatTaskAge", async () => {
     const { formatTaskAge } = await import("./main");
 
