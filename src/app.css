@@ -650,11 +650,11 @@ input[type="checkbox"] {
 /* ================================================================ notes === */
 
 .note {
-    padding: var(--sp-4) var(--sp-5);
-    margin-bottom: var(--sp-4);
+    padding: 0.5rem 0.75rem;
+    margin-bottom: var(--sp-2);
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md, 8px);
+    border-radius: var(--radius-xs, 4px);
     box-shadow: var(--shadow);
 }
 
@@ -3956,10 +3956,10 @@ textarea {
 
 .notes-list .note {
     margin: 0;
-    padding: 1rem 1.1rem;
+    padding: 0.5rem 0.75rem;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-xs, 4px);
     box-shadow: 0 1px 2px rgba(31, 35, 40, 0.03);
     transition: border-color 120ms ease, box-shadow 120ms ease;
 }
