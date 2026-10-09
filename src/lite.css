@@ -802,8 +802,8 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     flex: 1 1 auto;
     min-width: 0;
     height: 100vh;
-    overflow-y: auto;
-    scroll-behavior: smooth;
+    max-height: 100vh;
+    overflow: hidden !important;
     background: var(--color-bg-surface);
     padding: 0;
     box-sizing: border-box;
@@ -814,7 +814,8 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   .mac-editor-sticky {
     width: 100%;
     height: 100%;
-    min-height: 100%;
+    max-height: 100vh;
+    overflow: hidden !important;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -825,7 +826,8 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   .mac-composer-section {
     width: 100%;
     height: 100%;
-    min-height: 100%;
+    max-height: 100vh;
+    overflow: hidden !important;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -835,6 +837,8 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     flex: 1;
     width: 100%;
     height: 100%;
+    max-height: 100%;
+    overflow: hidden !important;
     display: flex;
     flex-direction: column;
     margin-bottom: 0 !important;
@@ -7469,7 +7473,7 @@ body.app .todo-group-tabs button.is-active,
 }
 
 /* ==========================================================================
-   Desktop 3-Pane Permanent Full-Size Editor Guardrails
+   Desktop 3-Pane Permanent Full-Size Editor Guardrails (Zero Overflow, Fits 100%)
    ========================================================================== */
 
 @media (min-width: 60.001rem) {
@@ -7479,7 +7483,8 @@ body.app .todo-group-tabs button.is-active,
   .mac-editor-sticky #new-note-form {
     width: 100% !important;
     height: 100% !important;
-    min-height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
@@ -7489,18 +7494,21 @@ body.app .todo-group-tabs button.is-active,
     background: transparent !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
 
-  .mac-editor-sticky #new-note-form .simple-editor-toolbar,
-  .mac-editor-sticky #new-note-form .simple-editor-footer {
-    display: flex !important;
+  .mac-editor-heading {
+    flex: 0 0 auto !important;
+    padding: 1rem 2rem !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .mac-editor-sticky #new-note-form .simple-editor-toolbar {
     order: 1 !important;
+    flex: 0 0 auto !important;
     width: 100% !important;
-    padding: 0.6rem 2.5rem !important;
+    padding: 0.5rem 2rem !important;
     background: var(--color-bg-surface-sunken) !important;
     border-bottom: 1px solid var(--color-border-subtle) !important;
     border-top: none !important;
@@ -7516,20 +7524,22 @@ body.app .todo-group-tabs button.is-active,
     flex: 1 1 auto !important;
     width: 100% !important;
     height: 100% !important;
-    min-height: calc(100vh - 12rem) !important;
+    min-height: 0 !important;
     max-height: none !important;
-    padding: 2rem 2.5rem !important;
-    font-size: 1.08rem !important;
-    line-height: 1.75 !important;
+    padding: 1.5rem 2rem !important;
+    font-size: 1.05rem !important;
+    line-height: 1.72 !important;
     border: none !important;
     box-sizing: border-box !important;
     resize: none !important;
+    overflow-y: auto !important;
   }
 
   .mac-editor-sticky #new-note-form .simple-editor-footer {
     order: 3 !important;
+    flex: 0 0 auto !important;
     width: 100% !important;
-    padding: 0.75rem 2.5rem !important;
+    padding: 0.6rem 2rem !important;
     border-top: 1px solid var(--color-border-subtle) !important;
     border-bottom: none !important;
     border-left: none !important;
@@ -7537,6 +7547,42 @@ body.app .todo-group-tabs button.is-active,
     border-radius: 0 !important;
     background: var(--color-bg-surface) !important;
     margin-top: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Active Note Detail Pane - Zero Overflow, Fits 100% */
+  .mac-active-note-section,
+  .mac-detail-card {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .mac-detail-header {
+    flex: 0 0 auto !important;
+    padding: 1rem 2rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .mac-detail-prose {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    padding: 1.5rem 2rem 2.5rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .mac-detail-card .note-backlinks {
+    flex: 0 0 auto !important;
+    padding: 0.85rem 2rem !important;
     box-sizing: border-box !important;
   }
 }
