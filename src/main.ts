@@ -2220,7 +2220,7 @@ function bindFormatting(form: HTMLFormElement, textarea: HTMLTextAreaElement): v
 }
 function formatNote(textarea: HTMLTextAreaElement, style: string): void { const start = textarea.selectionStart; const end = textarea.selectionEnd; const selected = textarea.value.slice(start, end); const formats: Record<string, [string, string]> = { heading: ["### ", ""], bold: ["**", "**"], italic: ["_", "_"], strike: ["~~", "~~"], list: ["* ", ""], numbered: ["1. ", ""], task: ["- [ ] ", ""], code: ["```\n", "\n```"], wikilink: ["[[", "]]"], quote: ["> ", ""] }; const [rawPrefix, suffix] = formats[style] ?? ["", ""]; const before = textarea.value.slice(0, start); const prefix = ["heading", "list", "numbered", "task", "quote"].includes(style) && before && !before.endsWith("\n") ? `\n${rawPrefix}` : rawPrefix; textarea.setRangeText(`${prefix}${selected}${suffix}`, start, end, "end"); textarea.focus(); textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length); textarea.dispatchEvent(new Event("input", { bubbles: true })); }
 function resizeEditor(textarea: HTMLTextAreaElement): void {
-  if (document.body.classList.contains("is-zen-mode")) {
+  if (document.body.classList.contains("is-zen-mode") || (window.matchMedia?.("(min-width: 60.001rem)").matches && textarea.closest(".mac-editor-sticky"))) {
     textarea.style.height = "";
     return;
   }

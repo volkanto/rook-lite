@@ -7467,3 +7467,76 @@ body.app .todo-group-tabs button.is-active,
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   Desktop 3-Pane Permanent Full-Size Editor Guardrails
+   ========================================================================== */
+
+@media (min-width: 60.001rem) {
+  .mac-editor-sticky,
+  .mac-editor-sticky .mac-composer-section,
+  .mac-editor-sticky .copilot-input-container,
+  .mac-editor-sticky #new-note-form {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-toolbar,
+  .mac-editor-sticky #new-note-form .simple-editor-footer {
+    display: flex !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-toolbar {
+    order: 1 !important;
+    width: 100% !important;
+    padding: 0.6rem 2.5rem !important;
+    background: var(--color-bg-surface-sunken) !important;
+    border-bottom: 1px solid var(--color-border-subtle) !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-textarea,
+  .mac-editor-sticky #new-note-form .editor-preview {
+    order: 2 !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: calc(100vh - 12rem) !important;
+    max-height: none !important;
+    padding: 2rem 2.5rem !important;
+    font-size: 1.08rem !important;
+    line-height: 1.75 !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    resize: none !important;
+  }
+
+  .mac-editor-sticky #new-note-form .simple-editor-footer {
+    order: 3 !important;
+    width: 100% !important;
+    padding: 0.75rem 2.5rem !important;
+    border-top: 1px solid var(--color-border-subtle) !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+    background: var(--color-bg-surface) !important;
+    margin-top: auto !important;
+    box-sizing: border-box !important;
+  }
+}
