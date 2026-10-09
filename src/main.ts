@@ -322,6 +322,9 @@ export function highlightLinkedNote(targetId?: string): void {
     note.classList.add("is-search-target");
     window.setTimeout(() => note.classList.remove("is-search-target"), 3200);
   });
+
+  const noteId = hash.replace("#note-", "");
+  loadNoteIntoEditor(noteId);
 }
 
 export async function insertTemplateIntoEditor(templateMarkdown: string): Promise<void> {
@@ -371,7 +374,7 @@ export async function renderToday(content: HTMLElement): Promise<void> {
 
   const relativeInfo = getRelativeDateInfo(date, today, getLocale());
 
-  content.innerHTML = `<div class="mac-workspace"><div class="mac-stream-pane"><header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="${s.dateNavigation}"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allNotes, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>${dayBacklinks.length ? `<section class="day-mentions-panel notes-panel" aria-labelledby="day-mentions-title"><div class="section-head"><div class="notes-panel-heading"><h3 id="day-mentions-title" class="panel-subtitle">${svg(icons.link, "backlink-icon-svg")}<span>${s.linkedMentionsTitle}</span></h3><span class="notes-count-badge">${dayBacklinks.length}</span></div></div><div class="day-mentions-list">${dayBacklinks.map((bl) => `<div class="day-mention-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="mention-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="day-mention-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></div>`).join("")}</div></section>` : ""}</div><aside class="mac-editor-pane"><div class="mac-editor-sticky"><div class="mac-composer-section" id="mac-composer-section"><div class="mac-editor-heading"><h2 class="mac-editor-title">${s.recordSubtitle || "Record Note"}</h2><span class="mac-editor-shortcut-hint">⌘Enter</span></div><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote)}</div></div><div class="mac-active-note-section is-hidden" id="mac-active-note-section"></div></div></aside></div>`;
+  content.innerHTML = `<div class="mac-workspace"><div class="mac-stream-pane"><header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="${s.dateNavigation}"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allNotes, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>${dayBacklinks.length ? `<section class="day-mentions-panel notes-panel" aria-labelledby="day-mentions-title"><div class="section-head"><div class="notes-panel-heading"><h3 id="day-mentions-title" class="panel-subtitle">${svg(icons.link, "backlink-icon-svg")}<span>${s.linkedMentionsTitle}</span></h3><span class="notes-count-badge">${dayBacklinks.length}</span></div></div><div class="day-mentions-list">${dayBacklinks.map((bl) => `<div class="day-mention-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="mention-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="day-mention-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></div>`).join("")}</div></section>` : ""}</div><aside class="mac-editor-pane"><div class="mac-editor-sticky"><div class="mac-composer-section" id="mac-composer-section"><div class="mac-editor-heading"><div class="mac-editor-title-wrap"><h2 class="mac-editor-title" id="mac-editor-title">${s.recordSubtitle || "Record Note"}</h2></div><div class="mac-editor-actions"><button type="button" class="mac-new-note-btn is-hidden" id="mac-new-note-btn" title="Create a new note (+)">+ New</button><span class="mac-editor-shortcut-hint">⌘Enter</span></div></div><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote)}</div></div></div></aside></div>`;
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
   bindCreateEditor(date); bindNoteActions();
   updateScrollToTopVisibility();
@@ -518,7 +521,12 @@ function toggleZenMode(targetForm?: HTMLFormElement): void {
   }
 }
 
+let activeSelectedNoteId: string | null = null;
+let currentDayDate: string = "";
+
 function bindCreateEditor(date: string): void {
+  currentDayDate = date;
+  activeSelectedNoteId = null;
   const s = currentStrings();
   const form = requireElement<HTMLFormElement>("#new-note-form");
   const textarea = requireElement<HTMLTextAreaElement>("#new-note-form textarea");
@@ -550,6 +558,7 @@ function bindCreateEditor(date: string): void {
   });
   updateComposer();
   const saveDraft = () => {
+    if (activeSelectedNoteId) return;
     window.clearTimeout(draftTimer);
     status(form, s.savingDraft);
     draftTimer = window.setTimeout(async () => {
@@ -590,10 +599,14 @@ function bindCreateEditor(date: string): void {
     setBusy(form, true);
     try {
       const content = textarea.value;
-      textarea.value = "";
-      resizeEditor(textarea);
-      updateComposer();
-      await notes.create(content, date);
+      if (activeSelectedNoteId) {
+        await notes.update(activeSelectedNoteId, content);
+      } else {
+        textarea.value = "";
+        resizeEditor(textarea);
+        updateComposer();
+        await notes.create(content, date);
+      }
       await renderRoute();
     } catch (error) {
       status(form, errorMessage(error), true);
@@ -617,115 +630,65 @@ function bindCreateEditor(date: string): void {
   });
 }
 
-let activeSelectedNoteId: string | null = null;
+export function loadNoteIntoEditor(noteId: string | null): void {
+  const form = document.querySelector<HTMLFormElement>("#new-note-form");
+  const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+  const titleEl = document.querySelector<HTMLElement>("#mac-editor-title");
+  const newNoteBtn = document.querySelector<HTMLButtonElement>("#mac-new-note-btn");
+  const submitBtn = form?.querySelector<HTMLButtonElement>("button[type='submit']");
+  const s = currentStrings();
+  if (!form || !textarea) return;
 
-export function toggleNoteDetail(noteId: string): void {
-  const composerSec = document.querySelector<HTMLElement>("#mac-composer-section");
-  const detailSec = document.querySelector<HTMLElement>("#mac-active-note-section");
-  if (!composerSec || !detailSec) return;
+  document.querySelectorAll<HTMLElement>(".note-list-item.is-selected").forEach((el) => {
+    el.classList.remove("is-selected");
+  });
 
-  if (activeSelectedNoteId === noteId) {
+  if (!noteId || activeSelectedNoteId === noteId) {
     activeSelectedNoteId = null;
-    document.querySelectorAll<HTMLElement>(".note-list-item.is-selected").forEach((el) => {
-      el.classList.remove("is-selected");
+    form.dataset.mode = "create";
+    delete form.dataset.editingNoteId;
+    if (titleEl) titleEl.textContent = s.recordSubtitle || "Record Note";
+    if (newNoteBtn) newNoteBtn.classList.add("is-hidden");
+    if (submitBtn) {
+      submitBtn.setAttribute("title", `${s.finishNote} (⌘Enter)`);
+      submitBtn.setAttribute("aria-label", s.finishNote);
+    }
+
+    void notes.getDraft(currentDayDate).then((draft) => {
+      textarea.value = draft?.content ?? "";
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      setEditorMode(form, "write", false);
     });
-    composerSec.classList.remove("is-hidden");
-    detailSec.classList.add("is-hidden");
-    detailSec.innerHTML = "";
     return;
   }
 
   void notes.listAll().then((all) => {
-    const note = all.find((item) => item.id === noteId);
-    if (!note) return;
+    const note = all.find((n) => n.id === noteId);
+    if (!note) {
+      loadNoteIntoEditor(null);
+      return;
+    }
 
     activeSelectedNoteId = noteId;
+    form.dataset.mode = "edit";
+    form.dataset.editingNoteId = noteId;
 
-    document.querySelectorAll<HTMLElement>(".note-list-item.is-selected").forEach((el) => {
-      el.classList.remove("is-selected");
-    });
     const item = document.querySelector<HTMLElement>(`#note-${noteId}`)?.closest<HTMLElement>(".note-list-item");
     if (item) item.classList.add("is-selected");
 
-    composerSec.classList.add("is-hidden");
-    detailSec.classList.remove("is-hidden");
-    detailSec.innerHTML = renderActiveNoteDetail(note, all);
-    bindDetailPaneActions(detailSec, note);
-  });
-}
-
-function renderActiveNoteDetail(note: Note, allNotes: Note[] = [], selectedDate = note.noteDate): string {
-  const s = currentStrings();
-  const backlinks = allNotes.length ? findNoteBacklinks(note, allNotes) : [];
-  return `<article class="mac-detail-card" data-active-note-id="${note.id}">
-    <header class="mac-detail-header">
-      <div class="mac-detail-meta">
-        <time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time>
-        ${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}
-      </div>
-      <div class="mac-detail-actions">
-        <button type="button" class="note-quick-action-btn copy-btn" data-detail-copy="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button>
-        <button type="button" class="note-quick-action-btn edit-btn" data-detail-edit="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button>
-        <button type="button" class="note-quick-action-btn delete-btn" data-detail-delete="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button>
-        <button type="button" class="note-quick-action-btn close-btn mac-detail-close" data-action="close-detail" aria-label="${s.closeSidebar || "Close"}" title="Close note and show editor">${svg(icons.close, "action-icon-svg")}</button>
-      </div>
-    </header>
-    <div class="prose mac-detail-prose">${renderMarkdown(note.content, true)}</div>
-    ${backlinks.length ? `<div class="note-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}
-  </article>`;
-}
-
-function bindDetailPaneActions(container: HTMLElement, note: Note): void {
-  const s = currentStrings();
-  container.querySelector<HTMLButtonElement>("[data-detail-copy]")?.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(note.content);
-    const btn = container.querySelector<HTMLButtonElement>("[data-detail-copy]");
-    if (btn) {
-      btn.innerHTML = `${svg(icons.check, "action-icon-svg")}`;
-      setTimeout(() => {
-        btn.innerHTML = `${svg(icons.copy, "action-icon-svg")}`;
-      }, 1500);
+    if (titleEl) {
+      titleEl.innerHTML = `<span>Editing Note</span><time class="mac-editor-time">${formatTime(note.createdAt, note.noteDate)}</time>`;
     }
-  });
-
-  container.querySelector<HTMLButtonElement>("[data-detail-edit]")?.addEventListener("click", () => {
-    showEditDialog(note);
-  });
-
-  container.querySelector<HTMLButtonElement>("[data-detail-delete]")?.addEventListener("click", () => {
-    showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
-      await notes.delete(note.id);
-      await refreshCalendar();
-      await renderRoute();
-    });
-  });
-
-  container.querySelector<HTMLButtonElement>(".mac-detail-close")?.addEventListener("click", () => {
-    if (activeSelectedNoteId) {
-      toggleNoteDetail(activeSelectedNoteId);
+    if (newNoteBtn) newNoteBtn.classList.remove("is-hidden");
+    if (submitBtn) {
+      submitBtn.setAttribute("title", `${s.saveChanges} (⌘Enter)`);
+      submitBtn.setAttribute("aria-label", s.saveChanges);
     }
-  });
 
-  container.querySelectorAll<HTMLInputElement>(".interactive-task-checkbox").forEach((cb) => {
-    cb.addEventListener("change", async (event) => {
-      event.stopPropagation();
-      const taskIndex = Number(cb.dataset.taskIndex);
-      if (Number.isNaN(taskIndex)) return;
-      const all = await notes.listAll();
-      const current = all.find((item) => item.id === note.id);
-      if (!current) return;
-      const updatedContent = toggleTaskInMarkdown(current.content, taskIndex);
-      await notes.update(current.id, updatedContent);
-      const listItem = cb.closest("li");
-      if (listItem) {
-        listItem.classList.toggle("is-task-completed", cb.checked);
-      }
-      const middleCb = document.querySelector<HTMLInputElement>(`#note-${note.id} [data-task-index="${taskIndex}"]`);
-      if (middleCb) {
-        middleCb.checked = cb.checked;
-        middleCb.closest("li")?.classList.toggle("is-task-completed", cb.checked);
-      }
-    });
+    textarea.value = note.content;
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    setEditorMode(form, "write", false);
+    textarea.focus();
   });
 }
 
@@ -757,7 +720,7 @@ function bindNoteActions(): void {
       if (target.closest("button, a, input, [data-format], textarea, label")) {
         return;
       }
-      toggleNoteDetail(noteId);
+      loadNoteIntoEditor(noteId);
     });
 
     noteEl.querySelectorAll<HTMLInputElement>(".interactive-task-checkbox").forEach((cb) => {
@@ -776,6 +739,11 @@ function bindNoteActions(): void {
         }
       });
     });
+  });
+
+  document.querySelector<HTMLButtonElement>("#mac-new-note-btn")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    loadNoteIntoEditor(null);
   });
 }
 

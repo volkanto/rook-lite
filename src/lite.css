@@ -848,20 +848,70 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.25rem 2.5rem;
+    padding: 1rem 2rem;
     margin-bottom: 0;
     border-bottom: 1px solid var(--color-border-subtle);
     background: var(--color-bg-surface);
     box-sizing: border-box;
   }
 
+  .mac-editor-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+  }
+
   .mac-editor-title {
     margin: 0;
     font-family: var(--font-editorial, var(--font-prose));
-    font-size: 1.25rem;
+    font-size: 1.18rem;
     font-weight: 600;
     color: var(--color-text-primary);
     letter-spacing: -0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mac-editor-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-shrink: 0;
+  }
+
+  .mac-new-note-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.65rem;
+    padding: 0 0.65rem;
+    font-family: var(--font-app);
+    font-size: 0.75rem;
+    font-weight: 550;
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface-sunken);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xs, 4px);
+    cursor: pointer;
+    transition: all 120ms ease;
+  }
+
+  .mac-new-note-btn:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-border-default);
+  }
+
+  .mac-new-note-btn.is-hidden {
+    display: none !important;
+  }
+
+  .mac-editor-time {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-text-tertiary);
+    font-weight: 500;
   }
 
   .mac-editor-shortcut-hint {

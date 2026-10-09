@@ -2083,10 +2083,10 @@ describe("Left menu bar icons and navigation", () => {
     metaEl.remove();
   });
 
-  it("toggles note detail in right panel on click and restores editor on second click", async () => {
+  it("keeps right panel always in editor mode and changes content when note is selected from left", async () => {
     const noteService = new NoteService(new NoteRepository());
     const today = localTodayIso();
-    const testNote = await noteService.create("Full detailed note content for master detail test", today);
+    const testNote = await noteService.create("Direct edit content loaded into permanent right editor", today);
 
     history.pushState({}, "", `/?date=${today}`);
     const { renderShell } = await import("./main");
@@ -2095,29 +2095,28 @@ describe("Left menu bar icons and navigation", () => {
     const noteEl = document.querySelector<HTMLElement>(`#note-${testNote.id}`);
     expect(noteEl).not.toBeNull();
 
-    const composerSec = document.querySelector<HTMLElement>("#mac-composer-section");
-    const detailSec = document.querySelector<HTMLElement>("#mac-active-note-section");
-    expect(composerSec).not.toBeNull();
-    expect(detailSec).not.toBeNull();
+    const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea");
+    expect(textarea).not.toBeNull();
+    const titleEl = document.querySelector<HTMLElement>("#mac-editor-title");
+    expect(titleEl).not.toBeNull();
 
-    // Initially, composer is visible, detail is hidden
-    expect(composerSec?.classList.contains("is-hidden")).toBe(false);
-    expect(detailSec?.classList.contains("is-hidden")).toBe(true);
+    // Initially, editor is in create/new mode
+    expect(textarea?.value).toBe("");
 
-    // Click note -> opens detail in right panel, hides composer
+    // Click note -> directly loads note into the right panel editor and marks item selected!
     noteEl?.click();
     await new Promise((resolve) => setTimeout(resolve, 80));
 
-    expect(composerSec?.classList.contains("is-hidden")).toBe(true);
-    expect(detailSec?.classList.contains("is-hidden")).toBe(false);
-    expect(detailSec?.querySelector(".mac-detail-prose")?.textContent).toContain("Full detailed note content");
+    expect(textarea?.value).toContain("Direct edit content loaded into permanent right editor");
+    expect(noteEl?.closest(".note-list-item")?.classList.contains("is-selected")).toBe(true);
+    expect(titleEl?.textContent).toContain("Editing Note");
 
-    // Click note once again -> hides detail, restores composer
+    // Click note once again -> deselects note and clears editor back to new note mode!
     noteEl?.click();
     await new Promise((resolve) => setTimeout(resolve, 80));
 
-    expect(composerSec?.classList.contains("is-hidden")).toBe(false);
-    expect(detailSec?.classList.contains("is-hidden")).toBe(true);
+    expect(textarea?.value).not.toContain("Direct edit content loaded into permanent right editor");
+    expect(noteEl?.closest(".note-list-item")?.classList.contains("is-selected")).toBe(false);
 
     await noteService.delete(testNote.id);
   });
