@@ -153,11 +153,13 @@ export function sanitizeLlamaOutput(raw) {
     text = text.slice(0, stopMatch);
   }
 
-  // Strip leftover turn markers, EOS tokens, or code fences
+  // Strip leftover turn markers, EOS tokens, code fences, or llama-cli EOF artifacts
   text = text
     .replace(/<\|im_start\|>|<\|im_end\|>|<\|endoftext\|>|\[end of text\]/gi, '')
     .replace(/^\s*```(?:markdown)?\s*/i, '')
     .replace(/\s*```\s*$/i, '')
+    .replace(/^[ \t]*>[ \t]*EOF[ \t]+by[ \t]+user[ \t]*\r?\n?/gim, '')
+    .replace(/>[ \t]*EOF[ \t]+by[ \t]+user/gi, '')
     .trim();
 
   return text;

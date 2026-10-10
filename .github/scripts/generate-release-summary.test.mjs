@@ -110,6 +110,13 @@ describe('generate-release-summary', () => {
       expect(sanitized).not.toContain('system');
       expect(sanitized).not.toContain('Here are PRs');
     });
+
+    it('strips llama-cli "> EOF by user" interactive artifacts', () => {
+      const raw = `### ✨ What's New\n- Added note grouping (#10)\n\n> EOF by user`;
+      const sanitized = sanitizeLlamaOutput(raw);
+      expect(sanitized).toBe(`### ✨ What's New\n- Added note grouping (#10)`);
+      expect(sanitized).not.toContain('EOF by user');
+    });
   });
 
   describe('validateSummary', () => {
