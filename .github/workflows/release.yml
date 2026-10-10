@@ -258,6 +258,11 @@ jobs:
       group: cloudflare-pages
       cancel-in-progress: false
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-version.outputs.commit_sha }}
+
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
@@ -270,7 +275,11 @@ jobs:
             echo "Error: dist/ directory or dist/index.html does not exist!"
             exit 1
           fi
-          echo "Verified dist/ directory exists."
+          if [ ! -d "functions" ]; then
+            echo "Error: functions/ directory does not exist!"
+            exit 1
+          fi
+          echo "Verified dist/ and functions/ directories exist."
 
       - name: Deploy to Cloudflare Pages
         id: deploy
