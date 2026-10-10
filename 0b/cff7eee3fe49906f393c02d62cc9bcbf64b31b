@@ -1,0 +1,62 @@
+src/locales/en.ts
+  s_c199d8d6be987a::t_484941bcf79da7 238-250
+tsconfig.json
+  s_c199d8d6be987a::t_07ef1d44c885f1 18
+src/locales/tr.ts
+  s_c199d8d6be987a::t_a2ffc3b4525530 237-249
+README.md
+  s_c199d8d6be987a::t_48f622eeafb28c 7,43-86
+  s_c199d8d6be987a::t_77461b0cc4ad00 87-89
+src/data.ts
+  s_c199d8d6be987a::t_b21a8b0f9f135f 19
+wrangler.toml
+  s_c199d8d6be987a::t_036be05ad0509c 1-7
+src/analytics/analytics.test.ts
+  s_c199d8d6be987a::t_2e8f82b905e16e 1-128,153
+  s_c199d8d6be987a::t_1bbb594be5293d 129-152
+functions/api/analytics.test.ts
+  s_c199d8d6be987a::t_3f2c8e74fe471a 1-154
+src/i18n.types.ts
+  s_c199d8d6be987a::t_a2c8a3b0b381d4 238-251
+src/lite.css
+  s_c199d8d6be987a::t_bf3bc25b8fb598 3928-3957
+.gitignore
+  s_c199d8d6be987a::t_3ac3e7407272c6 5
+src/main.ts
+  s_c199d8d6be987a::t_27d3fe8139e73d 18,29-30
+  s_c199d8d6be987a::t_27cf87461dbac4 736
+  s_c199d8d6be987a::t_c2a6a3bac9b2ba 612,638
+  s_c199d8d6be987a::t_355f29c34dfc29 1048
+  s_c199d8d6be987a::t_f62d0a424e7ca1 375
+  s_c199d8d6be987a::t_1e3cc958543654 1323-1354
+  s_c199d8d6be987a::t_5997649818f371 1076-1085
+  s_c199d8d6be987a::t_8e29d204e3f103 1116
+  s_c199d8d6be987a::t_ea732c9675829a 1154
+  s_c199d8d6be987a::t_6c5c92ffe848ca 1525-1534,1536-1539,1545,1553,1566
+  s_c199d8d6be987a::t_8d216a8f49e8f7 309-311
+  s_c199d8d6be987a::t_64abb90d01ce03 170,176,183,197,220,258-260
+  s_c199d8d6be987a::t_5eaf227896561d 2254-2266
+src/analytics/analytics.ts
+  s_c199d8d6be987a::t_95875476c98ba6 1-59
+src/command-palette/commandPalette.ts
+  s_c199d8d6be987a::t_4cc8b387b89b9a 201
+  s_c199d8d6be987a::t_58f083d86dc763 26
+functions/api/analytics.ts
+  s_c199d8d6be987a::t_59ac3eccd0745b 1-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "0bcff7eee3fe49906f393c02d62cc9bcbf64b31b",
+  "prompts": {},
+  "sessions": {
+    "s_c199d8d6be987a": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "a53d6713-cad0-4955-8ddd-602b0ecdd576",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
