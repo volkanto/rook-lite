@@ -1,0 +1,21 @@
+.github/scripts/generate-release-summary.test.mjs
+  s_c199d8d6be987a::t_dea1c29f2561fc 113-119
+.github/scripts/generate-release-summary.mjs
+  s_c199d8d6be987a::t_f595beedda9ad5 156,161-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "372b6891d8d194dec018b33b8c4d49677c4d287b",
+  "prompts": {},
+  "sessions": {
+    "s_c199d8d6be987a": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "a53d6713-cad0-4955-8ddd-602b0ecdd576",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
