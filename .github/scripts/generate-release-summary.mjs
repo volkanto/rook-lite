@@ -85,11 +85,41 @@ Summarize the provided pull requests into concise, user-facing release notes.
 Strict Rules:
 1. Truthfulness: Use ONLY the provided PR titles and categories. Do not invent, extrapolate, or hallucinate features, fixes, or details.
 2. Tone: Factual, professional, and clear.
-3. Anti-Fluff: DO NOT include motivational cheerleading (e.g., "Great job team!", "We are thrilled to announce").
+3. Anti-Fluff: DO NOT include motivational cheerleading (e.g., "Great job team!", "We are thrilled to announce"). No marketing filler.
 4. Anti-Exaggeration: Do not describe minor tweaks or routine maintenance as major overhauls.
-5. Organization: Group bullets under Markdown headers (e.g. "### ✨ What's New", "### ⚡ Improvements", "### 🐛 Bug Fixes"). Omit any empty headers.
-6. PR Attribution: Every bullet MUST end with its PR reference in the exact format: (#<number>).
-7. Format: Output raw Markdown only. Do not wrap the output in \`\`\`markdown code fences.<|im_end|>
+5. Format and Structure:
+   - Always start with a "## Highlights" section providing a concise 1-2 sentence executive overview summarizing the release theme and impact.
+   - Separate every major section with a horizontal rule ("---").
+   - Group entries strictly under these Markdown headers (omit any headers that have no items):
+     - "### ✨ What's New" (for new features and enhancements)
+     - "### ⚡ Improvements & Refactoring" (for refactors, performance, and polish)
+     - "### 🐛 Bug Fixes" (for bug fixes)
+     - "### 🧪 Quality & Tests" (for test additions and test coverage)
+     - "### 📚 Documentation" (for documentation changes)
+   - Format each PR item with a bold title and PR reference header, followed by indented sub-bullets explaining key details or capabilities:
+     - **<Feature or Change Title> (#<number>):**
+       - <Key capability or detail based strictly on PR title>
+6. Clean Output: Output raw Markdown only. Do not wrap the response in \`\`\`markdown code fences.
+
+Example Target Format:
+## Highlights
+
+This release introduces privacy-first anonymous product analytics to understand feature usage and streamlines note organization.
+
+---
+
+### ✨ What's New
+
+- **Privacy-First Product Analytics (#18):**
+  - Added optional, anonymous product feature usage telemetry using Cloudflare Pages Functions and Cloudflare Analytics Engine.
+  - Added privacy settings toggle under Settings (disabled by default).
+
+---
+
+### ⚡ Improvements & Refactoring
+
+- **Simplified Note Organization (#15):**
+  - Removed categories across database, UI, and services in favor of date-based journaling and tags.<|im_end|>
 <|im_start|>user
 Here are the merged pull requests for release ${rangeDescription}:
 ${prListString}
@@ -186,8 +216,8 @@ export function generateDeterministicReleaseNotes({
 }) {
   const sections = {
     features: { title: "### ✨ What's New", items: [] },
+    improvements: { title: "### ⚡ Improvements & Refactoring", items: [] },
     fixes: { title: "### 🐛 Bug Fixes", items: [] },
-    improvements: { title: "### ⚡ Improvements & Polish", items: [] },
     docs: { title: "### 📚 Documentation", items: [] },
     other: { title: "### 🔧 Other Changes", items: [] },
     internal: { title: "### 🛠️ Maintenance & Chores", items: [] }
@@ -233,7 +263,7 @@ export function generateDeterministicReleaseNotes({
     outputParts.push('_No significant changes detected for this release._');
   }
 
-  let finalMarkdown = outputParts.join('\n\n');
+  let finalMarkdown = outputParts.join('\n\n---\n\n');
 
   if (prevTag && repoUrl) {
     const targetRefForUrl = gitRef || currentTag;
