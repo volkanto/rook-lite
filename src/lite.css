@@ -3925,6 +3925,36 @@ textarea.simple-editor-textarea.is-hidden,
   margin: 0.75rem 1.4rem 1rem;
 }
 
+.analytics-privacy-details {
+  margin-top: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md, 8px);
+}
+
+.analytics-privacy-heading {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.analytics-never-collected-list {
+  margin: 0;
+  padding-left: 1.15rem;
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.analytics-never-collected-list li {
+  margin-bottom: 0.15rem;
+}
+
 .settings-segmented-control {
   display: inline-flex;
   align-items: center;

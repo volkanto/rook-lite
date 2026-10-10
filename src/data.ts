@@ -16,7 +16,7 @@ export const settingsRepository = new SettingsRepository();
 
 export async function createBackup(): Promise<RookBackupV1> {
   const snapshot = await dataSnapshot();
-  const allowedSettings = snapshot.settings.filter((setting) => ["ollama", "theme", "lastExportAt"].includes(setting.key));
+  const allowedSettings = snapshot.settings.filter((setting) => ["ollama", "theme", "lastExportAt", "analyticsEnabled"].includes(setting.key));
   return { schemaVersion: 1, exportedAt: new Date().toISOString(), application: { name: "rook-lite", version: APP_VERSION }, notes: snapshot.notes, summaries: snapshot.summaries, settings: allowedSettings };
 }
 

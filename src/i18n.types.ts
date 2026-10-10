@@ -235,6 +235,20 @@ export interface TranslationStrings {
   localAiEnabled: string;
   localAiDisabled: string;
 
+  // Privacy & Analytics settings
+  privacyTitle: string;
+  analyticsTitle: string;
+  analyticsSubtitle: string;
+  analyticsStatusEnabled: string;
+  analyticsStatusDisabled: string;
+  analyticsNeverCollectedTitle: string;
+  analyticsNeverNoteContents: string;
+  analyticsNeverNoteTitles: string;
+  analyticsNeverTags: string;
+  analyticsNeverSearches: string;
+  analyticsNeverAi: string;
+  analyticsNeverIdentifiers: string;
+
   // Storage & Persistence settings
   storageTitle: string;
   storageSubtitle: string;
