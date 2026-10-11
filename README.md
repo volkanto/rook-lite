@@ -4,7 +4,7 @@
 
 Rook Lite is a private, local-first personal daily notes and summary application. It runs entirely in the browser as a client-side Single Page Application (SPA), storing notes, categories, drafts, and summaries in **IndexedDB** on your machine.
 
-There are no remote databases, cloud sync servers, telemetry, or hosted AI backends. Notes stay on your device unless you explicitly export or back them up.
+There are no remote databases, cloud sync servers, or hosted AI backends. Notes stay on your device unless you explicitly export or back them up. Minimal, privacy-first anonymous product analytics are disabled by default and can be optionally enabled to help improve the application without collecting personal identifiers or note contents.
 
 ---
 
@@ -37,6 +37,72 @@ There are no remote databases, cloud sync servers, telemetry, or hosted AI backe
   2. **Local Ollama LLM:** Connects directly to local Ollama instances (`http://localhost:11434`) with strict loopback validation, model discovery, and automatic fallback.
 - **Markdown & Security:** Parsed via [Marked](https://marked.js.org/) and sanitized through [DOMPurify](https://github.com/cure53/DOMPurify) with support for interactive task checkboxes.
 - **Data Portability:** Zero lock-in. Full JSON backups, directory exports via the File System Access API, and zipped Markdown archives using [fflate](https://github.com/101arrowz/fflate).
+
+---
+
+## Privacy & Telemetry
+
+Rook Lite is designed with a strict privacy-first, local-first philosophy:
+
+- **Optional and Disabled by Default:** Telemetry is completely disabled by default (`analyticsEnabled: false`). You can opt in or disable it at any time in **Settings → Privacy & Analytics**.
+- **Notes Remain Strictly Local:** Notes, drafts, and summaries live exclusively in browser storage (IndexedDB). They are never transmitted over the network or stored in cloud databases.
+- **Strictly Never Collected:**
+  - Note contents and markdown text
+  - Note titles and headings
+  - Tags and categories
+  - Search queries
+  - AI prompts and AI responses
+  - User IDs, session IDs, cookies, persistent UUIDs, or browser fingerprints
+  - Cohorts, retention, user-level funnels, or individual behavior timelines
+- **What is Collected (When Explicitly Enabled):** Only anonymous, aggregate product feature counters sent to Cloudflare Analytics Engine via `POST /api/analytics`:
+  - Feature action name (e.g., `note_created`, `markdown_export_succeeded`)
+  - Application version (e.g., `1.5.1`)
+- **Cloudflare Web Analytics vs. Product Analytics:**
+  - **Cloudflare Web Analytics:** Edge-level, cookieless metrics for traffic, page views, referrers, and Core Web Vitals.
+  - **Cloudflare Analytics Engine:** Product feature usage counters recorded into the `rook_lite_events` dataset.
+- **Private Analytics Dashboard:**
+  - Accessible to project owners at `/internal/analytics`.
+  - Protected at the Cloudflare edge via Cloudflare Access Zero Trust or an admin secret token (`INTERNAL_ANALYTICS_SECRET`).
+  - Displays only server-side aggregates across 7d, 30d, and 90d windows: total events, most-used features, daily trends, app-version adoption, and operation outcome success rates.
+
+### Event Allow-List
+
+#### Feature Usage Counters
+| Event Name | Description | Trigger Condition |
+| --- | --- | --- |
+| `app_opened` | Application initialized | Emitted at most once per application load |
+| `note_created` | Note created | Emitted after a note is successfully saved in the composer |
+| `note_deleted` | Note deleted | Emitted after note deletion is confirmed |
+| `weekly_summary_opened` | Weekly summary viewed | Emitted when viewing a weekly summary period |
+| `monthly_summary_opened` | Monthly summary viewed | Emitted when viewing a monthly summary period |
+| `markdown_exported` | Markdown exported | Emitted after exporting notes to ZIP or local directory |
+| `backup_exported` | Full JSON backup exported | Emitted after downloading a JSON backup |
+| `backup_imported` | Backup restored | Emitted after restoring a JSON backup |
+| `template_used` | Template inserted | Emitted when a template is inserted into the editor |
+| `command_palette_opened` | Command palette opened | Emitted when the command palette is opened |
+| `ai_summary_used` | Local AI summary generated | Emitted after successfully generating a summary with Ollama |
+
+#### Operation Outcome & Health Events
+| Event Name | Description | Trigger Condition |
+| --- | --- | --- |
+| `markdown_export_started` | Markdown export initiated | Emitted when user triggers ZIP or directory export |
+| `markdown_export_succeeded` | Markdown export completed | Emitted when markdown export finishes successfully |
+| `markdown_export_failed` | Markdown export encountered error | Emitted when export fails (e.g. storage or FS permission error) |
+| `backup_import_started` | Backup restore initiated | Emitted when user confirms restoring a JSON backup |
+| `backup_import_succeeded` | Backup restore completed | Emitted when JSON backup is successfully written to IndexedDB |
+| `backup_import_failed` | Backup restore encountered error | Emitted when JSON validation or IndexedDB restore fails |
+| `ai_summary_started` | Ollama generation initiated | Emitted when summary generation starts with local Ollama |
+| `ai_summary_succeeded` | Ollama generation completed | Emitted when Ollama responds successfully without errors |
+| `ai_summary_failed` | Ollama generation encountered error | Emitted when Ollama times out, is unreachable, or falls back |
+
+### Cloudflare Analytics Engine Schema
+
+Data points written to the `rook_lite_events` dataset follow this schema:
+
+- `blob1`: Event name (string, e.g., `"note_created"`, `"markdown_export_succeeded"`)
+- `blob2`: Application version (string, e.g., `"1.5.1"`)
+- `double1`: Event count (number, always `1`)
+- `index1`: Query & sampling index (string, always `"rook-lite"`)
 
 ---
 
