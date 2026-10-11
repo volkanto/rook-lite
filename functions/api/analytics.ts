@@ -14,7 +14,17 @@ export const ALLOWED_EVENTS = [
   "backup_imported",
   "template_used",
   "command_palette_opened",
-  "ai_summary_used"
+  "ai_summary_used",
+  // Phase 2 outcome analytics
+  "markdown_export_started",
+  "markdown_export_succeeded",
+  "markdown_export_failed",
+  "backup_import_started",
+  "backup_import_succeeded",
+  "backup_import_failed",
+  "ai_summary_started",
+  "ai_summary_succeeded",
+  "ai_summary_failed"
 ] as const;
 
 export type AnalyticsEvent = (typeof ALLOWED_EVENTS)[number];
