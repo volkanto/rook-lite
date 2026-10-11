@@ -1,0 +1,47 @@
+README.md
+  s_c199d8d6be987a::t_fbb96d093e2816 55-56,58-61,64-66,68,86-97,102-103
+  s_c199d8d6be987a::t_6fd61a1ee6fdb4 49,63,70,85
+src/analytics/analytics.ts
+  s_c199d8d6be987a::t_b15e257f035547 15-25
+src/main.ts
+  s_c199d8d6be987a::t_7b482f1d2292ab 1597,1600,1602-1604,1608,1612,1616,1634-1644
+  s_c199d8d6be987a::t_eb4745b788984a 1156
+  s_c199d8d6be987a::t_fe4d67dd9214b7 1157,1160-1166,1169
+  s_c199d8d6be987a::t_6332d911bcbd22 333
+  s_c199d8d6be987a::t_c7e9aca0a65678 19
+  s_c199d8d6be987a::t_98f7f6b77e076a 1404-1413
+  s_c199d8d6be987a::t_3aa53a05155ad2 1066-1091
+  s_c199d8d6be987a::t_4c9c82830c0b4e 169-178,181,185,188,207-217
+src/analytics/analytics.test.ts
+  s_c199d8d6be987a::t_2eb1d7a65f2159 112,124-133,139-148
+  s_c199d8d6be987a::t_42f236e6d936af 149-150
+functions/api/internal/analytics.ts
+  s_c199d8d6be987a::t_e80c687079e8cf 1-316
+functions/api/internal/analytics.test.ts
+  s_c199d8d6be987a::t_b955ee58fce84f 1
+  s_c199d8d6be987a::t_6e97356139eb08 2-266
+src/analytics/dashboard.test.ts
+  s_c199d8d6be987a::t_fd30967156c85a 1-186
+src/analytics/dashboard.ts
+  s_c199d8d6be987a::t_d655d188c6a183 1-567
+functions/api/analytics.ts
+  s_c199d8d6be987a::t_51ef75f5a0761f 17-27
+src/lite.css
+  s_c199d8d6be987a::t_cadea4dc849ee8 3958-4268
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "46cd70d351eec7283db4f8a3c6dca80336e1596f",
+  "prompts": {},
+  "sessions": {
+    "s_c199d8d6be987a": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "a53d6713-cad0-4955-8ddd-602b0ecdd576",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
