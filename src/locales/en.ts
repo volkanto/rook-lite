@@ -197,6 +197,10 @@ export const locale: LocaleDefinition = {
 
     settingsTitle: "Settings",
     settingsLede: "Configure appearance, language, local AI, storage persistence, and local data.",
+    settingsTabGeneral: "General",
+    settingsTabData: "Data & Storage",
+    settingsTabAi: "Local AI",
+    settingsTabPrivacy: "Privacy",
 
     languageTitle: "Language",
     languageSubtitle: "Choose your preferred language for the interface.",
@@ -250,6 +254,7 @@ export const locale: LocaleDefinition = {
 
     storageTitle: "Storage & Persistence",
     storageSubtitle: "Your notes and summaries live directly inside your browser storage.",
+    storageQuotaHint: "Allocated by your browser based on available device disk space · 100% offline",
     metricNotes: "Notes",
     metricSummaries: "Summaries",
     metricDrafts: "Drafts",
