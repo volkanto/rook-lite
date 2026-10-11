@@ -4638,7 +4638,9 @@ body.app .sidebar nav > a:hover,
 body.app .sidebar-search-btn:hover,
 body.app .sidebar-theme-toggle:hover,
 body.app .sidebar-lang-toggle:hover,
-body.app .sidebar-lang-picker[open] .sidebar-lang-toggle {
+body.app .sidebar-lang-picker[open] .sidebar-lang-toggle,
+body.app .sidebar-support-toggle:hover,
+body.app .sidebar-support-picker[open] .sidebar-support-toggle {
     color: var(--color-text-primary) !important;
     background: var(--color-bg-hover) !important;
     border-color: transparent !important;

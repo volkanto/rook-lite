@@ -23,6 +23,13 @@ export interface TranslationStrings {
   localOnlyTooltip: string;
   languageSelectTooltip: string;
   githubTooltip: string;
+  supportTooltip: string;
+  supportTitle: string;
+  supportSubtitle: string;
+  supportGithubLabel: string;
+  supportGithubDesc: string;
+  supportBmacLabel: string;
+  supportBmacDesc: string;
   toolBold: string;
   toolItalic: string;
   toolQuote: string;
