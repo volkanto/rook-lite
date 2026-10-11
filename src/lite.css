@@ -203,9 +203,13 @@ body.app .sidebar-nav-divider,
 
 body.app .sidebar-lang-toggle:hover,
 body.app .sidebar-lang-picker[open] .sidebar-lang-toggle,
+body.app .sidebar-support-toggle:hover,
+body.app .sidebar-support-picker[open] .sidebar-support-toggle,
 body.app .sidebar-theme-toggle:hover,
 .sidebar-lang-toggle:hover,
 .sidebar-lang-picker[open] .sidebar-lang-toggle,
+.sidebar-support-toggle:hover,
+.sidebar-support-picker[open] .sidebar-support-toggle,
 .sidebar-theme-toggle:hover {
   background: var(--color-bg-hover) !important;
   color: var(--color-text-primary) !important;
@@ -216,8 +220,10 @@ body.app .sidebar-theme-toggle:hover,
 
 body.app .sidebar-theme-toggle:hover .nav-svg,
 body.app .sidebar-lang-toggle:hover .nav-svg,
+body.app .sidebar-support-toggle:hover .nav-svg,
 .sidebar-theme-toggle:hover .nav-svg,
-.sidebar-lang-toggle:hover .nav-svg {
+.sidebar-lang-toggle:hover .nav-svg,
+.sidebar-support-toggle:hover .nav-svg {
   color: var(--color-text-primary) !important;
 }
 
@@ -249,6 +255,7 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
 .sidebar .nav-svg,
 .sidebar-lang-toggle .nav-svg,
+.sidebar-support-toggle .nav-svg,
 .sidebar-theme-toggle .nav-svg {
   flex: 0 0 20px;
   width: 20px;
@@ -338,6 +345,150 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   width: 14px;
   height: 14px;
   stroke-width: 2.2;
+}
+
+/* Sidebar Support Picker */
+.sidebar-support-picker {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+}
+
+.sidebar-support-toggle::-webkit-details-marker {
+  display: none !important;
+}
+
+.support-heart-icon {
+  color: var(--color-icon-secondary, var(--text-soft));
+  transition: color 140ms ease, transform 140ms ease;
+}
+
+.sidebar-support-toggle:hover .support-heart-icon,
+.sidebar-support-picker[open] .support-heart-icon {
+  color: #e25555 !important;
+  transform: scale(1.1);
+}
+
+.sidebar-support-popover {
+  position: absolute;
+  left: calc(100% + 0.6rem);
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 17rem;
+  padding: 0.85rem;
+  background: var(--color-bg-surface, var(--surface));
+  border: 1px solid var(--color-border-default, var(--border));
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.06);
+  animation: modal-slide-up 140ms ease-out;
+}
+
+.support-popover-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.support-popover-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.support-popover-desc {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  line-height: 1.35;
+}
+
+.support-popover-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.support-option-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-bg-sunken);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: all 120ms ease;
+}
+
+.support-option-link:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-default);
+  transform: translateY(-1px);
+}
+
+.support-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.github-badge {
+  background: rgba(226, 85, 85, 0.12);
+  color: #e25555;
+}
+
+.bmac-badge {
+  background: rgba(245, 158, 11, 0.14);
+  color: #d97706;
+}
+
+.support-icon-svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.support-option-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.support-option-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.support-option-sub {
+  font-size: 0.68rem;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.support-ext-svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: transform 120ms ease;
+}
+
+.support-option-link:hover .support-ext-svg {
+  transform: translate(1px, -1px);
+  color: var(--color-text-primary);
 }
 
 .sidebar-close {
@@ -486,6 +637,10 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   :root.sidebar-collapsed body.app .sidebar-lang-picker,
   body.app .sidebar-lang-toggle,
   :root.sidebar-collapsed body.app .sidebar-lang-toggle,
+  body.app .sidebar-support-picker,
+  :root.sidebar-collapsed body.app .sidebar-support-picker,
+  body.app .sidebar-support-toggle,
+  :root.sidebar-collapsed body.app .sidebar-support-toggle,
   body.app .sidebar-theme-toggle,
   :root.sidebar-collapsed body.app .sidebar-theme-toggle {
     position: relative !important;
@@ -546,6 +701,10 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   :root.sidebar-collapsed body.app .sidebar-lang-picker,
   body.app .sidebar-lang-toggle,
   :root.sidebar-collapsed body.app .sidebar-lang-toggle,
+  body.app .sidebar-support-picker,
+  :root.sidebar-collapsed body.app .sidebar-support-picker,
+  body.app .sidebar-support-toggle,
+  :root.sidebar-collapsed body.app .sidebar-support-toggle,
   body.app .sidebar-theme-toggle,
   :root.sidebar-collapsed body.app .sidebar-theme-toggle {
     display: flex !important;
@@ -625,8 +784,10 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
 
   body.app .sidebar-footer .sidebar-theme-toggle,
   body.app .sidebar-footer .sidebar-lang-picker,
+  body.app .sidebar-footer .sidebar-support-picker,
   body.sidebar-drawer-open .sidebar-footer .sidebar-theme-toggle,
-  body.sidebar-drawer-open .sidebar-footer .sidebar-lang-picker {
+  body.sidebar-drawer-open .sidebar-footer .sidebar-lang-picker,
+  body.sidebar-drawer-open .sidebar-footer .sidebar-support-picker {
     margin: 0;
   }
 
@@ -639,7 +800,9 @@ body.app .sidebar-lang-toggle:hover .nav-svg,
   }
 
   body.app .sidebar-lang-popover,
-  body.sidebar-drawer-open .sidebar-lang-popover {
+  body.sidebar-drawer-open .sidebar-lang-popover,
+  body.app .sidebar-support-popover,
+  body.sidebar-drawer-open .sidebar-support-popover {
     left: auto;
     right: 0;
     bottom: calc(100% + 0.5rem);
