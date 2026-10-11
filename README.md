@@ -46,22 +46,28 @@ Rook Lite is designed with a strict privacy-first, local-first philosophy:
 
 - **Optional and Disabled by Default:** Telemetry is completely disabled by default (`analyticsEnabled: false`). You can opt in or disable it at any time in **Settings → Privacy & Analytics**.
 - **Notes Remain Strictly Local:** Notes, drafts, and summaries live exclusively in browser storage (IndexedDB). They are never transmitted over the network or stored in cloud databases.
-- **Never Collected:**
+- **Strictly Never Collected:**
   - Note contents and markdown text
   - Note titles and headings
   - Tags and categories
   - Search queries
   - AI prompts and AI responses
-  - User identifiers, session IDs, cookies, or browser fingerprints
+  - User IDs, session IDs, cookies, persistent UUIDs, or browser fingerprints
+  - Cohorts, retention, user-level funnels, or individual behavior timelines
 - **What is Collected (When Explicitly Enabled):** Only anonymous, aggregate product feature counters sent to Cloudflare Analytics Engine via `POST /api/analytics`:
-  - Feature action name (e.g., `note_created`, `command_palette_opened`)
-  - Application version (e.g., `1.4.0`)
-- **Cloudflare Web Analytics vs. Feature Analytics:**
-  - **Cloudflare Web Analytics:** Edge-level, cookieless metrics for traffic, page views, referrers, and Web Vitals performance.
+  - Feature action name (e.g., `note_created`, `markdown_export_succeeded`)
+  - Application version (e.g., `1.5.1`)
+- **Cloudflare Web Analytics vs. Product Analytics:**
+  - **Cloudflare Web Analytics:** Edge-level, cookieless metrics for traffic, page views, referrers, and Core Web Vitals.
   - **Cloudflare Analytics Engine:** Product feature usage counters recorded into the `rook_lite_events` dataset.
+- **Private Analytics Dashboard:**
+  - Accessible to project owners at `/internal/analytics`.
+  - Protected at the Cloudflare edge via Cloudflare Access Zero Trust or an admin secret token (`INTERNAL_ANALYTICS_SECRET`).
+  - Displays only server-side aggregates across 7d, 30d, and 90d windows: total events, most-used features, daily trends, app-version adoption, and operation outcome success rates.
 
-### Phase 1 Event Allow-List
+### Event Allow-List
 
+#### Feature Usage Counters
 | Event Name | Description | Trigger Condition |
 | --- | --- | --- |
 | `app_opened` | Application initialized | Emitted at most once per application load |
@@ -76,12 +82,25 @@ Rook Lite is designed with a strict privacy-first, local-first philosophy:
 | `command_palette_opened` | Command palette opened | Emitted when the command palette is opened |
 | `ai_summary_used` | Local AI summary generated | Emitted after successfully generating a summary with Ollama |
 
+#### Operation Outcome & Health Events
+| Event Name | Description | Trigger Condition |
+| --- | --- | --- |
+| `markdown_export_started` | Markdown export initiated | Emitted when user triggers ZIP or directory export |
+| `markdown_export_succeeded` | Markdown export completed | Emitted when markdown export finishes successfully |
+| `markdown_export_failed` | Markdown export encountered error | Emitted when export fails (e.g. storage or FS permission error) |
+| `backup_import_started` | Backup restore initiated | Emitted when user confirms restoring a JSON backup |
+| `backup_import_succeeded` | Backup restore completed | Emitted when JSON backup is successfully written to IndexedDB |
+| `backup_import_failed` | Backup restore encountered error | Emitted when JSON validation or IndexedDB restore fails |
+| `ai_summary_started` | Ollama generation initiated | Emitted when summary generation starts with local Ollama |
+| `ai_summary_succeeded` | Ollama generation completed | Emitted when Ollama responds successfully without errors |
+| `ai_summary_failed` | Ollama generation encountered error | Emitted when Ollama times out, is unreachable, or falls back |
+
 ### Cloudflare Analytics Engine Schema
 
 Data points written to the `rook_lite_events` dataset follow this schema:
 
-- `blob1`: Event name (string, e.g., `"note_created"`)
-- `blob2`: Application version (string, e.g., `"1.4.0"`)
+- `blob1`: Event name (string, e.g., `"note_created"`, `"markdown_export_succeeded"`)
+- `blob2`: Application version (string, e.g., `"1.5.1"`)
 - `double1`: Event count (number, always `1`)
 - `index1`: Query & sampling index (string, always `"rook-lite"`)
 

@@ -109,7 +109,7 @@ describe("Frontend Analytics Service", () => {
     });
   });
 
-  it("supports all 11 defined Phase 1 events", () => {
+  it("supports all defined Phase 1 and Phase 2 outcome events", () => {
     const expectedEvents: AnalyticsEvent[] = [
       "app_opened",
       "note_created",
@@ -121,10 +121,31 @@ describe("Frontend Analytics Service", () => {
       "backup_imported",
       "template_used",
       "command_palette_opened",
-      "ai_summary_used"
+      "ai_summary_used",
+      "markdown_export_started",
+      "markdown_export_succeeded",
+      "markdown_export_failed",
+      "backup_import_started",
+      "backup_import_succeeded",
+      "backup_import_failed",
+      "ai_summary_started",
+      "ai_summary_succeeded",
+      "ai_summary_failed"
     ];
 
     expect([...ALLOWED_ANALYTICS_EVENTS].sort()).toEqual(expectedEvents.sort());
+  });
+
+  it("does not send lifecycle outcome events when analytics are disabled", async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    await setAnalyticsEnabled(false);
+    await track("markdown_export_started");
+    await track("backup_import_failed");
+    await track("ai_summary_succeeded");
+
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it("renders privacy settings toggle and updates preference when toggled", async () => {
