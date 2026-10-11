@@ -23,6 +23,7 @@ export interface CommandPaletteOptions {
   getContext: () => CommandContext;
   actions: CommandActions;
   onNavigate?: (url: string) => void;
+  onOpen?: () => void;
 }
 
 export class CommandPaletteController {
@@ -197,6 +198,7 @@ export class CommandPaletteController {
   public async open(initialQuery = ""): Promise<void> {
     if (this.openState) return;
     this.openState = true;
+    this.options.onOpen?.();
     this.previousActiveElement = document.activeElement as HTMLElement | null;
 
     this.host.classList.add("is-open");

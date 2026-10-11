@@ -15,6 +15,8 @@ import { buildWikilinkInsertion, getLinkPickerCandidates } from "./link-picker";
 import { CommandPaletteController } from "./command-palette/commandPalette";
 import type { CommandActions, CommandContext } from "./command-palette/types";
 import { APP_VERSION } from "./version";
+import { isAnalyticsEnabled, setAnalyticsEnabled, track } from "./analytics/analytics";
+import { renderInternalAnalytics } from "./analytics/dashboard";
 
 type ThemePreference = "SYSTEM" | "LIGHT" | "DARK";
 
@@ -25,6 +27,8 @@ const summaries = new SummaryService();
 let draftTimer: number | undefined;
 let paletteController: CommandPaletteController | null = null;
 let currentActiveNote: Note | null = null;
+let lastOpenedSummaryPeriodKey: string | null = null;
+let appOpenedTracked = false;
 
 export const icons = {
   link: '<path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/>',
@@ -162,19 +166,32 @@ function initCommandPalette(): void {
       showShortcutsDialog();
     },
     exportMarkdownZip: async () => {
-      const allNotes = await notes.listAll();
-      downloadMarkdownZip(allNotes);
+      void track("markdown_export_started");
+      try {
+        const allNotes = await notes.listAll();
+        downloadMarkdownZip(allNotes);
+        void track("markdown_export_succeeded");
+        void track("markdown_exported");
+      } catch (err) {
+        void track("markdown_export_failed");
+        alert(errorMessage(err));
+      }
     },
     exportMarkdownDirectory: async () => {
+      void track("markdown_export_started");
       try {
         const allNotes = await notes.listAll();
         await exportToDirectory(allNotes);
+        void track("markdown_export_succeeded");
+        void track("markdown_exported");
       } catch (err) {
+        void track("markdown_export_failed");
         alert(errorMessage(err));
       }
     },
     createBackup: async () => {
       downloadJson(await createBackup());
+      void track("backup_exported");
     },
     triggerRestoreBackup: () => {
       const input = document.createElement("input");
@@ -187,9 +204,17 @@ function initCommandPalette(): void {
           const backup = parseBackup(await file.text());
           const s = currentStrings();
           showConfirm(s.replaceDataTitle, s.replaceDataMessage(backup.notes.length, backup.summaries.length), s.restoreBackupBtn, async () => {
-            await restoreBackup(backup);
-            await refreshCalendar();
-            await renderRoute();
+            void track("backup_import_started");
+            try {
+              await restoreBackup(backup);
+              void track("backup_import_succeeded");
+              void track("backup_imported");
+              await refreshCalendar();
+              await renderRoute();
+            } catch (err) {
+              void track("backup_import_failed");
+              alert(errorMessage(err));
+            }
           });
         } catch (err) {
           alert(errorMessage(err));
@@ -210,6 +235,7 @@ function initCommandPalette(): void {
       const s = currentStrings();
       showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
         await notes.delete(note.id);
+        void track("note_deleted");
         await refreshCalendar();
         await renderRoute();
       });
@@ -247,6 +273,9 @@ function initCommandPalette(): void {
     getNotes: () => notes.listAll(),
     getContext,
     actions,
+    onOpen: () => {
+      void track("command_palette_opened");
+    },
     onNavigate: (url) => {
       const parsed = new URL(url, location.origin);
       const isSamePath = parsed.pathname === location.pathname;
@@ -295,10 +324,13 @@ async function refreshCalendar(): Promise<void> {
 
 export async function renderRoute(): Promise<void> {
   const content = requireElement<HTMLElement>("#page-content"); const path = appPath();
+  if (path !== "/summaries") {
+    lastOpenedSummaryPeriodKey = null;
+  }
   document.querySelectorAll<HTMLElement>("[data-path]").forEach((link) => link.classList.toggle("is-active", link.dataset.path === "/" ? path === "/" : path.startsWith(link.dataset.path ?? "")));
   try {
     if (path === "/") await renderToday(content); else if (path === "/search") await renderSearch(content);
-    else if (path === "/summaries") await renderSummariesV2(content); else if (path === "/todos") await renderTodos(content); else if (path === "/data") await renderData(content); else if (path === "/settings") await renderSettings(content); else renderNotFound(content);
+    else if (path === "/summaries") await renderSummariesV2(content); else if (path === "/todos") await renderTodos(content); else if (path === "/data") await renderData(content); else if (path === "/settings") await renderSettings(content); else if (path === "/internal/analytics") await renderInternalAnalytics(content); else renderNotFound(content);
   } catch (error) { content.innerHTML = `<p class="notice error">${escapeHtml(errorMessage(error))}</p>`; }
   normalizeAppLinks(); document.body.classList.remove("sidebar-drawer-open"); content.focus({ preventScroll: true }); highlightLinkedNote();
 }
@@ -358,6 +390,7 @@ function applyTemplateText(form: HTMLFormElement, textarea: HTMLTextAreaElement,
   updateEditorWordCount(form);
   form.classList.add("has-content");
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  void track("template_used");
 }
 
 export async function renderToday(content: HTMLElement): Promise<void> {
@@ -594,6 +627,7 @@ function bindCreateEditor(date: string): void {
       resizeEditor(textarea);
       updateComposer();
       await notes.create(content, date);
+      void track("note_created");
       await renderRoute();
     } catch (error) {
       status(form, errorMessage(error), true);
@@ -619,7 +653,7 @@ function bindCreateEditor(date: string): void {
 
 function bindNoteActions(): void {
   const s = currentStrings();
-  document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => { await notes.delete(button.dataset.deleteNote ?? ""); await refreshCalendar(); await renderRoute(); })));
+  document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => { await notes.delete(button.dataset.deleteNote ?? ""); void track("note_deleted"); await refreshCalendar(); await renderRoute(); })));
   document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note); }));
   document.querySelectorAll<HTMLButtonElement>("[data-copy-note]").forEach((button) =>
     button.addEventListener("click", async () => {
@@ -717,6 +751,7 @@ export function showEditDialog(note: Note): void {
     if (!textarea.value.trim()) {
       showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
         await notes.delete(note.id);
+        void track("note_deleted");
         closeDialog();
         await refreshCalendar();
         await renderRoute();
@@ -1028,7 +1063,32 @@ export async function renderSummaries(content: HTMLElement): Promise<void> {
   document.title = "Summaries · Rook Lite";
   content.innerHTML = `<div class="page-head"><div><h1>Summaries</h1><p class="lede">Turn your local notes into an overview without sending them anywhere.</p></div></div><form id="summary-period-form" class="search-page-form lite-summary-controls"><div class="search-page-controls"><div class="search-filter"><label for="summary-type">Period</label><select id="summary-type" name="type">${["weekly", "monthly", "yearly", "custom"].map((option) => `<option value="${option}" ${option === period.type ? "selected" : ""}>${option[0].toUpperCase() + option.slice(1)}</option>`).join("")}</select></div><div class="search-filter"><label for="summary-start">${period.type === "custom" ? "Start" : "Date in period"}</label><input id="summary-start" name="start" type="date" value="${period.type === "custom" ? period.start : anchor}"></div><div class="search-filter" id="summary-end-wrap" ${period.type === "custom" ? "" : "hidden"}><label for="summary-end">End</label><input id="summary-end" name="end" type="date" value="${period.end}"></div></div><button type="submit">Show period</button></form><section id="summary-block" class="summary"><div class="summary-heading"><div><p class="summary-kicker">${period.start} to ${period.end}</p><h2>${period.type[0].toUpperCase() + period.type.slice(1)} summary</h2></div>${current ? '<span class="summary-status">Ready</span>' : ""}</div>${current ? `<p class="muted summary-meta"><span>${current.engine}</span>${current.model ? `<span> · ${escapeHtml(current.model)}</span>` : ""}${current.editedMarkdown ? '<span class="pill">edited</span>' : ""}</p><div class="prose">${renderMarkdown(current.editedMarkdown ?? current.generatedMarkdown)}</div><details class="summary-edit"><summary>Edit</summary><form id="summary-edit-form"><textarea name="text" rows="10">${escapeHtml(current.editedMarkdown ?? current.generatedMarkdown)}</textarea><p class="hint">Your edit is stored separately from regenerated text.</p><button type="submit">Save</button></form></details><button type="button" class="linklike" id="generate-summary">Write it again</button>` : '<p class="muted">No summary for this period yet. Rule-based generation works entirely offline.</p><button type="button" id="generate-summary">Write it</button>'}<p class="notice error" id="summary-error" hidden></p></section>${stored.length > (current ? 1 : 0) ? `<section class="summary-history-section"><div class="summary-history-head"><div><h2>Previous summaries</h2></div><span class="summary-history-count">${stored.length - (current ? 1 : 0)}</span></div><div class="summary-history-list">${stored.filter((summary) => summary.id !== current?.id).map((summary) => `<div class="summary-history-item"><div class="summary-history-summary"><div class="summary-history-copy"><strong>${summary.periodStart} to ${summary.periodEnd}</strong><span>${summary.type} · ${summary.engine} · ${summary.noteCount} notes</span></div></div></div>`).join("")}</div></section>` : ""}`;
   const periodForm = requireElement<HTMLFormElement>("#summary-period-form"); requireElement<HTMLSelectElement>("#summary-type").addEventListener("change", (event) => { requireElement<HTMLElement>("#summary-end-wrap").hidden = (event.currentTarget as HTMLSelectElement).value !== "custom"; }); periodForm.addEventListener("submit", (event) => { event.preventDefault(); const data = new FormData(periodForm); const next = new URLSearchParams({ type: data.get("type")?.toString() ?? "weekly", start: data.get("start")?.toString() ?? isoDate(new Date()) }); if (data.get("type") === "custom") next.set("end", data.get("end")?.toString() ?? ""); history.replaceState({}, "", appUrl(`/summaries?${next}`)); void renderRoute(); });
-  requireElement<HTMLButtonElement>("#generate-summary").addEventListener("click", async (event) => { const button = event.currentTarget as HTMLButtonElement; button.disabled = true; const settings = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS; const source = allNotes.filter((note) => note.noteDate >= period.start && note.noteDate <= period.end); const engine = settings.enabled ? new OllamaSummaryEngine(settings) : new RuleBasedSummaryEngine(); try { const result = await summaries.generate(source, period, engine); if (result.fallbackError) sessionStorage.setItem("summary-fallback", result.fallbackError); await renderRoute(); } catch (error) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = errorMessage(error); button.disabled = false; } });
+  requireElement<HTMLButtonElement>("#generate-summary").addEventListener("click", async (event) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    button.disabled = true;
+    const settings = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS;
+    const source = allNotes.filter((note) => note.noteDate >= period.start && note.noteDate <= period.end);
+    const isOllama = settings.enabled;
+    const engine = isOllama ? new OllamaSummaryEngine(settings) : new RuleBasedSummaryEngine();
+    if (isOllama) void track("ai_summary_started");
+    try {
+      const result = await summaries.generate(source, period, engine);
+      if (result.fallbackError) {
+        if (isOllama) void track("ai_summary_failed");
+        sessionStorage.setItem("summary-fallback", result.fallbackError);
+      } else if (result.summary.engine === "ollama") {
+        void track("ai_summary_succeeded");
+        void track("ai_summary_used");
+      }
+      await renderRoute();
+    } catch (error) {
+      if (isOllama) void track("ai_summary_failed");
+      const message = requireElement<HTMLElement>("#summary-error");
+      message.hidden = false;
+      message.textContent = errorMessage(error);
+      button.disabled = false;
+    }
+  });
   const fallback = sessionStorage.getItem("summary-fallback"); if (fallback) { const message = requireElement<HTMLElement>("#summary-error"); message.hidden = false; message.textContent = s.ollamaFallbackNotice(fallback); sessionStorage.removeItem("summary-fallback"); }
   const editForm = document.querySelector<HTMLFormElement>("#summary-edit-form"); editForm?.addEventListener("submit", async (event) => { event.preventDefault(); if (!current) return; await summaries.edit(current.id, new FormData(editForm).get("text")?.toString() ?? ""); await renderRoute(); });
 }
@@ -1055,6 +1115,16 @@ export async function renderSummariesV2(content: HTMLElement): Promise<void> {
   const range = `${formatShortDate(period.start)} – ${formatShortDate(period.end)}`;
   const shownMarkdown = current?.editedMarkdown ?? current?.generatedMarkdown;
   const s = currentStrings();
+
+  const summaryKey = `${period.type}:${period.start}:${period.end}`;
+  if (summaryKey !== lastOpenedSummaryPeriodKey) {
+    lastOpenedSummaryPeriodKey = summaryKey;
+    if (period.type === "weekly") {
+      void track("weekly_summary_opened");
+    } else if (period.type === "monthly") {
+      void track("monthly_summary_opened");
+    }
+  }
 
   document.title = `${s.summariesTitle} · Rook Lite`;
 
@@ -1083,11 +1153,20 @@ export async function renderSummariesV2(content: HTMLElement): Promise<void> {
     button.disabled = true;
     button.textContent = s.generatingSummary;
     const engine = new RuleBasedSummaryEngine();
+    const isOllama: boolean = (engine.id as string) === "ollama";
+    if (isOllama) void track("ai_summary_started");
     try {
       const result = await summaries.generate(source, period, engine);
-      if (result.fallbackError) sessionStorage.setItem("summary-fallback", result.fallbackError);
+      if (result.fallbackError) {
+        if (isOllama) void track("ai_summary_failed");
+        sessionStorage.setItem("summary-fallback", result.fallbackError);
+      } else if (result.summary.engine === "ollama") {
+        void track("ai_summary_succeeded");
+        void track("ai_summary_used");
+      }
       await renderRoute();
     } catch (error) {
+      if (isOllama) void track("ai_summary_failed");
       const message = requireElement<HTMLElement>("#summary-error");
       message.hidden = false;
       message.textContent = errorMessage(error);
@@ -1123,6 +1202,7 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
   const counts = await storageCounts();
   const allNotes = await notes.listAll();
   const lastExport = await settingsRepository.get<string>("lastExportAt");
+  const analyticsEnabled = await isAnalyticsEnabled();
   const ollama = await settingsRepository.get<OllamaSettings>("ollama") ?? DEFAULT_OLLAMA_SETTINGS;
   const estimate = await navigator.storage?.estimate?.();
   const persisted = await navigator.storage?.persisted?.();
@@ -1287,6 +1367,48 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
           </div>
           <div class="settings-row-action">
             <a href="https://github.com/volkanto/rook-lite" target="_blank" rel="noopener noreferrer" class="secondary-button icon-action-btn" title="GitHub" aria-label="GitHub">${svg(icons.github, "btn-action-icon")}<span class="visually-hidden">GitHub</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section" id="privacy-section">
+        <h2 class="settings-section-title">${s.privacyTitle}</h2>
+
+        <div class="settings-row settings-toggle-row">
+          <div class="settings-row-info">
+            <div class="title-with-badge">
+              <span class="settings-row-label">${s.analyticsTitle}</span>
+              <span class="ai-privacy-pill" id="analytics-status-pill">${analyticsEnabled ? s.analyticsStatusEnabled : s.analyticsStatusDisabled}</span>
+            </div>
+            <span class="settings-row-desc">${s.analyticsSubtitle}</span>
+            <div class="analytics-privacy-details">
+              <span class="analytics-privacy-heading">${s.analyticsNeverCollectedTitle}:</span>
+              <ul class="analytics-never-collected-list">
+                <li>${s.analyticsNeverNoteContents}</li>
+                <li>${s.analyticsNeverNoteTitles}</li>
+                <li>${s.analyticsNeverTags}</li>
+                <li>${s.analyticsNeverSearches}</li>
+                <li>${s.analyticsNeverAi}</li>
+                <li>${s.analyticsNeverIdentifiers}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="settings-row-action">
+            <label class="toggle-switch" for="analytics-enabled-toggle" title="${s.analyticsTitle}">
+              <input type="checkbox" id="analytics-enabled-toggle" ${analyticsEnabled ? "checked" : ""}>
+              <span class="toggle-slider"></span>
+              <span class="visually-hidden">${s.analyticsTitle}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <span class="settings-row-label">Internal Analytics Dashboard</span>
+            <span class="settings-row-desc">View private, aggregate product usage statistics and operation success rates.</span>
+          </div>
+          <div class="settings-row-action">
+            <a href="${appUrl("/internal/analytics")}" class="secondary-button" data-link style="text-decoration: none;">Open Dashboard</a>
           </div>
         </div>
       </section>
@@ -1461,20 +1583,43 @@ function bindSettingsEvents(content: HTMLElement): void {
     void loadModels(false);
   }
 
+  const analyticsToggle = content.querySelector<HTMLInputElement>("#analytics-enabled-toggle");
+  analyticsToggle?.addEventListener("change", async () => {
+    const isEnabled = analyticsToggle.checked;
+    await setAnalyticsEnabled(isEnabled);
+    const pill = content.querySelector<HTMLElement>("#analytics-status-pill");
+    if (pill) {
+      pill.textContent = isEnabled ? s.analyticsStatusEnabled : s.analyticsStatusDisabled;
+    }
+  });
+
   content.querySelector<HTMLButtonElement>("#zip-export")?.addEventListener("click", () => {
-    void notes.listAll().then((allN) => downloadMarkdownZip(allN));
+    void track("markdown_export_started");
+    void notes.listAll().then((allN) => {
+      downloadMarkdownZip(allN);
+      void track("markdown_export_succeeded");
+      void track("markdown_exported");
+    }).catch((error) => {
+      void track("markdown_export_failed");
+      dataMessage(errorMessage(error), true);
+    });
   });
   content.querySelector<HTMLButtonElement>("#directory-export")?.addEventListener("click", async () => {
+    void track("markdown_export_started");
     try {
       const allN = await notes.listAll();
       const count = await exportToDirectory(allN);
+      void track("markdown_export_succeeded");
+      void track("markdown_exported");
       dataMessage(s.exportedNotesCount(count), false);
     } catch (error) {
+      void track("markdown_export_failed");
       dataMessage(errorMessage(error), true);
     }
   });
   content.querySelector<HTMLButtonElement>("#create-backup")?.addEventListener("click", async () => {
     downloadJson(await createBackup());
+    void track("backup_exported");
   });
   content.querySelector<HTMLInputElement>("#restore-backup")?.addEventListener("change", async (event) => {
     const file = (event.currentTarget as HTMLInputElement).files?.[0];
@@ -1486,9 +1631,17 @@ function bindSettingsEvents(content: HTMLElement): void {
         s.replaceDataMessage(backup.notes.length, backup.summaries.length),
         s.restoreBackupBtn,
         async () => {
-          await restoreBackup(backup);
-          await refreshCalendar();
-          await renderRoute();
+          void track("backup_import_started");
+          try {
+            await restoreBackup(backup);
+            void track("backup_import_succeeded");
+            void track("backup_imported");
+            await refreshCalendar();
+            await renderRoute();
+          } catch (error) {
+            void track("backup_import_failed");
+            dataMessage(errorMessage(error), true);
+          }
         }
       );
     } catch (error) {
@@ -2174,7 +2327,19 @@ function formatTime(createdAt: string, noteDate: string): string { return format
 function errorMessage(error: unknown): string { const s = currentStrings(); return error instanceof Error ? error.message : s.somethingWentWrong; }
 function requireElement<T extends Element>(selector: string): T { const element = document.querySelector<T>(selector); if (!element) throw new Error(`Missing required element: ${selector}`); return element; }
 
-async function start(): Promise<void> { try { setLocale(getLocale()); await initializeLocalData(); await renderShell(); } catch (error) { requireElement<HTMLDivElement>("#app").innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`; } }
+async function start(): Promise<void> {
+  try {
+    setLocale(getLocale());
+    await initializeLocalData();
+    await renderShell();
+    if (!appOpenedTracked) {
+      appOpenedTracked = true;
+      void track("app_opened");
+    }
+  } catch (error) {
+    requireElement<HTMLDivElement>("#app").innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`;
+  }
+}
 
 if (import.meta.env.MODE !== "test") {
   void start();

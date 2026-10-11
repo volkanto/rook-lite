@@ -1,0 +1,7 @@
+name = "rook-lite"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "dist"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "rook_lite_events"

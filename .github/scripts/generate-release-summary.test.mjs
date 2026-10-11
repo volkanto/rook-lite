@@ -70,6 +70,9 @@ describe('generate-release-summary', () => {
       expect(prompt).toContain('Rook Lite');
       expect(prompt).toContain('Anti-Fluff');
       expect(prompt).toContain('Anti-Exaggeration');
+      expect(prompt).toContain('## Highlights');
+      expect(prompt).toContain('### ✨ What\'s New');
+      expect(prompt).toContain('### ⚡ Improvements & Refactoring');
       expect(prompt).toContain('<|im_start|>user');
       expect(prompt).toContain('#12: [features] feat: add wikilinks');
       expect(prompt).toContain('#14: [fixes] fix: prevent empty save');
@@ -106,6 +109,13 @@ describe('generate-release-summary', () => {
       expect(sanitized).toBe(`### ✨ What's New\n- Added note grouping (#10)`);
       expect(sanitized).not.toContain('system');
       expect(sanitized).not.toContain('Here are PRs');
+    });
+
+    it('strips llama-cli "> EOF by user" interactive artifacts', () => {
+      const raw = `### ✨ What's New\n- Added note grouping (#10)\n\n> EOF by user`;
+      const sanitized = sanitizeLlamaOutput(raw);
+      expect(sanitized).toBe(`### ✨ What's New\n- Added note grouping (#10)`);
+      expect(sanitized).not.toContain('EOF by user');
     });
   });
 
