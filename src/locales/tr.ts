@@ -196,6 +196,10 @@ export const locale: LocaleDefinition = {
 
     settingsTitle: "Ayarlar",
     settingsLede: "Görünüm, dil, yerel yapay zeka, kalıcı depolama ve yerel verileri yapılandırın.",
+    settingsTabGeneral: "Genel",
+    settingsTabData: "Veri ve Depolama",
+    settingsTabAi: "Yerel Yapay Zeka",
+    settingsTabPrivacy: "Gizlilik",
 
     languageTitle: "Dil",
     languageSubtitle: "Arayüz için tercih ettiğiniz dili seçin.",
@@ -249,6 +253,7 @@ export const locale: LocaleDefinition = {
 
     storageTitle: "Depolama ve Kalıcılık",
     storageSubtitle: "Notlarınız ve özetleriniz doğrudan tarayıcınızın içinde saklanır.",
+    storageQuotaHint: "Cihazın kullanılabilir disk alanına göre tarayıcı tarafından ayrılmıştır · %100 çevrimdışı",
     metricNotes: "Notlar",
     metricSummaries: "Özetler",
     metricDrafts: "Taslaklar",
