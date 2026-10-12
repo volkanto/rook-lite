@@ -30,6 +30,13 @@ export const locale: LocaleDefinition = {
     localOnlyTooltip: "Yalnızca yerel · bu tarayıcıda saklanır",
     languageSelectTooltip: "Dili değiştir / Switch language",
     githubTooltip: "GitHub kaynak kodu",
+    supportTooltip: "Rook Lite'ı Destekleyin",
+    supportTitle: "Geliştirmeyi Destekleyin",
+    supportSubtitle: "Ücretsiz, gizli ve %100 çevrimdışı",
+    supportGithubLabel: "GitHub Sponsors",
+    supportGithubDesc: "github.com/sponsors/volkanto",
+    supportBmacLabel: "Buy Me a Coffee",
+    supportBmacDesc: "buymeacoffee.com/volkanto",
     toolBold: "Kalın",
     toolItalic: "İtalik",
     toolQuote: "Alıntı",
@@ -196,6 +203,10 @@ export const locale: LocaleDefinition = {
 
     settingsTitle: "Ayarlar",
     settingsLede: "Görünüm, dil, yerel yapay zeka, kalıcı depolama ve yerel verileri yapılandırın.",
+    settingsTabGeneral: "Genel",
+    settingsTabData: "Veri ve Depolama",
+    settingsTabAi: "Yerel Yapay Zeka",
+    settingsTabPrivacy: "Gizlilik",
 
     languageTitle: "Dil",
     languageSubtitle: "Arayüz için tercih ettiğiniz dili seçin.",
@@ -249,6 +260,7 @@ export const locale: LocaleDefinition = {
 
     storageTitle: "Depolama ve Kalıcılık",
     storageSubtitle: "Notlarınız ve özetleriniz doğrudan tarayıcınızın içinde saklanır.",
+    storageQuotaHint: "Cihazın kullanılabilir disk alanına göre tarayıcı tarafından ayrılmıştır · %100 çevrimdışı",
     metricNotes: "Notlar",
     metricSummaries: "Özetler",
     metricDrafts: "Taslaklar",

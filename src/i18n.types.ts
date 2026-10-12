@@ -23,6 +23,13 @@ export interface TranslationStrings {
   localOnlyTooltip: string;
   languageSelectTooltip: string;
   githubTooltip: string;
+  supportTooltip: string;
+  supportTitle: string;
+  supportSubtitle: string;
+  supportGithubLabel: string;
+  supportGithubDesc: string;
+  supportBmacLabel: string;
+  supportBmacDesc: string;
   toolBold: string;
   toolItalic: string;
   toolQuote: string;
@@ -194,6 +201,10 @@ export interface TranslationStrings {
   // Settings View
   settingsTitle: string;
   settingsLede: string;
+  settingsTabGeneral: string;
+  settingsTabData: string;
+  settingsTabAi: string;
+  settingsTabPrivacy: string;
 
   // Language settings
   languageTitle: string;
@@ -252,6 +263,7 @@ export interface TranslationStrings {
   // Storage & Persistence settings
   storageTitle: string;
   storageSubtitle: string;
+  storageQuotaHint: string;
   metricNotes: string;
   metricSummaries: string;
   metricDrafts: string;
