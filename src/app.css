@@ -1108,63 +1108,63 @@ body.app .sidebar nav a.is-active .nav-label {
        Application surfaces
        ----------------------------------------------------------------------- */
 
-    --color-bg-app: #F7F7FA;
-    --color-bg-page: #F7F7FA;
+    --color-bg-app: #F7F7F8;
+    --color-bg-page: #F7F7F8;
     --color-bg-surface: #FFFFFF;
     --color-bg-raised: #FFFFFF;
-    --color-bg-sunken: #F2F4F7;
-    --color-bg-hover: #EEF1F5;
-    --color-bg-active: #E8ECF3;
-    --color-bg-selected: #ECECFF;
+    --color-bg-sunken: #F1F1F3;
+    --color-bg-hover: #EFEFEF;
+    --color-bg-active: #E8E8EC;
+    --color-bg-selected: #EFF6FF;
     --color-bg-overlay: rgba(15, 23, 42, 0.48);
 
     /* -----------------------------------------------------------------------
        Typography
        ----------------------------------------------------------------------- */
 
-    --color-text-primary: #1F2937;
-    --color-text-secondary: #667085;
-    --color-text-tertiary: #7A8599;
-    --color-text-muted: #98A2B3;
-    --color-text-disabled: #B6BEC9;
+    --color-text-primary: #191919;
+    --color-text-secondary: #5A5A5A;
+    --color-text-tertiary: #787878;
+    --color-text-muted: #9E9E9E;
+    --color-text-disabled: #C7C7CE;
     --color-text-inverse: #FFFFFF;
 
-    --color-text-link: #5B5BD6;
-    --color-text-link-hover: #4B4BC3;
+    --color-text-link: #2563EB;
+    --color-text-link-hover: #1D4ED8;
 
     /* -----------------------------------------------------------------------
        Icons
        ----------------------------------------------------------------------- */
 
-    --color-icon-primary: #344054;
-    --color-icon-secondary: #667085;
-    --color-icon-muted: #98A2B3;
+    --color-icon-primary: #191919;
+    --color-icon-secondary: #5A5A5A;
+    --color-icon-muted: #9E9E9E;
 
     /* -----------------------------------------------------------------------
        Borders
        ----------------------------------------------------------------------- */
 
-    --color-border-subtle: #ECEFF3;
-    --color-border-default: #E5E7EB;
-    --color-border-strong: #D0D5DD;
-    --color-border-hover: #BFC6D4;
+    --color-border-subtle: #E8E8EC;
+    --color-border-default: #DFDFE4;
+    --color-border-strong: #C7C7CE;
+    --color-border-hover: #A8A8B2;
 
     /* -----------------------------------------------------------------------
        Focus
        ----------------------------------------------------------------------- */
 
-    --color-focus: #5B5BD6;
-    --color-focus-ring: #A5B4FC;
+    --color-focus: #3B82F6;
+    --color-focus-ring: #BFDBFE;
 
     /* -----------------------------------------------------------------------
        Brand
        ----------------------------------------------------------------------- */
 
-    --color-brand: #5B5BD6;
-    --color-brand-hover: #4B4BC3;
-    --color-brand-active: #3F3FB4;
-    --color-brand-soft: #ECECFF;
-    --color-brand-softer: #F5F5FF;
+    --color-brand: #2563EB;
+    --color-brand-hover: #1D4ED8;
+    --color-brand-active: #1E40AF;
+    --color-brand-soft: #EFF6FF;
+    --color-brand-softer: #F8FAFC;
     --color-on-brand: #FFFFFF;
 
     /* -----------------------------------------------------------------------
@@ -1406,62 +1406,62 @@ body.app .sidebar nav a.is-active .nav-label {
 
 :root[data-theme="dark"] {
 
-    /* surfaces - Pitch black sidebar + Soft matte dark canvas */
+    /* surfaces - Notion Dark Obsidian Canvas + Things 3 Blue */
 
-    --color-bg-sidebar: #000000;
-    --color-bg-app: #121214;
-    --color-bg-page: #121214;
+    --color-bg-sidebar: #131315;
+    --color-bg-app: #19191D;
+    --color-bg-page: #19191D;
 
-    --color-bg-surface: #18181b;
-    --color-bg-raised: #202024;
+    --color-bg-surface: #202024;
+    --color-bg-raised: #28282D;
 
-    --color-bg-sunken: #0c0c0e;
-    --color-bg-hover: #222226;
-    --color-bg-active: #2a2a2f;
+    --color-bg-sunken: #131315;
+    --color-bg-hover: #2A2A30;
+    --color-bg-active: #32323A;
 
-    --color-bg-selected: #26262b;
+    --color-bg-selected: rgba(59, 130, 246, 0.16);
 
     --color-bg-overlay: rgba(0, 0, 0, 0.78);
 
     /* typography */
 
-    --color-text-primary: #F4F4F5;
-    --color-text-secondary: #A1A1AA;
-    --color-text-tertiary: #85858f;
-    --color-text-muted: #71717A;
+    --color-text-primary: #F5F5F7;
+    --color-text-secondary: #A0A0A8;
+    --color-text-tertiary: #84848E;
+    --color-text-muted: #6E6E78;
     --color-text-disabled: #52525B;
 
     --color-text-inverse: #000000;
 
-    --color-text-link: #E4E4E7;
-    --color-text-link-hover: #FFFFFF;
+    --color-text-link: #60A5FA;
+    --color-text-link-hover: #93C5FD;
 
     /* icons */
 
-    --color-icon-primary: #F4F4F5;
-    --color-icon-secondary: #A1A1AA;
-    --color-icon-muted: #71717A;
+    --color-icon-primary: #F5F5F7;
+    --color-icon-secondary: #A0A0A8;
+    --color-icon-muted: #6E6E78;
 
     /* borders - soft, refined neutral charcoal */
 
-    --color-border-subtle: #1e1e22;
-    --color-border-default: #27272b;
-    --color-border-strong: #36363c;
-    --color-border-hover: #45454d;
+    --color-border-subtle: #2C2C32;
+    --color-border-default: #383840;
+    --color-border-strong: #484852;
+    --color-border-hover: #585864;
 
     /* focus - calm neutral off-white */
 
-    --color-focus: #FFFFFF;
-    --color-focus-ring: rgba(255, 255, 255, 0.25);
+    --color-focus: #60A5FA;
+    --color-focus-ring: rgba(96, 165, 250, 0.28);
 
-    /* brand - calm clean monochrome contrast */
+    /* brand - calm clean contrast */
 
-    --color-brand: #FFFFFF;
-    --color-brand-hover: #F4F4F5;
-    --color-brand-active: #E4E4E7;
+    --color-brand: #60A5FA;
+    --color-brand-hover: #93C5FD;
+    --color-brand-active: #3B82F6;
 
-    --color-brand-soft: #202024;
-    --color-brand-softer: #161619;
+    --color-brand-soft: rgba(59, 130, 246, 0.16);
+    --color-brand-softer: rgba(59, 130, 246, 0.08);
 
     --color-on-brand: #09090b;
 
