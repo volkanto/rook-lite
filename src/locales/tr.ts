@@ -193,6 +193,9 @@ export const locale: LocaleDefinition = {
     todoGroupThisWeek: "Bu hafta",
     todoGroupEarlier: "Daha önce",
     todoGroupUntagged: "Etiketsiz",
+    linkedNotePanel: "Bağlantılı not",
+    closeSidePanel: "Not panelini kapat",
+    editInline: "Satır içi düzenle",
 
     editAction: "Düzenle",
     deleteAction: "Sil",

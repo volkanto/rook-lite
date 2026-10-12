@@ -194,6 +194,9 @@ export const locale: LocaleDefinition = {
     todoGroupThisWeek: "This week",
     todoGroupEarlier: "Earlier",
     todoGroupUntagged: "Untagged",
+    linkedNotePanel: "Linked note",
+    closeSidePanel: "Close note panel",
+    editInline: "Edit inline",
 
     editAction: "Edit",
     deleteAction: "Delete",

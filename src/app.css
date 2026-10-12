@@ -3850,8 +3850,7 @@ textarea {
     padding: 1.25rem;
 }
 
-.note-header,
-.note-tags {
+.note-header {
     border-style: solid;
 }
 
