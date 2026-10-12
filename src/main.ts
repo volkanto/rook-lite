@@ -956,11 +956,13 @@ export function groupTasks(
 let activeTodoNoteId: string | null = null;
 let activeTodoSidePanelMode: "view" | "edit" = "view";
 let activeTodoHighlightedLine: number | null = null;
+let activeTodoTaskText: string | null = null;
 
 export function closeTodoSidePanel(contentRoot?: HTMLElement): void {
   activeTodoNoteId = null;
   activeTodoSidePanelMode = "view";
   activeTodoHighlightedLine = null;
+  activeTodoTaskText = null;
   const root = contentRoot ?? document;
   const layout = root.querySelector<HTMLElement>("#todo-view-layout");
   const panel = root.querySelector<HTMLElement>("#todo-side-panel");
@@ -975,11 +977,11 @@ export function closeTodoSidePanel(contentRoot?: HTMLElement): void {
   root.querySelectorAll<HTMLElement>(".todo-note-jump.is-active").forEach((el) => el.classList.remove("is-active"));
 }
 
-function renderTodoSidePanelView(note: Note, allNotes: Note[] = []): string {
+function renderTodoSidePanelView(note: Note, allNotes: Note[] = [], taskText: string | null = null): string {
   const s = currentStrings();
   const formattedDate = formatDateHeading(note.noteDate);
   const backlinks = allNotes.length ? findNoteBacklinks(note, allNotes) : [];
-  return `<header class="todo-side-panel-header"><div class="todo-panel-title-group"><span class="todo-panel-icon-badge" aria-hidden="true">${svg(icons.note, "panel-icon-svg")}</span><div class="todo-panel-title-meta"><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="todo-panel-date-badge" title="${s.openCalendar}">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></a></div></div><div class="todo-panel-actions"><button type="button" class="todo-panel-btn todo-panel-edit-btn" data-panel-action="edit" title="${s.editInline}" aria-label="${s.editInline}">${svg(icons.edit, "panel-btn-svg")}<span>${s.editAction}</span></button><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="todo-panel-btn todo-panel-jump-btn" title="${s.goToNote}" aria-label="${s.goToNote}">${svg(icons.externalLink, "panel-btn-svg")}</a><button type="button" class="todo-panel-btn todo-panel-close-btn" data-panel-action="close" title="${s.closeSidePanel} (Esc)" aria-label="${s.closeSidePanel}">${svg(icons.close, "panel-btn-svg")}</button></div></header><div class="todo-side-panel-body"><article class="todo-side-panel-note"><div class="todo-panel-note-time"><time datetime="${note.createdAt}">${formatTime(note.createdAt, note.noteDate)}</time></div><div class="prose todo-panel-prose">${renderMarkdown(note.content, true)}</div>${backlinks.length ? `<div class="note-backlinks todo-panel-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags todo-panel-tags">${note.tags.map((tag) => `<a href="${appUrl(`/?date=${note.noteDate}&tag=${encodeURIComponent(tag)}`)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  return `<header class="todo-side-panel-header"><div class="todo-panel-header-top"><div class="todo-panel-kicker-badge"><span class="todo-panel-kicker-dot" aria-hidden="true"></span><span class="todo-panel-kicker">${escapeHtml(s.linkedNotePanel)}</span></div><div class="todo-panel-actions"><button type="button" class="todo-panel-btn todo-panel-edit-btn" data-panel-action="edit" title="${s.editInline}" aria-label="${s.editInline}">${svg(icons.edit, "panel-btn-svg")}<span>${s.editAction}</span></button><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="todo-panel-btn todo-panel-jump-btn" title="${s.goToNote}" aria-label="${s.goToNote}">${svg(icons.externalLink, "panel-btn-svg")}</a><button type="button" class="todo-panel-btn todo-panel-close-btn" data-panel-action="close" title="${s.closeSidePanel} (Esc)" aria-label="${s.closeSidePanel}">${svg(icons.close, "panel-btn-svg")}</button></div></div><div class="todo-panel-header-focus">${taskText ? `<h2 class="todo-panel-focus-task"><span class="focus-task-quote">“</span><span class="todo-panel-origin-task" title="${escapeHtml(taskText)}">${escapeHtml(taskText)}</span><span class="focus-task-quote">”</span></h2>` : ""}<div class="todo-panel-header-meta"><a href="${appUrl(`/?date=${note.noteDate}#note-${note.id}`)}" data-link class="todo-panel-date-badge" title="${s.openCalendar}">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></a><span class="meta-dot" aria-hidden="true">·</span><time datetime="${note.createdAt}" class="todo-panel-header-time">${formatTime(note.createdAt, note.noteDate)}</time></div></div></header><div class="todo-side-panel-body"><article class="todo-side-panel-note"><div class="prose todo-panel-prose">${renderMarkdown(note.content, true)}</div>${backlinks.length ? `<div class="note-backlinks todo-panel-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags todo-panel-tags">${note.tags.map((tag) => `<a href="${appUrl(`/?date=${note.noteDate}&tag=${encodeURIComponent(tag)}`)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 function renderTodoSidePanelEdit(note: Note): string {
@@ -1128,7 +1130,7 @@ function updateTodoSidePanel(content: HTMLElement, allNotes: Note[]): void {
     panel.innerHTML = renderTodoSidePanelEdit(currentNote);
     bindSidePanelEditMode(content, currentNote, allNotes);
   } else {
-    panel.innerHTML = renderTodoSidePanelView(currentNote, allNotes);
+    panel.innerHTML = renderTodoSidePanelView(currentNote, allNotes, activeTodoTaskText);
     bindSidePanelViewMode(content, currentNote, allNotes);
   }
 }
@@ -1137,14 +1139,15 @@ function todoItemMarkup(item: TaskItem, isSelected = false): string {
   const s = currentStrings();
   const { note, line, lineIndex } = item;
   const age = formatTaskAge(note.noteDate);
+  const taskText = line.replace(/^\s*[-*+]\s+\[ \]\s+/, "");
   const noteHeading = note.title?.trim()
     ? `${s.goToNote}: ${note.title.trim()} · ${formatShortDate(note.noteDate)}`
     : `${s.goToNote} · ${formatShortDate(note.noteDate)}`;
   return `<li class="todo-item ${isSelected ? "is-selected" : ""}" data-todo-note-id="${note.id}"><label class="lite-task-check"><input type="checkbox" data-task-note="${note.id}" data-task-line="${lineIndex}"><span>${escapeHtml(
-    line.replace(/^\s*[-*+]\s+\[ \]\s+/, "")
+    taskText
   )}</span></label><div class="todo-item-meta"><span class="todo-age-chip age-${age.ageClass}">${age.label}</span><a href="${appUrl(
     `/?date=${note.noteDate}#note-${note.id}`
-  )}" data-link data-open-note="${note.id}" data-task-line="${lineIndex}" class="todo-note-link todo-note-jump ${isSelected ? "is-active" : ""}" data-tooltip="${escapeHtml(noteHeading)}" aria-label="${escapeHtml(noteHeading)}"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="todo-jump-svg" aria-hidden="true"><path d="M4 12L12 4M12 4H6M12 4V10"/></svg></a></div></li>`;
+  )}" data-link data-open-note="${note.id}" data-task-line="${lineIndex}" data-task-text="${escapeHtml(taskText)}" class="todo-note-link todo-note-jump ${isSelected ? "is-active" : ""}" data-tooltip="${escapeHtml(noteHeading)}" aria-label="${escapeHtml(noteHeading)}"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="todo-jump-svg" aria-hidden="true"><path d="M4 12L12 4M12 4H6M12 4V10"/></svg></a></div></li>`;
 }
 
 export async function renderTodos(content: HTMLElement): Promise<void> {
@@ -1165,6 +1168,7 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
     activeTodoNoteId = null;
     activeTodoSidePanelMode = "view";
     activeTodoHighlightedLine = null;
+    activeTodoTaskText = null;
     content.classList.remove("has-todo-split");
     content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div><div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`;
     return;
@@ -1193,6 +1197,7 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
     activeTodoNoteId = null;
     activeTodoSidePanelMode = "view";
     activeTodoHighlightedLine = null;
+    activeTodoTaskText = null;
   }
   content.classList.toggle("has-todo-split", Boolean(activeNote));
 
@@ -1202,7 +1207,7 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
         .map((task) => todoItemMarkup(task, task.note.id === activeTodoNoteId))
         .join("")}</ul></section>`
     )
-    .join("")}</div></div><aside class="todo-side-panel ${activeNote ? "is-open" : ""}" id="todo-side-panel" role="complementary" aria-label="${escapeHtml(s.linkedNotePanel)}" ${activeNote ? 'aria-hidden="false"' : 'aria-hidden="true"'}>${activeNote ? (activeTodoSidePanelMode === "edit" ? renderTodoSidePanelEdit(activeNote) : renderTodoSidePanelView(activeNote, allNotes)) : ""}</aside></div>`;
+    .join("")}</div></div><div class="todo-panel-scrim" id="todo-panel-scrim" aria-hidden="true"></div><aside class="todo-side-panel ${activeNote ? "is-open" : ""}" id="todo-side-panel" role="complementary" aria-label="${escapeHtml(s.linkedNotePanel)}" ${activeNote ? 'aria-hidden="false"' : 'aria-hidden="true"'}>${activeNote ? (activeTodoSidePanelMode === "edit" ? renderTodoSidePanelEdit(activeNote) : renderTodoSidePanelView(activeNote, allNotes, activeTodoTaskText)) : ""}</aside></div>`;
 
   if (activeNote) {
     if (activeTodoSidePanelMode === "edit") {
@@ -1211,6 +1216,10 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
       bindSidePanelViewMode(content, activeNote, allNotes);
     }
   }
+
+  content.querySelector<HTMLElement>("#todo-panel-scrim")?.addEventListener("click", () => {
+    closeTodoSidePanel(content);
+  });
 
   content.querySelectorAll<HTMLAnchorElement>("[data-open-note]").forEach((link) => {
     link.addEventListener("click", (event) => {
@@ -1222,6 +1231,7 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
       const taskLine = Number(link.dataset.taskLine);
       activeTodoNoteId = noteId;
       activeTodoHighlightedLine = Number.isNaN(taskLine) ? null : taskLine;
+      activeTodoTaskText = link.dataset.taskText ?? null;
       activeTodoSidePanelMode = "view";
       updateTodoSidePanel(content, allNotes);
     });

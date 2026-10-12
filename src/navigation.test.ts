@@ -1496,6 +1496,16 @@ describe("Left menu bar icons and navigation", () => {
     expect(panel?.classList.contains("is-open")).toBe(true);
     expect(panel?.getAttribute("aria-hidden")).toBe("false");
 
+    // Verify scrim exists
+    const scrim = container.querySelector<HTMLElement>("#todo-panel-scrim");
+    expect(scrim).not.toBeNull();
+
+    // Verify kicker context shows linked note and task text
+    const kicker = panel?.querySelector<HTMLElement>(".todo-panel-kicker");
+    expect(kicker?.textContent).toContain("Linked note");
+    const originTask = panel?.querySelector<HTMLElement>(".todo-panel-origin-task");
+    expect(originTask?.textContent).toContain("Follow up with team");
+
     // Verify todo item is highlighted
     const todoItem = container.querySelector<HTMLElement>(".todo-item");
     expect(todoItem?.classList.contains("is-selected")).toBe(true);
