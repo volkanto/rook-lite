@@ -30,6 +30,13 @@ export const locale: LocaleDefinition = {
     localOnlyTooltip: "Local only · stored in this browser",
     languageSelectTooltip: "Switch language / Dili değiştir",
     githubTooltip: "Source code on GitHub",
+    supportTooltip: "Support Rook Lite",
+    supportTitle: "Support Development",
+    supportSubtitle: "Free, private, and 100% offline",
+    supportGithubLabel: "GitHub Sponsors",
+    supportGithubDesc: "github.com/sponsors/volkanto",
+    supportBmacLabel: "Buy Me a Coffee",
+    supportBmacDesc: "buymeacoffee.com/volkanto",
     toolBold: "Bold",
     toolItalic: "Italic",
     toolQuote: "Quote",
@@ -197,6 +204,10 @@ export const locale: LocaleDefinition = {
 
     settingsTitle: "Settings",
     settingsLede: "Configure appearance, language, local AI, storage persistence, and local data.",
+    settingsTabGeneral: "General",
+    settingsTabData: "Data & Storage",
+    settingsTabAi: "Local AI",
+    settingsTabPrivacy: "Privacy",
 
     languageTitle: "Language",
     languageSubtitle: "Choose your preferred language for the interface.",
@@ -250,6 +261,7 @@ export const locale: LocaleDefinition = {
 
     storageTitle: "Storage & Persistence",
     storageSubtitle: "Your notes and summaries live directly inside your browser storage.",
+    storageQuotaHint: "Allocated by your browser based on available device disk space · 100% offline",
     metricNotes: "Notes",
     metricSummaries: "Summaries",
     metricDrafts: "Drafts",

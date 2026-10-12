@@ -114,12 +114,25 @@ describe("Left menu bar icons and navigation", () => {
     expect(versionEl).not.toBeNull();
     expect(versionEl?.textContent).toMatch(/^v\d+\.\d+\.\d+/);
 
-    // Verify ordering: theme toggle -> lang picker
+    const supportPicker = footer?.querySelector(".sidebar-support-picker");
+    expect(supportPicker).not.toBeNull();
+    const supportToggle = supportPicker?.querySelector(".sidebar-support-toggle");
+    expect(supportToggle).not.toBeNull();
+    expect(supportToggle?.hasAttribute("data-sidebar-tooltip")).toBe(true);
+
+    const supportLinks = supportPicker?.querySelectorAll<HTMLAnchorElement>(".support-option-link");
+    expect(supportLinks?.length).toBe(2);
+    expect(supportLinks?.[0]?.href).toBe("https://github.com/sponsors/volkanto");
+    expect(supportLinks?.[1]?.href).toBe("https://buymeacoffee.com/volkanto");
+
+    // Verify ordering: theme toggle -> lang picker -> support picker
     const footerChildren = Array.from(footer?.children ?? []);
     const themeIdx = footerChildren.indexOf(themeToggle!);
     const langIdx = footerChildren.indexOf(langPicker!);
+    const supportIdx = footerChildren.indexOf(supportPicker!);
 
     expect(themeIdx).toBeLessThan(langIdx);
+    expect(langIdx).toBeLessThan(supportIdx);
     expect(themeToggle?.querySelectorAll("svg.nav-svg").length).toBe(2);
 
     const darkIcon = themeToggle?.querySelector(".theme-dark-icon");
