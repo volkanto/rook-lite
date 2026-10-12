@@ -1458,6 +1458,198 @@ describe("Left menu bar icons and navigation", () => {
     container.remove();
   });
 
+  it("opens linked note on the right panel with shift animation and supports inline editing rather than popup", async () => {
+    const { renderTodos, closeTodoSidePanel } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const note = await noteService.create("Meeting notes:\n- [ ] Follow up with team\nSome other notes", "2026-10-01");
+
+    const container = document.createElement("div");
+    container.id = "page-content";
+    container.className = "lite-shell-main";
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    const layout = container.querySelector<HTMLElement>("#todo-view-layout");
+    const panel = container.querySelector<HTMLElement>("#todo-side-panel");
+    const todoListPane = container.querySelector<HTMLElement>(".todo-list-pane");
+    expect(layout).not.toBeNull();
+    expect(panel).not.toBeNull();
+    expect(todoListPane).not.toBeNull();
+
+    // Initially, panel is not open
+    expect(layout?.classList.contains("has-panel-open")).toBe(false);
+    expect(panel?.classList.contains("is-open")).toBe(false);
+    expect(panel?.getAttribute("aria-hidden")).toBe("true");
+
+    // Click note jump button on the todo item
+    const noteLink = container.querySelector<HTMLAnchorElement>(".todo-item .todo-note-jump");
+    expect(noteLink).not.toBeNull();
+
+    noteLink?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    // Verify side panel opens and layout has shift class
+    expect(layout?.classList.contains("has-panel-open")).toBe(true);
+    expect(container.classList.contains("has-todo-split")).toBe(true);
+    expect(panel?.classList.contains("is-open")).toBe(true);
+    expect(panel?.getAttribute("aria-hidden")).toBe("false");
+
+    // Verify todo item is highlighted
+    const todoItem = container.querySelector<HTMLElement>(".todo-item");
+    expect(todoItem?.classList.contains("is-selected")).toBe(true);
+    expect(noteLink?.classList.contains("is-active")).toBe(true);
+
+    // Verify side panel content renders note
+    const panelProse = panel?.querySelector<HTMLElement>(".todo-panel-prose");
+    expect(panelProse?.textContent).toContain("Meeting notes:");
+    expect(panelProse?.textContent).toContain("Follow up with team");
+
+    // Verify NO modal popup dialog was opened in #dialog-host
+    const dialogHost = document.querySelector("#dialog-host");
+    expect(dialogHost?.childElementCount ?? 0).toBe(0);
+
+    // Click "Edit" button inside the panel
+    const editBtn = panel?.querySelector<HTMLButtonElement>('[data-panel-action="edit"]');
+    expect(editBtn).not.toBeNull();
+    editBtn?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    // Verify inline editor is displayed directly inside the panel (NOT a popup modal)
+    expect(panel?.querySelector(".todo-panel-inline-editor")).not.toBeNull();
+    expect(dialogHost?.childElementCount ?? 0).toBe(0);
+
+    const textarea = panel?.querySelector<HTMLTextAreaElement>("#todo-panel-edit-body");
+    expect(textarea).not.toBeNull();
+    expect(textarea?.value).toContain("- [ ] Follow up with team");
+
+    // Test inline edit Cancel button
+    const cancelBtn = panel?.querySelector<HTMLButtonElement>('[data-panel-action="cancel-edit"]');
+    expect(cancelBtn).not.toBeNull();
+    cancelBtn?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    // Panel returns to view mode without popup
+    expect(panel?.querySelector(".todo-panel-inline-editor")).toBeNull();
+    expect(panel?.querySelector(".todo-panel-prose")).not.toBeNull();
+
+    // Re-open inline editor to test saving
+    panel?.querySelector<HTMLButtonElement>('[data-panel-action="edit"]')?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    const activeTextarea = panel?.querySelector<HTMLTextAreaElement>("#todo-panel-edit-body");
+    expect(activeTextarea).not.toBeNull();
+
+    activeTextarea!.value = "Updated meeting notes:\n- [ ] New updated task";
+    const form = panel?.querySelector<HTMLFormElement>("#todo-panel-edit-form");
+    form?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Verify note is updated in db
+    const updatedNote = (await noteService.listAll()).find((n) => n.id === note.id);
+    expect(updatedNote?.content).toContain("- [ ] New updated task");
+
+    // Verify panel returned to view mode
+    const refreshedPanel = container.querySelector<HTMLElement>("#todo-side-panel");
+    const refreshedLayout = container.querySelector<HTMLElement>("#todo-view-layout");
+    expect(refreshedPanel?.querySelector(".todo-panel-inline-editor")).toBeNull();
+    expect(refreshedPanel?.querySelector(".todo-panel-prose")).not.toBeNull();
+
+    // Test closing panel via close button
+    const closeBtn = refreshedPanel?.querySelector<HTMLButtonElement>('[data-panel-action="close"]');
+    closeBtn?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(refreshedLayout?.classList.contains("has-panel-open")).toBe(false);
+    expect(refreshedPanel?.classList.contains("is-open")).toBe(false);
+
+    // Clean up
+    closeTodoSidePanel();
+    await noteService.delete(note.id);
+    container.remove();
+  });
+
+  it("switches notes in todo side panel and toggles interactive checkboxes", async () => {
+    const { renderTodos, closeTodoSidePanel } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const note1 = await noteService.create("- [ ] First note task", "2026-10-01");
+    const note2 = await noteService.create("- [ ] Second note task", "2026-10-02");
+
+    const container = document.createElement("div");
+    container.id = "page-content";
+    container.className = "lite-shell-main";
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    // Open first note
+    const jumpLink1 = container.querySelector<HTMLAnchorElement>(`[data-open-note="${note1.id}"]`);
+    expect(jumpLink1).not.toBeNull();
+    jumpLink1?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    let panel = container.querySelector<HTMLElement>("#todo-side-panel");
+    expect(panel?.textContent).toContain("First note task");
+
+    // Open second note
+    const jumpLink2 = container.querySelector<HTMLAnchorElement>(`[data-open-note="${note2.id}"]`);
+    expect(jumpLink2).not.toBeNull();
+    jumpLink2?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    panel = container.querySelector<HTMLElement>("#todo-side-panel");
+    expect(panel?.textContent).toContain("Second note task");
+
+    // Toggle interactive checkbox in side panel
+    const panelCheckbox = panel?.querySelector<HTMLInputElement>(".interactive-task-checkbox");
+    expect(panelCheckbox).not.toBeNull();
+    panelCheckbox?.dispatchEvent(new Event("change", { bubbles: true }));
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Verify task is toggled in db
+    const updatedNote2 = (await noteService.listAll()).find((n) => n.id === note2.id);
+    expect(updatedNote2?.content).toContain("- [x] Second note task");
+
+    // Clean up
+    closeTodoSidePanel();
+    await noteService.delete(note1.id);
+    await noteService.delete(note2.id);
+    container.remove();
+  });
+
+  it("renders tags as chips with separator in todo side panel", async () => {
+    const { renderTodos, closeTodoSidePanel } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    const note = await noteService.create("Meeting task #roadmap #design\n- [ ] Review designs", "2026-10-01");
+
+    const container = document.createElement("div");
+    container.id = "page-content";
+    container.className = "lite-shell-main";
+    document.body.appendChild(container);
+    await renderTodos(container);
+
+    const jumpLink = container.querySelector<HTMLAnchorElement>(`[data-open-note="${note.id}"]`);
+    expect(jumpLink).not.toBeNull();
+    jumpLink?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+
+    const panel = container.querySelector<HTMLElement>("#todo-side-panel");
+    const tagsContainer = panel?.querySelector<HTMLElement>(".note-tags");
+    expect(tagsContainer).not.toBeNull();
+
+    const tagPills = panel?.querySelectorAll<HTMLAnchorElement>(".tag-pill");
+    expect(tagPills?.length).toBe(2);
+    expect(tagPills?.[0].textContent).toBe("#roadmap");
+    expect(tagPills?.[1].textContent).toBe("#design");
+    expect(tagPills?.[0].href).toContain("tag=roadmap");
+    expect(tagPills?.[1].href).toContain("tag=design");
+
+    // Clean up
+    closeTodoSidePanel();
+    await noteService.delete(note.id);
+    container.remove();
+  });
+
   it("keeps calendar popover open when navigating months", async () => {
     const { renderShell, renderToday } = await import("./main");
 
