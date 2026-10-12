@@ -189,6 +189,9 @@ export interface TranslationStrings {
   todoGroupThisWeek: string;
   todoGroupEarlier: string;
   todoGroupUntagged: string;
+  linkedNotePanel: string;
+  closeSidePanel: string;
+  editInline: string;
 
   // Common UI
   editAction: string;
