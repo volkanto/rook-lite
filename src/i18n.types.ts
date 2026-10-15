@@ -82,6 +82,11 @@ export interface TranslationStrings {
   noNotesToday: string;
   noNotesForTag: (tag: string) => string;
   emptyNotesPrompt: string;
+  emptyDayPromptText: string;
+  emptyDayComposerPlaceholder: string;
+  quickTemplateDaily: string;
+  quickTemplateMeeting: string;
+  quickTemplateChecklist: string;
   editNote: string;
   deleteNote: string;
   actionsForNote: (title: string) => string;

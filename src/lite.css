@@ -3391,7 +3391,7 @@ body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-toolba
   box-sizing: border-box !important;
 }
 
-body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-textarea {
+body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-textarea:not(.is-hidden) {
   display: block !important;
   order: 2 !important;
   flex: 1 1 auto !important;
@@ -3409,7 +3409,8 @@ body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-textar
   box-sizing: border-box !important;
 }
 
-body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .editor-preview {
+body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .editor-preview:not(.is-hidden) {
+  display: block !important;
   order: 2 !important;
   flex: 1 1 auto !important;
   height: 100% !important;
@@ -3423,6 +3424,15 @@ body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .editor-preview {
   overflow-y: auto !important;
   background: var(--color-bg-surface, var(--surface)) !important;
   box-sizing: border-box !important;
+}
+
+body.is-zen-mode .simple-editor-textarea.is-hidden,
+body.is-zen-mode .editor-preview.is-hidden,
+body.is-zen-mode #new-note-form .simple-editor-textarea.is-hidden,
+body.is-zen-mode #new-note-form .editor-preview.is-hidden,
+body.is-zen-mode .editor-card .simple-editor-textarea.is-hidden,
+body.is-zen-mode .editor-card .editor-preview.is-hidden {
+  display: none !important;
 }
 
 body.is-zen-mode:not(:has(#edit-note-form)) #new-note-form .simple-editor-footer {
@@ -3483,8 +3493,8 @@ body.is-zen-mode .note-edit-dialog-head {
   border-bottom: 1px solid var(--color-border-subtle, var(--border)) !important;
 }
 
-body.is-zen-mode .editor-card-modal .simple-editor-textarea,
-body.is-zen-mode .editor-card-modal .editor-preview {
+body.is-zen-mode .editor-card-modal .simple-editor-textarea:not(.is-hidden),
+body.is-zen-mode .editor-card-modal .editor-preview:not(.is-hidden) {
   font-family: var(--font-ui) !important;
   font-size: 0.95rem !important;
   line-height: 1.65 !important;
@@ -3937,6 +3947,8 @@ a.tag-pill:hover,
 #new-note-form:focus-within .simple-editor-footer,
 #new-note-form:has(.editor-folder-picker[open]) .simple-editor-toolbar,
 #new-note-form:has(.editor-folder-picker[open]) .simple-editor-footer,
+#new-note-form.empty-day-editor-card .simple-editor-toolbar,
+#new-note-form.empty-day-editor-card .simple-editor-footer,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-toolbar,
@@ -3945,6 +3957,7 @@ a.tag-pill:hover,
 }
 
 #new-note-form:focus-within .simple-editor-toolbar,
+#new-note-form.empty-day-editor-card .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.is-preview .simple-editor-toolbar {
   order: 1 !important;
@@ -3966,12 +3979,14 @@ a.tag-pill:hover,
 }
 
 :root[data-theme="dark"] #new-note-form:focus-within .simple-editor-toolbar,
+:root[data-theme="dark"] #new-note-form.empty-day-editor-card .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.has-content .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.is-preview .simple-editor-toolbar {
   background: color-mix(in srgb, var(--color-bg-raised, #1c1c1f) 80%, var(--color-bg-surface, #121215)) !important;
 }
 
 #new-note-form:focus-within .simple-editor-footer,
+#new-note-form.empty-day-editor-card .simple-editor-footer,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-footer {
   order: 3 !important;
