@@ -1,0 +1,48 @@
+src/folders.test.ts
+  s_319b924f90d5b7::t_7a91b60777ebd7 388,390-391,393
+  s_319b924f90d5b7::t_f0a46889c38a31 525-545
+  s_319b924f90d5b7::t_5a8291f5f43f79 385
+  s_319b924f90d5b7::t_3ad9f0b150b313 546-564
+  s_319b924f90d5b7::t_98f524697c1428 382,386
+  s_319b924f90d5b7::t_3c7b68bb134acb 505-524
+src/locales/tr.ts
+  s_319b924f90d5b7::t_7b9dae432708b9 91-95
+src/i18n.types.ts
+  s_319b924f90d5b7::t_d536745d6770ed 85-89
+src/lite.css
+  s_319b924f90d5b7::t_af7c806424f3c3 3496-3497
+  s_319b924f90d5b7::t_8aebf72e7a2d39 3394,3412-3413,3429-3435
+  s_319b924f90d5b7::t_0c6125d97298a2 3950-3951,3960,3982,3989
+  s_319b924f90d5b7::t_d0cf9ad45b9ef3 3436-3437
+src/app.css
+  s_319b924f90d5b7::t_360f5e063d23ef 5666-5673
+  s_319b924f90d5b7::t_d8f69e11163afd 5521-5522,5526-5527,5535,5543-5545,5549-5555,5558-5562,5565-5573,5584,5610
+  s_319b924f90d5b7::t_022e1f4966031d 5518-5520,5523-5525,5528-5534,5536-5542,5546-5548,5556-5557,5563-5564,5574-5583,5585-5609,5611-5665
+src/main.ts
+  s_319b924f90d5b7::t_4a1383ff25bd87 615,628,644-647
+  s_319b924f90d5b7::t_2b83d63ad7d60b 542
+  s_319b924f90d5b7::t_cf7190e32b76ed 41
+  s_319b924f90d5b7::t_7c81333390b3b9 564,569-572
+  s_319b924f90d5b7::t_d174d748a6b627 2641-2653
+  s_319b924f90d5b7::t_34b1ffb40ed856 545
+  s_319b924f90d5b7::t_d253fa7a96676f 547
+  s_319b924f90d5b7::t_d8bed0e8d8d775 543-544
+src/locales/en.ts
+  s_319b924f90d5b7::t_ed58fa9f75a27f 91-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "ab80dc708141c973d006920c94217d8f7d3b3f25",
+  "prompts": {},
+  "sessions": {
+    "s_319b924f90d5b7": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "f046bc63-27e4-403c-9fdb-59e81d9a8788",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
