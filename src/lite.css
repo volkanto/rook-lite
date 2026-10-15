@@ -941,6 +941,98 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   text-align: left;
 }
 
+/* ==================== Creative Option 3: Typewriter Living Document ==================== */
+.typewriter-hidden-date-header {
+  margin: 0 0 0.5rem !important;
+  border-bottom: none !important;
+}
+
+.typewriter-hidden-date-header .minimal-date-info {
+  display: none !important;
+}
+
+.typewriter-hidden-date-header .minimal-date-bar {
+  justify-content: flex-end !important;
+  min-height: auto !important;
+  padding: 0 !important;
+}
+
+.typewriter-hidden-date-header .minimal-today-link {
+  display: none !important;
+}
+
+.typewriter-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border-subtle, var(--border));
+}
+
+.typewriter-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.typewriter-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-brand, #5B5BD6);
+  animation: typewriterPulse 2s infinite ease-in-out;
+}
+
+@keyframes typewriterPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.typewriter-kicker-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary, var(--text-soft));
+}
+
+.typewriter-auto-save-hint {
+  font-size: 0.74rem;
+  color: var(--color-text-tertiary, var(--muted));
+}
+
+.typewriter-composer .empty-day-editor-card {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.typewriter-composer .simple-editor-textarea {
+  min-height: 18rem !important;
+  font-family: var(--font-editorial, "Newsreader", "Charter", "Georgia", "Iowan Old Style", serif) !important;
+  font-size: 1.18rem !important;
+  line-height: 1.85 !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  padding: 0.5rem 0 !important;
+  background: transparent !important;
+}
+
+.typewriter-composer .simple-editor-toolbar {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px dashed var(--color-border-subtle, var(--border)) !important;
+  padding: 0 0 0.5rem 0 !important;
+}
+
+.typewriter-composer .simple-editor-footer {
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px dashed var(--color-border-subtle, var(--border)) !important;
+  padding: 0.75rem 0 0 0 !important;
+}
+
 .notes-day-header.minimal-date-header:has(.date-picker[open]) {
   position: relative;
   z-index: 100;

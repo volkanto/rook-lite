@@ -5518,11 +5518,12 @@ body.app .sidebar nav > a.is-active > .nav-svg {
 
 /* ======================================================= Empty Day Canvas === */
 
-/* Center the page on empty days */
+/* Center or anchor the page on empty days */
 body:has(.day-notes.is-empty-day) #page-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: 1.75rem;
   min-height: calc(100vh - 7rem);
   min-height: calc(100svh - 7rem);
   box-sizing: border-box;
