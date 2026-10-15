@@ -5515,3 +5515,159 @@ body.app .sidebar nav > a.is-active > .nav-svg {
 .folder-modal-btn.btn-save:active {
   transform: scale(0.98);
 }
+
+/* ======================================================= Empty Day Canvas === */
+
+/* Center the page on empty days */
+body:has(.day-notes.is-empty-day) #page-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 7rem);
+  min-height: calc(100svh - 7rem);
+  box-sizing: border-box;
+  animation: emptyCanvasFadeIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes emptyCanvasFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure the date bar is always 100% width with space-between alignment */
+.notes-day-header.minimal-date-header {
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.minimal-date-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 1rem !important;
+  box-sizing: border-box;
+}
+
+.minimal-date-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  min-width: 0 !important;
+}
+
+.minimal-date-nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+}
+
+.copilot-input-container {
+  width: 100%;
+}
+
+/* Extended Empty Day Editor Card */
+.empty-day-editor-card {
+  border-radius: var(--radius-lg, 12px) !important;
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  border-color: var(--color-border-default, var(--border)) !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease !important;
+  width: 100% !important;
+}
+
+:root[data-theme="dark"] .empty-day-editor-card {
+  box-shadow: 0 16px 44px -8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+
+.empty-day-editor-card:focus-within {
+  border-color: var(--color-brand, var(--accent)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand, var(--accent)) 14%, transparent), 0 16px 48px -10px rgba(0, 0, 0, 0.12) !important;
+}
+
+.empty-day-editor-card .simple-editor-textarea {
+  min-height: 12rem !important;
+  font-size: 0.98rem !important;
+  line-height: 1.68 !important;
+  padding: 1.15rem 1.25rem !important;
+}
+
+.empty-day-inspiration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+.inspiration-chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.inspiration-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, var(--text-soft));
+  background: var(--color-bg-surface, var(--surface));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: var(--radius-sm, 7px);
+  cursor: pointer;
+  user-select: none;
+  transition: all 120ms ease;
+}
+
+.inspiration-chip:hover {
+  color: var(--color-brand, var(--accent));
+  border-color: color-mix(in srgb, var(--color-brand, var(--accent)) 35%, transparent);
+  background: color-mix(in srgb, var(--color-brand, var(--accent)) 6%, transparent);
+  transform: translateY(-1px);
+}
+
+.inspiration-chip:active {
+  transform: scale(0.98);
+}
+
+.inspiration-svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.75;
+}
+
+.inspiration-chip:hover .inspiration-svg {
+  opacity: 1;
+}
+
+.empty-day-prompt {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, var(--muted));
+  max-width: 28rem;
+  line-height: 1.5;
+}
+
+/* Hide template picker and formatting tools in preview mode */
+.editor-card.is-preview .editor-template-picker,
+#new-note-form.is-preview .editor-template-picker,
+.editor-card.is-preview .editor-tools-cluster,
+#new-note-form.is-preview .editor-tools-cluster {
+  display: none !important;
+}

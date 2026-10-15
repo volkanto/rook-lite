@@ -379,15 +379,18 @@ describe("UI Folder Filtering & Workflows", () => {
     document.body.appendChild(host);
 
     await renderShell();
-    // On an empty day, section-head and folder-picker must be completely hidden
+    // On an empty day, section-head and folder-picker must be completely hidden, rendering centered empty-day canvas
     expect(document.querySelector(".section-head")).toBeNull();
     expect(document.querySelector("#folder-picker")).toBeNull();
+    expect(document.querySelector(".empty-day-composer")).not.toBeNull();
+    expect(document.querySelector("#new-note-form.empty-day-editor-card")).not.toBeNull();
 
-    // Create a note for today
+    // Create a note for the test date
     const noteService = new NoteService();
-    const today = (new Date()).toISOString().slice(0, 10);
-    await noteService.create("A note for today", today, null);
+    const testDate = "2026-10-15";
+    await noteService.create("A note for today", testDate, null);
 
+    history.replaceState({}, "", `/?date=${testDate}`);
     const pageContent = document.querySelector<HTMLElement>("#page-content")!;
     await renderToday(pageContent);
 
@@ -498,5 +501,65 @@ describe("UI Folder Filtering & Workflows", () => {
     await renderToday(pageContent);
     const retainedTagPicker = document.querySelector<HTMLElement>("#tag-picker");
     expect(retainedTagPicker?.hasAttribute("open")).toBe(true);
+  });
+
+  it("hides and closes template picker when switching to preview mode", async () => {
+    const { setEditorMode } = await import("./main");
+    const form = document.querySelector<HTMLFormElement>("#new-note-form")!;
+    const templatePicker = form.querySelector<HTMLDetailsElement>(".editor-template-picker")!;
+    expect(templatePicker).not.toBeNull();
+
+    // Open template picker in write mode
+    templatePicker.setAttribute("open", "");
+    expect(templatePicker.hasAttribute("open")).toBe(true);
+
+    // Switch to preview mode
+    setEditorMode(form, "preview", false);
+    expect(templatePicker.hasAttribute("open")).toBe(false);
+    expect(templatePicker.classList.contains("is-hidden")).toBe(true);
+
+    // Switch back to write mode
+    setEditorMode(form, "write", false);
+    expect(templatePicker.classList.contains("is-hidden")).toBe(false);
+  });
+
+  it("renders single full-width preview in zen mode without splitting into two panes", async () => {
+    const { setEditorMode } = await import("./main");
+    const form = document.querySelector<HTMLFormElement>("#new-note-form")!;
+    const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    const previewPane = form.querySelector<HTMLElement>(".editor-preview")!;
+
+    // Turn on zen mode
+    document.body.classList.add("is-zen-mode");
+
+    // Enter preview mode
+    textarea.value = "# Zen Title\nPeaceful reflection.";
+    setEditorMode(form, "preview", false);
+
+    expect(textarea.classList.contains("is-hidden")).toBe(true);
+    expect(previewPane.classList.contains("is-hidden")).toBe(false);
+
+    // Turn off zen mode
+    document.body.classList.remove("is-zen-mode");
+    setEditorMode(form, "write", false);
+  });
+
+  it("populates composer when clicking quick-start inspiration chips on empty day", async () => {
+    // Navigate to a clean empty date
+    history.replaceState({}, "", "/?date=2026-11-20");
+    const pageContent = document.querySelector<HTMLElement>("#page-content")!;
+    await renderToday(pageContent);
+
+    const form = document.querySelector<HTMLFormElement>("#new-note-form")!;
+    const textarea = form.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea")!;
+    expect(textarea.value).toBe("");
+
+    // Click daily standup chip
+    const dailyChip = document.querySelector<HTMLButtonElement>('.inspiration-chip[data-insert-template="standup"]');
+    expect(dailyChip).not.toBeNull();
+    dailyChip?.click();
+
+    expect(textarea.value).toContain("### Daily Standup");
+    expect(textarea.value).toContain("#standup");
   });
 });
