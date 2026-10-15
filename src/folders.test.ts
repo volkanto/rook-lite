@@ -373,19 +373,31 @@ describe("Summaries Default Scope", () => {
 });
 
 describe("UI Folder Filtering & Workflows", () => {
-  it("renders folder filter dropdown on Notes screen with All notes default", async () => {
+  it("hides section-head on empty days and renders folder filter dropdown when notes exist", async () => {
     const host = document.createElement("div");
     host.id = "app";
     document.body.appendChild(host);
 
     await renderShell();
+    // On an empty day, section-head and folder-picker must be completely hidden
+    expect(document.querySelector(".section-head")).toBeNull();
+    expect(document.querySelector("#folder-picker")).toBeNull();
+
+    // Create a note for today
+    const noteService = new NoteService();
+    const today = (new Date()).toISOString().slice(0, 10);
+    await noteService.create("A note for today", today, null);
+
+    const pageContent = document.querySelector<HTMLElement>("#page-content")!;
+    await renderToday(pageContent);
+
     const folderPicker = document.querySelector<HTMLDetailsElement>("#folder-picker");
     expect(folderPicker).not.toBeNull();
 
     const activeLabel = folderPicker?.querySelector(".filter-btn-label");
     expect(activeLabel?.textContent).toBe("All notes");
 
-    // Management menu must not be shown for All notes
+    // Redundant dot button is removed from the filter bar
     expect(document.querySelector("#folder-context-menu")).toBeNull();
   });
 
@@ -421,9 +433,9 @@ describe("UI Folder Filtering & Workflows", () => {
     expect(notesList).toHaveLength(1);
     expect(notesList[0].textContent).toContain("Typography system");
 
-    // Note card displays interactive folder pill
-    const noteFolderPill = notesList[0].querySelector(".note-folder-pill");
-    expect(noteFolderPill?.textContent).toContain("Design Tokens");
+    // Note card displays refined context badge
+    const noteFolderBadge = notesList[0].querySelector(".note-folder-badge");
+    expect(noteFolderBadge?.textContent).toContain("Design Tokens");
 
     // Editor pre-selects user folder
     const composerFolderInput = document.querySelector<HTMLInputElement>("#new-note-form input[name='folderId']");

@@ -5070,75 +5070,64 @@ body.app .sidebar nav > a.is-active > .nav-svg {
   height: 11px;
 }
 
-/* Note Card Interactive Folder Pill */
-.note-folder-pill-dropdown {
+/* Note Card Refined Context Badge (Option A) */
+.note-folder-badge-dropdown {
   position: relative;
   display: inline-flex;
-  margin-left: 0.45rem;
+  margin-left: 0.55rem;
 }
 
-.note-folder-pill {
+.note-folder-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  height: 1.6rem;
-  padding: 0 0.55rem;
+  height: 1.5rem;
+  padding: 0 0.5rem;
   font-size: 0.72rem;
   font-weight: 500;
-  border-radius: var(--radius-sm, 6px);
+  border-radius: var(--radius-sm, 5px);
   cursor: pointer;
   list-style: none;
   user-select: none;
   transition: all 120ms ease;
+  color: var(--color-text-secondary, var(--text-soft));
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
   border: 1px solid var(--color-border-subtle, var(--border));
 }
 
-.note-folder-pill::-webkit-details-marker {
+.note-folder-badge::-webkit-details-marker {
   display: none;
 }
 
-.note-folder-pill.is-filed {
+.note-folder-badge:hover,
+.note-folder-badge-dropdown[open] > .note-folder-badge {
   color: var(--color-text-primary, var(--text));
-  background: var(--color-bg-hover, var(--surface-lift));
-  border-color: color-mix(in srgb, var(--color-brand, var(--accent)) 30%, transparent);
-}
-
-.note-folder-pill.is-unfiled {
-  color: var(--color-text-muted, var(--muted));
-  background: transparent;
-  opacity: 0.65;
-}
-
-.note-folder-pill:hover,
-.note-folder-pill-dropdown[open] > .note-folder-pill {
-  opacity: 1;
-  color: var(--color-brand, var(--accent));
   background: var(--color-bg-hover, var(--surface-sunk));
   border-color: var(--color-border-default, var(--border));
 }
 
-.note-folder-pill-name {
-  max-width: 8rem;
+.note-folder-badge-svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.6;
+  transition: opacity 120ms ease;
+}
+
+.note-folder-badge:hover .note-folder-badge-svg,
+.note-folder-badge-dropdown[open] .note-folder-badge-svg {
+  opacity: 0.9;
+}
+
+.note-folder-badge-name {
+  max-width: 9rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.note-folder-pill-arrow {
-  width: 10px;
-  height: 10px;
-  opacity: 0.6;
-  transition: transform 120ms ease;
-}
-
-.note-folder-pill-dropdown[open] .note-folder-pill-arrow {
-  transform: rotate(180deg);
-}
-
-.note-folder-svg {
-  width: 12px;
-  height: 12px;
-  opacity: 0.75;
+.note-move-menu {
+  position: relative;
+  display: inline-flex;
 }
 
 .folder-move-popover {
@@ -5153,7 +5142,12 @@ body.app .sidebar nav > a.is-active > .nav-svg {
   background: var(--color-bg-surface, var(--surface));
   border: 1px solid var(--color-border-default, var(--border));
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.note-header-actions .folder-move-popover {
+  right: 0;
+  left: auto;
 }
 
 .folder-popover-header {
