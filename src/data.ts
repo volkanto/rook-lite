@@ -1,6 +1,6 @@
 import { strToU8, zipSync } from "fflate";
 import { dataSnapshot, restoreSnapshot, SettingsRepository } from "./db";
-import type { Note, OllamaSettings, RookBackupV1, Setting, Summary } from "./models";
+import type { Folder, Note, OllamaSettings, RookBackupV1, Setting, Summary } from "./models";
 import { DEFAULT_OLLAMA_PROMPT } from "./summaries";
 import { APP_VERSION } from "./version";
 
@@ -12,68 +12,184 @@ export const DEFAULT_OLLAMA_SETTINGS: OllamaSettings = {
   timeoutMs: 60000,
   systemPrompt: DEFAULT_OLLAMA_PROMPT
 };
+
 export const settingsRepository = new SettingsRepository();
 
 export async function createBackup(): Promise<RookBackupV1> {
   const snapshot = await dataSnapshot();
   const allowedSettings = snapshot.settings.filter((setting) => ["ollama", "theme", "lastExportAt", "analyticsEnabled"].includes(setting.key));
-  return { schemaVersion: 1, exportedAt: new Date().toISOString(), application: { name: "rook-lite", version: APP_VERSION }, notes: snapshot.notes, summaries: snapshot.summaries, settings: allowedSettings };
+  return {
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    application: { name: "rook-lite", version: APP_VERSION },
+    notes: snapshot.notes,
+    folders: snapshot.folders,
+    summaries: snapshot.summaries,
+    settings: allowedSettings
+  };
 }
 
 export function parseBackup(value: string): RookBackupV1 {
   let candidate: unknown;
-  try { candidate = JSON.parse(value); } catch { throw new Error("That file is not valid JSON."); }
+  try {
+    candidate = JSON.parse(value);
+  } catch {
+    throw new Error("That file is not valid JSON.");
+  }
   if (!isRecord(candidate) || candidate.schemaVersion !== 1) throw new Error("This backup schema is not supported.");
   if (!Array.isArray(candidate.notes) || !Array.isArray(candidate.summaries) || !Array.isArray(candidate.settings)) throw new Error("The backup is incomplete.");
   if (!candidate.notes.every(validNote) || !candidate.summaries.every(validSummary) || !candidate.settings.every(validSetting)) throw new Error("The backup contains invalid records.");
+  if (candidate.folders !== undefined) {
+    if (!Array.isArray(candidate.folders) || !candidate.folders.every(validFolder)) {
+      throw new Error("The backup contains invalid folder records.");
+    }
+    const folderIds = new Set(candidate.folders.map((f: Folder) => f.id));
+    if (folderIds.size !== candidate.folders.length) {
+      throw new Error("The backup contains duplicate folder IDs.");
+    }
+  }
   const noteIds = new Set(candidate.notes.map((note) => note.id));
   if (noteIds.size !== candidate.notes.length) throw new Error("The backup contains duplicate IDs.");
   return candidate as unknown as RookBackupV1;
 }
 
 export async function restoreBackup(backup: RookBackupV1): Promise<void> {
-  await restoreSnapshot({ notes: backup.notes, summaries: backup.summaries, settings: backup.settings });
+  const folders = backup.folders ?? [];
+  const validFolderIds = new Set(folders.map((f) => f.id));
+  const normalizedNotes = backup.notes.map((note) => {
+    if (note.folderId && !validFolderIds.has(note.folderId)) {
+      return { ...note, folderId: null };
+    }
+    return note;
+  });
+  await restoreSnapshot({
+    notes: normalizedNotes,
+    folders,
+    summaries: backup.summaries,
+    settings: backup.settings
+  });
 }
 
 export function downloadJson(backup: RookBackupV1): void {
   downloadBlob(new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" }), `rook-lite-backup-${backup.exportedAt.slice(0, 10)}.json`);
 }
 
-export function markdownFile(note: Note): { path: string; content: string } {
+export function markdownFile(note: Note, foldersMap?: Map<string, Folder>): { path: string; content: string } {
   const week = isoWeek(new Date(`${note.noteDate}T12:00:00`));
-  const title = note.title ?? "Untitled note"; const slug = safeSlug(title); const yamlList = (values: string[]) => values.length ? `\n${values.map((value) => `  - ${quoteYaml(value)}`).join("\n")}` : " []";
-  const front = `---\nid: ${quoteYaml(note.id)}\ntitle: ${quoteYaml(title)}\ndate: ${note.noteDate}\nisoWeekYear: ${week.year}\nisoWeek: ${week.week}\ntags:${yamlList(note.tags)}\ncreatedAt: ${quoteYaml(note.createdAt)}\nupdatedAt: ${quoteYaml(note.updatedAt)}\n---\n\n`;
+  const title = note.title ?? "Untitled note";
+  const slug = safeSlug(title);
+  const yamlList = (values: string[]) => values.length ? `\n${values.map((value) => `  - ${quoteYaml(value)}`).join("\n")}` : " []";
+  const folderName = note.folderId && foldersMap ? foldersMap.get(note.folderId)?.name : undefined;
+  const folderYaml = folderName ? `folder: ${quoteYaml(folderName)}\n` : "";
+  const front = `---\nid: ${quoteYaml(note.id)}\ntitle: ${quoteYaml(title)}\ndate: ${note.noteDate}\nisoWeekYear: ${week.year}\nisoWeek: ${week.week}\n${folderYaml}tags:${yamlList(note.tags)}\ncreatedAt: ${quoteYaml(note.createdAt)}\nupdatedAt: ${quoteYaml(note.updatedAt)}\n---\n\n`;
   const startsWithTitle = new RegExp(`^#{1,6}\\s+${escapeRegex(title)}\\s*$`, "im").test(note.content.split(/\r?\n/)[0] ?? "");
-  return { path: `${note.noteDate.slice(0, 4)}/${note.noteDate.slice(5, 7)}/week-${String(week.week).padStart(2, "0")}/${note.noteDate}-${slug}-${note.id.slice(0, 8)}.md`, content: `${front}${startsWithTitle ? "" : `# ${title}\n\n`}${note.content.trim()}\n` };
+  return {
+    path: `${note.noteDate.slice(0, 4)}/${note.noteDate.slice(5, 7)}/week-${String(week.week).padStart(2, "0")}/${note.noteDate}-${slug}-${note.id.slice(0, 8)}.md`,
+    content: `${front}${startsWithTitle ? "" : `# ${title}\n\n`}${note.content.trim()}\n`
+  };
 }
 
-export function createMarkdownZip(notes: Note[]): Blob {
+export function createMarkdownZip(notes: Note[], folders: Folder[] = []): Blob {
+  const foldersMap = new Map(folders.map((f) => [f.id, f]));
   const files: Record<string, Uint8Array> = { "rook-export/README.md": strToU8(`# Rook Lite export\n\n${notes.length} notes, one Markdown file each.\n`) };
-  for (const note of notes) { const file = markdownFile(note); files[`rook-export/${file.path}`] = strToU8(file.content); }
+  for (const note of notes) {
+    const file = markdownFile(note, foldersMap);
+    files[`rook-export/${file.path}`] = strToU8(file.content);
+  }
   return new Blob([zipSync(files, { level: 6 }) as Uint8Array<ArrayBuffer>], { type: "application/zip" });
 }
 
-export async function exportToDirectory(notes: Note[]): Promise<number> {
+export async function exportToDirectory(notes: Note[], folders: Folder[] = []): Promise<number> {
   const picker = (window as unknown as { showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle> }).showDirectoryPicker;
   if (!picker) throw new Error("Directory export is not supported by this browser.");
-  const root = await picker(); const exportRoot = await root.getDirectoryHandle("rook-export", { create: true });
+  const root = await picker();
+  const exportRoot = await root.getDirectoryHandle("rook-export", { create: true });
+  const foldersMap = new Map(folders.map((f) => [f.id, f]));
   for (const note of notes) {
-    const file = markdownFile(note); const parts = file.path.split("/"); const filename = parts.pop() as string; let directory = exportRoot;
+    const file = markdownFile(note, foldersMap);
+    const parts = file.path.split("/");
+    const filename = parts.pop() as string;
+    let directory = exportRoot;
     for (const part of parts) directory = await directory.getDirectoryHandle(part, { create: true });
-    const handle = await directory.getFileHandle(filename, { create: true }); const writable = await handle.createWritable(); await writable.write(file.content); await writable.close();
+    const handle = await directory.getFileHandle(filename, { create: true });
+    const writable = await handle.createWritable();
+    await writable.write(file.content);
+    await writable.close();
   }
-  await settingsRepository.set("lastExportAt", new Date().toISOString()); return notes.length;
+  await settingsRepository.set("lastExportAt", new Date().toISOString());
+  return notes.length;
 }
 
-export function downloadMarkdownZip(notes: Note[]): void { downloadBlob(createMarkdownZip(notes), `rook-export-${new Date().toISOString().slice(0, 10)}.zip`); }
-export function downloadBlob(blob: Blob, filename: string): void { const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = filename; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+export function downloadMarkdownZip(notes: Note[], folders: Folder[] = []): void {
+  downloadBlob(createMarkdownZip(notes, folders), `rook-export-${new Date().toISOString().slice(0, 10)}.zip`);
+}
 
-function safeSlug(value: string): string { return value.normalize("NFKD").toLocaleLowerCase("und").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "note"; }
-function quoteYaml(value: string): string { return JSON.stringify(value); }
-function escapeRegex(value: string): string { return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-function isoWeek(date: Date): { year: number; week: number } { const value = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())); value.setUTCDate(value.getUTCDate() + 4 - (value.getUTCDay() || 7)); return { year: value.getUTCFullYear(), week: Math.ceil((((value.getTime() - Date.UTC(value.getUTCFullYear(), 0, 1)) / 86400000) + 1) / 7) }; }
-function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === "object" && value !== null; }
-function strings(value: unknown): value is string[] { return Array.isArray(value) && value.every((item) => typeof item === "string"); }
-function validNote(value: unknown): value is Note { return isRecord(value) && typeof value.id === "string" && typeof value.content === "string" && typeof value.noteDate === "string" && strings(value.tags) && typeof value.createdAt === "string" && typeof value.updatedAt === "string" && typeof value.archived === "boolean"; }
-function validSummary(value: unknown): value is Summary { return isRecord(value) && typeof value.id === "string" && typeof value.generatedMarkdown === "string" && typeof value.periodStart === "string" && typeof value.periodEnd === "string" && strings(value.sourceNoteIds); }
-function validSetting(value: unknown): value is Setting { return isRecord(value) && typeof value.key === "string" && "value" in value && typeof value.updatedAt === "string"; }
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function safeSlug(value: string): string {
+  return value.normalize("NFKD").toLocaleLowerCase("und").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "note";
+}
+
+function quoteYaml(value: string): string {
+  return JSON.stringify(value);
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function isoWeek(date: Date): { year: number; week: number } {
+  const value = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  value.setUTCDate(value.getUTCDate() + 4 - (value.getUTCDay() || 7));
+  return {
+    year: value.getUTCFullYear(),
+    week: Math.ceil((((value.getTime() - Date.UTC(value.getUTCFullYear(), 0, 1)) / 86400000) + 1) / 7)
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function strings(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function validFolder(value: unknown): value is Folder {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    typeof value.name === "string" &&
+    typeof value.createdAt === "string" &&
+    typeof value.updatedAt === "string"
+  );
+}
+
+function validNote(value: unknown): value is Note {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    typeof value.content === "string" &&
+    typeof value.noteDate === "string" &&
+    strings(value.tags) &&
+    typeof value.createdAt === "string" &&
+    typeof value.updatedAt === "string" &&
+    typeof value.archived === "boolean" &&
+    (value.folderId === undefined || value.folderId === null || typeof value.folderId === "string")
+  );
+}
+
+function validSummary(value: unknown): value is Summary {
+  return isRecord(value) && typeof value.id === "string" && typeof value.generatedMarkdown === "string" && typeof value.periodStart === "string" && typeof value.periodEnd === "string" && strings(value.sourceNoteIds);
+}
+
+function validSetting(value: unknown): value is Setting {
+  return isRecord(value) && typeof value.key === "string" && "value" in value && typeof value.updatedAt === "string";
+}

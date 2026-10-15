@@ -5,9 +5,9 @@ import { createBackup, DEFAULT_OLLAMA_SETTINGS, downloadBlob, downloadJson, down
 import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, getLocaleDefinition, getRelativeDateInfo, setLocale, type SupportedLocale } from "./i18n";
 import { escapeHtml, extractTags, renderInlineMarkdown, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
 import { attachTagAutocomplete } from "./tag-autocomplete";
-import type { Note, OllamaSettings } from "./models";
+import type { Folder, Note, OllamaSettings } from "./models";
 import { appPath, appUrl, assetUrl, normalizeAppLinks, normalizeBase } from "./routing";
-import { initializeLocalData, NoteService } from "./services";
+import { initializeLocalData, NoteService, FolderService } from "./services";
 import { DEFAULT_OLLAMA_PROMPT, OllamaSummaryEngine, RuleBasedSummaryEngine, summaryPeriod, SummaryService, testOllama } from "./summaries";
 import { getPredefinedTemplates, getTemplateById } from "./templates";
 import { findDateBacklinks, findNoteBacklinks, setWikilinkNotesIndex } from "./wikilinks";
@@ -23,6 +23,7 @@ type ThemePreference = "SYSTEM" | "LIGHT" | "DARK";
 interface NavigationItem { path: string; label: string; icon: string; divider?: boolean }
 
 const notes = new NoteService();
+const folders = new FolderService();
 const summaries = new SummaryService();
 let draftTimer: number | undefined;
 let paletteController: CommandPaletteController | null = null;
@@ -31,6 +32,9 @@ let lastOpenedSummaryPeriodKey: string | null = null;
 let appOpenedTracked = false;
 
 export const icons = {
+  hash: '<path d="M5 9l14 0"/><path d="M5 15l14 0"/><path d="M11 4l-4 16"/><path d="M17 4l-4 16"/>',
+  folder: '<path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2 -2v-8a2 2 0 0 0 -2 -2h-8l-2 -2h-6a2 2 0 0 0 -2 2"/>',
+  folderPlus: '<path d="M12 19h-7a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2h4l3 3h7a2 2 0 0 1 2 2v3.5"/><path d="M16 19h6"/><path d="M19 16v6"/>',
   link: '<path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/>',
   quote: '<path d="M10 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"/><path d="M19 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"/>',
   template: '<path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M4 9h16"/><path d="M9 4v5"/>',
@@ -93,7 +97,7 @@ export async function renderShell(): Promise<void> {
   app.innerHTML = `<div id="search-modal" class="modal-backdrop" aria-hidden="true"></div>
     <div id="dialog-host"></div><button type="button" class="scrim" data-action="close-sidebar" aria-label="${s.closeSidebar}"></button>
     <header class="mobile-top-bar"><button type="button" class="mobile-sidebar-open" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="false">${svg(icons.menu, "mobile-nav-svg")}</button><button type="button" class="mobile-search-btn" data-action="open-search" aria-label="${s.searchPlaceholder}"><span class="search-placeholder">${s.searchPlaceholder}</span><kbd class="search-hotkey">⌘ K</kbd></button></header>
-    <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="${s.brandTooltip} · v${APP_VERSION}" data-sidebar-tooltip="${s.brandTooltip} · v${APP_VERSION}"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.sidebarCollapse, "collapse-svg")}<span class="sidebar-toggle-tooltip">${s.collapseSidebar}</span></button></div><div class="sidebar-search-row"><button type="button" class="sidebar-search-btn" data-action="open-search" aria-label="${s.searchPlaceholder}" data-sidebar-tooltip="${s.searchPlaceholder} (⌘K)">${svg(icons.search, "sidebar-search-svg nav-svg")}<span class="nav-label">${s.searchPlaceholder}</span><kbd class="sidebar-search-hotkey">⌘K</kbd></button></div><div class="sidebar-mobile-head"><span>${s.navNotes}</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="${s.closeSidebar}">${svg(icons.close, "sidebar-close-svg")}</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="${s.themeToggleAria}" data-sidebar-tooltip="${document.documentElement.dataset.theme === "dark" ? s.themeToggleLight : s.themeToggleDark}">${svg(icons.moon, "theme-dark-icon nav-svg")}${svg(icons.sun, "theme-light-icon nav-svg")}</button><details class="sidebar-lang-picker" id="sidebar-lang-picker"><summary class="sidebar-lang-toggle" aria-label="${s.languageSelectTooltip}" data-sidebar-tooltip="${s.languageSelectTooltip}">${svg(icons.globe, "nav-svg")}</summary><div class="sidebar-lang-popover" role="menu">${getAvailableLocales().map((loc) => `<button type="button" class="lang-option-btn ${getLocale() === loc.code ? "is-active" : ""}" data-select-lang="${loc.code}"><span class="lang-option-code">${loc.code.toUpperCase()}</span><span class="lang-option-label">${escapeHtml(loc.label)}</span>${getLocale() === loc.code ? `<span class="lang-active-check">${svg(icons.check, "lang-check-svg")}</span>` : ""}</button>`).join("")}</div></details><details class="sidebar-support-picker" id="sidebar-support-picker"><summary class="sidebar-support-toggle" aria-label="${s.supportTooltip}" data-sidebar-tooltip="${s.supportTooltip}">${svg(icons.heart, "nav-svg support-heart-icon")}</summary><div class="sidebar-support-popover" role="menu"><div class="support-popover-header"><span class="support-popover-title">${s.supportTitle}</span><span class="support-popover-desc">${s.supportSubtitle}</span></div><div class="support-popover-links"><a href="https://github.com/sponsors/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon github-badge">${svg(icons.heart, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportGithubLabel}</span><span class="support-option-sub">${s.supportGithubDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a><a href="https://buymeacoffee.com/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon bmac-badge">${svg(icons.coffee, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportBmacLabel}</span><span class="support-option-sub">${s.supportBmacDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a></div></div></details><span class="sidebar-version" title="Rook Lite v${APP_VERSION}">v${APP_VERSION}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"></main></div></div>`;
+    <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="${s.brandTooltip} · v${APP_VERSION}" data-sidebar-tooltip="${s.brandTooltip} · v${APP_VERSION}"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.sidebarCollapse, "collapse-svg")}<span class="sidebar-toggle-tooltip">${s.collapseSidebar}</span></button></div><div class="sidebar-search-row"><button type="button" class="sidebar-search-btn" data-action="open-search" aria-label="${s.searchPlaceholder}" data-sidebar-tooltip="${s.searchPlaceholder} (⌘K)">${svg(icons.search, "sidebar-search-svg nav-svg")}<span class="nav-label">${s.searchPlaceholder}</span><kbd class="sidebar-search-hotkey">⌘K</kbd></button></div><div class="sidebar-mobile-head"><span>${s.navNotes}</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="${s.closeSidebar}">${svg(icons.close, "sidebar-close-svg")}</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="${s.themeToggleAria}" data-sidebar-tooltip="${document.documentElement.dataset.theme === "dark" ? s.themeToggleLight : s.themeToggleDark}">${svg(icons.moon, "theme-dark-icon nav-svg")}${svg(icons.sun, "theme-light-icon nav-svg")}</button><details class="sidebar-lang-picker" id="sidebar-lang-picker"><summary class="sidebar-lang-toggle" aria-label="${s.languageSelectTooltip}" data-sidebar-tooltip="${s.languageSelectTooltip}">${svg(icons.globe, "nav-svg")}</summary><div class="sidebar-lang-popover" role="menu">${getAvailableLocales().map((loc) => `<button type="button" class="lang-option-btn ${getLocale() === loc.code ? "is-active" : ""}" data-select-lang="${loc.code}"><span class="lang-option-code">${loc.code.toUpperCase()}</span><span class="lang-option-label">${escapeHtml(loc.label)}</span>${getLocale() === loc.code ? `<span class="lang-active-check">${svg(icons.check, "lang-check-svg")}</span>` : ""}</button>`).join("")}</div></details><details class="sidebar-support-picker" id="sidebar-support-picker"><summary class="sidebar-support-toggle" aria-label="${s.supportTooltip}" data-sidebar-tooltip="${s.supportTooltip}">${svg(icons.heart, "nav-svg support-heart-icon")}</summary><div class="sidebar-support-popover" role="menu"><div class="support-popover-header"><span class="support-popover-title">${s.supportTitle}</span><span class="support-popover-desc">${s.supportSubtitle}</span></div><div class="support-popover-links"><a href="https://github.com/sponsors/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon github-badge">${svg(icons.heart, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportGithubLabel}</span><span class="support-option-sub">${s.supportGithubDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a><a href="https://buymeacoffee.com/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon bmac-badge">${svg(icons.coffee, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportBmacLabel}</span><span class="support-option-sub">${s.supportBmacDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a></div></div></details><span class="sidebar-version" title="Rook Lite v${APP_VERSION}">v${APP_VERSION}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"><div class="empty-notes" style="padding: 4rem 1rem; text-align: center;"><p style="color: var(--muted); font-size: 0.95rem;">Loading notes…</p></div></main></div></div>`;
   initCommandPalette();
   bindShellEvents(); applyTheme(); updateSidebarButton(); await renderRoute();
 }
@@ -171,8 +175,8 @@ function initCommandPalette(): void {
     exportMarkdownZip: async () => {
       void track("markdown_export_started");
       try {
-        const allNotes = await notes.listAll();
-        downloadMarkdownZip(allNotes);
+        const [allNotes, allFolders] = await Promise.all([notes.listAll(), folders.listAll()]);
+        downloadMarkdownZip(allNotes, allFolders);
         void track("markdown_export_succeeded");
         void track("markdown_exported");
       } catch (err) {
@@ -183,8 +187,8 @@ function initCommandPalette(): void {
     exportMarkdownDirectory: async () => {
       void track("markdown_export_started");
       try {
-        const allNotes = await notes.listAll();
-        await exportToDirectory(allNotes);
+        const [allNotes, allFolders] = await Promise.all([notes.listAll(), folders.listAll()]);
+        await exportToDirectory(allNotes, allFolders);
         void track("markdown_export_succeeded");
         void track("markdown_exported");
       } catch (err) {
@@ -337,7 +341,25 @@ export async function renderRoute(): Promise<void> {
   try {
     if (path === "/") await renderToday(content); else if (path === "/search") await renderSearch(content);
     else if (path === "/summaries") await renderSummariesV2(content); else if (path === "/todos") await renderTodos(content); else if (path === "/data") await renderData(content); else if (path === "/settings") await renderSettings(content); else if (path === "/internal/analytics") await renderInternalAnalytics(content); else renderNotFound(content);
-  } catch (error) { content.innerHTML = `<p class="notice error">${escapeHtml(errorMessage(error))}</p>`; }
+  } catch (error) {
+    const isLockTimeout = error instanceof Error && (error.message.includes("timed out") || error.message.includes("locking"));
+    if (isLockTimeout) {
+      content.innerHTML = `<div class="empty-notes" style="padding: 3.5rem 1.5rem; text-align: center; max-width: 32rem; margin: 2rem auto;">
+        <h3 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text-primary, var(--text));">Database Upgrade Pending</h3>
+        <p style="color: var(--color-text-secondary, var(--text-soft)); line-height: 1.5; font-size: 0.9rem; margin-bottom: 1rem;">
+          Another open tab or window of Rook Lite is currently using the database, which prevents the upgrade to support folders from completing.
+        </p>
+        <p style="color: var(--color-text-secondary, var(--text-soft)); line-height: 1.5; font-size: 0.88rem; margin-bottom: 1.5rem;">
+          <strong>To continue:</strong> Please close any other open tabs or windows of Rook Lite, then click the button below.
+        </p>
+        <button type="button" class="btn-primary" onclick="location.reload()" style="padding: 0.6rem 1.35rem; font-size: 0.9rem; border-radius: 6px; cursor: pointer;">
+          Refresh & Complete Upgrade
+        </button>
+      </div>`;
+    } else {
+      content.innerHTML = `<div class="empty-notes" style="padding:3rem 1.5rem; text-align:center;"><p class="notice error" style="margin-bottom:1rem;">${escapeHtml(errorMessage(error))}</p><button type="button" class="btn-primary" onclick="location.reload()">Reload</button></div>`;
+    }
+  }
   normalizeAppLinks(); document.body.classList.remove("sidebar-drawer-open"); content.focus({ preventScroll: true }); highlightLinkedNote();
 }
 
@@ -399,34 +421,153 @@ function applyTemplateText(form: HTMLFormElement, textarea: HTMLTextAreaElement,
   void track("template_used");
 }
 
+function parseSelectedTags(search: string): string[] {
+  const params = new URLSearchParams(search);
+  const values = params.getAll("tag");
+  const tags = new Set<string>();
+  for (const v of values) {
+    for (const part of v.split(",")) {
+      const trimmed = part.trim();
+      if (trimmed) tags.add(trimmed);
+    }
+  }
+  return Array.from(tags);
+}
+
 export async function renderToday(content: HTMLElement): Promise<void> {
+  const existingTagPicker = document.querySelector<HTMLDetailsElement>("#tag-picker");
+  const wasTagPickerOpen = existingTagPicker?.hasAttribute("open") ?? false;
+  const tagListScrollTop = existingTagPicker?.querySelector<HTMLElement>(".tag-popover-list")?.scrollTop ?? 0;
+
   const s = currentStrings();
   const requested = new URLSearchParams(location.search).get("date"); const today = isoDate(new Date()); const date = validIsoDate(requested) ? requested as string : today; const isToday = date === today;
-  const value = new Date(`${date}T12:00:00`); const allNotes = await notes.listAll();
+  const value = new Date(`${date}T12:00:00`);
+  const [allNotes, allFolders] = await Promise.all([notes.listAll(), folders.listAll()]);
   setWikilinkNotesIndex(allNotes);
   const dayNotes = await notes.listByDate(date); const draft = await notes.getDraft(date);
   const dayBacklinks = findDateBacklinks(date, allNotes);
-  const heading = formatDateHeading(date); const previous = shiftDate(date, -1); const next = shiftDate(date, 1); const selectedTag = new URLSearchParams(location.search).get("tag") ?? ""; const visibleNotes = selectedTag ? dayNotes.filter((note) => note.tags.includes(selectedTag)) : dayNotes; const frequentTags = tagCounts(dayNotes).slice(0, 6); document.title = `${heading} · Rook Lite`;
+  const heading = formatDateHeading(date); const previous = shiftDate(date, -1); const next = shiftDate(date, 1);
+  const selectedTags = parseSelectedTags(location.search);
+  const requestedFolder = new URLSearchParams(location.search).get("folder");
+
+  let activeFolderId: string | null = null;
+  if (requestedFolder === "unfiled") {
+    activeFolderId = "unfiled";
+  } else if (requestedFolder && allFolders.some((f) => f.id === requestedFolder)) {
+    activeFolderId = requestedFolder;
+  }
+
+  let filteredByFolder = dayNotes;
+  if (activeFolderId === "unfiled") {
+    filteredByFolder = dayNotes.filter((note) => !note.folderId);
+  } else if (activeFolderId) {
+    filteredByFolder = dayNotes.filter((note) => note.folderId === activeFolderId);
+  }
+
+  const visibleNotes = selectedTags.length
+    ? filteredByFolder.filter((note) => selectedTags.every((t) => note.tags.includes(t)))
+    : filteredByFolder;
+  const allFolderTags = tagCounts(filteredByFolder);
+  document.title = `${heading} · Rook Lite`;
 
   const relativeInfo = getRelativeDateInfo(date, today, getLocale());
 
-  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="${s.dateNavigation}"><a href="${appUrl(`/?date=${previous}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl("/")}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?date=${next}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div>${frequentTags.length ? `<nav class="tag-filters" aria-label="${s.filterByTag}"><a href="/?date=${date}" data-link class="${selectedTag ? "" : "is-active"}" ${selectedTag ? "" : 'aria-current="page"'}>${s.filterAll}</a>${frequentTags.map(([tag]) => `<a href="/?date=${date}&tag=${encodeURIComponent(tag)}" data-link class="${selectedTag === tag ? "is-active" : ""}" ${selectedTag === tag ? 'aria-current="page"' : ""}>#${escapeHtml(tag)}</a>`).join("")}</nav>` : ""}</div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allNotes, date)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${selectedTag ? s.noNotesForTag(selectedTag) : s.noNotesToday}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>${dayBacklinks.length ? `<section class="day-mentions-panel notes-panel" aria-labelledby="day-mentions-title"><div class="section-head"><div class="notes-panel-heading"><h3 id="day-mentions-title" class="panel-subtitle">${svg(icons.link, "backlink-icon-svg")}<span>${s.linkedMentionsTitle}</span></h3><span class="notes-count-badge">${dayBacklinks.length}</span></div></div><div class="day-mentions-list">${dayBacklinks.map((bl) => `<div class="day-mention-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="mention-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="day-mention-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></div>`).join("")}</div></section>` : ""}`;
+  const folderCounts = new Map<string, number>();
+  dayNotes.forEach((n) => {
+    if (n.folderId) folderCounts.set(n.folderId, (folderCounts.get(n.folderId) ?? 0) + 1);
+  });
+  const unfiledCount = dayNotes.filter((n) => !n.folderId).length;
+
+  const isUserFolder = Boolean(activeFolderId && activeFolderId !== "unfiled");
+  const targetNewNoteFolderId = isUserFolder ? activeFolderId : null;
+
+  const buildFolderUrl = (folderParam: string | null): string => {
+    const params = new URLSearchParams({ date });
+    if (folderParam) params.set("folder", folderParam);
+    if (selectedTags.length) params.set("tag", selectedTags.join(","));
+    return appUrl(`/?${params}`);
+  };
+
+  const buildTagUrl = (tagToToggle: string | null): string => {
+    const params = new URLSearchParams({ date });
+    if (activeFolderId) params.set("folder", activeFolderId);
+    if (tagToToggle === null) {
+      return appUrl(`/?${params}`);
+    }
+    const nextTags = selectedTags.includes(tagToToggle)
+      ? selectedTags.filter((t) => t !== tagToToggle)
+      : [...selectedTags, tagToToggle];
+    if (nextTags.length) params.set("tag", nextTags.join(","));
+    return appUrl(`/?${params}`);
+  };
+
+  const prevParams = new URLSearchParams({ date: previous });
+  if (activeFolderId) prevParams.set("folder", activeFolderId);
+  if (selectedTags.length) prevParams.set("tag", selectedTags.join(","));
+
+  const nextParams = new URLSearchParams({ date: next });
+  if (activeFolderId) nextParams.set("folder", activeFolderId);
+  if (selectedTags.length) nextParams.set("tag", selectedTags.join(","));
+
+  const todayParams = new URLSearchParams();
+  if (activeFolderId) todayParams.set("folder", activeFolderId);
+  if (selectedTags.length) todayParams.set("tag", selectedTags.join(","));
+  const todayHref = todayParams.toString() ? appUrl(`/?${todayParams}`) : appUrl("/");
+
+  const currentFolder = isUserFolder ? allFolders.find((f) => f.id === activeFolderId) : null;
+
+  let activeFolderLabel = s.folderAllNotes;
+  let activeFolderCount = dayNotes.length;
+  if (activeFolderId === "unfiled") {
+    activeFolderLabel = s.folderUnfiled;
+    activeFolderCount = unfiledCount;
+  } else if (currentFolder) {
+    activeFolderLabel = currentFolder.name;
+    activeFolderCount = folderCounts.get(currentFolder.id) ?? 0;
+  }
+
+  const folderControl = `<details class="filter-dropdown folder-filter-dropdown" id="folder-picker"><summary class="filter-dropdown-btn ${isUserFolder ? "is-filtered" : ""}" aria-haspopup="menu" aria-label="${s.folderFilterAria}" title="${s.folderFilterAria}">${svg(icons.folder, "filter-btn-icon")}<span class="filter-btn-label">${escapeHtml(activeFolderLabel)}</span><span class="filter-btn-badge">${activeFolderCount}</span>${svg(icons.chevronDown, "filter-btn-chevron")}</summary><div class="filter-dropdown-popover" role="menu"><div class="filter-popover-title">${s.selectFolder}</div><a href="${buildFolderUrl(null)}" data-link class="filter-popover-item ${activeFolderId === null ? "is-active" : ""}" role="menuitem">${svg(icons.note, "filter-item-icon")}<span class="filter-item-name">${s.folderAllNotes}</span><span class="filter-item-count">${dayNotes.length}</span>${activeFolderId === null ? svg(icons.check, "folder-check-svg") : ""}</a><a href="${buildFolderUrl("unfiled")}" data-link class="filter-popover-item ${activeFolderId === "unfiled" ? "is-active" : ""}" role="menuitem">${svg(icons.folder, "filter-item-icon")}<span class="filter-item-name">${s.folderUnfiled}</span><span class="filter-item-count">${unfiledCount}</span>${activeFolderId === "unfiled" ? svg(icons.check, "folder-check-svg") : ""}</a>${allFolders.length ? '<div class="filter-popover-sep" role="separator"></div>' : ""}${allFolders.map((f) => `<div class="filter-folder-row ${activeFolderId === f.id ? "is-active" : ""}"><a href="${buildFolderUrl(f.id)}" data-link class="filter-popover-item filter-folder-link" role="menuitem">${svg(icons.folder, "filter-item-icon")}<span class="filter-item-name">${escapeHtml(f.name)}</span><span class="filter-item-count">${folderCounts.get(f.id) ?? 0}</span>${activeFolderId === f.id ? svg(icons.check, "folder-check-svg") : ""}</a><div class="filter-folder-actions"><button type="button" class="folder-row-action-btn" data-action="rename-folder" data-folder-id="${f.id}" aria-label="${s.renameFolder}" title="${s.renameFolder}">${svg(icons.edit, "folder-row-action-svg")}</button><button type="button" class="folder-row-action-btn text-danger" data-action="delete-folder" data-folder-id="${f.id}" aria-label="${s.deleteFolder}" title="${s.deleteFolder}">${svg(icons.trash, "folder-row-action-svg")}</button></div></div>`).join("")}<div class="filter-popover-sep" role="separator"></div><button type="button" class="filter-popover-item filter-popover-action" data-action="create-folder">${svg(icons.folderPlus, "filter-item-icon")}<span>${s.createFolder}…</span></button></div></details>`;
+
+  let tagButtonLabel = s.filterTags;
+  if (selectedTags.length === 1) {
+    tagButtonLabel = selectedTags[0];
+  }
+
+  const tagControl = allFolderTags.length ? `<span class="filter-bar-divider" aria-hidden="true"></span><details class="filter-dropdown tag-filter-dropdown" id="tag-picker"><summary class="filter-dropdown-btn ${selectedTags.length ? "is-filtered" : ""}" aria-haspopup="menu" aria-label="${s.filterByTag}" title="${s.filterByTag}">${svg(icons.hash, "filter-btn-icon")}<span class="filter-btn-label">${escapeHtml(tagButtonLabel)}</span>${selectedTags.length > 1 ? `<span class="filter-btn-badge">${selectedTags.length}</span>` : ""}${svg(icons.chevronDown, "filter-btn-chevron")}</summary><div class="filter-dropdown-popover tag-dropdown-popover" role="menu"><div class="filter-popover-header-row"><span class="filter-popover-title">${s.filterByTag}</span>${selectedTags.length ? `<a href="${buildTagUrl(null)}" data-link class="filter-popover-clear" title="${s.clearFilters}">${s.clearFilters}</a>` : ""}</div><div class="tag-popover-list">${allFolderTags.map(([tag, count]) => {
+    const isChecked = selectedTags.includes(tag);
+    return `<a href="${buildTagUrl(tag)}" data-link class="tag-popover-item ${isChecked ? "is-checked" : ""}" role="menuitemcheckbox" aria-checked="${isChecked}"><span class="tag-checkbox-box ${isChecked ? "is-checked" : ""}">${isChecked ? svg(icons.check, "tag-check-svg") : ""}</span><span class="tag-item-name">#${escapeHtml(tag)}</span><span class="filter-item-count">${count}</span></a>`;
+  }).join("")}</div></div></details>${selectedTags.length ? `<a href="${buildTagUrl(null)}" data-link class="filter-clear-btn" aria-label="${s.clearFilters}" title="${s.clearFilters}">${svg(icons.close, "filter-clear-svg")}</a>` : ""}` : "";
+
+  content.innerHTML = `<header class="notes-day-header minimal-date-header"><div class="minimal-date-bar"><div class="minimal-date-info"><h1 class="minimal-date-title">${heading}</h1><span class="minimal-date-badge ${relativeInfo.status === "today" ? "is-today" : ""}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="${s.dateNavigation}"><a href="${appUrl(`/?${prevParams}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${todayHref}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><a href="${appUrl(`/?${nextParams}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header><div class="copilot-input-container">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote, false, targetNewNoteFolderId, allFolders)}</div><section class="day-notes notes-panel" aria-labelledby="day-notes-title"><div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div><div class="notes-head-controls"><div class="notes-filter-bar">${folderControl}${tagControl}</div></div></div>${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allNotes, date, allFolders)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes"><img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${activeFolderId && !selectedTags.length ? s.noNotesInFolder : (selectedTags.length ? s.noNotesForTag(selectedTags.join(", #")) : s.noNotesToday)}</p><span>${s.emptyNotesPrompt}</span></div>`}</section>${dayBacklinks.length ? `<section class="day-mentions-panel notes-panel" aria-labelledby="day-mentions-title"><div class="section-head"><div class="notes-panel-heading"><h3 id="day-mentions-title" class="panel-subtitle">${svg(icons.link, "backlink-icon-svg")}<span>${s.linkedMentionsTitle}</span></h3><span class="notes-count-badge">${dayBacklinks.length}</span></div></div><div class="day-mentions-list">${dayBacklinks.map((bl) => `<div class="day-mention-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="mention-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="day-mention-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></div>`).join("")}</div></section>` : ""}`;
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
+  if (wasTagPickerOpen) {
+    const newTagPicker = document.querySelector<HTMLDetailsElement>("#tag-picker");
+    if (newTagPicker) {
+      newTagPicker.setAttribute("open", "");
+      const newTagList = newTagPicker.querySelector<HTMLElement>(".tag-popover-list");
+      if (newTagList && tagListScrollTop > 0) {
+        newTagList.scrollTop = tagListScrollTop;
+      }
+    }
+  }
   bindCreateEditor(date); bindNoteActions();
   updateScrollToTopVisibility();
   requestAnimationFrame(() => updateScrollToTopVisibility());
 }
 
-function editorMarkup(id: string, value: string, label: string, isModal = false): string {
+function editorMarkup(id: string, value: string, label: string, isModal = false, selectedFolderId?: string | null, allFolders: Folder[] = []): string {
   const s = currentStrings();
   const isSubmitDisabled = !isModal && !value.trim();
-  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}" novalidate><div class="simple-editor-toolbar" aria-label="${s.markdownFormatting}"><div class="editor-tools-cluster"><button type="button" data-format="heading" aria-label="Heading" title="Add heading"><strong>H</strong></button><button type="button" data-format="bold" aria-label="${s.toolBold}" title="${s.toolBold}"><strong>B</strong></button><button type="button" data-format="italic" aria-label="${s.toolItalic}" title="${s.toolItalic}"><em>I</em></button><button type="button" data-format="quote" class="editor-tool-quote" aria-label="${s.toolQuote}" title="${s.toolQuote}">${svg(icons.quote, "editor-tool-svg")}</button><button type="button" data-format="code" aria-label="${s.toolCode}" title="${s.toolCode}">&lt;&gt;</button><button type="button" data-format="wikilink" class="editor-tool-wikilink" aria-label="${s.insertWikilink}" title="${s.insertWikilink} ([[)">${svg(icons.link, "editor-tool-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="numbered" aria-label="Numbered list" title="Add a numbered list"><span class="tool-num-icon">1. ≡</span></button><button type="button" data-format="list" aria-label="${s.toolBulletList}" title="${s.toolBulletList}">• ≡</button><button type="button" data-format="task" aria-label="${s.toolChecklist}" title="${s.toolChecklist}">✓ ≡</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="${s.toolTemplates}" aria-label="${s.toolTemplates}">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${getPredefinedTemplates(getLocale()).map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="${s.editorViewMode}"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span><span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect"${isSubmitDisabled ? " disabled" : ""}>${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
+  const currentFolderName = selectedFolderId ? (allFolders.find((f) => f.id === selectedFolderId)?.name ?? s.folderUnfiled) : s.folderUnfiled;
+  const folderSelector = `<details class="editor-folder-picker"><summary class="editor-folder-badge-btn" title="${s.selectFolder}">${svg(icons.folder, "editor-folder-badge-svg")}<span class="editor-folder-badge-name">${escapeHtml(currentFolderName)}</span>${svg(icons.chevronDown, "editor-folder-badge-arrow")}</summary><div class="composer-folder-popover" role="menu"><div class="folder-popover-header">${s.selectFolder}</div><button type="button" role="menuitem" class="composer-folder-item ${!selectedFolderId ? "is-active" : ""}" data-set-folder="">${svg(icons.folder, "folder-option-svg")}<span>${s.folderUnfiled}</span>${!selectedFolderId ? svg(icons.check, "folder-check-svg") : ""}</button>${allFolders.map((f) => `<button type="button" role="menuitem" class="composer-folder-item ${selectedFolderId === f.id ? "is-active" : ""}" data-set-folder="${f.id}">${svg(icons.folder, "folder-option-svg")}<span>${escapeHtml(f.name)}</span>${selectedFolderId === f.id ? svg(icons.check, "folder-check-svg") : ""}</button>`).join("")}<div class="folder-picker-sep" role="separator"></div><button type="button" role="menuitem" class="composer-folder-item" data-action="create-folder">${svg(icons.folderPlus, "folder-option-svg")}<span>${s.createFolder}…</span></button></div></details><input type="hidden" name="folderId" value="${selectedFolderId ?? ""}">`;
+  return `<form class="editor-card ${isModal ? "editor-card-modal" : ""}" id="${id}" novalidate><div class="simple-editor-toolbar" aria-label="${s.markdownFormatting}"><div class="editor-tools-cluster"><button type="button" data-format="heading" aria-label="Heading" title="Add heading"><strong>H</strong></button><button type="button" data-format="bold" aria-label="${s.toolBold}" title="${s.toolBold}"><strong>B</strong></button><button type="button" data-format="italic" aria-label="${s.toolItalic}" title="${s.toolItalic}"><em>I</em></button><button type="button" data-format="quote" class="editor-tool-quote" aria-label="${s.toolQuote}" title="${s.toolQuote}">${svg(icons.quote, "editor-tool-svg")}</button><button type="button" data-format="code" aria-label="${s.toolCode}" title="${s.toolCode}">&lt;&gt;</button><button type="button" data-format="wikilink" class="editor-tool-wikilink" aria-label="${s.insertWikilink}" title="${s.insertWikilink} ([[)">${svg(icons.link, "editor-tool-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" data-format="numbered" aria-label="Numbered list" title="Add a numbered list"><span class="tool-num-icon">1. ≡</span></button><button type="button" data-format="list" aria-label="${s.toolBulletList}" title="${s.toolBulletList}">• ≡</button><button type="button" data-format="task" aria-label="${s.toolChecklist}" title="${s.toolChecklist}">✓ ≡</button></div><div class="editor-toolbar-actions"><details class="editor-template-picker"><summary class="editor-mode-btn editor-template-btn" title="${s.toolTemplates}" aria-label="${s.toolTemplates}">${svg(icons.template, "editor-mode-svg")}</summary><div class="editor-template-menu" role="menu">${getPredefinedTemplates(getLocale()).map((tmpl) => `<button type="button" class="editor-template-item" data-insert-template="${tmpl.id}"><strong>${escapeHtml(tmpl.name)}</strong><span>${escapeHtml(tmpl.description)}</span></button>`).join("")}</div></details><div class="editor-mode-toggle" role="tablist" aria-label="${s.editorViewMode}"><button type="button" class="editor-mode-btn is-active" data-editor-mode="write" role="tab" aria-selected="true" title="${s.editorWrite}" aria-label="${s.editorWrite}">${svg(icons.edit, "editor-mode-svg")}</button><button type="button" class="editor-mode-btn" data-editor-mode="preview" role="tab" aria-selected="false" title="${s.editorPreview}" aria-label="${s.editorPreview}">${svg(icons.eye, "editor-mode-svg")}</button><span class="editor-tool-sep" aria-hidden="true"></span><button type="button" class="editor-mode-btn editor-zen-btn" data-action="toggle-zen" title="${s.zenMode} (⌘D)" aria-label="${s.zenMode}">${svg(icons.maximize, "editor-mode-svg")}</button></div></div></div><textarea id="${id}-body" name="bodyMarkdown" rows="${isModal ? 6 : 1}" aria-label="${s.notesTitle}" placeholder="${s.composerPlaceholder}" class="editor-textarea simple-editor-textarea">${escapeHtml(value)}</textarea><div class="editor-preview prose is-hidden" id="${id}-preview" aria-live="polite"></div><div class="simple-editor-footer"><div class="editor-footer-left editor-footer-meta"><span class="editor-word-count" aria-live="polite"></span>${folderSelector}<span class="simple-editor-hint editor-save-hint" data-save-status aria-live="polite">${isModal ? '<span class="shortcut-kbd-hint"><kbd>⌘Enter</kbd></span>' : (value ? s.draftRestored : s.markdownSupported)}</span></div><div class="editor-modal-actions">${isModal ? `<button type="button" class="btn-secondary" data-close-dialog>${s.cancel}</button>` : ""}<button type="submit" class="save-btn-rect"${isSubmitDisabled ? " disabled" : ""}>${isModal ? `${svg(icons.check, "save-icon-svg")}<span>${label}</span>` : label}</button></div></div></form>`;
 }
 
-function noteMarkup(note: Note, allNotes: Note[] = [], selectedDate = note.noteDate): string {
+function noteMarkup(note: Note, allNotes: Note[] = [], selectedDate = note.noteDate, allFolders: Folder[] = []): string {
   const s = currentStrings();
   const backlinks = allNotes.length ? findNoteBacklinks(note, allNotes) : [];
-  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time></div><div class="note-header-actions"><button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${backlinks.length ? `<div class="note-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  const noteFolder = note.folderId ? allFolders.find((f) => f.id === note.folderId) : undefined;
+  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time><details class="note-folder-pill-dropdown" data-note-folder-dropdown="${note.id}"><summary class="note-folder-pill ${noteFolder ? "is-filed" : "is-unfiled"}" aria-label="${s.moveToFolder}" title="${noteFolder ? `${escapeHtml(noteFolder.name)} · ${s.moveToFolder}` : s.moveToFolder}">${svg(icons.folder, "note-folder-svg")}<span class="note-folder-pill-name">${escapeHtml(noteFolder ? noteFolder.name : s.folderUnfiled)}</span>${svg(icons.chevronDown, "note-folder-pill-arrow")}</summary><div class="note-action-popover folder-move-popover" role="menu"><div class="folder-popover-header">${s.moveToFolder}</div><button type="button" role="menuitem" class="folder-move-item ${!note.folderId ? "is-active" : ""}" data-move-note="${note.id}" data-target-folder=""><span>${s.folderUnfiled}</span>${!note.folderId ? svg(icons.check, "folder-check-svg") : ""}</button>${allFolders.map((f) => `<button type="button" role="menuitem" class="folder-move-item ${note.folderId === f.id ? "is-active" : ""}" data-move-note="${note.id}" data-target-folder="${f.id}"><span>${escapeHtml(f.name)}</span>${note.folderId === f.id ? svg(icons.check, "folder-check-svg") : ""}</button>`).join("")}<div class="folder-picker-sep" role="separator"></div><button type="button" role="menuitem" class="folder-move-item folder-move-new" data-action="create-folder" data-assign-note="${note.id}"><span style="display:flex;align-items:center;gap:0.4rem;">${svg(icons.folderPlus, "action-icon-svg")} ${s.createFolder}…</span></button></div></details></div><div class="note-header-actions"><button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${backlinks.length ? `<div class="note-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string, allNotes: Note[]): void {
@@ -629,10 +770,12 @@ function bindCreateEditor(date: string): void {
     setBusy(form, true);
     try {
       const content = textarea.value;
+      const folderInput = form.querySelector<HTMLInputElement | HTMLSelectElement>("input[name='folderId'], select[name='folderId']");
+      const folderId = folderInput?.value ? folderInput.value : null;
       textarea.value = "";
       resizeEditor(textarea);
       updateComposer();
-      await notes.create(content, date);
+      await notes.create(content, date, folderId);
       void track("note_created");
       await renderRoute();
     } catch (error) {
@@ -659,8 +802,20 @@ function bindCreateEditor(date: string): void {
 
 function bindNoteActions(): void {
   const s = currentStrings();
+  document.querySelectorAll<HTMLButtonElement>("[data-move-note]").forEach((btn) => {
+    btn.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const noteId = btn.dataset.moveNote;
+      const targetFolder = btn.dataset.targetFolder || null;
+      if (noteId) {
+        await notes.moveToFolder(noteId, targetFolder);
+        await renderRoute();
+      }
+    });
+  });
   document.querySelectorAll<HTMLButtonElement>("[data-delete-note]").forEach((button) => button.addEventListener("click", () => showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => { await notes.delete(button.dataset.deleteNote ?? ""); void track("note_deleted"); await refreshCalendar(); await renderRoute(); })));
-  document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const note = (await notes.listAll()).find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note); }));
+  document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) => button.addEventListener("click", async () => { const [allN, allF] = await Promise.all([notes.listAll(), folders.listAll()]); const note = allN.find((item) => item.id === button.dataset.editNote); if (note) showEditDialog(note, allF); }));
   document.querySelectorAll<HTMLButtonElement>("[data-copy-note]").forEach((button) =>
     button.addEventListener("click", async () => {
       const note = (await notes.listAll()).find((item) => item.id === button.dataset.copyNote);
@@ -698,7 +853,7 @@ function bindNoteActions(): void {
   });
 }
 
-export function showEditDialog(note: Note): void {
+export function showEditDialog(note: Note, foldersList: Folder[] = []): void {
   const s = currentStrings();
   const host = requireElement<HTMLElement>("#dialog-host");
   const formattedDate = formatDateHeading(note.noteDate);
@@ -707,9 +862,18 @@ export function showEditDialog(note: Note): void {
   const backdrop = document.createElement("div");
   backdrop.className = "note-edit-backdrop";
   backdrop.id = "edit-note-backdrop";
-  backdrop.innerHTML = `<section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><a href="${appUrl(`/?date=${note.noteDate}`)}" data-link class="note-edit-date-badge" title="${s.openCalendar}">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></a></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true)}</div></section>`;
+  backdrop.innerHTML = `<section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><a href="${appUrl(`/?date=${note.noteDate}`)}" data-link class="note-edit-date-badge" title="${s.openCalendar}">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></a></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true, note.folderId, foldersList)}</div></section>`;
   host.replaceChildren(backdrop);
   document.body.style.overflow = "hidden";
+
+  if (!foldersList.length) {
+    void folders.listAll().then((allF) => {
+      const sel = backdrop.querySelector<HTMLSelectElement>("select[name='folderId']");
+      if (sel && sel.options.length <= 1) {
+        sel.innerHTML = `<option value="" ${!note.folderId ? "selected" : ""}>${s.folderUnfiled}</option>${allF.map((f) => `<option value="${f.id}" ${f.id === note.folderId ? "selected" : ""}>${escapeHtml(f.name)}</option>`).join("")}`;
+      }
+    });
+  }
 
   const cleanup = () => {
     window.removeEventListener("keydown", onKeydown);
@@ -766,7 +930,9 @@ export function showEditDialog(note: Note): void {
     }
     setBusy(form, true);
     try {
-      await notes.update(note.id, textarea.value);
+      const folderInput = form.querySelector<HTMLInputElement | HTMLSelectElement>("input[name='folderId'], select[name='folderId']");
+      const folderId = folderInput ? (folderInput.value || null) : undefined;
+      await notes.update(note.id, textarea.value, folderId);
       cleanup();
       closeDialog(backdrop);
       await renderRoute();
@@ -1963,8 +2129,8 @@ function bindSettingsEvents(content: HTMLElement): void {
 
   content.querySelector<HTMLButtonElement>("#zip-export")?.addEventListener("click", () => {
     void track("markdown_export_started");
-    void notes.listAll().then((allN) => {
-      downloadMarkdownZip(allN);
+    void Promise.all([notes.listAll(), folders.listAll()]).then(([allN, allF]) => {
+      downloadMarkdownZip(allN, allF);
       void track("markdown_export_succeeded");
       void track("markdown_exported");
     }).catch((error) => {
@@ -1975,8 +2141,8 @@ function bindSettingsEvents(content: HTMLElement): void {
   content.querySelector<HTMLButtonElement>("#directory-export")?.addEventListener("click", async () => {
     void track("markdown_export_started");
     try {
-      const allN = await notes.listAll();
-      const count = await exportToDirectory(allN);
+      const [allN, allF] = await Promise.all([notes.listAll(), folders.listAll()]);
+      const count = await exportToDirectory(allN, allF);
       void track("markdown_export_succeeded");
       void track("markdown_exported");
       dataMessage(s.exportedNotesCount(count), false);
@@ -2264,6 +2430,78 @@ function showConfirm(title: string, message: string, actionLabel: string, action
   });
 }
 
+export function showFolderModal(options: {
+  mode: "create" | "rename";
+  folder?: Folder;
+  onSave: (name: string) => Promise<void>;
+}): void {
+  const s = currentStrings();
+  const host = requireElement<HTMLElement>("#dialog-host");
+  const isCreate = options.mode === "create";
+  const title = isCreate ? s.createFolder : s.renameFolder;
+  const initialValue = options.folder?.name ?? "";
+  const actionLabel = isCreate ? s.createFolder : s.saveChanges;
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "note-edit-backdrop folder-modal-backdrop";
+  backdrop.id = "folder-modal-backdrop";
+  backdrop.innerHTML = `<section class="folder-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="folder-dialog-title"><form id="folder-modal-form" class="folder-modal-form"><header class="folder-modal-head"><div class="folder-modal-title-group"><span class="folder-modal-icon" aria-hidden="true">${svg(icons.folder, "folder-modal-svg")}</span><h2 id="folder-dialog-title">${escapeHtml(title)}</h2></div><button type="button" class="folder-modal-close" data-close-dialog aria-label="${s.closeEditor}">${svg(icons.close, "folder-close-svg")}</button></header><div class="folder-modal-body"><label for="folder-modal-name-input" class="folder-modal-label">${escapeHtml(s.folderNamePlaceholder)}</label><input type="text" id="folder-modal-name-input" name="folderName" class="folder-modal-input" value="${escapeHtml(initialValue)}" placeholder="${escapeHtml(s.folderNamePlaceholder)}" required maxlength="60" autocomplete="off" spellcheck="false" /><p class="folder-modal-error text-danger" id="folder-modal-error" hidden></p></div><footer class="folder-modal-footer"><button type="button" class="folder-modal-btn btn-ghost" data-close-dialog>${s.cancel}</button><button type="submit" class="folder-modal-btn btn-save" id="folder-modal-save">${escapeHtml(actionLabel)}</button></footer></form></section>`;
+  host.appendChild(backdrop);
+  document.body.style.overflow = "hidden";
+
+  const closeModal = () => {
+    window.removeEventListener("keydown", onKeydown);
+    closeDialog(backdrop);
+  };
+
+  backdrop.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target === backdrop || target.closest("[data-close-dialog]")) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeModal();
+    }
+  });
+
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      closeModal();
+    }
+  };
+  window.addEventListener("keydown", onKeydown);
+
+  const input = backdrop.querySelector<HTMLInputElement>("#folder-modal-name-input")!;
+  const errorEl = backdrop.querySelector<HTMLElement>("#folder-modal-error")!;
+  const form = backdrop.querySelector<HTMLFormElement>("#folder-modal-form")!;
+  const submitBtn = backdrop.querySelector<HTMLButtonElement>("#folder-modal-save")!;
+
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 50);
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    errorEl.hidden = true;
+    errorEl.textContent = "";
+    const name = input.value.trim();
+
+    try {
+      folders.validateFolderName(name);
+      submitBtn.disabled = true;
+      await options.onSave(name);
+      closeModal();
+    } catch (err) {
+      submitBtn.disabled = false;
+      errorEl.hidden = false;
+      errorEl.textContent = errorMessage(err);
+      input.focus();
+    }
+  });
+}
+
 export function closeDialog(target?: Element | null): void {
   const host = document.querySelector<HTMLElement>("#dialog-host");
   if (!host) return;
@@ -2391,7 +2629,7 @@ function bindShellEvents(): void {
     }
 
     const clickPath = event.composedPath();
-    document.querySelectorAll<HTMLDetailsElement>(".date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open], .sidebar-support-picker[open]").forEach((details) => {
+    document.querySelectorAll<HTMLDetailsElement>(".date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open], .sidebar-support-picker[open], .filter-dropdown[open], .note-folder-pill-dropdown[open], .editor-folder-picker[open]").forEach((details) => {
       if (!details.contains(target) && !clickPath.includes(details)) details.removeAttribute("open");
     });
 
@@ -2428,7 +2666,12 @@ function bindShellEvents(): void {
       event.preventDefault();
       const rawHref = link.getAttribute("href");
       const targetUrl = rawHref ? appUrl(rawHref) : link.href;
-      history.pushState({}, "", targetUrl);
+      const isInsideTagPicker = Boolean(link.closest("#tag-picker"));
+      if (isInsideTagPicker) {
+        history.replaceState({}, "", targetUrl);
+      } else {
+        history.pushState({}, "", targetUrl);
+      }
       closeSearch();
       closeAllDialogs();
       void renderRoute().then(() => {
@@ -2457,7 +2700,111 @@ function bindShellEvents(): void {
       }
       return;
     }
+    const folderPickBtn = target.closest<HTMLButtonElement>("[data-set-folder]");
+    if (folderPickBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      const s = currentStrings();
+      const folderId = folderPickBtn.dataset.setFolder || "";
+      const form = folderPickBtn.closest("form");
+      if (form) {
+        const input = form.querySelector<HTMLInputElement>("input[name='folderId']");
+        if (input) input.value = folderId;
+        const nameSpan = form.querySelector<HTMLElement>(".editor-folder-badge-name");
+        if (nameSpan) {
+          void folders.listAll().then((allF) => {
+            const chosen = allF.find((f) => f.id === folderId);
+            nameSpan.textContent = chosen ? chosen.name : s.folderUnfiled;
+          });
+        }
+        form.querySelectorAll<HTMLButtonElement>(".composer-folder-item").forEach((btn) => {
+          const match = (btn.dataset.setFolder || "") === folderId;
+          btn.classList.toggle("is-active", match);
+          const check = btn.querySelector(".folder-check-svg");
+          if (check) check.remove();
+          if (match) {
+            btn.insertAdjacentHTML("beforeend", svg(icons.check, "folder-check-svg"));
+          }
+        });
+        folderPickBtn.closest("details")?.removeAttribute("open");
+      }
+      return;
+    }
+
     const action = target.closest<HTMLElement>("[data-action]")?.dataset.action;
+    if (action === "create-folder") {
+      event.preventDefault();
+      const assignNoteId = target.closest<HTMLElement>("[data-assign-note]")?.dataset.assignNote;
+      showFolderModal({
+        mode: "create",
+        onSave: async (name) => {
+          const created = await folders.create(name);
+          if (assignNoteId) {
+            await notes.moveToFolder(assignNoteId, created.id);
+          }
+          const currentUrl = new URL(location.href);
+          currentUrl.searchParams.set("folder", created.id);
+          history.pushState({}, "", currentUrl.pathname + currentUrl.search);
+          await renderRoute();
+        }
+      });
+      return;
+    }
+    if (action === "rename-folder") {
+      event.preventDefault();
+      document.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((d) => d.removeAttribute("open"));
+      const folderId = target.closest<HTMLElement>("[data-folder-id]")?.dataset.folderId;
+      if (folderId) {
+        const folder = await folders.get(folderId);
+        if (folder) {
+          showFolderModal({
+            mode: "rename",
+            folder,
+            onSave: async (newName) => {
+              await folders.rename(folder.id, newName);
+              await renderRoute();
+            }
+          });
+        }
+      }
+      return;
+    }
+    if (action === "delete-folder") {
+      event.preventDefault();
+      document.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((d) => d.removeAttribute("open"));
+      const s = currentStrings();
+      const folderId = target.closest<HTMLElement>("[data-folder-id]")?.dataset.folderId;
+      if (folderId) {
+        const folder = await folders.get(folderId);
+        if (folder) {
+          showConfirm(
+            s.deleteFolderConfirmTitle,
+            s.deleteFolderConfirmMessage(folder.name),
+            s.deleteFolderBtn,
+            async () => {
+              await folders.delete(folder.id);
+              const currentUrl = new URL(location.href);
+              if (currentUrl.searchParams.get("folder") === folder.id) {
+                currentUrl.searchParams.delete("folder");
+                history.pushState({}, "", currentUrl.pathname + currentUrl.search);
+              }
+              await renderRoute();
+            }
+          );
+        }
+      }
+      return;
+    }
+    if (action === "focus-composer") {
+      event.preventDefault();
+      const textarea = document.querySelector<HTMLTextAreaElement>("#new-note-form textarea");
+      if (textarea) {
+        const form = textarea.closest("form");
+        if (form) setEditorMode(form, "write", false);
+        textarea.focus();
+      }
+      return;
+    }
     if (action === "open-shortcuts") {
       event.preventDefault();
       showShortcutsDialog();
@@ -2715,15 +3062,22 @@ function formatTime(createdAt: string, noteDate: string): string { return format
 function errorMessage(error: unknown): string { const s = currentStrings(); return error instanceof Error ? error.message : s.somethingWentWrong; }
 function requireElement<T extends Element>(selector: string): T { const element = document.querySelector<T>(selector); if (!element) throw new Error(`Missing required element: ${selector}`); return element; }
 
+window.addEventListener("rook:database-blocked", () => {
+  const content = document.querySelector<HTMLElement>("#page-content");
+  if (content) {
+    content.innerHTML = `<div class="empty-notes" style="padding:2rem 1rem; text-align:center;"><p style="font-weight:600; margin-bottom:0.5rem;">Database upgrade in progress</p><span style="color:var(--muted); font-size:0.9rem;">Please close any other open Rook Lite tabs and refresh this page.</span><div style="margin-top:1.25rem;"><button type="button" class="btn-primary" onclick="location.reload()" style="padding:0.5rem 1rem; border-radius:6px; cursor:pointer;">Reload</button></div></div>`;
+  }
+});
+
 async function start(): Promise<void> {
   try {
     setLocale(getLocale());
-    await initializeLocalData();
     await renderShell();
     if (!appOpenedTracked) {
       appOpenedTracked = true;
       void track("app_opened");
     }
+    void initializeLocalData().catch((err) => console.warn("initializeLocalData deferred:", err));
   } catch (error) {
     requireElement<HTMLDivElement>("#app").innerHTML = `<main class="shell"><p class="notice error">Rook Lite could not open local storage: ${escapeHtml(errorMessage(error))}</p></main>`;
   }

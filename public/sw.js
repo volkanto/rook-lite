@@ -1,4 +1,4 @@
-const CACHE_NAME = "rook-lite-shell-v5";
+const CACHE_NAME = "rook-lite-shell-v6";
 const BASE_URL = new URL("./", self.registration.scope);
 const appUrl = (path) => new URL(path, BASE_URL).toString();
 const APP_SHELL = ["./", "index.html", "logo.png", "empty-notes.png", "manifest.webmanifest"].map(appUrl);
@@ -56,6 +56,17 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+
+  // Bypass Vite dev server requests, source files, and HMR
+  if (
+    url.pathname.startsWith("/@") ||
+    url.pathname.startsWith("/src/") ||
+    url.pathname.startsWith("/node_modules/") ||
+    url.searchParams.has("import") ||
+    url.searchParams.has("t")
+  ) {
+    return;
+  }
 
   // Navigation requests (HTML pages)
   if (event.request.mode === "navigate") {
