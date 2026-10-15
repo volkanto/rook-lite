@@ -1,9 +1,17 @@
+export interface Folder {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Note {
   id: string;
   title: string | null;
   content: string;
   tags: string[];
   noteDate: string;
+  folderId?: string | null;
   language: "tr" | "en" | null;
   createdAt: string;
   updatedAt: string;
@@ -54,6 +62,7 @@ export interface RookBackupV1 {
   exportedAt: string;
   application: { name: "rook-lite"; version: string };
   notes: Note[];
+  folders?: Folder[];
   categories?: unknown[];
   summaries: Summary[];
   settings: Setting[];

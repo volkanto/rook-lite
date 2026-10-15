@@ -3332,7 +3332,9 @@ body.is-zen-mode .day-notes,
 body.is-zen-mode .notes-stream-footer,
 body.is-zen-mode .notes-panel,
 body.is-zen-mode .notes-count-badge,
-body.is-zen-mode .tag-filters {
+body.is-zen-mode .tag-filters,
+body.is-zen-mode .notes-filter-bar,
+body.is-zen-mode .tag-filter-group {
   display: none !important;
 }
 
@@ -3453,7 +3455,7 @@ body.is-zen-mode .note-edit-backdrop:not(#confirm-backdrop) {
   background: rgba(0, 0, 0, 0.88) !important;
 }
 
-body.is-zen-mode .note-edit-dialog:not(.lite-confirm-dialog) {
+body.is-zen-mode .note-edit-dialog:not(.lite-confirm-dialog, .folder-modal-dialog) {
   display: flex !important;
   flex-direction: column !important;
   width: min(52rem, 100%) !important;
@@ -3852,9 +3854,9 @@ a.tag-pill:hover,
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 18%, transparent), 0 4px 14px rgba(0, 0, 0, 0.05) !important;
 }
 
-#new-note-form:has(.editor-template-picker[open]),
-.editor-card:has(.editor-template-picker[open]),
-.copilot-input-container:has(.editor-template-picker[open]) {
+#new-note-form:has(.editor-template-picker[open], .editor-folder-picker[open]),
+.editor-card:has(.editor-template-picker[open], .editor-folder-picker[open]),
+.copilot-input-container:has(.editor-template-picker[open], .editor-folder-picker[open]) {
   z-index: 600 !important;
   position: relative !important;
   overflow: visible !important;
@@ -3933,6 +3935,8 @@ a.tag-pill:hover,
 /* When focused (clicked into text area) or has content/preview, all the toolbar is visible */
 #new-note-form:focus-within .simple-editor-toolbar,
 #new-note-form:focus-within .simple-editor-footer,
+#new-note-form:has(.editor-folder-picker[open]) .simple-editor-toolbar,
+#new-note-form:has(.editor-folder-picker[open]) .simple-editor-footer,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-toolbar,

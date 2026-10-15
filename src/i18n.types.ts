@@ -77,12 +77,36 @@ export interface TranslationStrings {
   entryPlural: string;
   filterAll: string;
   filterByTag: string;
+  filterTags: string;
+  clearFilters: string;
   noNotesToday: string;
   noNotesForTag: (tag: string) => string;
   emptyNotesPrompt: string;
   editNote: string;
   deleteNote: string;
   actionsForNote: (title: string) => string;
+
+  // Folders
+  folderAllNotes: string;
+  folderUnfiled: string;
+  folderFilterAria: string;
+  createFolder: string;
+  folderNamePlaceholder: string;
+  renameFolder: string;
+  deleteFolder: string;
+  manageFolder: string;
+  deleteFolderConfirmTitle: string;
+  deleteFolderConfirmMessage: (folderName: string) => string;
+  deleteFolderBtn: string;
+  moveToFolder: string;
+  selectFolder: string;
+  noNotesInFolder: string;
+  folderNameEmptyError: string;
+  folderNameDuplicateError: string;
+  folderNameReservedError: string;
+  folderCreated: string;
+  folderRenamed: string;
+  folderDeleted: string;
   backToTop: string;
   endOfNotes: (count: number) => string;
   copyNote: string;

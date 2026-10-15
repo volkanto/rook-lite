@@ -3,6 +3,15 @@
   <head>
     <script>
       (function () {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+              for (var i = 0; i < registrations.length; i++) {
+                registrations[i].unregister();
+              }
+            });
+          }
+        }
         var theme = localStorage.getItem('theme-preference') || 'SYSTEM';
         var resolved = theme === 'SYSTEM'
           ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
