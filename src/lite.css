@@ -1094,6 +1094,12 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   padding: 0.75rem 0 0 !important;
 }
 
+/* Hide toolbar and footer until user clicks/focuses or types in the editor */
+.typewriter-composer #new-note-form:not(:focus-within):not(.has-content):not(.is-preview):not(:has(.editor-folder-picker[open])):not(:has(.editor-template-picker[open])) .simple-editor-toolbar,
+.typewriter-composer #new-note-form:not(:focus-within):not(.has-content):not(.is-preview):not(:has(.editor-folder-picker[open])):not(:has(.editor-template-picker[open])) .simple-editor-footer {
+  display: none !important;
+}
+
 .notes-day-header.minimal-date-header:has(.date-picker[open]) {
   position: relative;
   z-index: 100;
@@ -4064,8 +4070,6 @@ a.tag-pill:hover,
 #new-note-form:focus-within .simple-editor-footer,
 #new-note-form:has(.editor-folder-picker[open]) .simple-editor-toolbar,
 #new-note-form:has(.editor-folder-picker[open]) .simple-editor-footer,
-#new-note-form.empty-day-editor-card .simple-editor-toolbar,
-#new-note-form.empty-day-editor-card .simple-editor-footer,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-toolbar,
@@ -4074,7 +4078,6 @@ a.tag-pill:hover,
 }
 
 #new-note-form:focus-within .simple-editor-toolbar,
-#new-note-form.empty-day-editor-card .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.is-preview .simple-editor-toolbar {
   order: 1 !important;
@@ -4096,14 +4099,12 @@ a.tag-pill:hover,
 }
 
 :root[data-theme="dark"] #new-note-form:focus-within .simple-editor-toolbar,
-:root[data-theme="dark"] #new-note-form.empty-day-editor-card .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.has-content .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.is-preview .simple-editor-toolbar {
   background: color-mix(in srgb, var(--color-bg-raised, #1c1c1f) 80%, var(--color-bg-surface, #121215)) !important;
 }
 
 #new-note-form:focus-within .simple-editor-footer,
-#new-note-form.empty-day-editor-card .simple-editor-footer,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-footer {
   order: 3 !important;
