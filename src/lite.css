@@ -1231,7 +1231,7 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   flex: 0 0 auto;
 }
 
-.minimal-date-nav .minimal-today-link {
+.minimal-date-nav .minimal-today-link.is-active {
   display: none !important;
 }
 
