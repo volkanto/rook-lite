@@ -957,7 +957,7 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .minimal-date-bar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0;
@@ -969,15 +969,6 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   align-items: center;
   gap: 0.55rem;
   min-width: 0;
-  height: 1.8rem;
-}
-
-.minimal-stepper-cluster {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.35rem;
-  flex-shrink: 0;
 }
 
 .typewriter-pulse-dot {
@@ -1038,34 +1029,23 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   color: var(--color-brand, #7C7CF8) !important;
 }
 
-.typewriter-today-jump-btn {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--color-brand, #5B5BD6);
-  text-decoration: none;
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-sm, 5px);
-  background: var(--color-brand-soft, #ECECFF);
-  border: 1px solid color-mix(in srgb, var(--color-brand) 25%, transparent);
-  transition: all 120ms ease;
-  line-height: 1.2;
-  white-space: nowrap;
+.today-jump-btn {
+  color: var(--color-brand, #5B5BD6) !important;
+  transition: all 120ms ease !important;
 }
 
-.typewriter-today-jump-btn:hover {
-  background: var(--color-brand, #5B5BD6);
-  color: #fff;
+.today-jump-btn:hover {
+  background: var(--color-brand-soft, #ECECFF) !important;
+  color: var(--color-brand, #5B5BD6) !important;
 }
 
-:root[data-theme="dark"] .typewriter-today-jump-btn {
-  background: rgba(91, 91, 214, 0.2);
-  color: #9D9DFF;
+:root[data-theme="dark"] .today-jump-btn {
+  color: var(--color-brand, #7C7CF8) !important;
 }
 
-:root[data-theme="dark"] .typewriter-today-jump-btn:hover {
-  background: var(--color-brand, #5B5BD6);
-  color: #fff;
+:root[data-theme="dark"] .today-jump-btn:hover {
+  background: rgba(91, 91, 214, 0.2) !important;
+  color: #9D9DFF !important;
 }
 
 /* 2. Typewriter Manuscript Writing Surface (from Creative 3) */
