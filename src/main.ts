@@ -332,6 +332,12 @@ async function refreshCalendar(): Promise<void> {
 
 export async function renderRoute(): Promise<void> {
   const content = requireElement<HTMLElement>("#page-content"); const path = appPath();
+  const activeEl = document.activeElement;
+  const wasPrevBtn = Boolean(activeEl?.classList.contains("prev-btn") || activeEl?.closest(".prev-btn"));
+  const wasNextBtn = Boolean(activeEl?.classList.contains("next-btn") || activeEl?.closest(".next-btn"));
+  const wasDateJump = Boolean(activeEl?.classList.contains("typewriter-today-jump-btn") || activeEl?.closest(".typewriter-today-jump-btn"));
+  const wasCalendarBtn = Boolean(activeEl?.classList.contains("minimal-calendar-btn") || activeEl?.closest(".minimal-calendar-btn"));
+
   if (path !== "/summaries") {
     lastOpenedSummaryPeriodKey = null;
   }
@@ -361,7 +367,18 @@ export async function renderRoute(): Promise<void> {
       content.innerHTML = `<div class="empty-notes" style="padding:3rem 1.5rem; text-align:center;"><p class="notice error" style="margin-bottom:1rem;">${escapeHtml(errorMessage(error))}</p><button type="button" class="btn-primary" onclick="location.reload()">Reload</button></div>`;
     }
   }
-  normalizeAppLinks(); document.body.classList.remove("sidebar-drawer-open"); content.focus({ preventScroll: true }); highlightLinkedNote();
+  normalizeAppLinks();
+  document.body.classList.remove("sidebar-drawer-open");
+  if (wasPrevBtn) {
+    content.querySelector<HTMLElement>(".prev-btn")?.focus({ preventScroll: true });
+  } else if (wasNextBtn) {
+    content.querySelector<HTMLElement>(".next-btn")?.focus({ preventScroll: true });
+  } else if (wasCalendarBtn) {
+    content.querySelector<HTMLElement>(".minimal-calendar-btn")?.focus({ preventScroll: true });
+  } else if (!wasDateJump && path !== "/") {
+    content.focus({ preventScroll: true });
+  }
+  highlightLinkedNote();
 }
 
 export function highlightLinkedNote(targetId?: string): void {
