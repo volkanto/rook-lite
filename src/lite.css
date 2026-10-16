@@ -1002,6 +1002,50 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   color: var(--color-text-tertiary, var(--muted));
 }
 
+.typewriter-kicker-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  color: var(--color-text-secondary, var(--text-soft));
+  letter-spacing: 0;
+}
+
+.typewriter-pulse-dot.is-archived {
+  background: var(--color-warning, #D4A72C);
+  animation: none;
+}
+
+.typewriter-today-jump-btn {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-brand, #5B5BD6);
+  text-decoration: none;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm, 5px);
+  background: var(--color-brand-soft, #ECECFF);
+  border: 1px solid color-mix(in srgb, var(--color-brand) 25%, transparent);
+  transition: all 120ms ease;
+}
+
+.typewriter-today-jump-btn:hover {
+  background: var(--color-brand, #5B5BD6);
+  color: #fff;
+}
+
+:root[data-theme="dark"] .typewriter-today-jump-btn {
+  background: rgba(91, 91, 214, 0.2);
+  color: #9D9DFF;
+}
+
+:root[data-theme="dark"] .typewriter-today-jump-btn:hover {
+  background: var(--color-brand, #5B5BD6);
+  color: #fff;
+}
+
 .notes-day-header.minimal-date-header {
   margin: 0 0 1rem;
   text-align: left;
