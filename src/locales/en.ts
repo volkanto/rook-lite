@@ -89,7 +89,7 @@ export const locale: LocaleDefinition = {
     noNotesForTag: (tag: string) => `No #${tag} notes today`,
     emptyNotesPrompt: "Write something above when there’s something worth remembering.",
     emptyDayPromptText: "A blank page for today. Capture a fleeting thought, plan your priorities, or start writing.",
-    emptyDayComposerPlaceholder: "Write your note for today... (⌘Enter to save)",
+    emptyDayComposerPlaceholder: "Tell your story, capture a thought, or write in Markdown...",
     quickTemplateDaily: "Daily plan",
     quickTemplateMeeting: "Meeting note",
     quickTemplateChecklist: "Checklist",

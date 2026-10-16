@@ -89,7 +89,7 @@ export const locale: LocaleDefinition = {
     noNotesForTag: (tag: string) => `Bugün #${tag} etiketiyle not yok`,
     emptyNotesPrompt: "Hatırlamaya değer bir şey olduğunda yukarıya yazın.",
     emptyDayPromptText: "Bugün için temiz bir sayfa. Aklınızdakileri yazın, önceliklerinizi planlayın veya not alın.",
-    emptyDayComposerPlaceholder: "Bugünkü notunuzu yazın... (Kaydetmek için ⌘Enter)",
+    emptyDayComposerPlaceholder: "Hikayenizi anlatın, bir düşünceyi yakalayın veya Markdown ile yazın...",
     quickTemplateDaily: "Günlük plan",
     quickTemplateMeeting: "Toplantı notu",
     quickTemplateChecklist: "Kontrol listesi",

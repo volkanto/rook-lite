@@ -581,7 +581,7 @@ describe("Left menu bar icons and navigation", () => {
 
     // Textarea has placeholder
     expect(textarea?.placeholder).toBeTruthy();
-    expect(textarea?.placeholder).toContain("⌘Enter to save");
+    expect(textarea?.placeholder).toContain("Markdown");
 
     // Focusing the composer activates toolbars while textarea remains 1-row initial size
     textarea?.focus();
@@ -844,7 +844,7 @@ describe("Left menu bar icons and navigation", () => {
     // Textarea with placeholder
     const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
     expect(textarea).not.toBeNull();
-    expect(textarea?.placeholder).toContain("⌘Enter to save");
+    expect(textarea?.placeholder).toContain("Markdown");
 
     // Single Finish note submit button (no separate cancel button in new-note-form)
     const submitBtn = form?.querySelector<HTMLButtonElement>("button[type='submit']");
