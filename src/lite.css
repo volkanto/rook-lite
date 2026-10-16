@@ -1177,7 +1177,8 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   flex: 0 0 auto;
 }
 
-.minimal-date-nav .minimal-today-link.is-active {
+.minimal-date-nav .minimal-today-link,
+.minimal-today-link {
   display: none !important;
 }
 
@@ -1213,47 +1214,6 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 .minimal-nav-svg {
   width: 0.95rem;
   height: 0.95rem;
-}
-
-.minimal-today-link {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 1.8rem !important;
-  padding: 0 0.75rem !important;
-  border-radius: 999px !important;
-  font-size: 0.75rem !important;
-  font-weight: 550 !important;
-  color: var(--color-text-secondary, var(--text-soft)) !important;
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  transition: all 120ms ease !important;
-  white-space: nowrap !important;
-}
-
-.minimal-today-link:hover {
-  background: var(--color-bg-surface, var(--surface)) !important;
-  color: var(--color-text-primary, var(--text)) !important;
-  border-color: var(--color-border-subtle, var(--border)) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-}
-
-.minimal-today-link.is-active {
-  background: var(--color-bg-surface, var(--surface)) !important;
-  color: var(--color-text-primary, var(--text)) !important;
-  border: 1px solid var(--color-border-subtle, var(--border)) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-  font-weight: 600 !important;
-  pointer-events: none !important;
-}
-
-:root[data-theme="dark"] .minimal-today-link.is-active {
-  background: var(--color-bg-raised, #1c1c1f) !important;
-  border-color: var(--color-border-default, #27272b) !important;
-  color: var(--color-text-primary, #F4F4F5) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
 
 .minimal-picker {
