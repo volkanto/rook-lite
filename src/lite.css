@@ -957,7 +957,7 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .minimal-date-bar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   padding: 0;
@@ -969,14 +969,15 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   align-items: center;
   gap: 0.55rem;
   min-width: 0;
+  height: 1.8rem;
 }
 
-.minimal-controls-cluster {
+.minimal-stepper-cluster {
   display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 .typewriter-pulse-dot {
