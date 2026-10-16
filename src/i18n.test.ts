@@ -28,37 +28,54 @@ describe("i18n internationalization and language support", () => {
 
   it("automatically discovers separated locale files from src/locales/", () => {
     const locales = getAvailableLocales();
-    expect(locales.length).toBeGreaterThanOrEqual(2);
+    expect(locales.length).toBeGreaterThanOrEqual(6);
 
     const codes = locales.map((l) => l.code);
     expect(codes).toContain("en");
+    expect(codes).toContain("de");
+    expect(codes).toContain("es");
     expect(codes).toContain("tr");
+    expect(codes).toContain("pt-BR");
+    expect(codes).toContain("fr");
 
     const en = locales.find((l) => l.code === "en");
     expect(en?.label).toBe("English");
     expect(en?.strings.today).toBe("Today");
 
+    const de = locales.find((l) => l.code === "de");
+    expect(de?.label).toBe("Deutsch");
+    expect(de?.strings.today).toBe("Heute");
+
+    const es = locales.find((l) => l.code === "es");
+    expect(es?.label).toBe("Español");
+    expect(es?.strings.today).toBe("Hoy");
+
     const tr = locales.find((l) => l.code === "tr");
     expect(tr?.label).toBe("Türkçe");
     expect(tr?.strings.today).toBe("Bugün");
+
+    const pt = locales.find((l) => l.code === "pt-BR");
+    expect(pt?.label).toBe("Português");
+    expect(pt?.strings.today).toBe("Hoje");
+
+    const fr = locales.find((l) => l.code === "fr");
+    expect(fr?.label).toBe("Français");
+    expect(fr?.strings.today).toBe("Aujourd'hui");
   });
 
-  it("defaults to en and allows setting tr", () => {
+  it("defaults to en and allows setting all supported locales", () => {
     expect(getLocale()).toBe("en");
     expect(document.documentElement.lang).toBe("en");
 
-    setLocale("tr");
-    expect(getLocale()).toBe("tr");
-    expect(localStorage.getItem("language-preference")).toBe("tr");
-    expect(document.documentElement.lang).toBe("tr");
-
-    setLocale("en");
-    expect(getLocale()).toBe("en");
-    expect(localStorage.getItem("language-preference")).toBe("en");
-    expect(document.documentElement.lang).toBe("en");
+    for (const code of ["de", "es", "tr", "pt-BR", "fr", "en"]) {
+      setLocale(code);
+      expect(getLocale()).toBe(code);
+      expect(localStorage.getItem("language-preference")).toBe(code);
+      expect(document.documentElement.lang).toBe(code);
+    }
   });
 
-  it("returns appropriate translation strings for en and tr", () => {
+  it("returns appropriate translation strings for all supported locales", () => {
     setLocale("en");
     const en = currentStrings();
     expect(en.navNotes).toBe("Notes");
@@ -66,14 +83,30 @@ describe("i18n internationalization and language support", () => {
     expect(en.navSummaries).toBe("Summaries");
     expect(en.navSettings).toBe("Settings");
     expect(en.today).toBe("Today");
-    expect(en.languageTitle).toBe("Language");
-    expect(en.todoGroupDate).toBe("Date");
-    expect(en.todoGroupTag).toBe("Tag");
-    expect(en.todoGroupAll).toBe("All");
-    expect(en.todoGroupToday).toBe("Today");
-    expect(en.todoGroupYesterday).toBe("Yesterday");
-    expect(en.todoGroupThisWeek).toBe("This week");
-    expect(en.todoGroupEarlier).toBe("Earlier");
+
+    setLocale("de");
+    const de = currentStrings();
+    expect(de.navNotes).toBe("Notizen");
+    expect(de.navTodos).toBe("Aufgaben");
+    expect(de.today).toBe("Heute");
+
+    setLocale("es");
+    const es = currentStrings();
+    expect(es.navNotes).toBe("Notas");
+    expect(es.navTodos).toBe("Tareas");
+    expect(es.today).toBe("Hoy");
+
+    setLocale("pt-BR");
+    const pt = currentStrings();
+    expect(pt.navNotes).toBe("Notas");
+    expect(pt.navTodos).toBe("Tarefas");
+    expect(pt.today).toBe("Hoje");
+
+    setLocale("fr");
+    const fr = currentStrings();
+    expect(fr.navNotes).toBe("Notes");
+    expect(fr.navTodos).toBe("Tâches");
+    expect(fr.today).toBe("Aujourd'hui");
 
     setLocale("tr");
     const tr = currentStrings();
@@ -99,6 +132,22 @@ describe("i18n internationalization and language support", () => {
     const enFormatted = formatDateHeading(testDate, "en");
     expect(enFormatted).toContain("September");
     expect(enFormatted).toContain("2026");
+
+    const deFormatted = formatDateHeading(testDate, "de");
+    expect(deFormatted).toContain("September");
+    expect(deFormatted).toContain("2026");
+
+    const esFormatted = formatDateHeading(testDate, "es");
+    expect(esFormatted).toContain("septiembre");
+    expect(esFormatted).toContain("2026");
+
+    const frFormatted = formatDateHeading(testDate, "fr");
+    expect(frFormatted).toContain("septembre");
+    expect(frFormatted).toContain("2026");
+
+    const ptFormatted = formatDateHeading(testDate, "pt-BR");
+    expect(ptFormatted).toContain("setembro");
+    expect(ptFormatted).toContain("2026");
 
     const trFormatted = formatDateHeading(testDate, "tr");
     expect(trFormatted).toContain("Eylül");

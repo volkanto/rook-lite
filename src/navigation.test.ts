@@ -223,7 +223,7 @@ describe("Left menu bar icons and navigation", () => {
     const mobileBar = document.querySelector(".mobile-top-bar");
     expect(mobileBar).not.toBeNull();
     expect(mobileBar?.querySelector(".mobile-sidebar-open")).not.toBeNull();
-    expect(mobileBar?.querySelector(".mobile-search-btn")).not.toBeNull();
+    expect(mobileBar?.querySelector(".mobile-search-btn")).toBeNull();
   });
 
   it("renders complete edit and delete buttons in single item note action popup", async () => {
