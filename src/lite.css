@@ -941,6 +941,165 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   text-align: left;
 }
 
+/* ==================== Hybrid: Unified Typewriter Document Masthead ==================== */
+.notes-day-header.minimal-date-header.typewriter-masthead {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border-subtle, var(--border));
+}
+
+.notes-day-header.minimal-date-header:has(.date-picker[open]) {
+  position: relative;
+  z-index: 100;
+}
+
+.minimal-date-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0;
+  width: 100%;
+}
+
+.minimal-date-info.typewriter-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.typewriter-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-brand, #5B5BD6);
+  animation: typewriterPulse 2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+.typewriter-pulse-dot.is-archived {
+  background: var(--color-warning, #D4A72C);
+  animation: none;
+}
+
+@keyframes typewriterPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.minimal-date-title.typewriter-kicker-label {
+  margin: 0 !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 0.72rem !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.1em !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+}
+
+.minimal-date-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 1.25rem !important;
+  padding: 0 0.45rem !important;
+  border-radius: 999px !important;
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  background: var(--color-bg-surface-sunken, var(--surface-sunk)) !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+.minimal-date-badge.is-today {
+  background: var(--color-brand-soft, #ECECFF) !important;
+  border-color: color-mix(in srgb, var(--color-brand) 28%, transparent) !important;
+  color: var(--color-brand, #5B5BD6) !important;
+}
+
+:root[data-theme="dark"] .minimal-date-badge.is-today {
+  background: var(--color-brand-soft, #202028) !important;
+  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent) !important;
+  color: var(--color-brand, #7C7CF8) !important;
+}
+
+.today-jump-btn {
+  color: var(--color-brand, #5B5BD6) !important;
+  transition: all 120ms ease !important;
+}
+
+.today-jump-btn:hover {
+  background: var(--color-brand-soft, #ECECFF) !important;
+  color: var(--color-brand, #5B5BD6) !important;
+}
+
+:root[data-theme="dark"] .today-jump-btn {
+  color: var(--color-brand, #7C7CF8) !important;
+}
+
+:root[data-theme="dark"] .today-jump-btn:hover {
+  background: rgba(91, 91, 214, 0.2) !important;
+  color: #9D9DFF !important;
+}
+
+/* 2. Typewriter Manuscript Writing Surface (from Creative 3) */
+.typewriter-composer .empty-day-editor-card {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.typewriter-composer .simple-editor-textarea {
+  min-height: 16rem !important;
+  font-family: var(--font-editorial, "Newsreader", "Charter", "Georgia", "Iowan Old Style", serif) !important;
+  font-size: 1.15rem !important;
+  line-height: 1.82 !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  padding: 0.75rem 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.typewriter-composer .simple-editor-textarea::placeholder {
+  color: var(--color-text-tertiary, var(--muted)) !important;
+  font-style: italic !important;
+  opacity: 0.75 !important;
+}
+
+.typewriter-composer .simple-editor-toolbar {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px dashed var(--color-border-subtle, var(--border)) !important;
+  padding: 0.25rem 0 0.5rem !important;
+  opacity: 0.65;
+  transition: opacity 150ms ease;
+}
+
+.typewriter-composer:focus-within .simple-editor-toolbar {
+  opacity: 1;
+}
+
+.typewriter-composer .simple-editor-footer {
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px dashed var(--color-border-subtle, var(--border)) !important;
+  padding: 0.75rem 0 0 !important;
+}
+
+/* Hide toolbar and footer until user clicks/focuses or types in the editor */
+.typewriter-composer #new-note-form:not(:focus-within):not(.has-content):not(.is-preview):not(:has(.editor-folder-picker[open])):not(:has(.editor-template-picker[open])) .simple-editor-toolbar,
+.typewriter-composer #new-note-form:not(:focus-within):not(.has-content):not(.is-preview):not(:has(.editor-folder-picker[open])):not(:has(.editor-template-picker[open])) .simple-editor-footer {
+  display: none !important;
+}
+
 .notes-day-header.minimal-date-header:has(.date-picker[open]) {
   position: relative;
   z-index: 100;
@@ -1013,6 +1172,11 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   flex: 0 0 auto;
 }
 
+.minimal-date-nav .minimal-today-link,
+.minimal-today-link {
+  display: none !important;
+}
+
 .minimal-nav-btn,
 .minimal-calendar-btn {
   display: inline-flex !important;
@@ -1045,47 +1209,6 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 .minimal-nav-svg {
   width: 0.95rem;
   height: 0.95rem;
-}
-
-.minimal-today-link {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 1.8rem !important;
-  padding: 0 0.75rem !important;
-  border-radius: 999px !important;
-  font-size: 0.75rem !important;
-  font-weight: 550 !important;
-  color: var(--color-text-secondary, var(--text-soft)) !important;
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  transition: all 120ms ease !important;
-  white-space: nowrap !important;
-}
-
-.minimal-today-link:hover {
-  background: var(--color-bg-surface, var(--surface)) !important;
-  color: var(--color-text-primary, var(--text)) !important;
-  border-color: var(--color-border-subtle, var(--border)) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-}
-
-.minimal-today-link.is-active {
-  background: var(--color-bg-surface, var(--surface)) !important;
-  color: var(--color-text-primary, var(--text)) !important;
-  border: 1px solid var(--color-border-subtle, var(--border)) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-  font-weight: 600 !important;
-  pointer-events: none !important;
-}
-
-:root[data-theme="dark"] .minimal-today-link.is-active {
-  background: var(--color-bg-raised, #1c1c1f) !important;
-  border-color: var(--color-border-default, #27272b) !important;
-  color: var(--color-text-primary, #F4F4F5) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
 
 .minimal-picker {
@@ -3947,8 +4070,6 @@ a.tag-pill:hover,
 #new-note-form:focus-within .simple-editor-footer,
 #new-note-form:has(.editor-folder-picker[open]) .simple-editor-toolbar,
 #new-note-form:has(.editor-folder-picker[open]) .simple-editor-footer,
-#new-note-form.empty-day-editor-card .simple-editor-toolbar,
-#new-note-form.empty-day-editor-card .simple-editor-footer,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-toolbar,
@@ -3957,7 +4078,6 @@ a.tag-pill:hover,
 }
 
 #new-note-form:focus-within .simple-editor-toolbar,
-#new-note-form.empty-day-editor-card .simple-editor-toolbar,
 #new-note-form.has-content .simple-editor-toolbar,
 #new-note-form.is-preview .simple-editor-toolbar {
   order: 1 !important;
@@ -3979,14 +4099,12 @@ a.tag-pill:hover,
 }
 
 :root[data-theme="dark"] #new-note-form:focus-within .simple-editor-toolbar,
-:root[data-theme="dark"] #new-note-form.empty-day-editor-card .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.has-content .simple-editor-toolbar,
 :root[data-theme="dark"] #new-note-form.is-preview .simple-editor-toolbar {
   background: color-mix(in srgb, var(--color-bg-raised, #1c1c1f) 80%, var(--color-bg-surface, #121215)) !important;
 }
 
 #new-note-form:focus-within .simple-editor-footer,
-#new-note-form.empty-day-editor-card .simple-editor-footer,
 #new-note-form.has-content .simple-editor-footer,
 #new-note-form.is-preview .simple-editor-footer {
   order: 3 !important;

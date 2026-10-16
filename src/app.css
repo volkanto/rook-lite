@@ -5518,26 +5518,14 @@ body.app .sidebar nav > a.is-active > .nav-svg {
 
 /* ======================================================= Empty Day Canvas === */
 
-/* Center the page on empty days */
+/* Center or anchor the page on empty days */
 body:has(.day-notes.is-empty-day) #page-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: calc(100vh - 7rem);
   min-height: calc(100svh - 7rem);
   box-sizing: border-box;
-  animation: emptyCanvasFadeIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes emptyCanvasFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Ensure the date bar is always 100% width with space-between alignment */
