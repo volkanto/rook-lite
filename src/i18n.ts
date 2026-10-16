@@ -19,11 +19,15 @@ for (const [filePath, mod] of Object.entries(rawModules)) {
   const fallbackCode = match ? match[1] : "";
   const def = (mod.default || mod.locale || mod) as LocaleDefinition;
   if (def && typeof def.strings === "object") {
-    const code = (def.code || fallbackCode).toLowerCase();
-    registeredLocales.set(code, {
+    const rawCode = def.code || fallbackCode;
+    const item: LocaleDefinition = {
       ...def,
-      code
-    });
+      code: rawCode
+    };
+    registeredLocales.set(rawCode, item);
+    if (rawCode.toLowerCase() !== rawCode) {
+      registeredLocales.set(rawCode.toLowerCase(), item);
+    }
   }
 }
 
@@ -32,12 +36,26 @@ const DEFAULT_LOCALE = registeredLocales.has("en")
   ? "en"
   : (registeredLocales.keys().next().value ?? "en");
 
+const PREFERRED_LOCALE_ORDER = ["en", "de", "es", "tr", "pt-BR", "fr"];
+
 export function getAvailableLocales(): LocaleDefinition[] {
-  return Array.from(registeredLocales.values());
+  const list = Array.from(new Set(registeredLocales.values()));
+  return list.sort((a, b) => {
+    const idxA = PREFERRED_LOCALE_ORDER.indexOf(a.code);
+    const idxB = PREFERRED_LOCALE_ORDER.indexOf(b.code);
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
+    return a.label.localeCompare(b.label);
+  });
 }
 
 export function getLocaleDefinition(code = getLocale()): LocaleDefinition {
-  return registeredLocales.get(code) ?? registeredLocales.get(DEFAULT_LOCALE)!;
+  return (
+    registeredLocales.get(code) ??
+    registeredLocales.get(code.toLowerCase()) ??
+    registeredLocales.get(DEFAULT_LOCALE)!
+  );
 }
 
 const STORAGE_KEY = "language-preference";
@@ -45,21 +63,26 @@ const STORAGE_KEY = "language-preference";
 export function getLocale(): string {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && registeredLocales.has(saved)) return saved;
+    if (saved && (registeredLocales.has(saved) || registeredLocales.has(saved.toLowerCase()))) {
+      return (registeredLocales.get(saved) ?? registeredLocales.get(saved.toLowerCase()))!.code;
+    }
   } catch {
     // Ignore localStorage errors
   }
   if (typeof navigator !== "undefined" && navigator.language) {
     const navLang = navigator.language.toLowerCase();
-    for (const code of registeredLocales.keys()) {
-      if (navLang.startsWith(code)) return code;
+    for (const [key, item] of registeredLocales.entries()) {
+      if (navLang.startsWith(key) || key.startsWith(navLang)) return item.code;
     }
   }
   return DEFAULT_LOCALE;
 }
 
 export function setLocale(localeCode: string): void {
-  const code = registeredLocales.has(localeCode) ? localeCode : DEFAULT_LOCALE;
+  const code =
+    registeredLocales.get(localeCode)?.code ??
+    registeredLocales.get(localeCode.toLowerCase())?.code ??
+    DEFAULT_LOCALE;
   try {
     localStorage.setItem(STORAGE_KEY, code);
   } catch {
@@ -76,20 +99,25 @@ export function currentStrings(): TranslationStrings {
 
 export const translations = new Proxy({} as Record<string, TranslationStrings>, {
   get(_target, prop: string) {
-    return registeredLocales.get(prop)?.strings ?? registeredLocales.get(DEFAULT_LOCALE)?.strings;
+    return (
+      registeredLocales.get(prop)?.strings ??
+      registeredLocales.get(prop.toLowerCase())?.strings ??
+      registeredLocales.get(DEFAULT_LOCALE)?.strings
+    );
   },
   has(_target, prop: string) {
-    return registeredLocales.has(prop);
+    return registeredLocales.has(prop) || registeredLocales.has(prop.toLowerCase());
   },
   ownKeys() {
-    return Array.from(registeredLocales.keys());
+    return Array.from(new Set(Array.from(registeredLocales.values()).map((l) => l.code)));
   },
   getOwnPropertyDescriptor(_target, prop: string) {
-    if (registeredLocales.has(prop)) {
+    const item = registeredLocales.get(prop) ?? registeredLocales.get(prop.toLowerCase());
+    if (item) {
       return {
         configurable: true,
         enumerable: true,
-        value: registeredLocales.get(prop)?.strings
+        value: item.strings
       };
     }
     return undefined;
@@ -97,10 +125,15 @@ export const translations = new Proxy({} as Record<string, TranslationStrings>, 
 });
 
 function getDateTimeLocale(code = getLocale()): string {
-  const def = registeredLocales.get(code);
+  const def = registeredLocales.get(code) ?? registeredLocales.get(code.toLowerCase());
   if (def?.dateTimeLocale) return def.dateTimeLocale;
-  if (code === "tr") return "tr-TR";
-  if (code === "en") return "en-US";
+  const lower = code.toLowerCase();
+  if (lower === "tr") return "tr-TR";
+  if (lower === "en") return "en-US";
+  if (lower === "de") return "de-DE";
+  if (lower === "es") return "es-ES";
+  if (lower === "fr") return "fr-FR";
+  if (lower === "pt-br") return "pt-BR";
   return code;
 }
 
@@ -199,4 +232,24 @@ export function getRelativeDateInfo(dateIso: string, todayIso: string, code = ge
     return { label: s.daysAgo(Math.abs(diffDays)), status: "past" };
   }
   return { label: s.daysLater(diffDays), status: "future" };
+}
+
+export function getLocaleFlagSvg(localeCode: string): string {
+  const code = localeCode.toLowerCase();
+  switch (code) {
+    case "en":
+      return `<svg class="lang-flag-svg" viewBox="0 0 24 24" width="20" height="14" aria-hidden="true"><rect x="2" y="5" width="20" height="14" fill="#B22234"/><rect x="2" y="6.07" width="20" height="1.08" fill="#fff"/><rect x="2" y="8.23" width="20" height="1.08" fill="#fff"/><rect x="2" y="10.38" width="20" height="1.08" fill="#fff"/><rect x="2" y="12.54" width="20" height="1.08" fill="#fff"/><rect x="2" y="14.69" width="20" height="1.08" fill="#fff"/><rect x="2" y="16.85" width="20" height="1.08" fill="#fff"/><rect x="2" y="5" width="8" height="7.54" fill="#3C3B6E"/><circle cx="4" cy="7" r="0.45" fill="#fff"/><circle cx="6" cy="7" r="0.45" fill="#fff"/><circle cx="8" cy="7" r="0.45" fill="#fff"/><circle cx="5" cy="8.77" r="0.45" fill="#fff"/><circle cx="7" cy="8.77" r="0.45" fill="#fff"/><circle cx="4" cy="10.54" r="0.45" fill="#fff"/><circle cx="6" cy="10.54" r="0.45" fill="#fff"/><circle cx="8" cy="10.54" r="0.45" fill="#fff"/></svg>`;
+    case "de":
+      return `<svg class="lang-flag-svg" viewBox="0 0 24 24" width="20" height="14" aria-hidden="true"><rect x="2" y="5" width="20" height="4.67" fill="#111"/><rect x="2" y="9.67" width="20" height="4.67" fill="#DD0000"/><rect x="2" y="14.33" width="20" height="4.67" fill="#FFCE00"/></svg>`;
+    case "es":
+      return `<svg class="lang-flag-svg" viewBox="0 0 24 24" width="20" height="14" aria-hidden="true"><rect x="2" y="5" width="20" height="14" fill="#AA151B"/><rect x="2" y="8.5" width="20" height="7" fill="#F1BF00"/><rect x="5.5" y="10" width="1.8" height="3" rx="0.5" fill="#AA151B"/></svg>`;
+    case "tr":
+      return `<svg class="lang-flag-svg" viewBox="0 0 24 24" width="20" height="14" aria-hidden="true"><rect x="2" y="5" width="20" height="14" fill="#E30A17"/><circle cx="10" cy="12" r="3.5" fill="#fff"/><circle cx="11" cy="12" r="2.8" fill="#E30A17"/><polygon points="14.5,12 15.8,12.4 16.5,11.2 16.2,12.6 17.5,13.1 16.1,13.3 16,14.7 15.3,13.5 14,13.8 15,12.8" fill="#fff"/></svg>`;
+    case "pt-br":
+      return `<svg class="lang-flag-svg" viewBox="0 0 24 24" width="20" height="14" aria-hidden="true"><rect x="2" y="5" width="20" height="14" fill="#009739"/><polygon points="12,6.5 20,12 12,17.5 4,12" fill="#FEDD00"/><circle cx="12" cy="12" r="2.8" fill="#012169"/><path d="M9.4 12a2.8 2.8 0 0 0 5.2 -.5a2.8 2.8 0 0 1 -5.2 .5" fill="#fff"/></svg>`;
+    case "fr":
+      return `<svg class="lang-flag-svg" viewBox="0 0 24 24" width="20" height="14" aria-hidden="true"><rect x="2" y="5" width="6.67" height="14" fill="#002395"/><rect x="8.67" y="5" width="6.67" height="14" fill="#fff"/><rect x="15.34" y="5" width="6.67" height="14" fill="#ED2939"/></svg>`;
+    default:
+      return "";
+  }
 }

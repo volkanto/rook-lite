@@ -39,6 +39,26 @@ describe("templates", () => {
     expect(meeting?.markdown).toContain("Katılımcılar");
   });
 
+  it("provides localized templates for de, es, fr, and pt-BR locales", () => {
+    for (const lang of ["de", "es", "fr", "pt-BR"]) {
+      const templates = getPredefinedTemplates(lang);
+      expect(templates.length).toBeGreaterThanOrEqual(4);
+
+      const standup = getTemplateById("standup", lang);
+      expect(standup).toBeDefined();
+      expect(standup?.markdown).toContain("#standup");
+
+      const meeting = getTemplateById("meeting", lang);
+      expect(meeting).toBeDefined();
+      expect(meeting?.markdown).toContain("#meeting");
+    }
+
+    expect(getTemplateById("standup", "de")?.name).toBe("Tägliches Standup");
+    expect(getTemplateById("standup", "es")?.name).toBe("Standup diario");
+    expect(getTemplateById("standup", "fr")?.name).toBe("Standup quotidien");
+    expect(getTemplateById("standup", "pt-BR")?.name).toBe("Standup diário");
+  });
+
   it("places tags at the end of the template after a blank line so extractTags parses them", () => {
     for (const tmpl of PREDEFINED_TEMPLATES) {
       // Tags should not be inside heading title

@@ -2,7 +2,7 @@ import "./app.css";
 import "./lite.css";
 import { clearAllData, storageCounts } from "./db";
 import { createBackup, DEFAULT_OLLAMA_SETTINGS, downloadBlob, downloadJson, downloadMarkdownZip, exportToDirectory, parseBackup, restoreBackup, settingsRepository } from "./data";
-import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, getLocaleDefinition, getRelativeDateInfo, setLocale, type SupportedLocale } from "./i18n";
+import { currentStrings, formatDateHeading, formatMonthYear, formatShortDate, formatTimeLocale, getAvailableLocales, getLocale, getLocaleDefinition, getLocaleFlagSvg, getRelativeDateInfo, setLocale, type SupportedLocale } from "./i18n";
 import { escapeHtml, extractTags, renderInlineMarkdown, renderMarkdown, toggleTaskInMarkdown } from "./markdown";
 import { attachTagAutocomplete } from "./tag-autocomplete";
 import type { Folder, Note, OllamaSettings } from "./models";
@@ -99,8 +99,8 @@ export async function renderShell(): Promise<void> {
   document.documentElement.lang = getLocale();
   app.innerHTML = `<div id="search-modal" class="modal-backdrop" aria-hidden="true"></div>
     <div id="dialog-host"></div><button type="button" class="scrim" data-action="close-sidebar" aria-label="${s.closeSidebar}"></button>
-    <header class="mobile-top-bar"><button type="button" class="mobile-sidebar-open" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="false">${svg(icons.menu, "mobile-nav-svg")}</button><button type="button" class="mobile-search-btn" data-action="open-search" aria-label="${s.searchPlaceholder}"><span class="search-placeholder">${s.searchPlaceholder}</span><kbd class="search-hotkey">⌘ K</kbd></button></header>
-    <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="${s.brandTooltip} · v${APP_VERSION}" data-sidebar-tooltip="${s.brandTooltip} · v${APP_VERSION}"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.sidebarCollapse, "collapse-svg")}<span class="sidebar-toggle-tooltip">${s.collapseSidebar}</span></button></div><div class="sidebar-search-row"><button type="button" class="sidebar-search-btn" data-action="open-search" aria-label="${s.searchPlaceholder}" data-sidebar-tooltip="${s.searchPlaceholder} (⌘K)">${svg(icons.search, "sidebar-search-svg nav-svg")}<span class="nav-label">${s.searchPlaceholder}</span><kbd class="sidebar-search-hotkey">⌘K</kbd></button></div><div class="sidebar-mobile-head"><span>${s.navNotes}</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="${s.closeSidebar}">${svg(icons.close, "sidebar-close-svg")}</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="${s.themeToggleAria}" data-sidebar-tooltip="${document.documentElement.dataset.theme === "dark" ? s.themeToggleLight : s.themeToggleDark}">${svg(icons.moon, "theme-dark-icon nav-svg")}${svg(icons.sun, "theme-light-icon nav-svg")}</button><details class="sidebar-lang-picker" id="sidebar-lang-picker"><summary class="sidebar-lang-toggle" aria-label="${s.languageSelectTooltip}" data-sidebar-tooltip="${s.languageSelectTooltip}">${svg(icons.globe, "nav-svg")}</summary><div class="sidebar-lang-popover" role="menu">${getAvailableLocales().map((loc) => `<button type="button" class="lang-option-btn ${getLocale() === loc.code ? "is-active" : ""}" data-select-lang="${loc.code}"><span class="lang-option-code">${loc.code.toUpperCase()}</span><span class="lang-option-label">${escapeHtml(loc.label)}</span>${getLocale() === loc.code ? `<span class="lang-active-check">${svg(icons.check, "lang-check-svg")}</span>` : ""}</button>`).join("")}</div></details><details class="sidebar-support-picker" id="sidebar-support-picker"><summary class="sidebar-support-toggle" aria-label="${s.supportTooltip}" data-sidebar-tooltip="${s.supportTooltip}">${svg(icons.heart, "nav-svg support-heart-icon")}</summary><div class="sidebar-support-popover" role="menu"><div class="support-popover-header"><span class="support-popover-title">${s.supportTitle}</span><span class="support-popover-desc">${s.supportSubtitle}</span></div><div class="support-popover-links"><a href="https://github.com/sponsors/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon github-badge">${svg(icons.heart, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportGithubLabel}</span><span class="support-option-sub">${s.supportGithubDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a><a href="https://buymeacoffee.com/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon bmac-badge">${svg(icons.coffee, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportBmacLabel}</span><span class="support-option-sub">${s.supportBmacDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a></div></div></details><span class="sidebar-version" title="Rook Lite v${APP_VERSION}">v${APP_VERSION}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"><div class="empty-notes" style="padding: 4rem 1rem; text-align: center;"><p style="color: var(--muted); font-size: 0.95rem;">Loading notes…</p></div></main></div></div>`;
+    <header class="mobile-top-bar"><button type="button" class="mobile-sidebar-open" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="false">${svg(icons.menu, "mobile-nav-svg")}</button></header>
+    <div class="main-layout"><aside class="sidebar" id="app-sidebar"><div class="sidebar-brand-row"><a class="sidebar-brand" href="${appUrl("/")}" data-link aria-label="${s.brandTooltip} · v${APP_VERSION}" data-sidebar-tooltip="${s.brandTooltip} · v${APP_VERSION}"><img src="${assetUrl("/logo.png")}" alt="" width="32" height="32" class="sidebar-brand-logo"><span class="sidebar-brand-name">Rook notes</span></a><button type="button" class="sidebar-collapse-button" data-action="toggle-sidebar" aria-label="${s.collapseSidebar}" aria-controls="app-sidebar" aria-expanded="true">${svg(icons.sidebarCollapse, "collapse-svg")}<span class="sidebar-toggle-tooltip">${s.collapseSidebar}</span></button></div><div class="sidebar-search-row"><button type="button" class="sidebar-search-btn" data-action="open-search" aria-label="${s.searchPlaceholder}" data-sidebar-tooltip="${s.searchPlaceholder} (⌘K)">${svg(icons.search, "sidebar-search-svg nav-svg")}<span class="nav-label">${s.searchPlaceholder}</span><kbd class="sidebar-search-hotkey">⌘K</kbd></button></div><div class="sidebar-mobile-head"><span>${s.navNotes}</span><button type="button" class="sidebar-close" data-action="close-sidebar" aria-label="${s.closeSidebar}">${svg(icons.close, "sidebar-close-svg")}</button></div><nav>${renderNavigation()}</nav><div class="sidebar-footer"><button type="button" class="sidebar-theme-toggle" data-action="toggle-theme" aria-label="${s.themeToggleAria}" data-sidebar-tooltip="${document.documentElement.dataset.theme === "dark" ? s.themeToggleLight : s.themeToggleDark}">${svg(icons.moon, "theme-dark-icon nav-svg")}${svg(icons.sun, "theme-light-icon nav-svg")}<span class="nav-label theme-label">${document.documentElement.dataset.theme === "dark" ? s.themeToggleLight : s.themeToggleDark}</span></button><details class="sidebar-lang-picker" id="sidebar-lang-picker"><summary class="sidebar-lang-toggle" aria-label="${s.languageSelectTooltip}" data-sidebar-tooltip="${s.languageSelectTooltip}">${svg(icons.globe, "nav-svg")}<span class="nav-label">${s.languageTitle}</span><span class="nav-sublabel">${escapeHtml(getLocaleDefinition().label)}</span>${svg(icons.chevronDown, "nav-chevron-svg")}</summary><div class="sidebar-lang-popover" role="menu">${getAvailableLocales().map((loc) => `<button type="button" class="lang-option-btn ${getLocale() === loc.code ? "is-active" : ""}" data-select-lang="${loc.code}"><span class="lang-option-flag">${getLocaleFlagSvg(loc.code)}</span><span class="lang-option-label">${escapeHtml(loc.label)}</span>${getLocale() === loc.code ? `<span class="lang-active-check">${svg(icons.check, "lang-check-svg")}</span>` : ""}</button>`).join("")}</div></details><details class="sidebar-support-picker" id="sidebar-support-picker"><summary class="sidebar-support-toggle" aria-label="${s.supportTooltip}" data-sidebar-tooltip="${s.supportTooltip}">${svg(icons.heart, "nav-svg support-heart-icon")}<span class="nav-label">${s.supportTitle}</span>${svg(icons.chevronDown, "nav-chevron-svg")}</summary><div class="sidebar-support-popover" role="menu"><div class="support-popover-header"><span class="support-popover-title">${s.supportTitle}</span><span class="support-popover-desc">${s.supportSubtitle}</span></div><div class="support-popover-links"><a href="https://github.com/sponsors/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon github-badge">${svg(icons.heart, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportGithubLabel}</span><span class="support-option-sub">${s.supportGithubDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a><a href="https://buymeacoffee.com/volkanto" target="_blank" rel="noopener noreferrer" class="support-option-link"><span class="support-badge-icon bmac-badge">${svg(icons.coffee, "support-icon-svg")}</span><div class="support-option-info"><span class="support-option-name">${s.supportBmacLabel}</span><span class="support-option-sub">${s.supportBmacDesc}</span></div>${svg(icons.externalLink, "support-ext-svg")}</a></div></div></details><span class="sidebar-version" title="Rook Lite v${APP_VERSION}">v${APP_VERSION}</span></div></aside><div class="shell"><main id="page-content" class="lite-shell-main" tabindex="-1"><div class="empty-notes" style="padding: 4rem 1rem; text-align: center;"><p style="color: var(--muted); font-size: 0.95rem;">Loading notes…</p></div></main></div></div>`;
   initCommandPalette();
   bindShellEvents(); applyTheme(); updateSidebarButton(); await renderRoute();
 }
@@ -1718,14 +1718,25 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
                 <span class="settings-row-label">${s.languageTitle}</span>
                 <span class="settings-row-desc">${s.languageSubtitle}</span>
               </div>
-              <div class="settings-segmented-control" role="radiogroup" aria-label="${s.languageTitle}">
-                ${getAvailableLocales().map((loc) => `
-                  <label class="settings-segmented-btn ${currentLocale === loc.code ? "is-active" : ""}">
-                    <input type="radio" name="settings-language" value="${loc.code}" ${currentLocale === loc.code ? "checked" : ""} class="visually-hidden">
-                    <span>${escapeHtml(loc.label)}</span>
-                  </label>
-                `).join("")}
-              </div>
+              <details class="settings-lang-dropdown" id="settings-lang-dropdown">
+                <summary class="settings-lang-summary" aria-haspopup="menu" aria-label="${s.languageTitle}">
+                  <span class="settings-lang-current">
+                    <span class="lang-option-flag">${getLocaleFlagSvg(currentLocale)}</span>
+                    <span>${escapeHtml(getLocaleDefinition(currentLocale).label)}</span>
+                  </span>
+                  ${svg(icons.chevronDown, "settings-lang-chevron")}
+                </summary>
+                <div class="settings-lang-menu" role="radiogroup" aria-label="${s.languageTitle}">
+                  ${getAvailableLocales().map((loc) => `
+                    <label class="settings-lang-item settings-segmented-btn ${currentLocale === loc.code ? "is-active" : ""}">
+                      <input type="radio" name="settings-language" value="${loc.code}" ${currentLocale === loc.code ? "checked" : ""} class="visually-hidden">
+                      <span class="lang-option-flag">${getLocaleFlagSvg(loc.code)}</span>
+                      <span class="settings-lang-item-label">${escapeHtml(loc.label)}</span>
+                      ${currentLocale === loc.code ? `<span class="lang-active-check">${svg(icons.check, "lang-check-svg")}</span>` : ""}
+                    </label>
+                  `).join("")}
+                </div>
+              </details>
             </div>
           </section>
 
@@ -2685,7 +2696,7 @@ function bindShellEvents(): void {
     }
 
     const clickPath = event.composedPath();
-    document.querySelectorAll<HTMLDetailsElement>(".date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open], .sidebar-support-picker[open], .filter-dropdown[open], .note-folder-badge-dropdown[open], .editor-folder-picker[open]").forEach((details) => {
+    document.querySelectorAll<HTMLDetailsElement>(".date-picker[open], .note-action-menu[open], .sidebar-lang-picker[open], .sidebar-support-picker[open], .filter-dropdown[open], .note-folder-badge-dropdown[open], .editor-folder-picker[open], .settings-lang-dropdown[open]").forEach((details) => {
       if (!details.contains(target) && !clickPath.includes(details)) details.removeAttribute("open");
     });
 
@@ -3098,6 +3109,8 @@ function applyTheme(): void {
     const nextLabel = resolved === "dark" ? s.themeToggleLight : s.themeToggleDark;
     toggle.setAttribute("aria-label", s.themeToggleAria);
     toggle.dataset.sidebarTooltip = nextLabel;
+    const labelEl = toggle.querySelector(".theme-label");
+    if (labelEl) labelEl.textContent = nextLabel;
   }
 }
 export async function openSearch(query = ""): Promise<void> {
