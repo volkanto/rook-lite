@@ -957,7 +957,7 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .minimal-date-bar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   padding: 0;
@@ -970,6 +970,15 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   gap: 0.55rem;
   min-width: 0;
   flex: 1 1 auto;
+  padding-top: 0.25rem;
+}
+
+.minimal-stepper-cluster {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  flex-shrink: 0;
 }
 
 .typewriter-pulse-dot {
@@ -1032,16 +1041,17 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .typewriter-today-jump-btn {
   font-family: var(--font-mono, monospace);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: var(--color-brand, #5B5BD6);
   text-decoration: none;
-  padding: 0.15rem 0.5rem;
+  padding: 0.12rem 0.45rem;
   border-radius: var(--radius-sm, 5px);
   background: var(--color-brand-soft, #ECECFF);
   border: 1px solid color-mix(in srgb, var(--color-brand) 25%, transparent);
   transition: all 120ms ease;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .typewriter-today-jump-btn:hover {
