@@ -957,7 +957,7 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .minimal-date-bar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0;
@@ -970,15 +970,6 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   gap: 0.55rem;
   min-width: 0;
   flex: 1 1 auto;
-  padding-top: 0.25rem;
-}
-
-.minimal-stepper-cluster {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.35rem;
-  flex-shrink: 0;
 }
 
 .typewriter-pulse-dot {
