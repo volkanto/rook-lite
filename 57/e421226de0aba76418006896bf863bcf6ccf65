@@ -1,0 +1,57 @@
+src/markdown.test.ts
+  s_99cd2eb82585d3::t_fadfb1c768bea0 112-125,128,134-136
+  s_99cd2eb82585d3::t_86a9047a98feb5 133,137-141
+  s_99cd2eb82585d3::t_62e77ba7d79d32 4
+  s_99cd2eb82585d3::t_d8055e6465a136 142-143
+src/wikilinks.ts
+  s_99cd2eb82585d3::t_327a49f97493c0 1
+  s_99cd2eb82585d3::t_4607031a00f655 84,87-93,96,108-111,115-118
+  s_99cd2eb82585d3::t_01b4b6cf216ac9 119-120
+src/locales/pt-BR.ts
+  s_99cd2eb82585d3::t_3955756f133003 325
+src/wikilinks.test.ts
+  s_99cd2eb82585d3::t_25a7ec48ef9a0a 88,92-93,95-99
+  s_99cd2eb82585d3::t_11de8adfa8957e 84,87,89-91,94
+  s_99cd2eb82585d3::t_bbdc29bde68831 100
+src/locales/de.ts
+  s_99cd2eb82585d3::t_105f49e5ceb94c 325
+src/locales/en.ts
+  s_99cd2eb82585d3::t_22e0d08f781c13 326
+src/locales/tr.ts
+  s_99cd2eb82585d3::t_7f3836d4dd001d 325
+src/lite.css
+  s_99cd2eb82585d3::t_761c4d6e628ab6 3337-3352
+  s_99cd2eb82585d3::t_37b5c9e135bae3 3308-3336
+src/locales/es.ts
+  s_99cd2eb82585d3::t_596f7306c37853 325
+src/i18n.types.ts
+  s_99cd2eb82585d3::t_281b31efcf098c 330
+src/markdown.ts
+  s_99cd2eb82585d3::t_96e1f8d16af9cb 104
+src/locales/fr.ts
+  s_99cd2eb82585d3::t_cb02ceb2313353 325
+src/navigation.test.ts
+  s_99cd2eb82585d3::t_3e9735770667e8 1945,1955-1961,1965-1972,1978,1981-1982,1989-1993,1995-1996,1998-1999,2001-2006,2009
+  s_99cd2eb82585d3::t_9ef635c634f46a 1946-1954,1962-1964,1973-1977,1979-1980,1983-1988,1994,1997,2000,2007-2008,2010-2012,2014-2023
+  s_99cd2eb82585d3::t_42434a0233e7d6 2013
+src/main.ts
+  s_99cd2eb82585d3::t_ffdac2cba1ac15 581-601
+  s_99cd2eb82585d3::t_e1719f6fd75154 2754-2755,2757
+  s_99cd2eb82585d3::t_39bbe1db8cd65b 2753,2756,2758-2760
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "57e421226de0aba76418006896bf863bcf6ccf65",
+  "prompts": {},
+  "sessions": {
+    "s_99cd2eb82585d3": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "360aad97-9c09-483d-80c8-bd839b5a6f0b",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
