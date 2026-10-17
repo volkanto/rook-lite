@@ -322,6 +322,7 @@ export const locale: LocaleDefinition = {
     badgeYesterday: "Gestern",
     badgeDate: "Datum",
     pickerNavHint: "<kbd>↑</kbd> <kbd>↓</kbd> zum Navigieren · <kbd>↵</kbd> zum Einfügen · <kbd>esc</kbd> zum Schließen",
+    brokenLinkTooltip: (title: string) => `Gelöschte oder fehlende Notiz: „${title}“`,
 
     palettePlaceholder: "Notizen suchen oder > für Befehle eingeben",
     paletteNavHint: "Navigieren",

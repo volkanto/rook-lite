@@ -1942,6 +1942,85 @@ describe("Left menu bar icons and navigation", () => {
     await noteService.delete(note2.id);
   });
 
+  it("renders broken link indicator for missing or deleted notes and does not create note on click", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const note = await noteService.create("Reference to [[Project Roadmap]] document.", today);
+
+    const { renderRoute, renderShell } = await import("./main");
+    history.pushState({}, "", `/?date=${today}`);
+    await renderShell();
+    await renderRoute();
+
+    const brokenLink = document.querySelector<HTMLAnchorElement>(".wikilink-broken");
+    expect(brokenLink).not.toBeNull();
+    expect(brokenLink?.textContent).toContain("Project Roadmap");
+    expect(brokenLink?.textContent).toContain("⊘");
+    expect(brokenLink?.getAttribute("data-wikilink-broken")).toBe("true");
+    expect(brokenLink?.getAttribute("aria-disabled")).toBe("true");
+    expect(brokenLink?.getAttribute("title")).toContain("Deleted or missing note");
+
+    const composer = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = composer?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    const initialValue = textarea?.value ?? "";
+
+    // Clicking broken link should NOT navigate or create a new note
+    brokenLink?.click();
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(textarea?.value).toBe(initialValue);
+    expect(document.querySelector(".lite-confirm-dialog")).toBeNull();
+
+    // Clean up
+    await noteService.delete(note.id);
+  });
+
+  it("dynamically shows broken link indicator when a referenced note is deleted", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const targetNote = await noteService.create("# Target Specs\nDetails here.", today);
+    const linkingNote = await noteService.create("Reference to [[Target Specs]].", today);
+
+    const { renderRoute, renderShell } = await import("./main");
+    history.pushState({}, "", `/?date=${today}`);
+    await renderShell();
+    await renderRoute();
+
+    // While note exists, link is resolved and active
+    let link = document.querySelector<HTMLAnchorElement>(`[data-wikilink-target="Target Specs"]`);
+    expect(link).not.toBeNull();
+    expect(link?.classList.contains("wikilink-broken")).toBe(false);
+    expect(link?.hasAttribute("data-link")).toBe(true);
+
+    // Delete target note
+    await noteService.delete(targetNote.id);
+
+    // Re-render
+    await renderRoute();
+
+    // Now link displays broken link indicator
+    link = document.querySelector<HTMLAnchorElement>(`[data-wikilink-target="Target Specs"]`);
+    expect(link).not.toBeNull();
+    expect(link?.classList.contains("wikilink-broken")).toBe(true);
+    expect(link?.textContent).toContain("⊘");
+    expect(link?.getAttribute("data-wikilink-broken")).toBe("true");
+
+    // Clean up
+    await noteService.delete(linkingNote.id);
+  });
+
+  it("pre-fills composer when arriving via ?create= URL parameter", async () => {
+    const { renderShell } = await import("./main");
+    history.pushState({}, "", "/?create=Sprint%20Kickoff");
+    await renderShell();
+
+    const composer = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = composer?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    expect(textarea?.value).toBe("# Sprint Kickoff\n\n");
+    expect(composer?.classList.contains("has-content")).toBe(true);
+    expect(window.location.search).not.toContain("create=");
+  });
+
   it("opens link picker modal when clicking toolbar backlink button and inserts selected note", async () => {
     const noteService = new NoteService(new NoteRepository());
     const note = await noteService.create("Sprint Planning Kickoff", "2026-10-01");

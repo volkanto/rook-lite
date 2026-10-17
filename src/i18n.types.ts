@@ -327,6 +327,7 @@ export interface TranslationStrings {
   badgeYesterday: string;
   badgeDate: string;
   pickerNavHint: string;
+  brokenLinkTooltip: (title: string) => string;
 
   // Command Palette
   palettePlaceholder: string;

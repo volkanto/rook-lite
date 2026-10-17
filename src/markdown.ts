@@ -101,7 +101,7 @@ function sanitizeHtml(html: string): string {
     USE_PROFILES: { html: true, svg: true },
     FORBID_TAGS: ["style", "iframe", "object", "embed"],
     FORBID_ATTR: ["style"],
-    ADD_ATTR: ["data-task-index", "aria-label", "aria-hidden", "data-link", "data-wikilink-target", "target", "rel"]
+    ADD_ATTR: ["data-task-index", "aria-label", "aria-hidden", "data-link", "data-wikilink-target", "data-wikilink-unresolved", "data-wikilink-broken", "aria-disabled", "target", "rel", "title"]
   });
 }
 

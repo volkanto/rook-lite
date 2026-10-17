@@ -81,7 +81,22 @@ And ignore \`[[2026-10-07]]\` inline.
       const html = renderWikilinkHtml("Project Titan");
       expect(html).toContain('href="/?date=2026-09-20#note-titan-1"');
       expect(html).toContain('class="wikilink wikilink-note"');
+      expect(html).not.toContain('wikilink-unresolved');
       expect(html).toContain(">Project Titan</a>");
+    });
+
+    it("renders broken link indicator for deleted or non-existent notes", () => {
+      setWikilinkNotesIndex([]);
+
+      const html = renderWikilinkHtml("Project Roadmap", "Roadmap Specs");
+      expect(html).toContain('class="wikilink wikilink-note wikilink-broken"');
+      expect(html).toContain('data-wikilink-broken="true"');
+      expect(html).toContain('data-wikilink-target="Project Roadmap"');
+      expect(html).toContain('aria-disabled="true"');
+      expect(html).toContain('title="Deleted or missing note: &quot;Project Roadmap&quot;"');
+      expect(html).toContain('<span class="wikilink-broken-icon" aria-hidden="true">⊘</span>');
+      expect(html).toContain("Roadmap Specs");
+      expect(html).not.toContain("data-link");
     });
   });
 

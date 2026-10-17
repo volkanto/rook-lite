@@ -3305,6 +3305,51 @@ button.editor-template-item:hover {
   font-variant-numeric: tabular-nums;
 }
 
+.wikilink.wikilink-broken {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  text-decoration: line-through;
+  text-decoration-color: var(--danger, #e25555);
+  background: color-mix(in srgb, var(--danger, #e25555) 8%, var(--color-bg-surface-sunken, var(--surface-sunk)));
+  opacity: 0.85;
+  cursor: not-allowed;
+  user-select: text;
+}
+
+.wikilink.wikilink-broken:hover {
+  color: var(--danger, #e25555) !important;
+  text-decoration: line-through;
+  text-decoration-color: var(--danger, #e25555);
+  background: color-mix(in srgb, var(--danger, #e25555) 14%, var(--color-bg-surface-sunken, var(--surface-sunk)));
+}
+
+.wikilink-broken-icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: var(--danger, #e25555);
+  line-height: 1;
+}
+
+.wikilink.wikilink-unresolved {
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  text-decoration: underline dashed;
+  text-decoration-color: var(--color-border-strong, var(--border));
+  text-underline-offset: 3px;
+  opacity: 0.9;
+}
+
+.wikilink.wikilink-unresolved:hover {
+  color: var(--color-brand, #2563eb) !important;
+  text-decoration: underline dashed;
+  text-decoration-color: var(--color-brand, #2563eb);
+  opacity: 1;
+  background: color-mix(in srgb, var(--color-brand, #2563eb) 8%, transparent);
+}
+
 .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge) {
   color: var(--color-brand, #2563eb);
   text-decoration: underline;
