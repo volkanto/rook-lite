@@ -965,7 +965,8 @@ export function showEditDialog(note: Note, foldersList: Folder[] = []): void {
       showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
         await notes.delete(note.id);
         void track("note_deleted");
-        closeDialog();
+        cleanup();
+        closeDialog(backdrop);
         await refreshCalendar();
         await renderRoute();
       });

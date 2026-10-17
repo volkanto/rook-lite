@@ -710,6 +710,12 @@ describe("Left menu bar icons and navigation", () => {
     // Note should now be permanently deleted
     const deletedNote = (await noteService.listAll()).find((n) => n.id === createdNote.id);
     expect(deletedNote).toBeUndefined();
+
+    // Dialogs should be completely unmounted and document body overflow restored
+    expect(document.querySelector("#confirm-backdrop")).toBeNull();
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+    expect(document.querySelector("#dialog-host")?.children.length).toBe(0);
+    expect(document.body.style.overflow).toBe("");
   });
 
   it("auto-expands textarea height when multiple lines are entered and shrinks on clear", async () => {
