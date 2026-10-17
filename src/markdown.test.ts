@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
 import { renderMarkdown, toggleTaskInMarkdown } from "./markdown";
+import { setWikilinkNotesIndex } from "./wikilinks";
 
 describe("markdown task toggling and interactive checkboxes", () => {
   it("toggles unchecked task to checked", () => {
@@ -108,12 +109,36 @@ describe("markdown code blocks and syntax highlighting", () => {
     expect(html).toContain(">2026-10-02</a>");
   });
 
-  it("renders note wikilinks with custom label linking to note date", () => {
+  it("renders note wikilinks with custom label linking to note date when resolved", () => {
+    setWikilinkNotesIndex([
+      {
+        id: "titan-1",
+        title: "Project Titan",
+        content: "Specs",
+        tags: [],
+        noteDate: "2026-10-02",
+        language: null,
+        createdAt: "2026-10-02T10:00:00Z",
+        updatedAt: "2026-10-02T10:00:00Z",
+        archived: false
+      }
+    ]);
     const markdown = "Check out [[Project Titan|Titan specs]].";
     const html = renderMarkdown(markdown);
-    expect(html).toContain('href="/?date=Project%20Titan"');
+    expect(html).toContain('href="/?date=2026-10-02#note-titan-1"');
     expect(html).toContain('class="wikilink wikilink-note"');
     expect(html).toContain(">Titan specs</a>");
+  });
+
+  it("renders broken link indicator for deleted or non-existent notes", () => {
+    setWikilinkNotesIndex([]);
+    const markdown = "Check out [[Project Falcon|Falcon specs]].";
+    const html = renderMarkdown(markdown);
+    expect(html).toContain('class="wikilink wikilink-note wikilink-broken"');
+    expect(html).toContain('data-wikilink-broken="true"');
+    expect(html).toContain('aria-disabled="true"');
+    expect(html).toContain('<span class="wikilink-broken-icon" aria-hidden="true">⊘</span>');
+    expect(html).toContain("Falcon specs");
   });
 
   it("does not render wikilinks inside code blocks or inline code", () => {

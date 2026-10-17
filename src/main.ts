@@ -578,6 +578,27 @@ export async function renderToday(content: HTMLElement): Promise<void> {
     }
   }
   bindCreateEditor(date); bindNoteActions();
+  const createTitle = new URLSearchParams(location.search).get("create");
+  if (createTitle) {
+    const composer = document.querySelector<HTMLFormElement>("#new-note-form");
+    const textarea = composer?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    if (composer && textarea) {
+      const templateText = `# ${createTitle}\n\n`;
+      if (!textarea.value.trim() || textarea.value.trim() === templateText.trim()) {
+        textarea.value = templateText;
+        setEditorMode(composer, "write", false);
+        composer.classList.add("has-content");
+        resizeEditor(textarea);
+        updateEditorWordCount(composer);
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+    const cleanUrl = new URL(location.href);
+    cleanUrl.searchParams.delete("create");
+    history.replaceState({}, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+  }
   updateScrollToTopVisibility();
   requestAnimationFrame(() => updateScrollToTopVisibility());
 }
@@ -2729,6 +2750,14 @@ function bindShellEvents(): void {
       }
       return;
     }
+
+    const brokenWikilink = target.closest<HTMLAnchorElement>("a[data-wikilink-broken], a.wikilink-broken");
+    if (brokenWikilink) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
     const link = target.closest<HTMLAnchorElement>("a[data-link]");
     if (link && !link.hasAttribute("data-open-note") && link.origin === location.origin && !event.metaKey && !event.ctrlKey) {
       event.preventDefault();
