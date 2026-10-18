@@ -1,0 +1,19 @@
+.github/workflows/release.yml
+  s_53ea3d112c8fa6::t_a29fb54190032b 30-54,57,94-95,97,126,228,275
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "bee6602e015aaeafe23662fceaaf438a39ec1515",
+  "prompts": {},
+  "sessions": {
+    "s_53ea3d112c8fa6": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "be2b0d6a-19aa-41a4-bf63-7f087f5eefde",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
