@@ -1838,6 +1838,11 @@ describe("Left menu bar icons and navigation", () => {
     expect(textarea.value).toContain("Daily Standup");
     expect(textarea.value).toContain("#standup");
     expect(textarea.closest("#new-note-form")?.classList.contains("has-content")).toBe(true);
+
+    // Clean up template draft
+    textarea.value = "";
+    const db = await (await import("./db")).database();
+    await db.clear("drafts");
   });
 
   it("shows confirmation dialog and replaces text when editor already has content", async () => {
@@ -1872,6 +1877,11 @@ describe("Left menu bar icons and navigation", () => {
     expect(textarea.value).toContain("Daily Standup");
     expect(textarea.value).toContain("#standup");
     expect(textarea.value).not.toContain("My original draft text");
+
+    // Clean up template draft
+    textarea.value = "";
+    const db = await (await import("./db")).database();
+    await db.clear("drafts");
   });
 
   it("opens template picker and inserts template on item click", async () => {
@@ -1892,6 +1902,11 @@ describe("Left menu bar icons and navigation", () => {
 
     expect(textarea.value).toContain("Daily Standup");
     expect(textarea.value).toContain("#standup");
+
+    // Clean up template draft
+    textarea.value = "";
+    const db = await (await import("./db")).database();
+    await db.clear("drafts");
   });
 
   it("renders wikilinks inside notes and navigates via SPA link", async () => {
@@ -2010,6 +2025,10 @@ describe("Left menu bar icons and navigation", () => {
   });
 
   it("pre-fills composer when arriving via ?create= URL parameter", async () => {
+    const { database } = await import("./db");
+    const db = await database();
+    await db.clear("drafts");
+
     const { renderShell } = await import("./main");
     history.pushState({}, "", "/?create=Sprint%20Kickoff");
     await renderShell();
@@ -2019,6 +2038,9 @@ describe("Left menu bar icons and navigation", () => {
     expect(textarea?.value).toBe("# Sprint Kickoff\n\n");
     expect(composer?.classList.contains("has-content")).toBe(true);
     expect(window.location.search).not.toContain("create=");
+
+    // Clean up
+    await db.clear("drafts");
   });
 
   it("opens link picker modal when clicking toolbar backlink button and inserts selected note", async () => {
