@@ -1,0 +1,20 @@
+src/navigation.test.ts
+  s_125134fa168a6f::t_91cd2298809aff 2028-2031,2041-2043
+  s_125134fa168a6f::t_f1395f7620e905 1841-1845,1880-1884,1905-1909
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "19eddb19d8e359cc0179b911bfbe01f2f3f22fd9",
+  "prompts": {},
+  "sessions": {
+    "s_125134fa168a6f": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "adaf5bb0-65d1-499c-bcf1-08a1a8875cef",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
