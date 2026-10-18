@@ -1,0 +1,85 @@
+src/locales/en.ts
+  s_facbe57363bddf::t_1ee7c9644301c8 293-294
+  s_facbe57363bddf::t_eec6a383f0472a 284-285,295
+docs/VISION.md
+  s_facbe57363bddf::t_a90873f92765a1 19
+  s_facbe57363bddf::t_03148a63b60287 119
+  s_facbe57363bddf::t_c45afc662f81f2 16-18
+  s_facbe57363bddf::t_152f75e6bfa67c 20-22,116-118
+src/lite.css
+  s_facbe57363bddf::t_afca4fae1014aa 8749,8752-8753,8755-8756,8759,8761,8763-8764,8767-8768,8771-8772,8774-8779,8781-8787,8790,8802-8803,8806,8810-8811,8814,8818,8829,8832-8833,8837-8838,8843-8844,8852-8853,8857,8860-8861,8864-8865,8868-8869,8872,8874-8875,8877,8883-8886,8891-8892,8899-8900,8905-8906,8909,8916-8917,8919-8921,8924-8925,8928,8937-8938,8941,8944-8948
+  s_facbe57363bddf::t_939d8c53f60442 8750,8757,8762,8765-8766,8769,8773,8780,8788,8792-8801,8804,8807-8809,8812,8815-8817,8819-8827,8830-8831,8834-8836,8839-8842,8845-8851,8854-8856,8858-8859,8862-8863,8866-8867,8870,8876,8878-8882,8887-8890,8893-8898,8901-8904,8907,8910-8915,8918,8922-8923,8926,8929-8936,8939,8942-8943
+  s_facbe57363bddf::t_78ee036ab6bf3f 8751,8754,8758,8760,8770,8789,8791,8805,8813,8828,8871,8873,8908,8927,8940
+  s_facbe57363bddf::t_fe2ab58f31370f 8949
+src/locales/fr.ts
+  s_facbe57363bddf::t_a66f9fb927dc0a 292-293
+  s_facbe57363bddf::t_a8cd0990204b1a 283-284,294
+src/analytics/notice.test.ts
+  s_facbe57363bddf::t_87ab5d65808be6 18-31
+  s_facbe57363bddf::t_9369981a5af682 180
+  s_facbe57363bddf::t_48677717e85353 227-248
+  s_facbe57363bddf::t_3553cf7f1a3882 3,42-45,134,151
+  s_facbe57363bddf::t_eea053705946ee 95
+  s_facbe57363bddf::t_887a410c2552e4 87-88,126
+  s_facbe57363bddf::t_63b450adca290d 173-179,181-226,249
+  s_facbe57363bddf::t_dd60b93231910a 1-2,4-17,32-41,46-86,89-90,92-93,96-125,127-133,135-150,152-172,250
+  s_facbe57363bddf::t_b8a7ac03d6c024 91,94
+docs/ANALYTICS_ROLLOUT_PLAN.md
+  s_facbe57363bddf::t_451f3204c0fddf 118
+  s_facbe57363bddf::t_4aa19530c3c66f 10
+  s_facbe57363bddf::t_5f8cf4208d02b1 7-9
+  s_facbe57363bddf::t_aa1acd1435aeda 11-13,115-117
+  s_facbe57363bddf::t_d4b66e0ddad705 119
+src/analytics/analytics.ts
+  s_facbe57363bddf::t_9ee495d4630d4b 31,36-37,47-69
+  s_facbe57363bddf::t_238624640816d5 39
+  s_facbe57363bddf::t_32f0c03017a248 70
+src/analytics/notice.ts
+  s_facbe57363bddf::t_2044ae9cf0147d 4
+  s_facbe57363bddf::t_a274b0ab996079 1-3,5-10,12-27,33-38,40-48,52-58,60-63,74,77-95
+  s_facbe57363bddf::t_70b2670d58fe8f 39,59,64-73,75-76
+  s_facbe57363bddf::t_c9ffafdea72d39 11,28-32,49-51
+src/main.ts
+  s_facbe57363bddf::t_b8d26963ed7748 89,109,113,115-117
+  s_facbe57363bddf::t_ded8fec0667c89 4
+  s_facbe57363bddf::t_be5d59c2d4d39e 104,114
+  s_facbe57363bddf::t_36c40b9044f8d5 118-119
+src/i18n.types.ts
+  s_facbe57363bddf::t_0729da8cf1f397 300-302
+src/views/settingsView.ts
+  s_facbe57363bddf::t_a130639a5d1edb 2
+  s_facbe57363bddf::t_522c1c4034d48c 601-603
+src/locales/es.ts
+  s_facbe57363bddf::t_53eb6f3e25cb6a 283-284,294
+  s_facbe57363bddf::t_45e12b53c7e813 292-293
+README.md
+  s_facbe57363bddf::t_333787a63d17ff 7,47,57
+src/analytics/analytics.test.ts
+  s_facbe57363bddf::t_6791a229b0f278 208-222
+  s_facbe57363bddf::t_5768d090906d2e 6-7,9-10,23,27,29-58
+src/locales/pt-BR.ts
+  s_facbe57363bddf::t_7344cc67cb97c3 283-284,294
+  s_facbe57363bddf::t_7068b468f68431 292-293
+src/locales/de.ts
+  s_facbe57363bddf::t_ce3980b703e732 283-284,294
+  s_facbe57363bddf::t_57d0c86546be89 292-293
+src/locales/tr.ts
+  s_facbe57363bddf::t_eb1c2d578ae666 283-284,294
+  s_facbe57363bddf::t_01370843984925 292-293
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "369a80031a24e3c163d2ee59f31a45d0603246c0",
+  "prompts": {},
+  "sessions": {
+    "s_facbe57363bddf": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "9296b298-7a7c-4c1c-a18c-59dfbca43ad2",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "volkanto <dev@tokmak.org>"
+    }
+  }
+}
