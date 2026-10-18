@@ -334,6 +334,159 @@ export const locale: LocaleDefinition = {
     sectionNotes: "Notes",
     sectionCommands: "Commands",
     sectionMoreNotes: "More Notes",
+    commandTemplatePrefix: "Template",
+    commands: {
+      "contextual-edit-note": {
+        title: "Edit note",
+        description: "Edit the active or selected note",
+        keywords: ["edit", "modify", "change", "write", "note"]
+      },
+      "contextual-copy-note": {
+        title: "Copy note Markdown",
+        description: "Copy content of selected note to clipboard",
+        keywords: ["copy", "clipboard", "markdown", "text", "share"]
+      },
+      "contextual-delete-note": {
+        title: "Delete note",
+        description: "Delete the selected note",
+        keywords: ["delete", "remove", "trash", "destroy"]
+      },
+      "contextual-regenerate-summary": {
+        title: "Regenerate summary",
+        description: "Re-run summary generation for current period",
+        keywords: ["regenerate", "re-run", "recreate", "ai summary", "refresh"]
+      },
+      "contextual-copy-summary": {
+        title: "Copy summary Markdown",
+        description: "Copy generated summary to clipboard",
+        keywords: ["copy", "clipboard", "summary", "markdown"]
+      },
+      "contextual-download-summary": {
+        title: "Download summary Markdown",
+        description: "Export summary as a markdown file",
+        keywords: ["export", "download", "save", "summary", "markdown"]
+      },
+      "new-note": {
+        title: "New note",
+        description: "Compose a new note",
+        keywords: ["new", "create", "compose", "write", "draft", "add", "note"]
+      },
+      "today": {
+        title: "Go to today",
+        description: "Jump to today's notes stream",
+        keywords: ["today", "now", "current day", "daily", "home"]
+      },
+      "open-tasks": {
+        title: "Open tasks",
+        description: "View all unfinished checklist items across your notes",
+        keywords: ["todo", "tasks", "open tasks", "checklist", "action items", "uncompleted"]
+      },
+      "filter-tags": {
+        title: "Filter notes by tag",
+        description: "Search notes by hashtag",
+        keywords: ["tags", "topics", "hashtags", "filter tags"]
+      },
+      "review-this-week": {
+        title: "Review this week",
+        description: "Generate or view weekly summary for the current week",
+        keywords: ["summary", "weekly", "this week", "review", "digest", "week"]
+      },
+      "review-this-month": {
+        title: "Review this month",
+        description: "Generate or view monthly summary for the current month",
+        keywords: ["summary", "monthly", "this month", "review", "digest", "month"]
+      },
+      "open-latest-summary": {
+        title: "Open latest summary",
+        description: "Navigate to summaries dashboard",
+        keywords: ["latest summary", "recent summary", "overview", "summaries"]
+      },
+      "custom-review": {
+        title: "Custom review",
+        description: "Create a summary for a custom date range",
+        keywords: ["custom summary", "date range", "summary range", "custom review"]
+      },
+      "go-to-date": {
+        title: "Go to date",
+        description: "Jump to a specific calendar date",
+        keywords: ["jump to date", "calendar", "day", "date picker", "pick date"]
+      },
+      "previous-day": {
+        title: "Previous day",
+        description: "Navigate to yesterday or previous day",
+        keywords: ["previous day", "yesterday", "prev", "back", "earlier"]
+      },
+      "next-day": {
+        title: "Next day",
+        description: "Navigate to tomorrow or next day",
+        keywords: ["next day", "tomorrow", "forward", "later"]
+      },
+      "export-markdown-zip": {
+        title: "Export Markdown (Zip)",
+        description: "Download all notes in a zip archive with frontmatter",
+        keywords: ["export", "markdown", "download", "zip", "save notes", "backup notes"]
+      },
+      "create-json-backup": {
+        title: "Create JSON backup",
+        description: "Save a full JSON snapshot of notes and summaries",
+        keywords: ["backup", "json", "export backup", "save data", "download data", "snapshot"]
+      },
+      "restore-backup": {
+        title: "Restore backup",
+        description: "Import and restore a JSON backup file",
+        keywords: ["restore", "import backup", "load data", "replace data", "upload backup"]
+      },
+      "toggle-theme": {
+        title: "Toggle theme",
+        description: "Switch between light and dark appearance",
+        keywords: ["theme", "dark", "light", "appearance", "mode", "toggle theme"]
+      },
+      "set-theme-light": {
+        title: "Set theme: Light",
+        description: "Use light interface mode",
+        keywords: ["theme", "light", "bright", "white", "day"]
+      },
+      "set-theme-dark": {
+        title: "Set theme: Dark",
+        description: "Use dark interface mode",
+        keywords: ["theme", "dark", "night", "black"]
+      },
+      "set-theme-system": {
+        title: "Set theme: System",
+        description: "Match operating system light/dark preference",
+        keywords: ["theme", "system", "auto", "default theme"]
+      },
+      "toggle-zen-mode": {
+        title: "Toggle Zen mode",
+        description: "Expand writing space and hide navigation",
+        keywords: ["zen", "distraction free", "focus", "full screen", "maximize"]
+      },
+      "keyboard-shortcuts": {
+        title: "Keyboard Shortcuts",
+        description: "View all keyboard navigation and editing shortcuts",
+        keywords: ["shortcuts", "hotkeys", "cheat sheet", "help", "keys", "keyboard"]
+      },
+      "open-settings": {
+        title: "Open Settings",
+        description: "Configure preferences and appearance",
+        keywords: ["settings", "preferences", "config", "options"]
+      },
+      "ai-settings": {
+        title: "AI & Ollama settings",
+        description: "View local Ollama settings",
+        keywords: ["ai", "ollama", "local ai", "model", "llama", "summary model", "ai settings"]
+      },
+      "data-management": {
+        title: "Data management",
+        description: "Export, backup, and storage information",
+        keywords: ["storage", "data", "backup", "export", "data management", "indexeddb"]
+      },
+      "export-markdown-dir": {
+        title: "Export to folder",
+        description: "Export Markdown files directly to a local folder",
+        keywords: ["export", "folder", "directory", "local files", "filesystem"]
+      }
+    },
 
     dataManagementTitle: "Export and backup",
     dataManagementSubtitle: "Your notes stay in this browser unless you explicitly export them.",

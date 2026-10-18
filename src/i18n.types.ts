@@ -1,3 +1,9 @@
+export interface CommandI18n {
+  title: string;
+  description: string;
+  keywords?: string[];
+}
+
 export interface TranslationStrings {
   // Navigation
   navNotes: string;
@@ -338,6 +344,8 @@ export interface TranslationStrings {
   sectionNotes: string;
   sectionCommands: string;
   sectionMoreNotes: string;
+  commandTemplatePrefix: string;
+  commands: Record<string, CommandI18n>;
 
   // Data management
   dataManagementTitle: string;

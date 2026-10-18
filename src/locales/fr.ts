@@ -332,6 +332,159 @@ export const locale: LocaleDefinition = {
     sectionNotes: "Notes",
     sectionCommands: "Commandes",
     sectionMoreNotes: "Plus de notes",
+    commandTemplatePrefix: "Modèle",
+    commands: {
+      "contextual-edit-note": {
+        title: "Modifier la note",
+        description: "Modifier la note active ou sélectionnée",
+        keywords: ["modifier", "changer", "écrire", "note"]
+      },
+      "contextual-copy-note": {
+        title: "Copier le Markdown de la note",
+        description: "Copier le contenu de la note sélectionnée dans le presse-papiers",
+        keywords: ["copier", "presse-papiers", "markdown", "texte"]
+      },
+      "contextual-delete-note": {
+        title: "Supprimer la note",
+        description: "Supprimer la note sélectionnée",
+        keywords: ["supprimer", "effacer", "corbeille"]
+      },
+      "contextual-regenerate-summary": {
+        title: "Régénérer le résumé",
+        description: "Relancer la génération du résumé pour la période en cours",
+        keywords: ["résumé", "régénérer", "actualiser", "ia"]
+      },
+      "contextual-copy-summary": {
+        title: "Copier le résumé Markdown",
+        description: "Copier le résumé généré dans le presse-papiers",
+        keywords: ["copier", "presse-papiers", "résumé"]
+      },
+      "contextual-download-summary": {
+        title: "Télécharger le résumé Markdown",
+        description: "Exporter le résumé sous forme de fichier markdown",
+        keywords: ["télécharger", "enregistrer", "exporter", "résumé"]
+      },
+      "new-note": {
+        title: "Nouvelle note",
+        description: "Rédiger une nouvelle note",
+        keywords: ["nouveau", "nouvelle", "créer", "écrire", "note"]
+      },
+      "today": {
+        title: "Aller à aujourd'hui",
+        description: "Accéder au flux des notes d'aujourd'hui",
+        keywords: ["aujourd'hui", "actuel", "journal", "accueil"]
+      },
+      "open-tasks": {
+        title: "Tâches ouvertes",
+        description: "Voir toutes les tâches non terminées dans vos notes",
+        keywords: ["tâches", "ouvertes", "todo", "liste"]
+      },
+      "filter-tags": {
+        title: "Filtrer par mot-clé",
+        description: "Rechercher des notes par hashtag",
+        keywords: ["mots-clés", "tags", "filtrer", "thèmes"]
+      },
+      "review-this-week": {
+        title: "Faire le point de la semaine",
+        description: "Générer ou afficher le résumé de la semaine en cours",
+        keywords: ["résumé", "hebdomadaire", "cette semaine", "revue"]
+      },
+      "review-this-month": {
+        title: "Faire le point du mois",
+        description: "Générer ou afficher le résumé du mois en cours",
+        keywords: ["résumé", "mensuel", "ce mois", "revue"]
+      },
+      "open-latest-summary": {
+        title: "Ouvrir le dernier résumé",
+        description: "Accéder au tableau de bord des résumés",
+        keywords: ["dernier résumé", "tableau de bord", "résumés"]
+      },
+      "custom-review": {
+        title: "Période personnalisée",
+        description: "Créer un résumé pour une plage de dates personnalisée",
+        keywords: ["personnalisé", "plage", "dates", "résumé"]
+      },
+      "go-to-date": {
+        title: "Aller à la date",
+        description: "Accéder à une date de calendrier spécifique",
+        keywords: ["date", "calendrier", "jour"]
+      },
+      "previous-day": {
+        title: "Jour précédent",
+        description: "Aller à hier ou au jour précédent",
+        keywords: ["jour précédent", "hier", "retour"]
+      },
+      "next-day": {
+        title: "Jour suivant",
+        description: "Aller à demain ou au jour suivant",
+        keywords: ["jour suivant", "demain", "suivant"]
+      },
+      "export-markdown-zip": {
+        title: "Exporter en Markdown (ZIP)",
+        description: "Télécharger toutes les notes dans une archive ZIP",
+        keywords: ["exporter", "markdown", "zip", "télécharger", "sauvegarde"]
+      },
+      "create-json-backup": {
+        title: "Créer une sauvegarde JSON",
+        description: "Enregistrer un instantané JSON complet des notes et résumés",
+        keywords: ["sauvegarde", "json", "exporter", "enregistrer"]
+      },
+      "restore-backup": {
+        title: "Restaurer une sauvegarde",
+        description: "Importer et restaurer un fichier de sauvegarde JSON",
+        keywords: ["restaurer", "importer", "sauvegarde"]
+      },
+      "toggle-theme": {
+        title: "Changer de thème",
+        description: "Basculer entre l'apparence claire et sombre",
+        keywords: ["thème", "sombre", "clair", "mode"]
+      },
+      "set-theme-light": {
+        title: "Définir le thème : Clair",
+        description: "Utiliser le mode d'interface clair",
+        keywords: ["thème", "clair", "jour"]
+      },
+      "set-theme-dark": {
+        title: "Définir le thème : Sombre",
+        description: "Utiliser le mode d'interface sombre",
+        keywords: ["thème", "sombre", "nuit", "noir"]
+      },
+      "set-theme-system": {
+        title: "Définir le thème : Système",
+        description: "Suivre les préférences claires/sombres du système",
+        keywords: ["thème", "système", "automatique"]
+      },
+      "toggle-zen-mode": {
+        title: "Basculer en mode Zen",
+        description: "Agrandir l'espace d'écriture et masquer la navigation",
+        keywords: ["zen", "focus", "plein écran", "sans distraction"]
+      },
+      "keyboard-shortcuts": {
+        title: "Raccourcis clavier",
+        description: "Voir tous les raccourcis de navigation et d'édition",
+        keywords: ["raccourcis", "clavier", "aide"]
+      },
+      "open-settings": {
+        title: "Ouvrir les paramètres",
+        description: "Configurer les préférences et l'apparence",
+        keywords: ["paramètres", "préférences", "configuration", "options"]
+      },
+      "ai-settings": {
+        title: "Paramètres IA et Ollama",
+        description: "Afficher les paramètres locaux d'Ollama",
+        keywords: ["ia", "ai", "ollama", "modèle", "local"]
+      },
+      "data-management": {
+        title: "Gestion des données",
+        description: "Informations d'exportation, de sauvegarde et de stockage",
+        keywords: ["stockage", "données", "sauvegarde", "exporter"]
+      },
+      "export-markdown-dir": {
+        title: "Exporter vers un dossier",
+        description: "Exporter les fichiers Markdown directement vers un dossier local",
+        keywords: ["exporter", "dossier", "répertoire", "fichiers"]
+      }
+    },
 
     dataManagementTitle: "Exportation et sauvegarde",
     dataManagementSubtitle: "Vos notes restent dans ce navigateur sauf si vous les exportez.",
