@@ -4,7 +4,7 @@
 
 Rook Lite is a private, local-first personal daily notes and summary application. It runs entirely in the browser as a client-side Single Page Application (SPA), storing notes, categories, drafts, and summaries in **IndexedDB** on your machine.
 
-There are no remote databases, cloud sync servers, or hosted AI backends. Notes stay on your device unless you explicitly export or back them up. Minimal, privacy-first anonymous product analytics are disabled by default and can be optionally enabled to help improve the application without collecting personal identifiers or note contents.
+There are no remote databases, cloud sync servers, or hosted AI backends. Notes stay on your device unless you explicitly export or back them up. Minimal, privacy-first anonymous product analytics are enabled by default (collecting only feature usage counters, no personal identifiers or note contents) with an upfront notification, and can be disabled in Settings at any time.
 
 ---
 
@@ -44,7 +44,7 @@ There are no remote databases, cloud sync servers, or hosted AI backends. Notes 
 
 Rook Lite is designed with a strict privacy-first, local-first philosophy:
 
-- **Optional and Disabled by Default:** Telemetry is completely disabled by default (`analyticsEnabled: false`). You can opt in or disable it at any time in **Settings → Privacy & Analytics**.
+- **Privacy-First and Anonymous by Default:** Minimal anonymous product telemetry is enabled by default (`analyticsEnabled: true`) with a transparent notification upon opening the app. Telemetry collects only which features are used, with absolute zero personal data. You can disable telemetry at any time in **Settings → Privacy & Analytics**.
 - **Notes Remain Strictly Local:** Notes, drafts, and summaries live exclusively in browser storage (IndexedDB). They are never transmitted over the network or stored in cloud databases.
 - **Strictly Never Collected:**
   - Note contents and markdown text
@@ -54,7 +54,7 @@ Rook Lite is designed with a strict privacy-first, local-first philosophy:
   - AI prompts and AI responses
   - User IDs, session IDs, cookies, persistent UUIDs, or browser fingerprints
   - Cohorts, retention, user-level funnels, or individual behavior timelines
-- **What is Collected (When Explicitly Enabled):** Only anonymous, aggregate product feature counters sent to Cloudflare Analytics Engine via `POST /api/analytics`:
+- **What is Collected:** Only anonymous, aggregate product feature counters sent to Cloudflare Analytics Engine via `POST /api/analytics`:
   - Feature action name (e.g., `note_created`, `markdown_export_succeeded`)
   - Application version (e.g., `1.5.1`)
 - **Cloudflare Web Analytics vs. Product Analytics:**

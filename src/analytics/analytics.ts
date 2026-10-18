@@ -28,18 +28,44 @@ export const ALLOWED_ANALYTICS_EVENTS = [
 export type AnalyticsEvent = (typeof ALLOWED_ANALYTICS_EVENTS)[number];
 
 export const ANALYTICS_SETTING_KEY = "analyticsEnabled";
+export const ANALYTICS_NOTICE_DISMISSED_KEY = "rook_analytics_notice_dismissed";
 
 export async function isAnalyticsEnabled(): Promise<boolean> {
   try {
     const value = await settingsRepository.get<boolean>(ANALYTICS_SETTING_KEY);
-    return value === true;
+    // Analytics is enabled by default unless explicitly disabled by user (value === false)
+    return value !== false;
   } catch {
-    return false;
+    return true;
   }
 }
 
 export async function setAnalyticsEnabled(enabled: boolean): Promise<void> {
   await settingsRepository.set(ANALYTICS_SETTING_KEY, Boolean(enabled));
+}
+
+export function isAnalyticsNoticeDismissed(): boolean {
+  try {
+    return localStorage.getItem(ANALYTICS_NOTICE_DISMISSED_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function dismissAnalyticsNotice(): void {
+  try {
+    localStorage.setItem(ANALYTICS_NOTICE_DISMISSED_KEY, "true");
+  } catch {
+    // Ignore storage quota or privacy mode errors
+  }
+}
+
+export function resetAnalyticsNoticeDismissed(): void {
+  try {
+    localStorage.removeItem(ANALYTICS_NOTICE_DISMISSED_KEY);
+  } catch {
+    // Ignore errors
+  }
 }
 
 /**

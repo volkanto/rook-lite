@@ -1,4 +1,5 @@
 import { isAnalyticsEnabled, setAnalyticsEnabled, track } from "../analytics/analytics";
+import { removeAnalyticsNotice } from "../analytics/notice";
 import { clearAllData, storageCounts } from "../db";
 import {
   createBackup,
@@ -596,6 +597,9 @@ export function bindSettingsEvents(content: HTMLElement): void {
     const pill = content.querySelector<HTMLElement>("#analytics-status-pill");
     if (pill) {
       pill.textContent = isEnabled ? s.analyticsStatusEnabled : s.analyticsStatusDisabled;
+    }
+    if (!isEnabled) {
+      removeAnalyticsNotice();
     }
   });
 
