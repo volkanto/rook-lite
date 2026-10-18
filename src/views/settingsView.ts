@@ -1,4 +1,5 @@
 import { isAnalyticsEnabled, setAnalyticsEnabled, track } from "../analytics/analytics";
+import { removeAnalyticsNotice } from "../analytics/notice";
 import { clearAllData, storageCounts } from "../db";
 import {
   createBackup,
@@ -365,16 +366,6 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
                 </label>
               </div>
             </div>
-
-            <div class="settings-row">
-              <div class="settings-row-info">
-                <span class="settings-row-label">Internal Analytics Dashboard</span>
-                <span class="settings-row-desc">View private, aggregate product usage statistics and operation success rates.</span>
-              </div>
-              <div class="settings-row-action">
-                <a href="${appUrl("/internal/analytics")}" class="secondary-button" data-link style="text-decoration: none;">Open Dashboard</a>
-              </div>
-            </div>
           </section>
         </div>
       </div>
@@ -596,6 +587,9 @@ export function bindSettingsEvents(content: HTMLElement): void {
     const pill = content.querySelector<HTMLElement>("#analytics-status-pill");
     if (pill) {
       pill.textContent = isEnabled ? s.analyticsStatusEnabled : s.analyticsStatusDisabled;
+    }
+    if (!isEnabled) {
+      removeAnalyticsNotice();
     }
   });
 

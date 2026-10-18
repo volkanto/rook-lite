@@ -3,7 +3,11 @@ import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ALLOWED_ANALYTICS_EVENTS,
+  ANALYTICS_NOTICE_DISMISSED_KEY,
+  dismissAnalyticsNotice,
   isAnalyticsEnabled,
+  isAnalyticsNoticeDismissed,
+  resetAnalyticsNoticeDismissed,
   setAnalyticsEnabled,
   track,
   type AnalyticsEvent
@@ -16,12 +20,42 @@ describe("Frontend Analytics Service", () => {
   beforeEach(async () => {
     const db = await database();
     await db.clear("settings");
+    localStorage.clear();
     vi.restoreAllMocks();
   });
 
-  it("defaults analyticsEnabled to false (OFF)", async () => {
+  it("defaults analyticsEnabled to true (ON)", async () => {
     const enabled = await isAnalyticsEnabled();
-    expect(enabled).toBe(false);
+    expect(enabled).toBe(true);
+  });
+
+  it("sends network request when enabled by default (no explicit setting saved)", async () => {
+    const fetchSpy = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchSpy);
+
+    await track("app_opened");
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [url, options] = fetchSpy.mock.calls[0];
+    expect(url).toBe("/api/analytics");
+    const payload = JSON.parse(options.body);
+    expect(payload).toEqual({
+      event: "app_opened",
+      version: APP_VERSION
+    });
+  });
+
+  it("tracks and manages analytics notice dismissal in localStorage", () => {
+    expect(isAnalyticsNoticeDismissed()).toBe(false);
+    expect(localStorage.getItem(ANALYTICS_NOTICE_DISMISSED_KEY)).toBeNull();
+
+    dismissAnalyticsNotice();
+    expect(isAnalyticsNoticeDismissed()).toBe(true);
+    expect(localStorage.getItem(ANALYTICS_NOTICE_DISMISSED_KEY)).toBe("true");
+
+    resetAnalyticsNoticeDismissed();
+    expect(isAnalyticsNoticeDismissed()).toBe(false);
+    expect(localStorage.getItem(ANALYTICS_NOTICE_DISMISSED_KEY)).toBeNull();
   });
 
   it("persists analyticsEnabled setting using settingsRepository", async () => {
@@ -169,6 +203,21 @@ describe("Frontend Analytics Service", () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     expect(await isAnalyticsEnabled()).toBe(true);
+    expect(pill?.textContent).toContain("Active");
+  });
+
+  it("renders privacy settings toggle as checked and active by default", async () => {
+    document.body.innerHTML = '<div id="app"></div><div id="page-content"></div>';
+    const { renderSettings } = await import("../main");
+    const content = document.getElementById("page-content")!;
+
+    await renderSettings(content);
+
+    const toggle = content.querySelector<HTMLInputElement>("#analytics-enabled-toggle");
+    expect(toggle).not.toBeNull();
+    expect(toggle?.checked).toBe(true);
+
+    const pill = content.querySelector<HTMLElement>("#analytics-status-pill");
     expect(pill?.textContent).toContain("Active");
   });
 });

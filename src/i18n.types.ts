@@ -297,6 +297,9 @@ export interface TranslationStrings {
   analyticsNeverSearches: string;
   analyticsNeverAi: string;
   analyticsNeverIdentifiers: string;
+  analyticsNoticeTitle: string;
+  analyticsNoticeDesc: string;
+  analyticsNoticeDismiss: string;
 
   // Storage & Persistence settings
   storageTitle: string;

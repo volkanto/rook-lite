@@ -12,7 +12,6 @@ export interface RouterConfig {
   renderTodos: RouteHandler;
   renderData: RouteHandler;
   renderSettings: RouteHandler;
-  renderInternalAnalytics: RouteHandler;
   highlightLinkedNote: () => void;
   closeTodoSidePanel: (content: HTMLElement) => void;
   resetSummaryPeriodKey: () => void;
@@ -66,8 +65,6 @@ export async function renderRoute(): Promise<void> {
         await routerConfig.renderData(content);
       } else if (path === "/settings") {
         await routerConfig.renderSettings(content);
-      } else if (path === "/internal/analytics") {
-        await routerConfig.renderInternalAnalytics(content);
       } else {
         renderNotFound(content);
       }
