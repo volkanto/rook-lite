@@ -27,8 +27,34 @@ permissions:
   pull-requests: read
 
 jobs:
+  verify:
+    name: Run Tests & Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Build application check
+        run: npm run build
+
   prepare-version:
     name: Prepare Version & Tag
+    needs: verify
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.set_tag.outputs.tag }}
@@ -65,9 +91,10 @@ jobs:
             echo "commit_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           fi
 
-  test:
-    name: Run Tests & Verification
+  build-artifact:
+    name: Build Production Artifact
     needs: prepare-version
+    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -84,12 +111,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Run test suite
-        run: npm test
-
       - name: Build application
         run: npm run build
 
@@ -102,7 +123,7 @@ jobs:
 
   publish-release:
     name: Generate Release Notes & Publish
-    needs: [prepare-version, test]
+    needs: prepare-version
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -204,7 +225,7 @@ jobs:
 
   docker-release:
     name: Build & Push Docker Image
-    needs: [prepare-version, test]
+    needs: prepare-version
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     steps:
@@ -251,7 +272,7 @@ jobs:
 
   cloudflare-deploy:
     name: Deploy to Cloudflare Pages
-    needs: [prepare-version, docker-release, publish-release]
+    needs: [prepare-version, build-artifact, docker-release, publish-release]
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     concurrency:
