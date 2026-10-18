@@ -1,3 +1,4 @@
+import { currentStrings } from "./i18n";
 import type { Note } from "./models";
 
 export interface WikilinkItem {
@@ -80,11 +81,19 @@ export function renderWikilinkHtml(target: string, label?: string): string {
   const isDate = ISO_DATE_REGEX.test(cleanTarget);
   let href: string;
   let typeClass: string;
+  let isBroken = false;
 
   if (isDate) {
+    if (anchor) {
+      const noteId = anchor.startsWith("note-") ? anchor.slice(5) : anchor;
+      const anchorExists = cachedNotesIndex.length === 0 || cachedNotesIndex.some((n) => n.id === anchor || n.id === noteId);
+      if (!anchorExists) {
+        isBroken = true;
+      }
+    }
     const hash = anchor ? (anchor.startsWith("note-") ? `#${anchor}` : `#note-${anchor}`) : "";
     href = `/?date=${encodeURIComponent(cleanTarget)}${hash}`;
-    typeClass = "wikilink-date";
+    typeClass = isBroken ? "wikilink-date wikilink-broken" : "wikilink-date";
   } else {
     // Note reference (by Title or ID)
     const targetLower = cleanTarget.toLowerCase();
@@ -95,14 +104,18 @@ export function renderWikilinkHtml(target: string, label?: string): string {
     if (matchedNote) {
       href = `/?date=${encodeURIComponent(matchedNote.noteDate)}#note-${encodeURIComponent(matchedNote.id)}`;
       typeClass = "wikilink-note";
-    } else if (cleanTarget.startsWith("note-")) {
-      href = `/#${encodeURIComponent(cleanTarget)}`;
-      typeClass = "wikilink-note";
     } else {
-      // Unresolved note reference
-      href = `/?date=${encodeURIComponent(cleanTarget)}`;
-      typeClass = "wikilink-note";
+      // Linked note was deleted or not found
+      isBroken = true;
+      href = "#";
+      typeClass = "wikilink-note wikilink-broken";
     }
+  }
+
+  if (isBroken) {
+    const s = currentStrings();
+    const titleAttr = ` title="${escapeAttr(s.brokenLinkTooltip(cleanTarget))}"`;
+    return `<a href="${href}" class="wikilink ${typeClass}" data-wikilink-target="${escapeAttr(cleanTarget)}" data-wikilink-broken="true" aria-disabled="true"${titleAttr}><span class="wikilink-broken-icon" aria-hidden="true">⊘</span><span class="wikilink-label">${escapeText(displayLabel)}</span></a>`;
   }
 
   return `<a href="${href}" data-link class="wikilink ${typeClass}" data-wikilink-target="${escapeAttr(cleanTarget)}">${escapeText(displayLabel)}</a>`;

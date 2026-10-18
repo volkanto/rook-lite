@@ -322,6 +322,7 @@ export const locale: LocaleDefinition = {
     badgeYesterday: "Dün",
     badgeDate: "Tarih",
     pickerNavHint: "<kbd>↑</kbd> <kbd>↓</kbd> gezinmek için · <kbd>↵</kbd> eklemek için · <kbd>esc</kbd> kapatmak için",
+    brokenLinkTooltip: (title: string) => `Silinmiş veya bulunamayan not: "${title}"`,
 
     // Command Palette
     palettePlaceholder: "Notlarda arayın veya komutlar için > yazın",
