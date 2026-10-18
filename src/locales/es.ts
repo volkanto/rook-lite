@@ -332,6 +332,159 @@ export const locale: LocaleDefinition = {
     sectionNotes: "Notas",
     sectionCommands: "Comandos",
     sectionMoreNotes: "Más notas",
+    commandTemplatePrefix: "Plantilla",
+    commands: {
+      "contextual-edit-note": {
+        title: "Editar nota",
+        description: "Edita la nota activa o seleccionada",
+        keywords: ["editar", "modificar", "cambiar", "escribir", "nota"]
+      },
+      "contextual-copy-note": {
+        title: "Copiar Markdown de la nota",
+        description: "Copia el contenido de la nota seleccionada al portapapeles",
+        keywords: ["copiar", "portapapeles", "markdown", "texto"]
+      },
+      "contextual-delete-note": {
+        title: "Eliminar nota",
+        description: "Elimina la nota seleccionada",
+        keywords: ["eliminar", "borrar", "papelera"]
+      },
+      "contextual-regenerate-summary": {
+        title: "Regenerar resumen",
+        description: "Vuelve a generar el resumen para el período actual",
+        keywords: ["resumen", "regenerar", "actualizar", "ia"]
+      },
+      "contextual-copy-summary": {
+        title: "Copiar resumen Markdown",
+        description: "Copia el resumen generado al portapapeles",
+        keywords: ["copiar", "portapapeles", "resumen"]
+      },
+      "contextual-download-summary": {
+        title: "Descargar resumen Markdown",
+        description: "Exporta el resumen como archivo markdown",
+        keywords: ["descargar", "guardar", "exportar", "resumen"]
+      },
+      "new-note": {
+        title: "Nueva nota",
+        description: "Redactar una nueva nota",
+        keywords: ["nueva", "crear", "escribir", "nota", "borrador"]
+      },
+      "today": {
+        title: "Ir a hoy",
+        description: "Saltar al flujo de notas de hoy",
+        keywords: ["hoy", "ahora", "diario", "inicio"]
+      },
+      "open-tasks": {
+        title: "Tareas pendientes",
+        description: "Ver todos los elementos de lista de verificación pendientes",
+        keywords: ["tareas", "pendientes", "lista", "checklist"]
+      },
+      "filter-tags": {
+        title: "Filtrar por etiqueta",
+        description: "Buscar notas por hashtag",
+        keywords: ["etiquetas", "tags", "filtrar", "temas"]
+      },
+      "review-this-week": {
+        title: "Revisar esta semana",
+        description: "Generar o ver resumen semanal de la semana actual",
+        keywords: ["resumen", "semanal", "esta semana", "revisión"]
+      },
+      "review-this-month": {
+        title: "Revisar este mes",
+        description: "Generar o ver resumen mensual del mes actual",
+        keywords: ["resumen", "mensual", "este mes", "revisión"]
+      },
+      "open-latest-summary": {
+        title: "Abrir último resumen",
+        description: "Navegar al panel de resúmenes",
+        keywords: ["último resumen", "panel", "resúmenes"]
+      },
+      "custom-review": {
+        title: "Revisión personalizada",
+        description: "Crear un resumen para un rango de fechas personalizado",
+        keywords: ["personalizado", "rango", "fechas", "resumen"]
+      },
+      "go-to-date": {
+        title: "Ir a la fecha",
+        description: "Saltar a una fecha específica del calendario",
+        keywords: ["ir a fecha", "calendario", "día"]
+      },
+      "previous-day": {
+        title: "Día anterior",
+        description: "Navegar a ayer o al día anterior",
+        keywords: ["día anterior", "ayer", "atrás"]
+      },
+      "next-day": {
+        title: "Día siguiente",
+        description: "Navegar a mañana o al día siguiente",
+        keywords: ["día siguiente", "mañana", "adelante"]
+      },
+      "export-markdown-zip": {
+        title: "Exportar Markdown (ZIP)",
+        description: "Descargar todas las notas en un archivo ZIP con metadatos",
+        keywords: ["exportar", "markdown", "zip", "descargar", "respaldo"]
+      },
+      "create-json-backup": {
+        title: "Crear copia de seguridad JSON",
+        description: "Guardar una instantánea JSON completa de notas y resúmenes",
+        keywords: ["copia de seguridad", "json", "respaldo", "guardar"]
+      },
+      "restore-backup": {
+        title: "Restaurar copia de seguridad",
+        description: "Importar y restaurar un archivo de respaldo JSON",
+        keywords: ["restaurar", "importar", "recuperar", "respaldo"]
+      },
+      "toggle-theme": {
+        title: "Cambiar tema",
+        description: "Alternar entre modo claro y oscuro",
+        keywords: ["tema", "oscuro", "claro", "modo"]
+      },
+      "set-theme-light": {
+        title: "Establecer tema: Claro",
+        description: "Usar modo de interfaz claro",
+        keywords: ["tema", "claro", "blanco", "día"]
+      },
+      "set-theme-dark": {
+        title: "Establecer tema: Oscuro",
+        description: "Usar modo de interfaz oscuro",
+        keywords: ["tema", "oscuro", "noche", "negro"]
+      },
+      "set-theme-system": {
+        title: "Establecer tema: Sistema",
+        description: "Coincidir con la preferencia del sistema operativo",
+        keywords: ["tema", "sistema", "automático"]
+      },
+      "toggle-zen-mode": {
+        title: "Alternar modo Zen",
+        description: "Expandir espacio de escritura y ocultar navegación",
+        keywords: ["zen", "enfoque", "pantalla completa", "sin distracciones"]
+      },
+      "keyboard-shortcuts": {
+        title: "Atajos de teclado",
+        description: "Ver todos los atajos de teclado de navegación y edición",
+        keywords: ["atajos", "teclado", "ayuda", "hotkeys"]
+      },
+      "open-settings": {
+        title: "Abrir configuración",
+        description: "Configurar preferencias y apariencia",
+        keywords: ["configuración", "ajustes", "preferencias", "opciones"]
+      },
+      "ai-settings": {
+        title: "Ajustes de IA y Ollama",
+        description: "Ver ajustes de Ollama local",
+        keywords: ["ia", "ai", "ollama", "modelo", "local"]
+      },
+      "data-management": {
+        title: "Gestión de datos",
+        description: "Información de exportación, copia de seguridad y almacenamiento",
+        keywords: ["almacenamiento", "datos", "respaldo", "exportar"]
+      },
+      "export-markdown-dir": {
+        title: "Exportar a carpeta",
+        description: "Exportar archivos Markdown directamente a una carpeta local",
+        keywords: ["exportar", "carpeta", "directorio", "archivos"]
+      }
+    },
 
     dataManagementTitle: "Exportación y respaldo",
     dataManagementSubtitle: "Tus notas permanecen en este navegador a menos que las exportes expresamente.",

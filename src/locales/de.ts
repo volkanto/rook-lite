@@ -332,6 +332,159 @@ export const locale: LocaleDefinition = {
     sectionNotes: "Notizen",
     sectionCommands: "Befehle",
     sectionMoreNotes: "Weitere Notizen",
+    commandTemplatePrefix: "Vorlage",
+    commands: {
+      "contextual-edit-note": {
+        title: "Notiz bearbeiten",
+        description: "Aktive oder ausgewählte Notiz bearbeiten",
+        keywords: ["bearbeiten", "ändern", "schreiben", "notiz"]
+      },
+      "contextual-copy-note": {
+        title: "Notiz-Markdown kopieren",
+        description: "Inhalt der ausgewählten Notiz in die Zwischenablage kopieren",
+        keywords: ["kopieren", "zwischenablage", "markdown", "text"]
+      },
+      "contextual-delete-note": {
+        title: "Notiz löschen",
+        description: "Ausgewählte Notiz löschen",
+        keywords: ["löschen", "entfernen", "papierkorb"]
+      },
+      "contextual-regenerate-summary": {
+        title: "Zusammenfassung neu erstellen",
+        description: "Zusammenfassung für den aktuellen Zeitraum erneut generieren",
+        keywords: ["zusammenfassung", "neu", "aktualisieren", "ki"]
+      },
+      "contextual-copy-summary": {
+        title: "Zusammenfassung kopieren",
+        description: "Generierte Zusammenfassung in die Zwischenablage kopieren",
+        keywords: ["kopieren", "zwischenablage", "zusammenfassung"]
+      },
+      "contextual-download-summary": {
+        title: "Zusammenfassung herunterladen",
+        description: "Zusammenfassung als Markdown-Datei exportieren",
+        keywords: ["herunterladen", "speichern", "exportieren", "zusammenfassung"]
+      },
+      "new-note": {
+        title: "Neue Notiz",
+        description: "Eine neue Notiz verfassen",
+        keywords: ["neu", "erstellen", "schreiben", "notiz", "entwurf"]
+      },
+      "today": {
+        title: "Zu Heute springen",
+        description: "Zum Notizen-Stream von heute springen",
+        keywords: ["heute", "jetzt", "aktuell", "tagesnotiz", "startseite"]
+      },
+      "open-tasks": {
+        title: "Offene Aufgaben",
+        description: "Alle unvollständigen Checklisten-Einträge in Ihren Notizen anzeigen",
+        keywords: ["aufgaben", "offen", "todo", "checkliste"]
+      },
+      "filter-tags": {
+        title: "Nach Schlagwörtern filtern",
+        description: "Notizen nach Hashtags filtern",
+        keywords: ["schlagwörter", "tags", "filtern", "kategorien"]
+      },
+      "review-this-week": {
+        title: "Diese Woche auswerten",
+        description: "Wöchentliche Zusammenfassung für die aktuelle Woche erstellen oder anzeigen",
+        keywords: ["zusammenfassung", "wöchentlich", "diese woche", "rückblick"]
+      },
+      "review-this-month": {
+        title: "Diesen Monat auswerten",
+        description: "Monatliche Zusammenfassung für den aktuellen Monat erstellen oder anzeigen",
+        keywords: ["zusammenfassung", "monatlich", "dieser monat", "rückblick"]
+      },
+      "open-latest-summary": {
+        title: "Neueste Zusammenfassung öffnen",
+        description: "Zum Übersichts-Dashboard wechseln",
+        keywords: ["neueste zusammenfassung", "übersicht", "zusammenfassungen"]
+      },
+      "custom-review": {
+        title: "Benutzerdefinierte Auswertung",
+        description: "Zusammenfassung für einen benutzerdefinierten Zeitraum erstellen",
+        keywords: ["benutzerdefiniert", "zeitraum", "zusammenfassung"]
+      },
+      "go-to-date": {
+        title: "Zu Datum springen",
+        description: "Zu einem bestimmten Kalendertag wechseln",
+        keywords: ["datum", "kalender", "springen", "tag"]
+      },
+      "previous-day": {
+        title: "Vorheriger Tag",
+        description: "Zu gestern oder zum vorherigen Tag navigieren",
+        keywords: ["vorheriger tag", "gestern", "zurück"]
+      },
+      "next-day": {
+        title: "Nächster Tag",
+        description: "Zu morgen oder zum nächsten Tag navigieren",
+        keywords: ["nächster tag", "morgen", "weiter"]
+      },
+      "export-markdown-zip": {
+        title: "Markdown exportieren (ZIP)",
+        description: "Alle Notizen mit Frontmatter als ZIP-Archiv herunterladen",
+        keywords: ["exportieren", "markdown", "zip", "herunterladen", "sichern"]
+      },
+      "create-json-backup": {
+        title: "JSON-Backup erstellen",
+        description: "Vollständigen JSON-Schnappschuss von Notizen und Zusammenfassungen speichern",
+        keywords: ["backup", "json", "sicherung", "speichern"]
+      },
+      "restore-backup": {
+        title: "Backup wiederherstellen",
+        description: "JSON-Backup-Datei importieren und wiederherstellen",
+        keywords: ["wiederherstellen", "importieren", "laden", "backup"]
+      },
+      "toggle-theme": {
+        title: "Design wechseln",
+        description: "Zwischen hellem und dunklem Erscheinungsbild wechseln",
+        keywords: ["design", "thema", "dunkel", "hell", "modus"]
+      },
+      "set-theme-light": {
+        title: "Design festlegen: Hell",
+        description: "Hellen Oberflächenmodus verwenden",
+        keywords: ["design", "hell", "weiß", "tag"]
+      },
+      "set-theme-dark": {
+        title: "Design festlegen: Dunkel",
+        description: "Dunklen Oberflächenmodus verwenden",
+        keywords: ["design", "dunkel", "nacht", "schwarz"]
+      },
+      "set-theme-system": {
+        title: "Design festlegen: System",
+        description: "Betriebssystem-Einstellung für Hell/Dunkel übernehmen",
+        keywords: ["design", "system", "automatisch"]
+      },
+      "toggle-zen-mode": {
+        title: "Zen-Modus umschalten",
+        description: "Schreibbereich vergrößern und Navigation ausblenden",
+        keywords: ["zen", "fokus", "vollbild", "ablenkungsfrei"]
+      },
+      "keyboard-shortcuts": {
+        title: "Tastatur-Kurzbefehle",
+        description: "Alle Navigations- und Bearbeitungs-Kurzbefehle anzeigen",
+        keywords: ["kurzbefehle", "tastatur", "hilfe", "shortcuts"]
+      },
+      "open-settings": {
+        title: "Einstellungen öffnen",
+        description: "Einstellungen und Erscheinungsbild anpassen",
+        keywords: ["einstellungen", "optionen", "konfiguration"]
+      },
+      "ai-settings": {
+        title: "KI- & Ollama-Einstellungen",
+        description: "Lokale Ollama-Einstellungen anzeigen",
+        keywords: ["ki", "ai", "ollama", "modell", "lokal"]
+      },
+      "data-management": {
+        title: "Datenverwaltung",
+        description: "Informationen zu Export, Sicherung und Speicher",
+        keywords: ["speicher", "daten", "backup", "export"]
+      },
+      "export-markdown-dir": {
+        title: "In Ordner exportieren",
+        description: "Markdown-Dateien direkt in einen lokalen Ordner exportieren",
+        keywords: ["exportieren", "ordner", "verzeichnis", "dateien"]
+      }
+    },
 
     dataManagementTitle: "Export und Backup",
     dataManagementSubtitle: "Deine Notizen bleiben in diesem Browser, es sei denn, du exportierst sie.",

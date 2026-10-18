@@ -1,4 +1,4 @@
-import { currentStrings } from "../i18n";
+import { currentStrings, getLocale } from "../i18n";
 import type { Note } from "../models";
 import { normalize } from "../services";
 import { getRecentCommands, recordCommandUse } from "./commandHistory";
@@ -200,6 +200,7 @@ export class CommandPaletteController {
     this.openState = true;
     this.options.onOpen?.();
     this.previousActiveElement = document.activeElement as HTMLElement | null;
+    this.commands = createCommandRegistry(this.options.actions, getLocale());
 
     this.host.classList.add("is-open");
     this.host.setAttribute("aria-hidden", "false");
@@ -266,7 +267,7 @@ export class CommandPaletteController {
     } else if (parsedHasFilter(query)) {
       this.footerContainer.innerHTML = `<span class="mode-tag-filter">Filtered Search</span>`;
     } else {
-      this.footerContainer.innerHTML = `<span>Type <kbd>&gt;</kbd> for commands</span>`;
+      this.footerContainer.innerHTML = `<span>${currentStrings().paletteCommandsHint}</span>`;
     }
 
     if (!this.flattenedItems.length) {
