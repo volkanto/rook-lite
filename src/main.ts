@@ -2,7 +2,6 @@ import "./app.css";
 import "./lite.css";
 import { track } from "./analytics/analytics";
 import { renderAnalyticsNotice } from "./analytics/notice";
-import { renderInternalAnalytics } from "./analytics/dashboard";
 import { CommandPaletteController } from "./command-palette/commandPalette";
 import type { CommandActions, CommandContext } from "./command-palette/types";
 import {
@@ -71,7 +70,6 @@ configureRouter({
   renderTodos,
   renderData,
   renderSettings,
-  renderInternalAnalytics,
   highlightLinkedNote,
   closeTodoSidePanel,
   resetSummaryPeriodKey

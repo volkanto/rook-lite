@@ -60,10 +60,6 @@ Rook Lite is designed with a strict privacy-first, local-first philosophy:
 - **Cloudflare Web Analytics vs. Product Analytics:**
   - **Cloudflare Web Analytics:** Edge-level, cookieless metrics for traffic, page views, referrers, and Core Web Vitals.
   - **Cloudflare Analytics Engine:** Product feature usage counters recorded into the `rook_lite_events` dataset.
-- **Private Analytics Dashboard:**
-  - Accessible to project owners at `/internal/analytics`.
-  - Protected at the Cloudflare edge via Cloudflare Access Zero Trust or an admin secret token (`INTERNAL_ANALYTICS_SECRET`).
-  - Displays only server-side aggregates across 7d, 30d, and 90d windows: total events, most-used features, daily trends, app-version adoption, and operation outcome success rates.
 
 ### Event Allow-List
 
