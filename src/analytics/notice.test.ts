@@ -225,6 +225,62 @@ describe("Analytics Notification Banner", () => {
       expect(document.getElementById(ANALYTICS_NOTICE_ID)).toBeNull();
     });
 
+    it("re-renders notice banner when user toggles analytics back ON in settings if not previously dismissed", async () => {
+      document.body.innerHTML = '<div id="app"></div>';
+      const { renderShell, renderSettings } = await import("../main");
+      await renderShell();
+
+      const pageContent = document.getElementById("page-content")!;
+      await renderSettings(pageContent);
+
+      const toggle = pageContent.querySelector<HTMLInputElement>("#analytics-enabled-toggle")!;
+
+      // Toggle OFF
+      toggle.checked = false;
+      toggle.dispatchEvent(new Event("change"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(document.getElementById(ANALYTICS_NOTICE_ID)).toBeNull();
+
+      // Toggle ON
+      toggle.checked = true;
+      toggle.dispatchEvent(new Event("change"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(document.getElementById(ANALYTICS_NOTICE_ID)).not.toBeNull();
+    });
+
+    it("does not re-render notice banner when user toggles analytics ON in settings if already closed/dismissed", async () => {
+      document.body.innerHTML = '<div id="app"></div>';
+      const { renderShell, renderSettings } = await import("../main");
+      await renderShell();
+
+      const banner = document.getElementById(ANALYTICS_NOTICE_ID);
+      expect(banner).not.toBeNull();
+
+      // User closes / dismisses the banner
+      const closeBtn = banner?.querySelector<HTMLButtonElement>('[data-action="dismiss-analytics-notice"]');
+      closeBtn?.click();
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      expect(document.getElementById(ANALYTICS_NOTICE_ID)).toBeNull();
+      expect(isAnalyticsNoticeDismissed()).toBe(true);
+
+      const pageContent = document.getElementById("page-content")!;
+      await renderSettings(pageContent);
+
+      const toggle = pageContent.querySelector<HTMLInputElement>("#analytics-enabled-toggle")!;
+
+      // Toggle OFF then ON
+      toggle.checked = false;
+      toggle.dispatchEvent(new Event("change"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      toggle.checked = true;
+      toggle.dispatchEvent(new Event("change"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      // Should still NOT be rendered because user closed it
+      expect(document.getElementById(ANALYTICS_NOTICE_ID)).toBeNull();
+    });
+
     it("redirects directly to the privacy tab when clicking Settings link in notice", async () => {
       document.body.innerHTML = '<div id="app"></div>';
       const { renderShell } = await import("../main");

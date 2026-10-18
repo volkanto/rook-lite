@@ -1,5 +1,5 @@
 import { isAnalyticsEnabled, setAnalyticsEnabled, track } from "../analytics/analytics";
-import { removeAnalyticsNotice } from "../analytics/notice";
+import { removeAnalyticsNotice, renderAnalyticsNotice } from "../analytics/notice";
 import { clearAllData, storageCounts } from "../db";
 import {
   createBackup,
@@ -590,6 +590,11 @@ export function bindSettingsEvents(content: HTMLElement): void {
     }
     if (!isEnabled) {
       removeAnalyticsNotice();
+    } else {
+      const slot = document.getElementById("privacy-notice-slot") ?? document.getElementById("analytics-notice-slot");
+      if (slot) {
+        await renderAnalyticsNotice(slot);
+      }
     }
   });
 
