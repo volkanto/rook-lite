@@ -262,7 +262,7 @@ export function noteMarkup(
   const lineCount = rawLines.length;
   const isLongNote = lineCount > 6 || note.content.length > 280;
   const clampedFooter = isLongNote
-    ? `<div class="note-expand-footer"><button type="button" class="note-expand-drawer-btn" data-open-drawer="${note.id}" aria-label="${s.openInDrawer}" title="${s.openInDrawer}"><span>${s.openInDrawer}</span>${svg(icons.externalLink, "expand-btn-svg")}</button></div>`
+    ? `<div class="note-fade-overlay" aria-hidden="true"><span class="note-fade-hint">more…</span></div>`
     : "";
 
   return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time>${folderBadge}</div><div class="note-header-actions">${unfiledMoveControl}<button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="note-prose-container ${isLongNote ? "is-clampable" : ""}"><div class="prose">${renderMarkdown(note.content, true)}</div>${clampedFooter}</div>${backlinks.length ? `<div class="note-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
@@ -655,12 +655,26 @@ export function bindNoteActions(): void {
       noteEl.addEventListener("click", (event) => {
         const target = event.target as HTMLElement;
         if (target.closest("button, a, input, details, summary")) return;
+        if (window.getSelection()?.toString().trim()) return;
         const noteId = noteEl.dataset.noteId ?? noteEl.id.replace(/^note-/, "");
         if (!noteId) return;
         activeSplitNoteId = noteId;
         const currentUrl = new URL(location.href);
         const curDate = currentUrl.searchParams.get("date") ?? isoDate(new Date());
         void updateSplitPanel(curDate);
+      });
+    });
+  } else {
+    document.querySelectorAll<HTMLElement>(".day-notes .note").forEach((noteEl) => {
+      noteEl.addEventListener("click", async (event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest("button, a, input, details, summary")) return;
+        if (window.getSelection()?.toString().trim()) return;
+        const noteId = noteEl.dataset.noteId ?? noteEl.id.replace(/^note-/, "");
+        if (!noteId) return;
+        const [allN, allF] = await Promise.all([notes.listAll(), folders.listAll()]);
+        const note = allN.find((item) => item.id === noteId);
+        if (note) showEditDialog(note, allF);
       });
     });
   }

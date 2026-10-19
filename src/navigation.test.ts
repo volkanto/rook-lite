@@ -437,18 +437,15 @@ describe("Left menu bar icons and navigation", () => {
     const noteEl = document.getElementById(`note-${longNote.id}`);
     expect(noteEl).not.toBeNull();
 
-    // Contains prose container with is-clampable class
+    // Contains prose container with is-clampable class and subtle fade hint
     const proseContainer = noteEl?.querySelector(".note-prose-container.is-clampable");
     expect(proseContainer).not.toBeNull();
+    const fadeOverlay = noteEl?.querySelector(".note-fade-overlay");
+    expect(fadeOverlay).not.toBeNull();
+    expect(fadeOverlay?.textContent).toContain("more");
 
-    // Has expand drawer button
-    const expandBtn = noteEl?.querySelector<HTMLButtonElement>("[data-open-drawer]");
-    expect(expandBtn).not.toBeNull();
-    expect(expandBtn?.dataset.openDrawer).toBe(longNote.id);
-    expect(expandBtn?.textContent).toContain("Read & Edit in Drawer");
-
-    // Clicking expand button opens the side drawer
-    expandBtn?.click();
+    // Clicking note card opens the side drawer
+    noteEl?.click();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     const drawer = document.querySelector(".note-peek-drawer");
