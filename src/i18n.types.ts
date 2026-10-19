@@ -263,6 +263,17 @@ export interface TranslationStrings {
   themeLightDesc: string;
   themeDark: string;
   themeDarkDesc: string;
+  noteDensityTitle: string;
+  noteDensityDesc: string;
+  densityCompact: string;
+  densityComfortable: string;
+  densityFull: string;
+  openInDrawer: string;
+  notesLayoutTitle: string;
+  notesLayoutDesc: string;
+  layoutOneColumn: string;
+  layoutTwoColumns: string;
+  newNote: string;
 
   // Local AI settings
   localAiTitle: string;

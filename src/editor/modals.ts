@@ -2,7 +2,7 @@ import { track } from "../analytics/analytics";
 import { icons, svg } from "../icons";
 import { currentStrings, formatDateHeading } from "../i18n";
 import { buildWikilinkInsertion, getLinkPickerCandidates } from "../link-picker";
-import { escapeHtml, renderInlineMarkdown } from "../markdown";
+import { escapeHtml, renderInlineMarkdown, renderMarkdown } from "../markdown";
 import type { Folder, Note } from "../models";
 import { appUrl } from "../routing";
 import { folders, notes } from "../servicesContext";
@@ -20,6 +20,18 @@ export function setCalendarRefresher(refresher: CalendarRefresher): void {
   activeCalendarRefresher = refresher;
 }
 
+export type SplitEditorRestorer = (date: string) => void;
+let activeSplitEditorRestorer: SplitEditorRestorer | null = null;
+export function setSplitEditorRestorer(restorer: SplitEditorRestorer): void {
+  activeSplitEditorRestorer = restorer;
+}
+
+export type SplitNoteSelector = (noteId: string, date: string) => void;
+let activeSplitNoteSelector: SplitNoteSelector | null = null;
+export function setSplitNoteSelector(selector: SplitNoteSelector): void {
+  activeSplitNoteSelector = selector;
+}
+
 async function triggerCalendarRefresh(): Promise<void> {
   if (activeCalendarRefresher) {
     await activeCalendarRefresher();
@@ -29,25 +41,69 @@ async function triggerCalendarRefresh(): Promise<void> {
 export function closeDialog(target?: Element | null): void {
   const host = document.querySelector<HTMLElement>("#dialog-host");
   if (!host) return;
+
+  const performRemoval = (element: Element) => {
+    element.remove();
+    if (host.children.length === 0) {
+      document.body.style.overflow = "";
+      document.body.classList.remove("has-editor-drawer-open");
+      if (document.body.classList.contains("is-zen-mode")) {
+        toggleZenMode();
+      }
+    }
+  };
+
+  const closeWithAnimation = (backdrop: Element) => {
+    if (backdrop.classList.contains("is-closing")) return;
+    backdrop.classList.add("is-closing");
+    document.body.classList.remove("has-editor-drawer-open");
+
+    const isTestEnv = typeof process !== "undefined" && Boolean(process.env?.VITEST);
+    if (isTestEnv) {
+      performRemoval(backdrop);
+      return;
+    }
+
+    let cleanedUp = false;
+    const finalize = () => {
+      if (cleanedUp) return;
+      cleanedUp = true;
+      performRemoval(backdrop);
+    };
+
+    const dialog = backdrop.querySelector(".note-edit-dialog");
+    if (dialog) {
+      dialog.addEventListener("animationend", finalize, { once: true });
+      setTimeout(finalize, 340);
+    } else {
+      finalize();
+    }
+  };
+
   if (target !== undefined) {
     if (target && host.contains(target)) {
       const backdrop = target.classList.contains("note-edit-backdrop")
         ? target
         : target.closest(".note-edit-backdrop");
-      if (backdrop) {
-        backdrop.remove();
+      if (backdrop && backdrop.classList.contains("note-drawer-backdrop")) {
+        closeWithAnimation(backdrop);
+      } else if (backdrop) {
+        performRemoval(backdrop);
       } else {
-        target.remove();
+        performRemoval(target);
       }
     }
   } else if (host.lastElementChild) {
-    host.lastElementChild.remove();
+    const last = host.lastElementChild;
+    if (last.classList.contains("note-drawer-backdrop")) {
+      closeWithAnimation(last);
+    } else {
+      performRemoval(last);
+    }
   } else {
     host.replaceChildren();
-  }
-
-  if (host.children.length === 0) {
     document.body.style.overflow = "";
+    document.body.classList.remove("has-editor-drawer-open");
     if (document.body.classList.contains("is-zen-mode")) {
       toggleZenMode();
     }
@@ -58,6 +114,7 @@ export function closeAllDialogs(): void {
   const host = document.querySelector<HTMLElement>("#dialog-host");
   if (host) host.replaceChildren();
   document.body.style.overflow = "";
+  document.body.classList.remove("has-editor-drawer-open");
   if (document.body.classList.contains("is-zen-mode")) {
     toggleZenMode();
   }
@@ -393,16 +450,139 @@ export async function showLinkPickerModal(textarea: HTMLTextAreaElement): Promis
 
 export function showEditDialog(note: Note, foldersList: Folder[] = []): void {
   const s = currentStrings();
-  const host = requireElement<HTMLElement>("#dialog-host");
   const formattedDate = formatDateHeading(note.noteDate);
   void notes.listAll().then((all) => setWikilinkNotesIndex(all));
 
+  const splitPanel = document.getElementById("notes-split-panel");
+  if (splitPanel && activeSplitNoteSelector) {
+    activeSplitNoteSelector(note.id, note.noteDate);
+    return;
+  }
+
+  const splitEditorPane = document.getElementById("split-pane-editor-form-host") ?? document.getElementById("split-editor-body");
+  if (splitEditorPane) {
+    document.querySelectorAll(".note.is-selected").forEach((el) => el.classList.remove("is-selected"));
+    const activeNoteCard = document.getElementById(`note-${note.id}`);
+    activeNoteCard?.classList.add("is-selected");
+
+    const splitHeading = document.getElementById("split-editor-heading");
+    if (splitHeading) splitHeading.textContent = s.editNoteTitle;
+
+    const splitSubmeta = document.getElementById("split-editor-submeta");
+    if (splitSubmeta) {
+      splitSubmeta.textContent = `${formatDateHeading(note.noteDate)} · ${new Date(note.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    const newNoteBtn = (document.getElementById("split-new-note-btn") ?? document.querySelector(".split-switch-new-btn")) as HTMLButtonElement | null;
+    if (newNoteBtn) {
+      newNoteBtn.style.display = "inline-flex";
+      newNoteBtn.onclick = () => {
+        closeSplitEdit();
+      };
+    }
+
+    const editWrapper = document.createElement("div");
+    editWrapper.className = "note-edit-dialog split-embedded-editor";
+    editWrapper.innerHTML = `<div class="note-modal-form note-drawer-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true, note.folderId, foldersList)}</div>`;
+    splitEditorPane.replaceChildren(editWrapper);
+
+    const closeSplitEdit = () => {
+      window.removeEventListener("keydown", onKeydown);
+      document.querySelectorAll(".note.is-selected").forEach((el) => el.classList.remove("is-selected"));
+      if (splitHeading) splitHeading.textContent = s.newNote;
+      if (splitSubmeta) splitSubmeta.textContent = formattedDate;
+      if (newNoteBtn) newNoteBtn.style.display = "none";
+      if (activeSplitEditorRestorer) {
+        activeSplitEditorRestorer(note.noteDate);
+      }
+    };
+
+    const form = requireElement<HTMLFormElement>("#edit-note-form");
+    const textarea = requireElement<HTMLTextAreaElement>("#edit-note-form textarea");
+    bindFormatting(form, textarea);
+    bindEditorPreview(form);
+    updateEditorWordCount(form);
+    textarea.addEventListener("input", () => updateEditorWordCount(form));
+    textarea.focus();
+    textarea.addEventListener("keydown", (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+    attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
+    textarea.addEventListener("input", () => {
+      const cursor = textarea.selectionStart;
+      if (cursor >= 2 && textarea.value.slice(cursor - 2, cursor) === "[[") {
+        textarea.setRangeText("", cursor - 2, cursor, "end");
+        void showLinkPickerModal(textarea);
+      }
+    });
+
+    form.querySelector("[data-close-dialog]")?.addEventListener("click", () => {
+      closeSplitEdit();
+    });
+
+    const onKeydown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (document.querySelector(".link-picker-dialog, .lite-confirm-dialog")) return;
+        closeSplitEdit();
+      }
+    };
+    window.addEventListener("keydown", onKeydown);
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!textarea.value.trim()) {
+        showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
+          await notes.delete(note.id);
+          void track("note_deleted");
+          window.removeEventListener("keydown", onKeydown);
+          await triggerCalendarRefresh();
+          await renderRoute();
+        });
+        return;
+      }
+      setBusy(form, true);
+      try {
+        const folderInput = form.querySelector<HTMLInputElement | HTMLSelectElement>("input[name='folderId'], select[name='folderId']");
+        const folderId = folderInput ? (folderInput.value || null) : undefined;
+        await notes.update(note.id, textarea.value, folderId);
+        note.content = textarea.value;
+        if (folderId !== undefined) note.folderId = folderId;
+        setBusy(form, false);
+        status(form, s.draftSaved);
+        const noteEl = document.getElementById(`note-${note.id}`);
+        if (noteEl) {
+          const prose = noteEl.querySelector(".prose");
+          if (prose) prose.innerHTML = renderMarkdown(note.content, true);
+        }
+        await triggerCalendarRefresh();
+      } catch (error) {
+        status(form, errorMessage(error), true);
+        setBusy(form, false);
+      }
+    });
+
+    return;
+  }
+
+  const host = requireElement<HTMLElement>("#dialog-host");
+
   const backdrop = document.createElement("div");
-  backdrop.className = "note-edit-backdrop";
+  backdrop.className = "note-edit-backdrop note-drawer-backdrop";
   backdrop.id = "edit-note-backdrop";
-  backdrop.innerHTML = `<section class="note-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head"><div class="note-edit-dialog-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><a href="${appUrl(`/?date=${note.noteDate}`)}" data-link class="note-edit-date-badge" title="${s.openCalendar}">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></a></div><button type="button" class="note-edit-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></header><div class="note-modal-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true, note.folderId, foldersList)}</div></section>`;
+  backdrop.innerHTML = `<section class="note-edit-dialog note-peek-drawer" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head note-drawer-head"><div class="note-edit-dialog-title-group note-drawer-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.edit, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.editNoteTitle}</h2><a href="${appUrl(`/?date=${note.noteDate}`)}" data-link class="note-edit-date-badge" title="${s.openCalendar}">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></a></div><div class="note-drawer-head-actions"><button type="button" class="notes-split-btn drawer-new-note-btn" id="drawer-new-note-btn" title="${s.newNote}">${svg(icons.plus, "action-icon-svg")}<span>${s.newNote}</span></button><button type="button" class="note-edit-close note-drawer-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></div></header><div class="note-modal-form note-drawer-form">${editorMarkup("edit-note-form", note.content, s.saveChanges, true, note.folderId, foldersList)}</div></section>`;
   host.replaceChildren(backdrop);
-  document.body.style.overflow = "hidden";
+  document.body.classList.add("has-editor-drawer-open");
+  if (typeof window !== "undefined" && window.innerWidth <= 768) {
+    document.body.style.overflow = "hidden";
+  }
+
+  const drawerNewNoteBtn = backdrop.querySelector<HTMLButtonElement>("#drawer-new-note-btn");
+  drawerNewNoteBtn?.addEventListener("click", () => {
+    void showComposeDrawer(note.noteDate, foldersList);
+  });
 
   if (!foldersList.length) {
     void folders.listAll().then((allF) => {
@@ -415,6 +595,7 @@ export function showEditDialog(note: Note, foldersList: Folder[] = []): void {
 
   const cleanup = () => {
     window.removeEventListener("keydown", onKeydown);
+    document.body.classList.remove("has-editor-drawer-open");
   };
 
   backdrop.addEventListener("click", (event) => {
@@ -472,9 +653,112 @@ export function showEditDialog(note: Note, foldersList: Folder[] = []): void {
       const folderInput = form.querySelector<HTMLInputElement | HTMLSelectElement>("input[name='folderId'], select[name='folderId']");
       const folderId = folderInput ? (folderInput.value || null) : undefined;
       await notes.update(note.id, textarea.value, folderId);
+      note.content = textarea.value;
+      if (folderId !== undefined) note.folderId = folderId;
+      setBusy(form, false);
+      status(form, s.draftSaved);
+      const noteEl = document.getElementById(`note-${note.id}`);
+      if (noteEl) {
+        const prose = noteEl.querySelector(".prose");
+        if (prose) prose.innerHTML = renderMarkdown(note.content, true);
+      }
+      await triggerCalendarRefresh();
+    } catch (error) {
+      status(form, errorMessage(error), true);
+      setBusy(form, false);
+    }
+  });
+}
+
+export async function showComposeDrawer(date: string, foldersList: Folder[] = []): Promise<void> {
+  const s = currentStrings();
+  const host = requireElement<HTMLElement>("#dialog-host");
+  const formattedDate = formatDateHeading(date);
+  void notes.listAll().then((all) => setWikilinkNotesIndex(all));
+
+  const [allF, draft] = await Promise.all([
+    foldersList.length ? foldersList : folders.listAll(),
+    notes.getDraft(date)
+  ]);
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "note-edit-backdrop note-drawer-backdrop";
+  backdrop.id = "edit-note-backdrop";
+  backdrop.innerHTML = `<section class="note-edit-dialog note-peek-drawer" role="dialog" aria-modal="true" aria-labelledby="note-edit-title"><header class="note-edit-dialog-head note-drawer-head"><div class="note-edit-dialog-title-group note-drawer-title-group"><span class="note-edit-icon-badge" aria-hidden="true">${svg(icons.plus, "note-edit-icon-svg")}</span><h2 id="note-edit-title">${s.newNote}</h2><span class="note-edit-date-badge">${svg(icons.calendar, "badge-calendar-svg")}<span>${formattedDate}</span></span></div><div class="note-drawer-head-actions"><button type="button" class="note-edit-close note-drawer-close" data-close-dialog aria-label="${s.closeEditor}" title="${s.closeEditor} (Esc)">${svg(icons.close, "dialog-close-svg")}</button></div></header><div class="note-modal-form note-drawer-form">${editorMarkup("drawer-new-note-form", draft?.content ?? "", s.finishNote, true, null, allF, false)}</div></section>`;
+
+  host.replaceChildren(backdrop);
+  document.body.classList.add("has-editor-drawer-open");
+  if (typeof window !== "undefined" && window.innerWidth <= 768) {
+    document.body.style.overflow = "hidden";
+  }
+
+  const cleanup = () => {
+    window.removeEventListener("keydown", onKeydown);
+    document.body.classList.remove("has-editor-drawer-open");
+  };
+
+  backdrop.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target === backdrop || target.closest("[data-close-dialog]")) {
       cleanup();
       closeDialog(backdrop);
+    }
+  });
+
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      const currentHost = document.querySelector<HTMLElement>("#dialog-host");
+      if (currentHost && currentHost.lastElementChild !== backdrop) return;
+      cleanup();
+      closeDialog(backdrop);
+    }
+  };
+  window.addEventListener("keydown", onKeydown);
+
+  const form = requireElement<HTMLFormElement>("#drawer-new-note-form");
+  const textarea = requireElement<HTMLTextAreaElement>("#drawer-new-note-form textarea");
+  bindFormatting(form, textarea);
+  bindEditorPreview(form);
+  updateEditorWordCount(form);
+  textarea.addEventListener("input", () => updateEditorWordCount(form));
+  textarea.focus();
+
+  textarea.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+  attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
+  textarea.addEventListener("input", () => {
+    const cursor = textarea.selectionStart;
+    if (cursor >= 2 && textarea.value.slice(cursor - 2, cursor) === "[[") {
+      textarea.setRangeText("", cursor - 2, cursor, "end");
+      void showLinkPickerModal(textarea);
+    }
+  });
+
+  form.querySelector("[data-close-dialog]")?.addEventListener("click", () => {
+    cleanup();
+    closeDialog(backdrop);
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!textarea.value.trim()) return;
+    setBusy(form, true);
+    try {
+      const folderInput = form.querySelector<HTMLInputElement | HTMLSelectElement>("input[name='folderId'], select[name='folderId']");
+      const folderId = folderInput?.value ? folderInput.value : null;
+      const content = textarea.value;
+      textarea.value = "";
+      await notes.create(content, date, folderId);
+      void track("note_created");
+      await notes.saveDraft(date, "");
+      setBusy(form, false, s.draftSaved);
+      await triggerCalendarRefresh();
       await renderRoute();
+      updateEditorWordCount(form);
     } catch (error) {
       status(form, errorMessage(error), true);
       setBusy(form, false);

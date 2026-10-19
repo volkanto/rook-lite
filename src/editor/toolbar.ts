@@ -19,7 +19,7 @@ export function updateEditorWordCount(form: HTMLFormElement): void {
 }
 
 export function resizeEditor(textarea: HTMLTextAreaElement): void {
-  if (document.body.classList.contains("is-zen-mode")) {
+  if (document.body.classList.contains("is-zen-mode") || textarea.closest(".notes-split-panel, .split-pane-editor")) {
     textarea.style.height = "";
     return;
   }

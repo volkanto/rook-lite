@@ -27,6 +27,8 @@ import { appUrl } from "../routing";
 import { folders, notes } from "../servicesContext";
 import { DEFAULT_OLLAMA_PROMPT, testOllama } from "../summaries";
 import { setTheme, type ThemePreference } from "../theme";
+import { getNotePreviewDensity, setNotePreviewDensity, type NotePreviewDensity } from "../density";
+import { getNotesPageLayout, setNotesPageLayout, type NotesPageLayout } from "../notesLayout";
 import { errorMessage, formatBytes } from "../utils/dom";
 import { APP_VERSION } from "../version";
 import { showConfirm } from "../editor/modals";
@@ -62,6 +64,8 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
   const estimate = await navigator.storage?.estimate?.();
   const persisted = await navigator.storage?.persisted?.();
   const currentTheme = (localStorage.getItem("theme-preference") ?? "SYSTEM") as ThemePreference;
+  const currentDensity = getNotePreviewDensity();
+  const currentLayout = getNotesPageLayout();
   const currentLocale = getLocale();
   document.title = `${s.settingsTitle} · Rook Lite`;
 
@@ -122,6 +126,43 @@ export async function renderSettings(content: HTMLElement): Promise<void> {
                   <label class="settings-segmented-btn ${currentTheme === val ? "is-active" : ""}">
                     <input type="radio" name="settings-theme" value="${val}" ${currentTheme === val ? "checked" : ""} class="visually-hidden">
                     ${svg(iconSvg, "settings-segmented-icon")}
+                    <span>${label}</span>
+                  </label>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row-info">
+                <span class="settings-row-label">${s.noteDensityTitle}</span>
+                <span class="settings-row-desc">${s.noteDensityDesc}</span>
+              </div>
+              <div class="settings-segmented-control" role="radiogroup" aria-label="${s.noteDensityTitle}">
+                ${([
+                  ["compact", s.densityCompact],
+                  ["comfortable", s.densityComfortable],
+                  ["full", s.densityFull]
+                ] as const).map(([val, label]) => `
+                  <label class="settings-segmented-btn ${currentDensity === val ? "is-active" : ""}">
+                    <input type="radio" name="settings-note-density" value="${val}" ${currentDensity === val ? "checked" : ""} class="visually-hidden">
+                    <span>${label}</span>
+                  </label>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-row-info">
+                <span class="settings-row-label">${s.notesLayoutTitle}</span>
+                <span class="settings-row-desc">${s.notesLayoutDesc}</span>
+              </div>
+              <div class="settings-segmented-control" role="radiogroup" aria-label="${s.notesLayoutTitle}">
+                ${([
+                  ["one-column", s.layoutOneColumn],
+                  ["two-columns", s.layoutTwoColumns]
+                ] as const).map(([val, label]) => `
+                  <label class="settings-segmented-btn ${currentLayout === val ? "is-active" : ""}">
+                    <input type="radio" name="settings-notes-layout" value="${val}" ${currentLayout === val ? "checked" : ""} class="visually-hidden">
                     <span>${label}</span>
                   </label>
                 `).join("")}
@@ -466,6 +507,26 @@ export function bindSettingsEvents(content: HTMLElement): void {
   content.querySelectorAll<HTMLInputElement>('input[name="settings-theme"]').forEach((input) => {
     input.addEventListener("change", () => {
       setTheme(input.value as ThemePreference);
+      const control = input.closest(".settings-segmented-control");
+      control?.querySelectorAll(".settings-segmented-btn").forEach((btn) => {
+        const isMatch = (btn.querySelector("input") as HTMLInputElement)?.value === input.value;
+        btn.classList.toggle("is-active", isMatch);
+      });
+    });
+  });
+  content.querySelectorAll<HTMLInputElement>('input[name="settings-note-density"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      setNotePreviewDensity(input.value as NotePreviewDensity);
+      const control = input.closest(".settings-segmented-control");
+      control?.querySelectorAll(".settings-segmented-btn").forEach((btn) => {
+        const isMatch = (btn.querySelector("input") as HTMLInputElement)?.value === input.value;
+        btn.classList.toggle("is-active", isMatch);
+      });
+    });
+  });
+  content.querySelectorAll<HTMLInputElement>('input[name="settings-notes-layout"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      setNotesPageLayout(input.value as NotesPageLayout);
       const control = input.closest(".settings-segmented-control");
       control?.querySelectorAll(".settings-segmented-btn").forEach((btn) => {
         const isMatch = (btn.querySelector("input") as HTMLInputElement)?.value === input.value;

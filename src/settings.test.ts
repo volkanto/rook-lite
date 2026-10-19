@@ -239,4 +239,75 @@ describe("Redesigned Settings Page", () => {
     });
     container.remove();
   });
+
+  it("renders note density options in Appearance and updates preference on change", async () => {
+    history.replaceState({}, "", "/settings#general");
+    const { renderSettings, getNotePreviewDensity } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSettings(container);
+
+    const compactRadio = container.querySelector<HTMLInputElement>('input[name="settings-note-density"][value="compact"]');
+    const comfortableRadio = container.querySelector<HTMLInputElement>('input[name="settings-note-density"][value="comfortable"]');
+    const fullRadio = container.querySelector<HTMLInputElement>('input[name="settings-note-density"][value="full"]');
+
+    expect(compactRadio).not.toBeNull();
+    expect(comfortableRadio).not.toBeNull();
+    expect(fullRadio).not.toBeNull();
+
+    // Default is comfortable
+    expect(comfortableRadio?.checked).toBe(true);
+    expect(comfortableRadio?.closest(".settings-segmented-btn")?.classList.contains("is-active")).toBe(true);
+
+    // Switch to compact
+    compactRadio?.click();
+    expect(getNotePreviewDensity()).toBe("compact");
+    expect(localStorage.getItem("rook_note_preview_density")).toBe("compact");
+    expect(document.documentElement.dataset.noteDensity).toBe("compact");
+    expect(compactRadio?.closest(".settings-segmented-btn")?.classList.contains("is-active")).toBe(true);
+    expect(comfortableRadio?.closest(".settings-segmented-btn")?.classList.contains("is-active")).toBe(false);
+
+    // Switch to full
+    fullRadio?.click();
+    expect(getNotePreviewDensity()).toBe("full");
+    expect(localStorage.getItem("rook_note_preview_density")).toBe("full");
+    expect(document.documentElement.dataset.noteDensity).toBe("full");
+    expect(fullRadio?.closest(".settings-segmented-btn")?.classList.contains("is-active")).toBe(true);
+
+    container.remove();
+  });
+
+  it("renders notes page layout options in Appearance and updates preference on change", async () => {
+    history.replaceState({}, "", "/settings#general");
+    const { renderSettings, getNotesPageLayout } = await import("./main");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    await renderSettings(container);
+
+    const oneColRadio = container.querySelector<HTMLInputElement>('input[name="settings-notes-layout"][value="one-column"]');
+    const twoColRadio = container.querySelector<HTMLInputElement>('input[name="settings-notes-layout"][value="two-columns"]');
+
+    expect(oneColRadio).not.toBeNull();
+    expect(twoColRadio).not.toBeNull();
+
+    // Default is one-column
+    expect(oneColRadio?.checked).toBe(true);
+    expect(oneColRadio?.closest(".settings-segmented-btn")?.classList.contains("is-active")).toBe(true);
+
+    // Switch to two-columns
+    twoColRadio?.click();
+    expect(getNotesPageLayout()).toBe("two-columns");
+    expect(localStorage.getItem("rook_notes_page_layout")).toBe("two-columns");
+    expect(document.documentElement.dataset.notesLayout).toBe("two-columns");
+    expect(twoColRadio?.closest(".settings-segmented-btn")?.classList.contains("is-active")).toBe(true);
+    expect(oneColRadio?.closest(".settings-segmented-btn")?.classList.contains("is-active")).toBe(false);
+
+    // Switch back to one-column
+    oneColRadio?.click();
+    expect(getNotesPageLayout()).toBe("one-column");
+    expect(localStorage.getItem("rook_notes_page_layout")).toBe("one-column");
+    expect(document.documentElement.dataset.notesLayout).toBe("one-column");
+
+    container.remove();
+  });
 });
