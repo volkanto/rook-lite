@@ -208,6 +208,12 @@ export const locale: LocaleDefinition = {
     todosLede: "Open tasks found in your Markdown notes.",
     noOpenTasks: "No open tasks.",
     noOpenTasksPrompt: "Add a - [ ] item to a note and it will appear here.",
+    todoEmptyTitle: "All caught up",
+    todoEmptyAction: "Open today's note",
+    todoEmptyHint: "New note",
+    todoEmptySyntaxHelp: "Task syntax",
+    todoEmptyExampleOpen: "Plan priorities or write a task",
+    todoEmptyExampleDone: "Mark completed items with an x",
     taskAgeToday: "Today",
     taskAgeDays: (days: number) => `${days}d open`,
     taskAgeWeeks: (weeks: number) => `${weeks}w open`,
@@ -525,7 +531,8 @@ export const locale: LocaleDefinition = {
     shortcutEscape: "Close modals & dialogs",
     notFoundTitle: "That page does not exist.",
     notFoundDesc: "404",
-    notFoundReturnHome: "Return to today's notes."
+    notFoundMessage: "The note or page you are looking for could not be found, was moved, or has been deleted.",
+    notFoundReturnHome: "Return to today's notes"
   }
 };
 

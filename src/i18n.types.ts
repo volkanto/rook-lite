@@ -209,6 +209,12 @@ export interface TranslationStrings {
   todosLede: string;
   noOpenTasks: string;
   noOpenTasksPrompt: string;
+  todoEmptyTitle: string;
+  todoEmptyAction: string;
+  todoEmptyHint: string;
+  todoEmptySyntaxHelp: string;
+  todoEmptyExampleOpen: string;
+  todoEmptyExampleDone: string;
   taskAgeToday: string;
   taskAgeDays: (days: number) => string;
   taskAgeWeeks: (weeks: number) => string;
@@ -386,6 +392,7 @@ export interface TranslationStrings {
   shortcutEscape: string;
   notFoundTitle: string;
   notFoundDesc: string;
+  notFoundMessage: string;
   notFoundReturnHome: string;
 }
 

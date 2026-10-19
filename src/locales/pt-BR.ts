@@ -207,6 +207,12 @@ export const locale: LocaleDefinition = {
     todosLede: "Tarefas pendentes encontradas em suas notas Markdown.",
     noOpenTasks: "Nenhuma tarefa aberta.",
     noOpenTasksPrompt: "Adicione um item - [ ] em uma nota e ele aparecerá aqui.",
+    todoEmptyTitle: "Tudo em dia",
+    todoEmptyAction: "Abrir nota de hoje",
+    todoEmptyHint: "Nova nota",
+    todoEmptySyntaxHelp: "Sintaxe de tarefas",
+    todoEmptyExampleOpen: "Planejar prioridades ou anotar uma tarefa",
+    todoEmptyExampleDone: "Marcar itens concluídos com um x",
     taskAgeToday: "Hoje",
     taskAgeDays: (days: number) => `aberta há ${days}d`,
     taskAgeWeeks: (weeks: number) => `aberta há ${weeks}sem`,
@@ -523,7 +529,8 @@ export const locale: LocaleDefinition = {
     shortcutEscape: "Fechar caixas de diálogo",
     notFoundTitle: "Esta página não existe.",
     notFoundDesc: "404",
-    notFoundReturnHome: "Voltar para as notas de hoje."
+    notFoundMessage: "A nota ou página que você está procurando não foi encontrada, foi movida ou excluída.",
+    notFoundReturnHome: "Voltar para as notas de hoje"
   }
 };
 

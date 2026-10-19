@@ -1,6 +1,7 @@
+import { icons, svg } from "./icons";
 import { currentStrings } from "./i18n";
 import { escapeHtml } from "./markdown";
-import { appPath, appUrl, normalizeAppLinks } from "./routing";
+import { appPath, appUrl, assetUrl, normalizeAppLinks } from "./routing";
 import { errorMessage, requireElement } from "./utils/dom";
 
 export type RouteHandler = (content: HTMLElement) => Promise<void> | void;
@@ -26,7 +27,8 @@ export function configureRouter(config: RouterConfig): void {
 export function renderNotFound(content: HTMLElement): void {
   const s = currentStrings();
   document.title = `${s.notFoundTitle} · Rook Lite`;
-  content.innerHTML = `<div class="page-head"><div><p class="eyebrow">${s.notFoundDesc}</p><h1>${s.notFoundTitle}</h1><p class="lede"><a href="${appUrl("/")}" data-link>${s.notFoundReturnHome}</a></p></div></div>`;
+  content.innerHTML = `<div class="empty-notes lite-page-placeholder not-found-page"><img src="${assetUrl("/not-found.png")}" alt="" width="140" height="140" class="empty-notes-illustration not-found-illustration" aria-hidden="true"><p class="eyebrow">${escapeHtml(s.notFoundDesc)}</p><h1 class="not-found-title">${escapeHtml(s.notFoundTitle)}</h1><p class="not-found-message">${escapeHtml(s.notFoundMessage)}</p><div class="inspiration-chips not-found-actions" role="toolbar"><a href="${appUrl("/")}" data-link class="inspiration-chip not-found-home-link">${svg(icons.chevronLeft, "inspiration-svg")}<span>${escapeHtml(s.notFoundReturnHome)}</span></a></div></div>`;
+  normalizeAppLinks(content);
 }
 
 export async function renderRoute(): Promise<void> {
