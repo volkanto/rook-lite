@@ -207,6 +207,12 @@ export const locale: LocaleDefinition = {
     todosLede: "Offene Aufgaben aus deinen Markdown-Notizen.",
     noOpenTasks: "Keine offenen Aufgaben.",
     noOpenTasksPrompt: "Füge - [ ] zu einer Notiz hinzu und die Aufgabe erscheint hier.",
+    todoEmptyTitle: "Alles erledigt",
+    todoEmptyAction: "Heutige Notiz öffnen",
+    todoEmptyHint: "Neue Notiz",
+    todoEmptySyntaxHelp: "Aufgaben-Syntax",
+    todoEmptyExampleOpen: "Prioritäten planen oder Aufgabe notieren",
+    todoEmptyExampleDone: "Erledigte Punkte mit einem x markieren",
     taskAgeToday: "Heute",
     taskAgeDays: (days: number) => `seit ${days}d offen`,
     taskAgeWeeks: (weeks: number) => `seit ${weeks}w offen`,
@@ -523,7 +529,8 @@ export const locale: LocaleDefinition = {
     shortcutEscape: "Dialoge & Modals schließen",
     notFoundTitle: "Diese Seite existiert nicht.",
     notFoundDesc: "404",
-    notFoundReturnHome: "Zurück zu den heutigen Notizen."
+    notFoundMessage: "Die gesuchte Notiz oder Seite wurde nicht gefunden, verschoben oder gelöscht.",
+    notFoundReturnHome: "Zurück zu den heutigen Notizen"
   }
 };
 

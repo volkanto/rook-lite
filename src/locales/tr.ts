@@ -207,6 +207,12 @@ export const locale: LocaleDefinition = {
     todosLede: "Markdown notlarınızda bulunan açık görevler.",
     noOpenTasks: "Açık görev yok.",
     noOpenTasksPrompt: "Bir nota - [ ] öğesi eklediğinizde burada görünecektir.",
+    todoEmptyTitle: "Tümü tamamlandı",
+    todoEmptyAction: "Bugünün notunu aç",
+    todoEmptyHint: "Yeni not",
+    todoEmptySyntaxHelp: "Görev sözdizimi",
+    todoEmptyExampleOpen: "Öncelikleri planla veya görev yaz",
+    todoEmptyExampleDone: "Tamamlanan maddeleri x ile işaretle",
     taskAgeToday: "Bugün",
     taskAgeDays: (days: number) => `${days}g açık`,
     taskAgeWeeks: (weeks: number) => `${weeks}h açık`,
@@ -524,7 +530,8 @@ export const locale: LocaleDefinition = {
     shortcutEscape: "Pencereleri ve aramayı kapat",
     notFoundTitle: "Bu sayfa mevcut değil.",
     notFoundDesc: "404",
-    notFoundReturnHome: "Bugünün notlarına dönün."
+    notFoundMessage: "Aradığınız not veya sayfa bulunamadı, taşınmış veya silinmiş olabilir.",
+    notFoundReturnHome: "Bugünün notlarına dönün"
   }
 };
 

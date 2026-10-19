@@ -207,6 +207,12 @@ export const locale: LocaleDefinition = {
     todosLede: "Tâches en cours détectées dans vos notes Markdown.",
     noOpenTasks: "Aucune tâche en cours.",
     noOpenTasksPrompt: "Ajoutez un élément - [ ] dans une note pour le voir ici.",
+    todoEmptyTitle: "Tout est à jour",
+    todoEmptyAction: "Ouvrir la note du jour",
+    todoEmptyHint: "Nouvelle note",
+    todoEmptySyntaxHelp: "Syntaxe des tâches",
+    todoEmptyExampleOpen: "Planifier les priorités ou noter une tâche",
+    todoEmptyExampleDone: "Marquer les éléments terminés avec un x",
     taskAgeToday: "Aujourd'hui",
     taskAgeDays: (days: number) => `ouverte depuis ${days}j`,
     taskAgeWeeks: (weeks: number) => `ouverte depuis ${weeks}sem`,
@@ -523,7 +529,8 @@ export const locale: LocaleDefinition = {
     shortcutEscape: "Fermer les boîtes de dialogue",
     notFoundTitle: "Cette page n'existe pas.",
     notFoundDesc: "404",
-    notFoundReturnHome: "Retourner aux notes d'aujourd'hui."
+    notFoundMessage: "La note ou la page que vous recherchez est introuvable, a été déplacée ou supprimée.",
+    notFoundReturnHome: "Retourner aux notes d'aujourd'hui"
   }
 };
 

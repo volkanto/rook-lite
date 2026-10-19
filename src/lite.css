@@ -6181,18 +6181,28 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .summary-empty {
-  display: grid;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
   min-height: 14rem;
-  padding: 2.5rem 1rem;
-  place-items: center;
-  align-content: center;
+  padding: 2.5rem 1rem !important;
   color: var(--color-text-muted, var(--muted));
   text-align: center;
 }
 
+.summary-empty .empty-notes-illustration,
+.summary-empty .summary-empty-illustration,
 .summary-empty img {
-  margin-bottom: 0.65rem;
-  opacity: 0.55;
+  display: block;
+  width: clamp(7.5rem, 20vw, 10rem);
+  max-width: 160px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  opacity: 1;
+  margin: 0 auto 0.85rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
 }
 
 .summary-empty h3 {
@@ -6205,6 +6215,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .summary-empty p {
   margin-top: 0.25rem;
   font-size: 0.8rem;
+  font-weight: 400 !important;
   color: var(--color-text-muted, var(--muted));
 }
 
@@ -8265,6 +8276,182 @@ body.app .todo-group-tabs button.is-active,
   .task-list-item.is-highlighted-todo {
     transition: none !important;
   }
+}
+
+/* ==========================================================================
+   Todo View Empty State (Harmonized with Application Design)
+   ========================================================================== */
+
+.empty-notes.todo-empty-notes {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3rem 1.25rem 3.5rem !important;
+  text-align: center !important;
+  min-height: 20rem;
+}
+
+.empty-notes.todo-empty-notes .todo-empty-title {
+  margin: 0.25rem 0 0.35rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  letter-spacing: -0.015em;
+}
+
+.empty-notes.todo-empty-notes .todo-empty-prompt {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, var(--muted));
+  max-width: 26rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+/* Minimal task syntax preview in harmony with .todo-item */
+.todo-empty-syntax-sample {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 24rem;
+  margin: 0 auto 1.35rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--color-bg-surface, var(--surface));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: var(--radius-md, 8px);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .todo-empty-syntax-sample {
+  background: var(--color-bg-raised, #18181b);
+}
+
+.todo-sample-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  color: var(--color-text-primary, var(--text));
+  line-height: 1.4;
+}
+
+.todo-sample-row.is-done {
+  color: var(--color-text-tertiary, var(--muted));
+}
+
+.todo-sample-row.is-done .todo-sample-text {
+  text-decoration: line-through;
+}
+
+.todo-sample-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-strong, #D0D5DD);
+  background: transparent;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.todo-sample-check.is-checked {
+  background: var(--color-brand, var(--text));
+  border-color: var(--color-brand, var(--text));
+  position: relative;
+}
+
+.todo-sample-check.is-checked::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.26rem;
+  border-left: 1.8px solid var(--color-bg-surface, #ffffff);
+  border-bottom: 1.8px solid var(--color-bg-surface, #ffffff);
+  transform: rotate(-45deg) translate(0.01rem, -0.03rem);
+  display: block;
+}
+
+.todo-sample-marker {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 550;
+  color: var(--color-brand);
+  background: color-mix(in srgb, var(--color-brand) 10%, transparent);
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  margin-right: 0.25rem;
+}
+
+.todo-sample-row.is-done .todo-sample-marker {
+  color: var(--color-text-muted, var(--muted));
+  background: color-mix(in srgb, var(--color-text-muted) 12%, transparent);
+}
+
+.todo-inspiration-chips {
+  margin-bottom: 0.85rem;
+}
+
+.todo-inspiration-link {
+  text-decoration: none !important;
+}
+
+.todo-shortcut-hint {
+  margin-top: 0.25rem;
+}
+
+.todo-shortcut-hint .shortcut-hint-sep {
+  color: var(--color-text-muted, var(--muted));
+}
+
+/* ==========================================================================
+   404 Not Found Page (Harmonized with Application Design)
+   ========================================================================== */
+
+.empty-notes.not-found-page {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3.5rem 1.25rem 4rem !important;
+  text-align: center !important;
+  min-height: 22rem;
+}
+
+.not-found-page .eyebrow {
+  margin: 0 0 0.35rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--color-brand, var(--text-soft)) !important;
+}
+
+.not-found-page .not-found-title {
+  margin: 0 0 0.45rem !important;
+  font-size: 1.25rem !important;
+  font-weight: 650 !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  letter-spacing: -0.02em;
+}
+
+.not-found-page .not-found-message {
+  margin: 0 0 1.35rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 400 !important;
+  color: var(--color-text-muted, var(--muted)) !important;
+  max-width: 26rem;
+  line-height: 1.55;
+}
+
+.not-found-page .not-found-actions {
+  margin-top: 0.25rem;
+}
+
+.not-found-page .not-found-home-link {
+  text-decoration: none !important;
 }
 
 .lite-summary-controls {

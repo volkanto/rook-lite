@@ -1,7 +1,7 @@
 const CACHE_NAME = "rook-lite-shell-v7";
 const BASE_URL = new URL("./", self.registration.scope);
 const appUrl = (path) => new URL(path, BASE_URL).toString();
-const APP_SHELL = ["./", "index.html", "logo.png", "empty-notes.png", "manifest.webmanifest"].map(appUrl);
+const APP_SHELL = ["./", "index.html", "logo.png", "empty-notes.png", "empty-todos.png", "empty-summaries.png", "not-found.png", "manifest.webmanifest"].map(appUrl);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

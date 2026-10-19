@@ -123,6 +123,22 @@ describe("i18n internationalization and language support", () => {
     expect(tr.todoGroupYesterday).toBe("Dün");
     expect(tr.todoGroupThisWeek).toBe("Bu hafta");
     expect(tr.todoGroupEarlier).toBe("Daha önce");
+    expect(tr.todoEmptyTitle).toBe("Tümü tamamlandı");
+    expect(tr.todoEmptyAction).toBe("Bugünün notunu aç");
+    expect(tr.todoEmptyHint).toBe("Yeni not");
+    expect(tr.todoEmptySyntaxHelp).toBe("Görev sözdizimi");
+    expect(tr.todoEmptyExampleOpen).toBe("Öncelikleri planla veya görev yaz");
+    expect(tr.todoEmptyExampleDone).toBe("Tamamlanan maddeleri x ile işaretle");
+
+    for (const locale of getAvailableLocales()) {
+      expect(locale.strings.todoEmptyTitle).toBeTruthy();
+      expect(locale.strings.todoEmptyAction).toBeTruthy();
+      expect(locale.strings.todoEmptyHint).toBeTruthy();
+      expect(locale.strings.todoEmptySyntaxHelp).toBeTruthy();
+      expect(locale.strings.todoEmptyExampleOpen).toBeTruthy();
+      expect(locale.strings.todoEmptyExampleDone).toBeTruthy();
+      expect(locale.strings.notFoundMessage).toBeTruthy();
+    }
   });
 
   it("formats dates according to selected locale", () => {

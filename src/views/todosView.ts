@@ -3,7 +3,7 @@ import { icons, svg } from "../icons";
 import { currentStrings, formatDateHeading, formatShortDate, getLocale } from "../i18n";
 import { escapeHtml, extractTags, renderInlineMarkdown, renderMarkdown, toggleTaskInMarkdown } from "../markdown";
 import type { Note } from "../models";
-import { appUrl, normalizeAppLinks } from "../routing";
+import { appUrl, assetUrl, normalizeAppLinks } from "../routing";
 import { notes } from "../servicesContext";
 import { attachTagAutocomplete } from "../tag-autocomplete";
 import { getPredefinedTemplates } from "../templates";
@@ -376,7 +376,8 @@ export async function renderTodos(content: HTMLElement): Promise<void> {
     activeTodoHighlightedLine = null;
     activeTodoTaskText = null;
     content.classList.remove("has-todo-split");
-    content.innerHTML = `<div class="page-head"><div><h1>${s.todosTitle}</h1><p class="lede">${s.todosLede}</p></div></div><div class="empty-notes lite-page-placeholder"><p>${s.noOpenTasks}</p><span>${s.noOpenTasksPrompt}</span></div>`;
+    content.innerHTML = `<div class="page-head"><div><h1>${escapeHtml(s.todosTitle)}</h1><p class="lede">${escapeHtml(s.todosLede)}</p></div></div><div class="empty-notes lite-page-placeholder todo-empty-notes"><img src="${assetUrl("/empty-todos.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p class="todo-empty-title">${escapeHtml(s.noOpenTasks)}</p><span class="todo-empty-prompt">${escapeHtml(s.noOpenTasksPrompt)}</span><div class="todo-empty-syntax-sample" role="region" aria-label="${escapeHtml(s.todoEmptySyntaxHelp)}"><div class="todo-sample-row"><span class="todo-sample-check" aria-hidden="true"></span><span class="todo-sample-text"><code class="todo-sample-marker">- [ ]</code> ${escapeHtml(s.todoEmptyExampleOpen)}</span></div><div class="todo-sample-row is-done"><span class="todo-sample-check is-checked" aria-hidden="true"></span><span class="todo-sample-text"><code class="todo-sample-marker">- [x]</code> ${escapeHtml(s.todoEmptyExampleDone)}</span></div></div><div class="inspiration-chips todo-inspiration-chips" role="toolbar" aria-label="${escapeHtml(s.todoEmptyAction)}"><a href="${appUrl("/")}" data-link class="inspiration-chip todo-inspiration-link">${svg(icons.plus, "inspiration-svg")}<span>${escapeHtml(s.todoEmptyAction)}</span></a></div><div class="shortcut-kbd-hint todo-shortcut-hint"><kbd>N</kbd><span>${escapeHtml(s.todoEmptyHint)}</span><span class="shortcut-hint-sep" aria-hidden="true">·</span><kbd>⌘K</kbd><span>${escapeHtml(s.searchPlaceholder)}</span></div></div>`;
+    normalizeAppLinks(content);
     return;
   }
 

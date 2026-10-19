@@ -1276,6 +1276,45 @@ describe("Left menu bar icons and navigation", () => {
     const dateInputs = container.querySelectorAll('.summary-date-fields input[type="date"]');
     expect(dateInputs.length).toBe(2);
 
+    // Verify empty state illustration
+    const summaryEmpty = container.querySelector(".summary-empty");
+    expect(summaryEmpty).not.toBeNull();
+    const emptyImg = summaryEmpty?.querySelector<HTMLImageElement>("img.summary-empty-illustration");
+    expect(emptyImg).not.toBeNull();
+    expect(emptyImg?.src).toContain("empty-summaries.png");
+
+    container.remove();
+  });
+
+  it("renders 404 page with not-found illustration, proper message, and link back to today", async () => {
+    const { renderNotFound } = await import("./router");
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    renderNotFound(container);
+
+    // Verify container and illustration
+    const notFoundContainer = container.querySelector(".empty-notes.not-found-page");
+    expect(notFoundContainer).not.toBeNull();
+
+    const img = notFoundContainer?.querySelector<HTMLImageElement>("img.empty-notes-illustration");
+    expect(img).not.toBeNull();
+    expect(img?.src).toContain("not-found.png");
+
+    // Verify 404 eyebrow, title, and descriptive message
+    expect(notFoundContainer?.querySelector(".eyebrow")?.textContent).toBe("404");
+    expect(notFoundContainer?.querySelector(".not-found-title")?.textContent).toBe("That page does not exist.");
+    const message = notFoundContainer?.querySelector(".not-found-message");
+    expect(message).not.toBeNull();
+    expect(message?.textContent).toContain("could not be found");
+
+    // Verify link back to today's notes
+    const homeLink = notFoundContainer?.querySelector<HTMLAnchorElement>(".not-found-home-link");
+    expect(homeLink).not.toBeNull();
+    expect(homeLink?.hasAttribute("data-link")).toBe(true);
+    expect(homeLink?.textContent).toContain("Return to today's notes");
+    expect(homeLink?.querySelector(".inspiration-svg")).not.toBeNull();
+
     container.remove();
   });
 
@@ -1310,6 +1349,75 @@ describe("Left menu bar icons and navigation", () => {
     expect(noteLinks[0].querySelector(".todo-jump-svg")).not.toBeNull();
 
     await noteService.delete(note.id);
+    container.remove();
+  });
+
+  it("renders harmonized minimalist empty state with illustration, syntax sample, inspiration chips, and shortcuts when there are no open tasks", async () => {
+    const { renderTodos } = await import("./main");
+    const { NoteService } = await import("./services");
+    const { NoteRepository } = await import("./db");
+    const noteService = new NoteService(new NoteRepository());
+
+    // Clean any existing notes
+    const all = await noteService.listAll();
+    for (const n of all) {
+      await noteService.delete(n.id);
+    }
+
+    const container = document.createElement("div");
+    container.id = "page-content";
+    container.className = "lite-shell-main";
+    document.body.appendChild(container);
+
+    await renderTodos(container);
+
+    // Verify container and illustration
+    const emptyContainer = container.querySelector(".empty-notes.todo-empty-notes");
+    expect(emptyContainer).not.toBeNull();
+
+    const illustration = emptyContainer?.querySelector<HTMLImageElement>("img.empty-notes-illustration");
+    expect(illustration).not.toBeNull();
+    expect(illustration?.src).toContain("empty-todos.png");
+
+    // Verify copy
+    const title = emptyContainer?.querySelector(".todo-empty-title");
+    expect(title?.textContent).toBe("No open tasks.");
+    const desc = emptyContainer?.querySelector(".todo-empty-prompt");
+    expect(desc?.textContent).toContain("Add a - [ ] item to a note");
+
+    // Verify markdown syntax showcase
+    const syntaxBox = emptyContainer?.querySelector(".todo-empty-syntax-sample");
+    expect(syntaxBox).not.toBeNull();
+    expect(syntaxBox?.getAttribute("role")).toBe("region");
+
+    const syntaxItems = syntaxBox?.querySelectorAll(".todo-sample-row");
+    expect(syntaxItems?.length).toBe(2);
+    expect(syntaxItems?.[0].textContent).toContain("- [ ]");
+    expect(syntaxItems?.[1].textContent).toContain("- [x]");
+    expect(syntaxItems?.[1].classList.contains("is-done")).toBe(true);
+
+    const check = syntaxItems?.[0].querySelector(".todo-sample-check");
+    expect(check).not.toBeNull();
+    const checked = syntaxItems?.[1].querySelector(".todo-sample-check.is-checked");
+    expect(checked).not.toBeNull();
+
+    // Verify native inspiration chips action link
+    const chips = emptyContainer?.querySelector(".inspiration-chips");
+    expect(chips).not.toBeNull();
+    const cta = chips?.querySelector<HTMLAnchorElement>(".inspiration-chip.todo-inspiration-link");
+    expect(cta).not.toBeNull();
+    expect(cta?.hasAttribute("data-link")).toBe(true);
+    expect(cta?.textContent).toContain("Open today's note");
+    expect(cta?.querySelector(".inspiration-svg")).not.toBeNull();
+
+    // Verify native keyboard shortcut hints
+    const shortcuts = emptyContainer?.querySelector(".shortcut-kbd-hint.todo-shortcut-hint");
+    expect(shortcuts).not.toBeNull();
+    const kbds = shortcuts?.querySelectorAll("kbd");
+    expect(kbds?.length).toBe(2);
+    expect(kbds?.[0].textContent).toBe("N");
+    expect(kbds?.[1].textContent).toBe("⌘K");
+
     container.remove();
   });
 
