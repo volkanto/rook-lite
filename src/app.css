@@ -3800,7 +3800,9 @@ h2 {
     line-height: 1.65;
 }
 
-button,
+button.primary-button,
+button.btn-primary,
+button[type="submit"]:not(.btn-secondary):not(.notes-split-btn),
 .save-btn-rect,
 .flat-add-btn,
 .settings-save-btn,
@@ -3814,7 +3816,9 @@ a.buttonlike {
     box-shadow: var(--shadow-sm);
 }
 
-button:hover:not(:disabled),
+button.primary-button:hover:not(:disabled),
+button.btn-primary:hover:not(:disabled),
+button[type="submit"]:not(.btn-secondary):not(.notes-split-btn):hover:not(:disabled),
 .save-btn-rect:hover:not(:disabled),
 .flat-add-btn:hover:not(:disabled),
 .settings-save-btn:hover:not(:disabled),

@@ -3,6 +3,24 @@
   --font-ui: var(--font-app);
   --font-prose: var(--font-app);
   --font-mono: "SFMono-Regular", ui-monospace, "Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+
+  /* Calm, Minimalist Link & Button Hover Tokens */
+  --link-color: var(--color-text-link, #5B5BD6);
+  --link-color-hover: var(--color-text-link-hover, #4B4BC3);
+  --btn-hover-bg: #E2E8F0;
+  --btn-hover-border: #94A3B8;
+  --btn-hover-text: #0F172A;
+  --btn-hover-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  --link-color: #93C5FD;
+  --link-color-hover: #BFDBFE;
+  --btn-hover-bg: rgba(255, 255, 255, 0.12);
+  --btn-hover-border: rgba(255, 255, 255, 0.28);
+  --btn-hover-text: #FFFFFF;
+  --btn-hover-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Two-Tone Dark Theme: Pitch black left panel, soft matte main reading canvas */
@@ -1463,9 +1481,30 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .minimal-nav-btn:hover,
 .minimal-calendar-btn:hover {
-  background: var(--color-bg-surface, var(--surface)) !important;
-  color: var(--color-text-primary, var(--text)) !important;
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+  border-color: var(--btn-hover-border) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.minimal-nav-btn:hover .minimal-nav-svg,
+.minimal-calendar-btn:hover .minimal-nav-svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .minimal-nav-btn:hover,
+:root[data-theme="dark"] .minimal-calendar-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .minimal-nav-btn:hover .minimal-nav-svg,
+:root[data-theme="dark"] .minimal-calendar-btn:hover .minimal-nav-svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 .minimal-nav-svg {
@@ -2552,22 +2591,48 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 /* Individual button style is visible ONLY when hovering that specific button */
 .note-quick-action-btn:hover {
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
-  border-color: var(--color-border-subtle, var(--border));
-  color: var(--color-text-primary, var(--text));
-  box-shadow: none;
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.note-quick-action-btn:hover svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
 }
 
 .note-quick-action-btn.copy-btn:hover,
 .note-quick-action-btn.edit-btn:hover {
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  color: var(--color-brand);
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  background: var(--btn-hover-bg) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
 }
 
 .note-quick-action-btn.delete-btn:hover {
-  background: var(--color-danger-bg);
-  border-color: color-mix(in srgb, var(--color-danger) 30%, transparent);
-  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger, #E25555) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-danger, #E25555) 35%, transparent) !important;
+  color: var(--color-danger, #E25555) !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn.copy-btn:hover,
+:root[data-theme="dark"] .note-quick-action-btn.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn.delete-btn:hover {
+  background: rgba(248, 113, 113, 0.14) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+  color: #F87171 !important;
 }
 
 .note-quick-action-btn.is-copied {
@@ -3142,9 +3207,40 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .notes-split-btn:hover,
 .split-new-note-btn:hover {
-  border-color: var(--color-brand, var(--accent));
-  color: var(--color-brand, var(--accent));
-  background: color-mix(in srgb, var(--color-brand, var(--accent)) 6%, var(--color-bg-surface, var(--surface)));
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  background: var(--btn-hover-bg) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.notes-split-btn:hover span,
+.split-new-note-btn:hover span {
+  color: var(--btn-hover-text) !important;
+}
+
+.notes-split-btn:hover svg,
+.split-new-note-btn:hover svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .notes-split-btn:hover,
+:root[data-theme="dark"] .split-new-note-btn:hover {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+:root[data-theme="dark"] .notes-split-btn:hover span,
+:root[data-theme="dark"] .split-new-note-btn:hover span {
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .notes-split-btn:hover svg,
+:root[data-theme="dark"] .split-new-note-btn:hover svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 .notes-split-panel-body,
@@ -3659,9 +3755,15 @@ body.is-zen-mode #edit-note-backdrop .note-edit-dialog {
 }
 
 .note-edit-close:hover {
-  background: var(--color-bg-hover, var(--surface-sunk));
-  border-color: var(--color-border-subtle, var(--border));
-  color: var(--color-text-primary, var(--text));
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .note-edit-close:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #FFFFFF !important;
 }
 
 .dialog-close-svg {
@@ -4033,9 +4135,20 @@ button.editor-template-item:hover {
 }
 
 .wikilink:hover {
-  color: var(--color-brand, #2563eb) !important;
-  text-decoration-color: var(--color-brand, #2563eb);
-  background: color-mix(in srgb, var(--color-brand, #2563eb) 10%, transparent);
+  color: var(--link-color-hover) !important;
+  text-decoration-color: var(--link-color-hover);
+  background: color-mix(in srgb, var(--link-color) 12%, transparent);
+}
+
+:root[data-theme="dark"] .wikilink {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(147, 197, 253, 0.4);
+}
+
+:root[data-theme="dark"] .wikilink:hover {
+  color: #FFFFFF !important;
+  text-decoration-color: #93C5FD;
+  background: rgba(147, 197, 253, 0.14) !important;
 }
 
 .wikilink.wikilink-date {
@@ -4080,22 +4193,40 @@ button.editor-template-item:hover {
 }
 
 .wikilink.wikilink-unresolved:hover {
-  color: var(--color-brand, #2563eb) !important;
+  color: var(--link-color) !important;
   text-decoration: underline dashed;
-  text-decoration-color: var(--color-brand, #2563eb);
+  text-decoration-color: var(--link-color);
   opacity: 1;
-  background: color-mix(in srgb, var(--color-brand, #2563eb) 8%, transparent);
+  background: color-mix(in srgb, var(--link-color) 8%, transparent);
+}
+
+:root[data-theme="dark"] .wikilink.wikilink-unresolved:hover {
+  color: #93C5FD !important;
+  text-decoration-color: #93C5FD;
+  background: rgba(147, 197, 253, 0.08) !important;
 }
 
 .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge) {
-  color: var(--color-brand, #2563eb);
+  color: var(--link-color);
   text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color 120ms ease;
+  text-decoration-color: color-mix(in srgb, var(--link-color) 40%, transparent);
+  text-underline-offset: 2.5px;
+  transition: color 120ms ease, text-decoration-color 120ms ease;
 }
 
 .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge):hover {
-  color: var(--color-brand-hover, #1d4ed8);
+  color: var(--link-color-hover);
+  text-decoration-color: var(--link-color-hover);
+}
+
+:root[data-theme="dark"] .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge) {
+  color: #93C5FD;
+  text-decoration-color: rgba(147, 197, 253, 0.4);
+}
+
+:root[data-theme="dark"] .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge):hover {
+  color: #BFDBFE;
+  text-decoration-color: #BFDBFE;
 }
 
 /* Note Backlinks Section inside note cards */
@@ -4173,8 +4304,16 @@ button.editor-template-item:hover {
 
 .backlink-date-badge:hover,
 .mention-date-badge:hover {
-  color: var(--color-brand, #2563eb) !important;
-  border-color: var(--color-brand, #2563eb) !important;
+  color: var(--btn-hover-text) !important;
+  border-color: var(--btn-hover-border) !important;
+  background: var(--btn-hover-bg) !important;
+}
+
+:root[data-theme="dark"] .backlink-date-badge:hover,
+:root[data-theme="dark"] .mention-date-badge:hover {
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .backlink-snippet-rendered,
@@ -4830,9 +4969,17 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .editor-modal-actions .btn-secondary:hover {
-  background: var(--color-bg-hover, var(--surface-sunk));
-  border-color: var(--color-border-default, var(--border));
-  color: var(--color-text-primary, var(--text));
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+:root[data-theme="dark"] .editor-modal-actions .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--btn-hover-shadow) !important;
 }
 
 .editor-modal-actions .save-btn-rect {
@@ -4854,7 +5001,30 @@ textarea.simple-editor-textarea.is-hidden,
 }
 
 .editor-modal-actions .save-btn-rect:hover:not(:disabled) {
-  background: var(--color-brand-hover);
+  background: var(--color-brand-hover, #4B4BC3) !important;
+  color: #FFFFFF !important;
+}
+
+.editor-modal-actions .save-btn-rect:hover:not(:disabled) span,
+.editor-modal-actions .save-btn-rect:hover:not(:disabled) svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .editor-modal-actions .save-btn-rect {
+  background: #FFFFFF !important;
+  color: #09090b !important;
+}
+
+:root[data-theme="dark"] .editor-modal-actions .save-btn-rect:hover:not(:disabled) {
+  background: #E4E4E7 !important;
+  color: #09090b !important;
+}
+
+:root[data-theme="dark"] .editor-modal-actions .save-btn-rect:hover:not(:disabled) span,
+:root[data-theme="dark"] .editor-modal-actions .save-btn-rect:hover:not(:disabled) svg {
+  color: #09090b !important;
+  stroke: #09090b !important;
 }
 
 .editor-modal-actions .save-btn-rect:active:not(:disabled) {
@@ -4995,10 +5165,35 @@ body:has(.command-palette) .floating-quick-note-container {
 }
 
 .floating-quick-note-btn:hover {
-  border-color: var(--color-brand, #2563eb);
-  color: var(--color-brand, #2563eb);
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  background: var(--btn-hover-bg) !important;
   transform: translateY(-2px);
   box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.floating-quick-note-btn:hover span,
+.floating-quick-note-btn:hover .floating-quick-kbd {
+  color: var(--btn-hover-text) !important;
+}
+
+.floating-quick-note-btn:hover .floating-quick-icon {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .floating-quick-note-btn:hover {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  background: rgba(42, 42, 48, 0.98) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+:root[data-theme="dark"] .floating-quick-note-btn:hover span,
+:root[data-theme="dark"] .floating-quick-note-btn:hover .floating-quick-kbd,
+:root[data-theme="dark"] .floating-quick-note-btn:hover .floating-quick-icon {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 .floating-quick-icon {
@@ -5088,10 +5283,48 @@ body:has(.command-palette) .floating-quick-note-container {
 
 a.tag-pill:hover,
 .notes-list a.tag-pill:hover {
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  background: var(--color-bg-selected);
-  color: var(--color-brand);
+  border-color: var(--btn-hover-border) !important;
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
   text-decoration: none;
+}
+
+:root[data-theme="dark"] a.tag-pill:hover,
+:root[data-theme="dark"] .notes-list a.tag-pill:hover {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.inspiration-chip:hover {
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.inspiration-chip:hover span {
+  color: var(--btn-hover-text) !important;
+}
+
+.inspiration-chip:hover .inspiration-svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="dark"] .inspiration-chip:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .inspiration-chip:hover span,
+:root[data-theme="dark"] .inspiration-chip:hover .inspiration-svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 .empty-notes .empty-notes-illustration {
