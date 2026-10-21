@@ -25,10 +25,42 @@ export function status(form: HTMLFormElement, message: string, error = false): v
   }
 }
 
-export function setBusy(form: HTMLFormElement, busy: boolean): void {
+export function setBusy(form: HTMLFormElement, busy: boolean, successMessage?: string): void {
   form.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
     button.disabled = busy;
   });
+
+  const submitBtn = form.querySelector<HTMLButtonElement>("button[type='submit']");
+  if (!submitBtn) return;
+
+  if (busy) {
+    if (!submitBtn.dataset.originalContent) {
+      submitBtn.dataset.originalContent = submitBtn.innerHTML;
+    }
+    submitBtn.setAttribute("aria-busy", "true");
+    submitBtn.classList.add("is-busy");
+    const s = currentStrings();
+    const label = s.savingDraft || "Saving…";
+    submitBtn.innerHTML = `<svg class="save-spinner" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-dasharray="38" stroke-linecap="round" fill="none" /></svg><span>${label}</span>`;
+  } else {
+    submitBtn.removeAttribute("aria-busy");
+    submitBtn.classList.remove("is-busy");
+    if (successMessage) {
+      submitBtn.classList.add("is-saved");
+      submitBtn.innerHTML = `<svg class="save-success-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5l10 -10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>${successMessage}</span>`;
+      const original = submitBtn.dataset.originalContent;
+      window.setTimeout(() => {
+        submitBtn.classList.remove("is-saved");
+        if (original && submitBtn.dataset.originalContent === original) {
+          submitBtn.innerHTML = original;
+          delete submitBtn.dataset.originalContent;
+        }
+      }, 1400);
+    } else if (submitBtn.dataset.originalContent) {
+      submitBtn.innerHTML = submitBtn.dataset.originalContent;
+      delete submitBtn.dataset.originalContent;
+    }
+  }
 }
 
 export function updateScrollToTopVisibility(): void {

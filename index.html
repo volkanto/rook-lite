@@ -24,6 +24,10 @@
             localStorage.getItem('sidebar-collapsed') === 'true') {
           document.documentElement.classList.add('sidebar-collapsed');
         }
+        var density = localStorage.getItem('rook_note_preview_density') || 'comfortable';
+        document.documentElement.setAttribute('data-note-density', density);
+        var layout = localStorage.getItem('rook_notes_page_layout') || 'one-column';
+        document.documentElement.setAttribute('data-notes-layout', layout);
       })();
     </script>
     <meta charset="UTF-8">

@@ -279,9 +279,12 @@ describe("Left menu bar icons and navigation", () => {
     // Open edit dialog
     showEditDialog(createdNote);
 
-    // Dialog is mounted in #dialog-host
+    // Dialog is mounted in #dialog-host as a slide-over side drawer
     const dialog = document.querySelector(".note-edit-dialog");
     expect(dialog).not.toBeNull();
+    expect(dialog?.classList.contains("note-peek-drawer")).toBe(true);
+    expect(document.querySelector(".note-drawer-backdrop")).not.toBeNull();
+    expect(document.body.classList.contains("has-editor-drawer-open")).toBe(true);
 
     // Header has title, formatted date badge, and close button with Lucide SVG
     const title = dialog?.querySelector("#note-edit-title");
@@ -334,9 +337,55 @@ describe("Left menu bar icons and navigation", () => {
     // Clicking cancel closes the dialog
     cancelBtn?.click();
     expect(document.querySelector(".note-edit-dialog")).toBeNull();
+    expect(document.body.classList.contains("has-editor-drawer-open")).toBe(false);
 
     // Clean up
     await noteService.delete(createdNote.id);
+  });
+
+  it("allows morphing drawer into new note composer directly via drawer header button in 1-column mode", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const testDate = "2026-08-15";
+    const createdNote = await noteService.create("Original note in 1 column", testDate);
+
+    try {
+      const { renderShell, showEditDialog, setNotesPageLayout } = await import("./main");
+      setNotesPageLayout("one-column");
+      history.pushState({}, "", `/?date=${testDate}`);
+      await renderShell();
+
+      showEditDialog(createdNote);
+
+      const drawer = document.querySelector(".note-peek-drawer");
+      expect(drawer).not.toBeNull();
+      expect(drawer?.querySelector("#note-edit-title")?.textContent).toBe("Edit note");
+
+      // Has + New note button in drawer header
+      const newNoteBtn = drawer?.querySelector<HTMLButtonElement>("#drawer-new-note-btn");
+      expect(newNoteBtn).not.toBeNull();
+      expect(newNoteBtn?.textContent).toContain("New note");
+
+      // Click + New note in drawer
+      newNoteBtn?.click();
+      await new Promise((resolve) => setTimeout(resolve, 80));
+
+      // Drawer remains open and morphs into new note composer
+      expect(document.querySelector(".note-peek-drawer")).not.toBeNull();
+      expect(document.querySelector("#note-edit-title")?.textContent).toBe("New note");
+      expect(document.querySelector("#drawer-new-note-form")).not.toBeNull();
+
+      // Textarea is ready
+      const newTextarea = document.querySelector<HTMLTextAreaElement>("#drawer-new-note-form textarea");
+      expect(newTextarea).not.toBeNull();
+      if (newTextarea) newTextarea.value = "Drafted directly inside the drawer canvas";
+
+      // Close drawer via close button
+      const closeBtn = document.querySelector<HTMLButtonElement>(".note-drawer-close");
+      closeBtn?.click();
+      expect(document.querySelector(".note-peek-drawer")).toBeNull();
+    } finally {
+      await noteService.delete(createdNote.id);
+    }
   });
 
   it("keeps note edit modal layout bounded and scrollable for long notes without inline height explosion", async () => {
@@ -371,6 +420,48 @@ describe("Left menu bar icons and navigation", () => {
 
     cancelBtn?.click();
     expect(document.querySelector(".note-edit-dialog")).toBeNull();
+
+    await noteService.delete(longNote.id);
+  });
+
+  it("renders long notes with clamping and opens 2/3 side drawer when clicking expand drawer button", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const longContent = Array.from({ length: 20 }, (_, i) => `- Item ${i + 1}: Important daily task or meeting notes`).join("\n");
+    const longNote = await noteService.create(longContent, today);
+
+    const { renderShell } = await import("./main");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const noteEl = document.getElementById(`note-${longNote.id}`);
+    expect(noteEl).not.toBeNull();
+
+    // Contains prose container with is-clampable class and subtle fade hint
+    const proseContainer = noteEl?.querySelector(".note-prose-container.is-clampable");
+    expect(proseContainer).not.toBeNull();
+    const fadeOverlay = noteEl?.querySelector(".note-fade-overlay");
+    expect(fadeOverlay).not.toBeNull();
+    expect(fadeOverlay?.textContent).toContain("more");
+
+    // Clicking note card opens the side drawer
+    noteEl?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const drawer = document.querySelector(".note-peek-drawer");
+    expect(drawer).not.toBeNull();
+    expect(document.body.classList.contains("has-editor-drawer-open")).toBe(true);
+
+    const form = drawer?.querySelector<HTMLFormElement>("#edit-note-form");
+    expect(form).not.toBeNull();
+    const textarea = form?.querySelector<HTMLTextAreaElement>("textarea.simple-editor-textarea");
+    expect(textarea?.value).toBe(longContent);
+
+    // Cancel closes drawer
+    const cancelBtn = drawer?.querySelector<HTMLButtonElement>("[data-close-dialog]");
+    cancelBtn?.click();
+    expect(document.querySelector(".note-peek-drawer")).toBeNull();
+    expect(document.body.classList.contains("has-editor-drawer-open")).toBe(false);
 
     await noteService.delete(longNote.id);
   });
@@ -2354,12 +2445,17 @@ describe("Left menu bar icons and navigation", () => {
     form?.requestSubmit();
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // Now edit dialog is closed
-    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
+    // Edit dialog stays open after saving changes
+    expect(document.querySelector("#edit-note-backdrop")).not.toBeNull();
 
     // Verify persisted note
     const updated = (await noteService.listAll()).find((n) => n.id === editableNote.id);
     expect(updated?.content).toBe("See [[Reference Target Note]]");
+
+    // Close edit dialog via cancel button
+    const cancelBtn = document.querySelector<HTMLButtonElement>("#edit-note-form [data-close-dialog]");
+    cancelBtn?.click();
+    expect(document.querySelector("#edit-note-backdrop")).toBeNull();
 
     await noteService.delete(targetNote.id);
     await noteService.delete(editableNote.id);
@@ -2481,5 +2577,138 @@ describe("Left menu bar icons and navigation", () => {
     expect(location.search).toContain("date=2026-05-15");
 
     await noteService.delete(noteWithExternal.id);
+  });
+
+  it("supports switching between 1-column and 2-columns notes layout with persistent right editor", async () => {
+    const noteService = new NoteService(new NoteRepository());
+    const today = localTodayIso();
+    const createdNote = await noteService.create("Testing two columns note content", today);
+
+    const { renderShell, setNotesPageLayout, getNotesPageLayout } = await import("./main");
+    setNotesPageLayout("one-column");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    // In 1-column mode, composer is on top of notes list
+    expect(document.querySelector("#notes-two-columns-layout")).toBeNull();
+    const topComposer = document.querySelector(".copilot-input-container");
+    expect(topComposer).not.toBeNull();
+
+    // Toggle layout via header button
+    const toggleBtn = document.querySelector<HTMLButtonElement>("[data-action='toggle-notes-layout']");
+    expect(toggleBtn).not.toBeNull();
+    toggleBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    // Now in 2-columns mode
+    expect(getNotesPageLayout()).toBe("two-columns");
+    const twoColLayout = document.querySelector("#notes-view-split-layout, #notes-two-columns-layout");
+    expect(twoColLayout).not.toBeNull();
+
+    const leftCol = document.querySelector(".notes-stream-pane, .notes-left-column");
+    const rightCol = document.querySelector(".notes-split-panel, .notes-right-column");
+    expect(leftCol).not.toBeNull();
+    expect(rightCol).not.toBeNull();
+
+    // When nothing selected, right panel heading is "New note" with composer
+    const splitHeading = document.querySelector("#split-editor-heading");
+    expect(splitHeading?.textContent).toBe("New note");
+    expect(rightCol?.querySelector("#new-note-form")).not.toBeNull();
+
+    // Click note in left column to edit it in the right panel
+    const noteInLeft = leftCol?.querySelector<HTMLElement>(`#note-${createdNote.id}`);
+    expect(noteInLeft).not.toBeNull();
+    noteInLeft?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Right panel now edits that note
+    expect(document.querySelector("#split-editor-heading")?.textContent).toBe("Edit note");
+    expect(rightCol?.querySelector("#edit-note-form")).not.toBeNull();
+    const textarea = rightCol?.querySelector<HTMLTextAreaElement>("#edit-note-form textarea");
+    expect(textarea?.value).toBe("Testing two columns note content");
+    expect(noteInLeft?.classList.contains("is-selected")).toBe(true);
+
+    // Save changes: should NOT reset to new note mode
+    if (textarea) textarea.value = "Updated note content in 2-column mode";
+    rightCol?.querySelector<HTMLFormElement>("#edit-note-form")?.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Still in Edit note mode on that note
+    expect(document.querySelector("#split-editor-heading")?.textContent).toBe("Edit note");
+    expect(noteInLeft?.classList.contains("is-selected")).toBe(true);
+
+    // Switch back to new note via header button in right panel
+    const newNoteBtn = rightCol?.querySelector<HTMLButtonElement>("#split-new-note-btn, .split-new-btn");
+    expect(newNoteBtn).not.toBeNull();
+    newNoteBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(document.querySelector("#split-editor-heading")?.textContent).toBe("New note");
+    expect(noteInLeft?.classList.contains("is-selected")).toBe(false);
+
+    // Reset layout
+    setNotesPageLayout("one-column");
+    await noteService.delete(createdNote.id);
+  });
+
+  it("shows rotating saving spinner in submit button during save and displays saved confirmation", async () => {
+    const { setBusy } = await import("./main");
+    const form = document.createElement("form");
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.className = "save-btn-rect";
+    btn.innerHTML = "<span>Save changes</span>";
+    form.appendChild(btn);
+    document.body.appendChild(form);
+
+    // Initial state
+    expect(btn.disabled).toBe(false);
+
+    // Set busy (saving in progress)
+    setBusy(form, true);
+    expect(btn.disabled).toBe(true);
+    expect(btn.getAttribute("aria-busy")).toBe("true");
+    expect(btn.classList.contains("is-busy")).toBe(true);
+    expect(btn.querySelector(".save-spinner")).not.toBeNull();
+    expect(btn.textContent).toContain("Saving");
+
+    // Save complete with success message
+    setBusy(form, false, "Saved locally ✓");
+    expect(btn.disabled).toBe(false);
+    expect(btn.getAttribute("aria-busy")).toBeNull();
+    expect(btn.classList.contains("is-busy")).toBe(false);
+    expect(btn.classList.contains("is-saved")).toBe(true);
+    expect(btn.querySelector(".save-success-icon")).not.toBeNull();
+    expect(btn.textContent).toContain("Saved locally ✓");
+
+    form.remove();
+  });
+
+  it("renders floating quick note bar in 1-column layout and opens compose drawer on click or C hotkey", async () => {
+    const { renderShell, setNotesPageLayout } = await import("./main");
+    setNotesPageLayout("one-column");
+    history.pushState({}, "", "/");
+    await renderShell();
+
+    const quickBar = document.getElementById("floating-quick-note-container");
+    expect(quickBar).not.toBeNull();
+
+    const quickBtn = quickBar?.querySelector<HTMLButtonElement>("button[data-action='open-compose-drawer']");
+    expect(quickBtn).not.toBeNull();
+
+    // Click quick note button
+    quickBtn?.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Opens compose drawer
+    const drawer = document.querySelector(".note-peek-drawer");
+    expect(drawer).not.toBeNull();
+    expect(drawer?.querySelector("#note-edit-title")?.textContent).toBe("New note");
+    expect(drawer?.querySelector("#drawer-new-note-form")).not.toBeNull();
+
+    // Clean up
+    const closeBtn = drawer?.querySelector<HTMLButtonElement>(".note-drawer-close");
+    closeBtn?.click();
+    expect(document.querySelector(".note-peek-drawer")).toBeNull();
   });
 });

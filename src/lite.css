@@ -3,6 +3,24 @@
   --font-ui: var(--font-app);
   --font-prose: var(--font-app);
   --font-mono: "SFMono-Regular", ui-monospace, "Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+
+  /* Calm, Minimalist Link & Button Hover Tokens */
+  --link-color: var(--color-text-link, #5B5BD6);
+  --link-color-hover: var(--color-text-link-hover, #4B4BC3);
+  --btn-hover-bg: #E2E8F0;
+  --btn-hover-border: #94A3B8;
+  --btn-hover-text: #0F172A;
+  --btn-hover-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  --link-color: #93C5FD;
+  --link-color-hover: #BFDBFE;
+  --btn-hover-bg: rgba(255, 255, 255, 0.12);
+  --btn-hover-border: rgba(255, 255, 255, 0.28);
+  --btn-hover-text: #FFFFFF;
+  --btn-hover-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Two-Tone Dark Theme: Pitch black left panel, soft matte main reading canvas */
@@ -1164,15 +1182,27 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 }
 
 #page-content {
+  width: 100%;
   max-width: 52rem;
-  margin: 2rem auto 4rem;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+  margin-left: max(1.5rem, calc((100% - 52rem) / 2));
+  margin-right: max(1.5rem, calc((100% - 52rem) / 2));
   padding: 0 1.5rem;
+  box-sizing: border-box;
+  transition: width 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              margin 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              padding 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (max-width: 48rem) {
   #page-content {
+    margin-top: 1.25rem;
+    margin-bottom: 3rem;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0 1rem;
-    margin: 1.25rem auto 3rem;
   }
 }
 
@@ -1354,14 +1384,18 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   gap: 1rem;
   padding: 0.35rem 0;
   min-height: 2.5rem;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
 }
 
 .minimal-date-info {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
   gap: 0.65rem;
   min-width: 0;
+  overflow: hidden;
 }
 
 .minimal-date-title {
@@ -1371,6 +1405,10 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   line-height: 1.25 !important;
   color: var(--color-text-primary, var(--text)) !important;
   letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
 }
 
 .minimal-date-badge {
@@ -1443,9 +1481,30 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 .minimal-nav-btn:hover,
 .minimal-calendar-btn:hover {
-  background: var(--color-bg-surface, var(--surface)) !important;
-  color: var(--color-text-primary, var(--text)) !important;
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+  border-color: var(--btn-hover-border) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.minimal-nav-btn:hover .minimal-nav-svg,
+.minimal-calendar-btn:hover .minimal-nav-svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .minimal-nav-btn:hover,
+:root[data-theme="dark"] .minimal-calendar-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .minimal-nav-btn:hover .minimal-nav-svg,
+:root[data-theme="dark"] .minimal-calendar-btn:hover .minimal-nav-svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 .minimal-nav-svg {
@@ -1912,6 +1971,76 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   font-family: var(--font-app);
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
+}
+
+/* Note Prose Clamping & Drawer Expansion */
+.note-prose-container {
+  position: relative;
+  width: 100%;
+}
+
+:root[data-note-density="compact"] .note-prose-container.is-clampable .prose {
+  max-height: 8.5rem;
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+:root[data-note-density="comfortable"] .note-prose-container.is-clampable .prose,
+:root:not([data-note-density]) .note-prose-container.is-clampable .prose {
+  max-height: 15rem;
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+}
+
+:root[data-note-density="full"] .note-prose-container.is-clampable .prose {
+  max-height: none !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+:root[data-note-density="full"] .note-fade-overlay {
+  display: none !important;
+}
+
+.note {
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.note:hover {
+  border-color: var(--color-border-default, var(--border));
+}
+
+.note-fade-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2.25rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0 0.5rem 0.15rem;
+  pointer-events: none;
+}
+
+.note-fade-hint {
+  font-family: var(--font-app);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted, var(--muted));
+  opacity: 0.55;
+  transition: opacity 140ms ease, color 140ms ease;
+}
+
+.note:hover .note-fade-hint {
+  opacity: 1;
+  color: var(--color-brand, var(--accent));
 }
 
 .notes-list .note .prose {
@@ -2462,22 +2591,48 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 
 /* Individual button style is visible ONLY when hovering that specific button */
 .note-quick-action-btn:hover {
-  background: var(--color-bg-surface-sunken, var(--surface-sunk));
-  border-color: var(--color-border-subtle, var(--border));
-  color: var(--color-text-primary, var(--text));
-  box-shadow: none;
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.note-quick-action-btn:hover svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
 }
 
 .note-quick-action-btn.copy-btn:hover,
 .note-quick-action-btn.edit-btn:hover {
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  color: var(--color-brand);
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  background: var(--btn-hover-bg) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
 }
 
 .note-quick-action-btn.delete-btn:hover {
-  background: var(--color-danger-bg);
-  border-color: color-mix(in srgb, var(--color-danger) 30%, transparent);
-  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger, #E25555) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-danger, #E25555) 35%, transparent) !important;
+  color: var(--color-danger, #E25555) !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn.copy-btn:hover,
+:root[data-theme="dark"] .note-quick-action-btn.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn.delete-btn:hover {
+  background: rgba(248, 113, 113, 0.14) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+  color: #F87171 !important;
 }
 
 .note-quick-action-btn.is-copied {
@@ -2803,6 +2958,684 @@ body.app .sidebar-support-toggle:hover .nav-svg,
   z-index: 1300;
 }
 
+/* ========================================================================= */
+/* Two-Columns Split Layout (Todos-Style Smoothness & Full-Height Editor)    */
+/* ========================================================================= */
+
+.notes-layout-toggle-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+}
+
+:root[data-notes-layout="two-columns"] html,
+:root[data-notes-layout="two-columns"] body.app {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+:root[data-notes-layout="two-columns"] body.app .main-layout {
+  height: 100vh !important;
+  height: 100svh !important;
+  max-height: 100vh !important;
+  max-height: 100svh !important;
+  overflow: hidden !important;
+}
+
+:root[data-notes-layout="two-columns"] body.app .shell {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  margin-left: var(--sidebar-collapsed-width, 64px) !important;
+  width: calc(100% - var(--sidebar-collapsed-width, 64px)) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+:root[data-notes-layout="two-columns"]:not(.sidebar-collapsed) body.app .shell {
+  margin-left: var(--sidebar-expanded-width, 264px) !important;
+  width: calc(100% - var(--sidebar-expanded-width, 264px)) !important;
+}
+
+:root[data-notes-layout="two-columns"] #page-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.notes-view-split-layout,
+.notes-two-columns-layout {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  position: relative;
+}
+
+/* Left Pane: 1/3 daily notes stream */
+.notes-stream-pane,
+.notes-left-column {
+  flex: 0 0 34% !important;
+  width: 34% !important;
+  max-width: 34% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 1.5rem 1.25rem 4rem 1.5rem !important;
+  box-sizing: border-box !important;
+  background: var(--color-bg-app, var(--surface-sunk)) !important;
+  border-right: 1px solid var(--color-border-subtle, var(--border)) !important;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              width 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.notes-stream-pane .notes-day-header,
+.notes-left-column .notes-day-header {
+  margin-bottom: 1.25rem !important;
+}
+
+.notes-stream-pane .notes-list,
+.notes-left-column .notes-list {
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notes-stream-pane .note,
+.notes-left-column .note {
+  cursor: pointer;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  border: 1px solid var(--color-border-default, var(--border));
+  border-radius: var(--radius-md, 10px);
+  padding: 0.95rem 1.15rem !important;
+  transition: border-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.notes-stream-pane .note:hover,
+.notes-left-column .note:hover {
+  border-color: var(--color-brand, var(--accent)) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Prominent selected note styling matching the todos section */
+.notes-stream-pane .note.is-selected,
+.notes-left-column .note.is-selected {
+  border-color: color-mix(in srgb, var(--color-brand) 65%, var(--color-border-default, var(--border))) !important;
+  background: color-mix(in srgb, var(--color-brand) 7%, var(--color-bg-surface, var(--surface))) !important;
+  box-shadow: inset 4px 0 0 var(--color-brand, #2563eb), 0 2px 8px color-mix(in srgb, var(--color-brand) 15%, transparent) !important;
+  transform: none !important;
+}
+
+/* Right Pane: 2/3 Full-Height Dedicated Editor Panel */
+.notes-split-panel,
+.notes-right-column {
+  flex: 1 1 0% !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--color-bg-surface, #ffffff) !important;
+  border-top: 3px solid var(--color-brand, #2563eb) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  animation: panelContentFade 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-theme="dark"] .notes-split-panel,
+:root[data-theme="dark"] .notes-right-column {
+  background: #18181d !important;
+  border-top: 3px solid var(--color-brand, #3b82f6) !important;
+}
+
+@keyframes panelContentFade {
+  from {
+    opacity: 0.85;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notes-split-panel-header,
+.split-pane-header {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1rem;
+  padding: 1rem 1.75rem 0.9rem !important;
+  border-bottom: 1px solid var(--color-border-default, rgba(0, 0, 0, 0.08)) !important;
+  background: var(--color-bg-surface, #ffffff) !important;
+  box-sizing: border-box !important;
+}
+
+:root[data-theme="dark"] .notes-split-panel-header,
+:root[data-theme="dark"] .split-pane-header {
+  background: #1d1d23 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.notes-split-panel-kicker,
+.split-pane-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.notes-split-kicker-dot,
+.split-pane-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--color-brand, #2563eb);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand, #2563eb) 20%, transparent);
+  flex-shrink: 0;
+}
+
+.notes-split-panel-title,
+.split-pane-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary, var(--text));
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.notes-split-panel-meta,
+.split-pane-submeta {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, var(--muted));
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notes-split-panel-actions,
+.split-pane-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notes-split-btn,
+.split-new-note-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-primary, var(--text));
+  background: var(--color-bg-surface, var(--surface));
+  border: 1px solid var(--color-border-subtle, var(--border));
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.notes-split-btn:hover,
+.split-new-note-btn:hover {
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  background: var(--btn-hover-bg) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.notes-split-btn:hover span,
+.split-new-note-btn:hover span {
+  color: var(--btn-hover-text) !important;
+}
+
+.notes-split-btn:hover svg,
+.split-new-note-btn:hover svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .notes-split-btn:hover,
+:root[data-theme="dark"] .split-new-note-btn:hover {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+:root[data-theme="dark"] .notes-split-btn:hover span,
+:root[data-theme="dark"] .split-new-note-btn:hover span {
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .notes-split-btn:hover svg,
+:root[data-theme="dark"] .split-new-note-btn:hover svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.notes-split-panel-body,
+.split-pane-editor-form-host {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.notes-split-panel-body form.editor-card,
+.split-pane-editor-form-host form.editor-card {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.notes-split-panel-body .simple-editor-toolbar,
+.split-pane-editor-form-host .simple-editor-toolbar {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.75rem 1.75rem !important;
+  border-top: 0 !important;
+  border-bottom: 1px solid var(--color-border-subtle, var(--border)) !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  opacity: 1 !important;
+  box-sizing: border-box !important;
+}
+
+.notes-split-panel-body textarea.simple-editor-textarea,
+.notes-split-panel-body .editor-preview,
+.split-pane-editor-form-host textarea.simple-editor-textarea,
+.split-pane-editor-form-host .editor-preview {
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+  width: 100% !important;
+  padding: 1.5rem 2rem !important;
+  font-family: var(--font-app) !important;
+  font-size: 1.05rem !important;
+  line-height: 1.75 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  resize: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+}
+
+.notes-split-panel-body .simple-editor-footer,
+.split-pane-editor-form-host .simple-editor-footer {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.85rem 1.75rem !important;
+  border-top: 1px solid var(--color-border-subtle, var(--border)) !important;
+  background: color-mix(in srgb, var(--color-bg-surface-sunken, var(--surface-sunk)) 35%, var(--color-bg-surface, var(--surface))) !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 48rem) {
+  :root[data-notes-layout="two-columns"] #page-content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .notes-view-split-layout,
+  .notes-two-columns-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .notes-stream-pane,
+  .notes-left-column {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border-subtle, var(--border));
+    padding: 1rem;
+  }
+
+  .notes-split-panel,
+  .notes-right-column {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 36rem;
+  }
+}
+
+/* Slide-Over Side Drawer Note Editor (2/3 Editor, 1/3 Notes List, Zero Blur) */
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) #page-content {
+  width: calc(100% * 1 / 3) !important;
+  max-width: calc(100% * 1 / 3) !important;
+  margin-top: 2rem !important;
+  margin-bottom: 4rem !important;
+  margin-left: 0 !important;
+  margin-right: calc(100% * 2 / 3) !important;
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+  box-sizing: border-box !important;
+  transition: width 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              margin 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              padding 320ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .notes-list {
+  width: 100% !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .note {
+  padding: 0.95rem 1.1rem !important;
+}
+
+/* Compact Single-Line Date Header in Contracted Left Stream */
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .notes-day-header.minimal-date-header.typewriter-masthead {
+  padding-bottom: 0.45rem !important;
+  margin-bottom: 0.85rem !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-date-bar {
+  gap: 0.45rem !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-date-info,
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-date-info.typewriter-kicker-row {
+  gap: 0.35rem !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-date-title,
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-date-title.typewriter-kicker-label {
+  font-size: 0.68rem !important;
+  letter-spacing: 0.05em !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-date-badge {
+  height: 1.15rem !important;
+  padding: 0 0.35rem !important;
+  font-size: 0.62rem !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-date-nav {
+  gap: 1px !important;
+  padding: 1px !important;
+  flex-shrink: 0 !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-nav-btn,
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-calendar-btn {
+  width: 1.6rem !important;
+  height: 1.6rem !important;
+}
+
+body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) .minimal-nav-svg {
+  width: 0.82rem !important;
+  height: 0.82rem !important;
+}
+
+#edit-note-backdrop.note-drawer-backdrop,
+#edit-note-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root.sidebar-collapsed #edit-note-backdrop {
+  left: var(--sidebar-collapsed-width, 64px) !important;
+}
+
+:root:not(.sidebar-collapsed) #edit-note-backdrop {
+  left: var(--sidebar-expanded-width, 264px) !important;
+}
+
+@media (max-width: 60rem) {
+  #edit-note-backdrop {
+    left: 0 !important;
+  }
+}
+
+#edit-note-backdrop .note-edit-dialog.note-peek-drawer,
+#edit-note-backdrop .note-edit-dialog {
+  width: calc(100% * 2 / 3) !important;
+  max-width: calc(100% * 2 / 3) !important;
+  height: 100vh !important;
+  height: 100svh !important;
+  max-height: 100vh !important;
+  max-height: 100svh !important;
+  border-radius: 0 !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  border-left: 1px solid var(--color-border-default, rgba(0, 0, 0, 0.12)) !important;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.08), -24px 0 64px rgba(0, 0, 0, 0.04) !important;
+  animation: drawer-slide-in 320ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  box-sizing: border-box !important;
+  will-change: transform;
+}
+
+#edit-note-backdrop.is-closing .note-edit-dialog.note-peek-drawer,
+#edit-note-backdrop.is-closing .note-edit-dialog {
+  animation: drawer-slide-out 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+:root[data-theme="dark"] #edit-note-backdrop .note-edit-dialog.note-peek-drawer,
+:root[data-theme="dark"] #edit-note-backdrop .note-edit-dialog {
+  border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: -8px 0 36px rgba(0, 0, 0, 0.7), -24px 0 72px rgba(0, 0, 0, 0.45) !important;
+}
+
+@keyframes drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.note-drawer-head {
+  padding: 0.95rem 1.5rem !important;
+  border-top: 3px solid var(--color-brand, #2563eb) !important;
+}
+
+.note-drawer-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.note-drawer-form {
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  height: 100% !important;
+}
+
+.note-drawer-form .editor-card,
+.note-drawer-form .editor-card-modal {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.note-drawer-form .simple-editor-textarea {
+  min-height: 12rem;
+  padding: 1.25rem 1.65rem !important;
+  font-family: var(--font-app);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.note-drawer-form .editor-preview {
+  padding: 1.25rem 1.65rem !important;
+}
+
+.note-drawer-form .simple-editor-toolbar {
+  padding: 0.65rem 1.5rem !important;
+}
+
+.note-drawer-form .simple-editor-footer {
+  padding: 0.85rem 1.5rem !important;
+}
+
+@media (max-width: 48rem) {
+  body.has-editor-drawer-open:not(:has(#edit-note-backdrop.is-closing)) #page-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  #edit-note-backdrop.note-drawer-backdrop,
+  #edit-note-backdrop {
+    left: 0 !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  #edit-note-backdrop .note-edit-dialog.note-peek-drawer,
+  #edit-note-backdrop .note-edit-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 75vh !important;
+    height: 75svh !important;
+    max-height: 75svh !important;
+    border-radius: 16px 16px 0 0 !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--color-border-default, var(--border)) !important;
+    animation: drawer-sheet-up 320ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  #edit-note-backdrop.is-closing .note-edit-dialog.note-peek-drawer,
+  #edit-note-backdrop.is-closing .note-edit-dialog {
+    animation: drawer-sheet-down 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes drawer-sheet-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes drawer-sheet-down {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+}
+
+body.is-zen-mode #edit-note-backdrop {
+  left: 0 !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 1.5rem !important;
+  background: rgba(0, 0, 0, 0.88) !important;
+}
+
+body.is-zen-mode #edit-note-backdrop .note-edit-dialog {
+  width: min(52rem, 100%) !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  border-radius: var(--radius-lg, 12px) !important;
+  border: 1px solid var(--color-border-default, var(--border)) !important;
+  animation: none !important;
+}
+
 @keyframes modal-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -2922,9 +3755,15 @@ body.app .sidebar-support-toggle:hover .nav-svg,
 }
 
 .note-edit-close:hover {
-  background: var(--color-bg-hover, var(--surface-sunk));
-  border-color: var(--color-border-subtle, var(--border));
-  color: var(--color-text-primary, var(--text));
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .note-edit-close:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #FFFFFF !important;
 }
 
 .dialog-close-svg {
@@ -3296,9 +4135,20 @@ button.editor-template-item:hover {
 }
 
 .wikilink:hover {
-  color: var(--color-brand, #2563eb) !important;
-  text-decoration-color: var(--color-brand, #2563eb);
-  background: color-mix(in srgb, var(--color-brand, #2563eb) 10%, transparent);
+  color: var(--link-color-hover) !important;
+  text-decoration-color: var(--link-color-hover);
+  background: color-mix(in srgb, var(--link-color) 12%, transparent);
+}
+
+:root[data-theme="dark"] .wikilink {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(147, 197, 253, 0.4);
+}
+
+:root[data-theme="dark"] .wikilink:hover {
+  color: #FFFFFF !important;
+  text-decoration-color: #93C5FD;
+  background: rgba(147, 197, 253, 0.14) !important;
 }
 
 .wikilink.wikilink-date {
@@ -3343,22 +4193,40 @@ button.editor-template-item:hover {
 }
 
 .wikilink.wikilink-unresolved:hover {
-  color: var(--color-brand, #2563eb) !important;
+  color: var(--link-color) !important;
   text-decoration: underline dashed;
-  text-decoration-color: var(--color-brand, #2563eb);
+  text-decoration-color: var(--link-color);
   opacity: 1;
-  background: color-mix(in srgb, var(--color-brand, #2563eb) 8%, transparent);
+  background: color-mix(in srgb, var(--link-color) 8%, transparent);
+}
+
+:root[data-theme="dark"] .wikilink.wikilink-unresolved:hover {
+  color: #93C5FD !important;
+  text-decoration-color: #93C5FD;
+  background: rgba(147, 197, 253, 0.08) !important;
 }
 
 .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge) {
-  color: var(--color-brand, #2563eb);
+  color: var(--link-color);
   text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color 120ms ease;
+  text-decoration-color: color-mix(in srgb, var(--link-color) 40%, transparent);
+  text-underline-offset: 2.5px;
+  transition: color 120ms ease, text-decoration-color 120ms ease;
 }
 
 .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge):hover {
-  color: var(--color-brand-hover, #1d4ed8);
+  color: var(--link-color-hover);
+  text-decoration-color: var(--link-color-hover);
+}
+
+:root[data-theme="dark"] .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge) {
+  color: #93C5FD;
+  text-decoration-color: rgba(147, 197, 253, 0.4);
+}
+
+:root[data-theme="dark"] .prose a:not(.wikilink):not(.backlink-date-badge):not(.tag-pill):not(.mention-date-badge):hover {
+  color: #BFDBFE;
+  text-decoration-color: #BFDBFE;
 }
 
 /* Note Backlinks Section inside note cards */
@@ -3436,8 +4304,16 @@ button.editor-template-item:hover {
 
 .backlink-date-badge:hover,
 .mention-date-badge:hover {
-  color: var(--color-brand, #2563eb) !important;
-  border-color: var(--color-brand, #2563eb) !important;
+  color: var(--btn-hover-text) !important;
+  border-color: var(--btn-hover-border) !important;
+  background: var(--btn-hover-bg) !important;
+}
+
+:root[data-theme="dark"] .backlink-date-badge:hover,
+:root[data-theme="dark"] .mention-date-badge:hover {
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .backlink-snippet-rendered,
@@ -4075,64 +4951,506 @@ textarea.simple-editor-textarea.is-hidden,
   margin-left: auto;
 }
 
+/* ==========================================================================
+   UNIFIED BUTTON DESIGN SYSTEM
+   Standardized Geometry, Motion, and Contrast across All Tiers
+   ========================================================================== */
+
+/* 1. Primary Buttons */
+.btn-primary,
+.save-btn-rect,
+.folder-modal-btn.btn-save,
+#generate-summary,
+button.primary-button,
+button.btn-primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 0.95rem !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--color-brand, #5B5BD6) !important;
+  color: #FFFFFF !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.btn-primary:hover:not(:disabled),
+.save-btn-rect:hover:not(:disabled),
+.folder-modal-btn.btn-save:hover:not(:disabled),
+#generate-summary:hover:not(:disabled),
+button.primary-button:hover:not(:disabled),
+button.btn-primary:hover:not(:disabled) {
+  background: var(--color-brand-hover, #4B4BC3) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(91, 91, 214, 0.25) !important;
+}
+
+.btn-primary:hover:not(:disabled) span,
+.btn-primary:hover:not(:disabled) svg,
+.save-btn-rect:hover:not(:disabled) span,
+.save-btn-rect:hover:not(:disabled) svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.btn-primary:active:not(:disabled),
+.save-btn-rect:active:not(:disabled),
+.folder-modal-btn.btn-save:active:not(:disabled),
+#generate-summary:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+:root[data-theme="dark"] .btn-primary,
+:root[data-theme="dark"] .save-btn-rect,
+:root[data-theme="dark"] .folder-modal-btn.btn-save,
+:root[data-theme="dark"] #generate-summary {
+  background: #FFFFFF !important;
+  color: #09090b !important;
+}
+
+:root[data-theme="dark"] .btn-primary:hover:not(:disabled),
+:root[data-theme="dark"] .save-btn-rect:hover:not(:disabled),
+:root[data-theme="dark"] .folder-modal-btn.btn-save:hover:not(:disabled),
+:root[data-theme="dark"] #generate-summary:hover:not(:disabled) {
+  background: #E4E4E7 !important;
+  color: #09090b !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15) !important;
+}
+
+:root[data-theme="dark"] .btn-primary:hover:not(:disabled) span,
+:root[data-theme="dark"] .btn-primary:hover:not(:disabled) svg,
+:root[data-theme="dark"] .save-btn-rect:hover:not(:disabled) span,
+:root[data-theme="dark"] .save-btn-rect:hover:not(:disabled) svg {
+  color: #09090b !important;
+  stroke: #09090b !important;
+}
+
+/* 2. Secondary & Surface Buttons */
+.btn-secondary,
+.secondary-button,
+.notes-split-btn,
+.split-new-note-btn,
+.folder-modal-btn.btn-ghost,
+.privacy-toast-btn,
+.summary-document-actions .secondary-button,
+.ai-actions-row .secondary-button,
 .editor-modal-actions .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.1rem;
-  height: 2.1rem;
-  padding: 0 0.85rem;
-  border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: 5px;
-  background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-secondary, var(--text-soft));
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 120ms ease;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 0.85rem !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
 }
 
-.editor-modal-actions .btn-secondary:hover {
-  background: var(--color-bg-hover, var(--surface-sunk));
-  border-color: var(--color-border-default, var(--border));
-  color: var(--color-text-primary, var(--text));
+.btn-secondary:hover:not(:disabled),
+.secondary-button:hover:not(:disabled),
+.notes-split-btn:hover:not(:disabled),
+.split-new-note-btn:hover:not(:disabled),
+.folder-modal-btn.btn-ghost:hover:not(:disabled),
+.privacy-toast-btn:hover:not(:disabled),
+.summary-document-actions .secondary-button:hover:not(:disabled),
+.ai-actions-row .secondary-button:hover:not(:disabled),
+.editor-modal-actions .btn-secondary:hover:not(:disabled) {
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
 }
 
-.editor-modal-actions .save-btn-rect {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  min-height: 2.1rem;
-  height: 2.1rem;
-  padding: 0 0.95rem;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-  font-size: 0.78rem;
-  font-weight: 600;
-  box-shadow: none;
-  cursor: pointer;
-  transition: all 120ms ease;
+.btn-secondary:hover:not(:disabled) span,
+.btn-secondary:hover:not(:disabled) svg,
+.secondary-button:hover:not(:disabled) span,
+.secondary-button:hover:not(:disabled) svg,
+.notes-split-btn:hover:not(:disabled) span,
+.notes-split-btn:hover:not(:disabled) svg,
+.split-new-note-btn:hover:not(:disabled) span,
+.split-new-note-btn:hover:not(:disabled) svg,
+.privacy-toast-btn:hover:not(:disabled) span,
+.privacy-toast-btn:hover:not(:disabled) svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
 }
 
-.editor-modal-actions .save-btn-rect:hover:not(:disabled) {
-  background: var(--color-brand-hover);
+.btn-secondary:active:not(:disabled),
+.secondary-button:active:not(:disabled),
+.notes-split-btn:active:not(:disabled),
+.split-new-note-btn:active:not(:disabled),
+.privacy-toast-btn:active:not(:disabled) {
+  transform: scale(0.97) !important;
 }
 
-.editor-modal-actions .save-btn-rect:active:not(:disabled) {
-  transform: scale(0.98);
+:root[data-theme="dark"] .btn-secondary,
+:root[data-theme="dark"] .secondary-button,
+:root[data-theme="dark"] .notes-split-btn,
+:root[data-theme="dark"] .split-new-note-btn,
+:root[data-theme="dark"] .folder-modal-btn.btn-ghost,
+:root[data-theme="dark"] .privacy-toast-btn,
+:root[data-theme="dark"] .summary-document-actions .secondary-button,
+:root[data-theme="dark"] .ai-actions-row .secondary-button,
+:root[data-theme="dark"] .editor-modal-actions .btn-secondary {
+  background: var(--color-bg-surface, #1e1e22) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #F4F4F5 !important;
+  box-shadow: none !important;
 }
 
-.save-btn-rect:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
+:root[data-theme="dark"] .btn-secondary:hover:not(:disabled),
+:root[data-theme="dark"] .secondary-button:hover:not(:disabled),
+:root[data-theme="dark"] .notes-split-btn:hover:not(:disabled),
+:root[data-theme="dark"] .split-new-note-btn:hover:not(:disabled),
+:root[data-theme="dark"] .folder-modal-btn.btn-ghost:hover:not(:disabled),
+:root[data-theme="dark"] .privacy-toast-btn:hover:not(:disabled),
+:root[data-theme="dark"] .summary-document-actions .secondary-button:hover:not(:disabled),
+:root[data-theme="dark"] .ai-actions-row .secondary-button:hover:not(:disabled),
+:root[data-theme="dark"] .editor-modal-actions .btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+:root[data-theme="dark"] .btn-secondary:hover:not(:disabled) span,
+:root[data-theme="dark"] .btn-secondary:hover:not(:disabled) svg,
+:root[data-theme="dark"] .secondary-button:hover:not(:disabled) span,
+:root[data-theme="dark"] .secondary-button:hover:not(:disabled) svg,
+:root[data-theme="dark"] .notes-split-btn:hover:not(:disabled) span,
+:root[data-theme="dark"] .notes-split-btn:hover:not(:disabled) svg,
+:root[data-theme="dark"] .split-new-note-btn:hover:not(:disabled) span,
+:root[data-theme="dark"] .split-new-note-btn:hover:not(:disabled) svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+/* 3. Ghost & Icon Buttons */
+.note-quick-action-btn,
+.minimal-nav-btn,
+.minimal-calendar-btn,
+.today-jump-btn,
+.note-edit-close,
+.note-drawer-close,
+.folder-modal-close,
+.privacy-toast-close,
+.todo-panel-btn,
+.copy-code-btn,
+.sidebar-search-btn,
+.sidebar-collapse-button,
+.mobile-sidebar-open,
+.editor-mode-btn,
+.back-to-top-link,
+.simple-editor-toolbar button[data-format] {
+  border-radius: var(--radius-sm, 6px) !important;
+  border: 1px solid transparent !important;
+  background: transparent;
+  color: var(--color-icon-secondary, #667085);
+  cursor: pointer !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.note-quick-action-btn:hover,
+.minimal-nav-btn:hover,
+.minimal-calendar-btn:hover,
+.today-jump-btn:hover,
+.note-edit-close:hover,
+.note-drawer-close:hover,
+.folder-modal-close:hover,
+.privacy-toast-close:hover,
+.todo-panel-btn:hover,
+.copy-code-btn:hover,
+.sidebar-search-btn:hover,
+.sidebar-collapse-button:hover,
+.mobile-sidebar-open:hover,
+.editor-mode-btn:hover,
+.back-to-top-link:hover,
+.simple-editor-toolbar button[data-format]:hover {
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.note-quick-action-btn:hover svg,
+.minimal-nav-btn:hover svg,
+.minimal-calendar-btn:hover svg,
+.note-edit-close:hover svg,
+.note-drawer-close:hover svg,
+.folder-modal-close:hover svg,
+.privacy-toast-close:hover svg,
+.todo-panel-btn:hover svg,
+.copy-code-btn:hover svg,
+.sidebar-search-btn:hover svg,
+.editor-mode-btn:hover svg,
+.back-to-top-link:hover svg,
+.simple-editor-toolbar button[data-format]:hover svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+.note-quick-action-btn:active,
+.minimal-nav-btn:active,
+.minimal-calendar-btn:active,
+.note-edit-close:active,
+.note-drawer-close:active,
+.todo-panel-btn:active,
+.copy-code-btn:active {
+  transform: scale(0.96) !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn:hover,
+:root[data-theme="dark"] .minimal-nav-btn:hover,
+:root[data-theme="dark"] .minimal-calendar-btn:hover,
+:root[data-theme="dark"] .today-jump-btn:hover,
+:root[data-theme="dark"] .note-edit-close:hover,
+:root[data-theme="dark"] .note-drawer-close:hover,
+:root[data-theme="dark"] .folder-modal-close:hover,
+:root[data-theme="dark"] .privacy-toast-close:hover,
+:root[data-theme="dark"] .todo-panel-btn:hover,
+:root[data-theme="dark"] .copy-code-btn:hover,
+:root[data-theme="dark"] .sidebar-search-btn:hover,
+:root[data-theme="dark"] .sidebar-collapse-button:hover,
+:root[data-theme="dark"] .mobile-sidebar-open:hover,
+:root[data-theme="dark"] .editor-mode-btn:hover,
+:root[data-theme="dark"] .back-to-top-link:hover,
+:root[data-theme="dark"] .simple-editor-toolbar button[data-format]:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn:hover svg,
+:root[data-theme="dark"] .minimal-nav-btn:hover svg,
+:root[data-theme="dark"] .minimal-calendar-btn:hover svg,
+:root[data-theme="dark"] .note-edit-close:hover svg,
+:root[data-theme="dark"] .note-drawer-close:hover svg,
+:root[data-theme="dark"] .folder-modal-close:hover svg,
+:root[data-theme="dark"] .privacy-toast-close:hover svg,
+:root[data-theme="dark"] .todo-panel-btn:hover svg,
+:root[data-theme="dark"] .copy-code-btn:hover svg,
+:root[data-theme="dark"] .sidebar-search-btn:hover svg,
+:root[data-theme="dark"] .editor-mode-btn:hover svg,
+:root[data-theme="dark"] .back-to-top-link:hover svg,
+:root[data-theme="dark"] .simple-editor-toolbar button[data-format]:hover svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.save-btn-rect:disabled,
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .save-icon-svg {
   width: 0.95rem;
   height: 0.95rem;
+}
+
+/* Saving Micro-Spinner & Saved State on Submit Buttons */
+.save-spinner {
+  width: 0.9rem;
+  height: 0.9rem;
+  animation: saveSpin 650ms linear infinite;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+@keyframes saveSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.save-success-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  vertical-align: middle;
+  stroke: currentColor;
+}
+
+button[type="submit"].is-busy,
+.save-btn-rect.is-busy {
+  opacity: 0.88 !important;
+  cursor: wait !important;
+  pointer-events: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+}
+
+button[type="submit"].is-saved,
+.save-btn-rect.is-saved {
+  background: color-mix(in srgb, #10b981 16%, var(--color-bg-surface, var(--surface))) !important;
+  border-color: #10b981 !important;
+  color: #059669 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.45rem !important;
+  transition: all 160ms ease !important;
+}
+
+:root[data-theme="dark"] button[type="submit"].is-saved,
+:root[data-theme="dark"] .save-btn-rect.is-saved {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #10b981 !important;
+  color: #34d399 !important;
+}
+
+/* Floating Bottom Quick Note Bar */
+.floating-quick-note-container {
+  position: fixed;
+  bottom: 2.25rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 500;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  animation: floatingBarEntrance 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+}
+
+:root[data-notes-layout="two-columns"] .floating-quick-note-container {
+  display: none !important;
+}
+
+body.has-editor-drawer-open .floating-quick-note-container,
+body:has(#edit-note-backdrop) .floating-quick-note-container,
+body:has(.link-picker-dialog) .floating-quick-note-container,
+body:has(.lite-confirm-dialog) .floating-quick-note-container,
+body:has(.command-palette) .floating-quick-note-container {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translate(-50%, 16px) !important;
+}
+
+@keyframes floatingBarEntrance {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.floating-quick-note-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem 0.55rem 1rem;
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-default, rgba(0, 0, 0, 0.12));
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+  color: var(--color-text-primary, var(--text));
+  font-family: var(--font-app);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+:root[data-theme="dark"] .floating-quick-note-btn {
+  background: rgba(30, 30, 36, 0.92);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.floating-quick-note-btn:hover {
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  background: var(--btn-hover-bg) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.floating-quick-note-btn:hover span,
+.floating-quick-note-btn:hover .floating-quick-kbd {
+  color: var(--btn-hover-text) !important;
+}
+
+.floating-quick-note-btn:hover .floating-quick-icon {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+:root[data-theme="dark"] .floating-quick-note-btn:hover {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  background: rgba(42, 42, 48, 0.98) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+:root[data-theme="dark"] .floating-quick-note-btn:hover span,
+:root[data-theme="dark"] .floating-quick-note-btn:hover .floating-quick-kbd,
+:root[data-theme="dark"] .floating-quick-note-btn:hover .floating-quick-icon {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.floating-quick-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  stroke-width: 2.25;
+}
+
+.floating-quick-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: var(--color-bg-surface-sunken, rgba(0, 0, 0, 0.06));
+  border: 1px solid var(--color-border-subtle, rgba(0, 0, 0, 0.08));
+  color: var(--color-text-muted, var(--muted));
+  margin-left: 0.2rem;
 }
 
 @media (max-width: 40rem) {
@@ -4201,10 +5519,48 @@ textarea.simple-editor-textarea.is-hidden,
 
 a.tag-pill:hover,
 .notes-list a.tag-pill:hover {
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  background: var(--color-bg-selected);
-  color: var(--color-brand);
+  border-color: var(--btn-hover-border) !important;
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
   text-decoration: none;
+}
+
+:root[data-theme="dark"] a.tag-pill:hover,
+:root[data-theme="dark"] .notes-list a.tag-pill:hover {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.inspiration-chip:hover {
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.inspiration-chip:hover span {
+  color: var(--btn-hover-text) !important;
+}
+
+.inspiration-chip:hover .inspiration-svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="dark"] .inspiration-chip:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+}
+
+:root[data-theme="dark"] .inspiration-chip:hover span,
+:root[data-theme="dark"] .inspiration-chip:hover .inspiration-svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 .empty-notes .empty-notes-illustration {
@@ -4410,6 +5766,98 @@ a.tag-pill:hover,
   background: transparent !important;
   border-bottom-left-radius: 11px !important;
   border-bottom-right-radius: 11px !important;
+}
+
+/* ========================================================================= */
+/* Two-Columns Mode: Split Panel Full-Height Editor Overrides                 */
+/* Eliminates rounded corners, card borders, and collapsed ghost sizes       */
+/* ========================================================================= */
+
+.notes-split-panel #new-note-form,
+.notes-split-panel #edit-note-form,
+.notes-split-panel form.editor-card {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  position: static !important;
+  overflow: hidden !important;
+}
+
+.notes-split-panel #new-note-form:focus-within,
+.notes-split-panel #edit-note-form:focus-within {
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.notes-split-panel #new-note-form .simple-editor-toolbar,
+.notes-split-panel #edit-note-form .simple-editor-toolbar {
+  order: 1 !important;
+  display: flex !important;
+  opacity: 1 !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.75rem 1.75rem !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-radius: 0 !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  box-sizing: border-box !important;
+}
+
+.notes-split-panel #new-note-form .simple-editor-footer,
+.notes-split-panel #edit-note-form .simple-editor-footer {
+  order: 3 !important;
+  display: flex !important;
+  opacity: 1 !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.85rem 1.75rem !important;
+  border-top: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-bottom: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--color-bg-surface-sunken, var(--surface-sunk)) 35%, var(--color-bg-surface, var(--surface))) !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.notes-split-panel #new-note-form textarea.simple-editor-textarea,
+.notes-split-panel #edit-note-form textarea.simple-editor-textarea,
+.notes-split-panel .editor-preview {
+  order: 2 !important;
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+  width: 100% !important;
+  padding: 1.5rem 2rem !important;
+  font-family: var(--font-app) !important;
+  font-size: 1.05rem !important;
+  line-height: 1.75 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-primary, var(--text)) !important;
+  resize: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
 }
 
 .copilot-input-container .editor-card:focus-within {
@@ -7332,34 +8780,36 @@ mark.palette-highlight {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-height: 2.2rem !important;
-  padding: 0.45rem 1.15rem !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 1.15rem !important;
   border: 1px solid transparent !important;
   border-radius: var(--radius-sm, 6px) !important;
   background: var(--color-danger, #E25555) !important;
   color: #ffffff !important;
-  font-family: var(--font-ui) !important;
-  font-size: 0.85rem !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.8rem !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   box-shadow: none !important;
-  transition: all 120ms ease !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.btn-danger-confirm:hover {
+.btn-danger-confirm:hover:not(:disabled) {
   background: var(--color-danger-hover, #c93b3b) !important;
   color: #ffffff !important;
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(226, 85, 85, 0.28) !important;
 }
 
-.btn-danger-confirm:active {
-  transform: scale(0.98) !important;
+.btn-danger-confirm:active:not(:disabled) {
+  transform: scale(0.97) !important;
 }
 
 .btn-danger-confirm:disabled {
-  opacity: 0.6 !important;
+  opacity: 0.5 !important;
   pointer-events: none !important;
+  transform: none !important;
 }
 
 :root[data-theme="dark"] .btn-danger-confirm {
@@ -7367,9 +8817,11 @@ mark.palette-highlight {
   color: #ffffff !important;
 }
 
-:root[data-theme="dark"] .btn-danger-confirm:hover {
+:root[data-theme="dark"] .btn-danger-confirm:hover:not(:disabled) {
   background: #f87171 !important;
-  color: #09090b !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(248, 113, 113, 0.35) !important;
 }
 
 .todo-group-tabs {

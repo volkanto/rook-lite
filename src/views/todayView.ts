@@ -25,7 +25,8 @@ import {
   setEditorMode,
   updateEditorWordCount
 } from "../editor/toolbar";
-import { setCalendarRefresher, showConfirm, showEditDialog, showLinkPickerModal } from "../editor/modals";
+import { setCalendarRefresher, setSplitEditorRestorer, setSplitNoteSelector, showComposeDrawer, showConfirm, showEditDialog, showLinkPickerModal } from "../editor/modals";
+import { getNotesPageLayout, setNotesPageLayout } from "../notesLayout";
 import { renderRoute } from "../router";
 
 let draftTimer: number | undefined;
@@ -185,9 +186,20 @@ export async function renderToday(content: HTMLElement): Promise<void> {
   const isEmptyDayCanvas = !hasDayNotes && !isFiltered;
   const sectionHead = hasDayNotes ? `<div class="section-head"><div class="notes-panel-heading"><h2 id="day-notes-title">${s.notesTitle}</h2><span class="notes-count-badge">${visibleNotes.length} ${visibleNotes.length === 1 ? s.entrySingle : s.entryPlural}</span></div><div class="notes-head-controls"><div class="notes-filter-bar">${folderControl}${tagControl}</div></div></div>` : "";
 
-  const dateHeaderMarkup = `<header class="notes-day-header minimal-date-header typewriter-masthead ${!isToday ? "is-historical-day" : ""}"><div class="minimal-date-bar"><div class="minimal-date-info typewriter-kicker-row"><span class="typewriter-pulse-dot ${!isToday ? "is-archived" : ""}" aria-hidden="true"></span><h1 class="minimal-date-title typewriter-kicker-label">${heading.toUpperCase()}</h1><span class="minimal-date-badge ${isToday ? "is-today" : "typewriter-kicker-badge"}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="${s.dateNavigation}">${!isToday ? `<a href="${todayHref}" data-link class="minimal-nav-btn today-jump-btn" aria-label="${s.today} (T)" title="${s.today} (T)">${svg(icons.recenter, "minimal-nav-svg")}</a>` : ""}<a href="${appUrl(`/?${prevParams}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl(`/?${nextParams}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><a href="${todayHref}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header>`;
+  const layout = getNotesPageLayout();
+  const dateHeaderMarkup = `<header class="notes-day-header minimal-date-header typewriter-masthead ${!isToday ? "is-historical-day" : ""}"><div class="minimal-date-bar"><div class="minimal-date-info typewriter-kicker-row"><span class="typewriter-pulse-dot ${!isToday ? "is-archived" : ""}" aria-hidden="true"></span><h1 class="minimal-date-title typewriter-kicker-label">${heading.toUpperCase()}</h1><span class="minimal-date-badge ${isToday ? "is-today" : "typewriter-kicker-badge"}"><span>${relativeInfo.label}</span></span></div><div class="minimal-date-nav" role="navigation" aria-label="${s.dateNavigation}">${!isToday ? `<a href="${todayHref}" data-link class="minimal-nav-btn today-jump-btn" aria-label="${s.today} (T)" title="${s.today} (T)">${svg(icons.recenter, "minimal-nav-svg")}</a>` : ""}<a href="${appUrl(`/?${prevParams}`)}" data-link class="minimal-nav-btn prev-btn date-nav-arrow" aria-label="${s.previousDay}" title="${s.previousDay}">${svg(icons.chevronLeft, "minimal-nav-svg")}</a><a href="${appUrl(`/?${nextParams}`)}" data-link class="minimal-nav-btn next-btn date-nav-arrow" aria-label="${s.nextDay}" title="${s.nextDay}">${svg(icons.chevronRight, "minimal-nav-svg")}</a><a href="${todayHref}" data-link class="minimal-today-link date-today-btn ${isToday ? "is-active" : ""}" ${isToday ? 'aria-disabled="true" tabindex="-1"' : `title="${s.today}"`}>${s.today}</a><button type="button" class="minimal-nav-btn notes-layout-toggle-btn" data-action="toggle-notes-layout" aria-label="${layout === 'one-column' ? s.layoutTwoColumns : s.layoutOneColumn}" title="${layout === 'one-column' ? s.layoutTwoColumns : s.layoutOneColumn}">${svg(layout === 'one-column' ? icons.columns : icons.layoutList, "minimal-nav-svg")}</button><details class="date-picker minimal-picker"><summary class="minimal-calendar-btn" aria-label="${s.openCalendar}" title="${s.openCalendar}">${svg(icons.calendar, "minimal-nav-svg")}</summary><div class="date-picker-popover" id="notes-calendar"></div></details></div></div></header>`;
 
-  content.innerHTML = `${dateHeaderMarkup}<div class="copilot-input-container ${isEmptyDayCanvas ? "empty-day-composer typewriter-composer" : ""}">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote, false, targetNewNoteFolderId, allFolders, isEmptyDayCanvas)}</div><section class="day-notes notes-panel ${isEmptyDayCanvas ? "is-empty-day" : ""}" aria-label="${s.notesTitle}">${sectionHead}${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allNotes, date, allFolders)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes ${isEmptyDayCanvas ? "empty-day-inspiration" : ""}">${isEmptyDayCanvas ? `<div class="inspiration-chips" role="toolbar" aria-label="${s.toolTemplates}"><button type="button" class="inspiration-chip" data-insert-template="standup">${svg(icons.sparkle, "inspiration-svg")}<span>${s.quickTemplateDaily}</span></button><button type="button" class="inspiration-chip" data-insert-template="meeting">${svg(icons.calendar, "inspiration-svg")}<span>${s.quickTemplateMeeting}</span></button><button type="button" class="inspiration-chip" data-insert-template="checklist">${svg(icons.check, "inspiration-svg")}<span>${s.quickTemplateChecklist}</span></button></div><p class="empty-day-prompt">${s.emptyDayPromptText}</p>` : `<img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${activeFolderId && !selectedTags.length ? s.noNotesInFolder : (selectedTags.length ? s.noNotesForTag(selectedTags.join(", #")) : s.noNotesToday)}</p><span>${s.emptyNotesPrompt}</span>` }</div>`}</section>${dayBacklinks.length ? `<section class="day-mentions-panel notes-panel" aria-labelledby="day-mentions-title"><div class="section-head"><div class="notes-panel-heading"><h3 id="day-mentions-title" class="panel-subtitle">${svg(icons.link, "backlink-icon-svg")}<span>${s.linkedMentionsTitle}</span></h3><span class="notes-count-badge">${dayBacklinks.length}</span></div></div><div class="day-mentions-list">${dayBacklinks.map((bl) => `<div class="day-mention-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="mention-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="day-mention-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></div>`).join("")}</div></section>` : ""}`;
+  const notesPanelMarkup = `<section class="day-notes notes-panel ${isEmptyDayCanvas ? "is-empty-day" : ""}" aria-label="${s.notesTitle}">${sectionHead}${visibleNotes.length ? `<div class="notes-list">${visibleNotes.map((note) => noteMarkup(note, allNotes, date, allFolders)).join("")}</div><footer class="notes-stream-footer is-hidden" hidden><button type="button" class="back-to-top-link" data-action="scroll-to-top" aria-label="${s.backToTop}">${svg(icons.arrowUp, "back-to-top-icon")}<span>${s.backToTop}</span><kbd class="shortcut-kbd-hint">⌘↑</kbd></button></footer>` : `<div class="empty-notes ${isEmptyDayCanvas ? "empty-day-inspiration" : ""}">${isEmptyDayCanvas ? `<div class="inspiration-chips" role="toolbar" aria-label="${s.toolTemplates}"><button type="button" class="inspiration-chip" data-insert-template="standup">${svg(icons.sparkle, "inspiration-svg")}<span>${s.quickTemplateDaily}</span></button><button type="button" class="inspiration-chip" data-insert-template="meeting">${svg(icons.calendar, "inspiration-svg")}<span>${s.quickTemplateMeeting}</span></button><button type="button" class="inspiration-chip" data-insert-template="checklist">${svg(icons.check, "inspiration-svg")}<span>${s.quickTemplateChecklist}</span></button></div><p class="empty-day-prompt">${s.emptyDayPromptText}</p>` : `<img src="${assetUrl("/empty-notes.png")}" alt="" width="140" height="140" class="empty-notes-illustration" aria-hidden="true"><p>${activeFolderId && !selectedTags.length ? s.noNotesInFolder : (selectedTags.length ? s.noNotesForTag(selectedTags.join(", #")) : s.noNotesToday)}</p><span>${s.emptyNotesPrompt}</span>` }</div>`}</section>`;
+
+  const backlinksMarkup = dayBacklinks.length ? `<section class="day-mentions-panel notes-panel" aria-labelledby="day-mentions-title"><div class="section-head"><div class="notes-panel-heading"><h3 id="day-mentions-title" class="panel-subtitle">${svg(icons.link, "backlink-icon-svg")}<span>${s.linkedMentionsTitle}</span></h3><span class="notes-count-badge">${dayBacklinks.length}</span></div></div><div class="day-mentions-list">${dayBacklinks.map((bl) => `<div class="day-mention-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="mention-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="day-mention-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></div>`).join("")}</div></section>` : "";
+
+  if (layout === "two-columns") {
+    const activeNote = activeSplitNoteId ? allNotes.find((n) => n.id === activeSplitNoteId && !n.archived) ?? null : null;
+    content.innerHTML = `<div class="notes-view-split-layout has-panel-open" id="notes-view-split-layout"><aside class="notes-stream-pane" id="notes-stream-pane">${dateHeaderMarkup}${notesPanelMarkup}${backlinksMarkup}</aside><section class="notes-split-panel is-open" id="notes-split-panel" role="complementary" aria-label="${s.notesTitle}">${renderSplitPanel(activeNote, draft?.content ?? "", targetNewNoteFolderId, allFolders, date, heading)}</section></div>`;
+  } else {
+    activeSplitNoteId = null;
+    content.innerHTML = `${dateHeaderMarkup}<div class="copilot-input-container ${isEmptyDayCanvas ? "empty-day-composer typewriter-composer" : ""}">${editorMarkup("new-note-form", draft?.content ?? "", s.finishNote, false, targetNewNoteFolderId, allFolders, isEmptyDayCanvas)}</div>${notesPanelMarkup}${backlinksMarkup}<div class="floating-quick-note-container" id="floating-quick-note-container"><button type="button" class="floating-quick-note-btn" data-action="open-compose-drawer" aria-label="${s.newNote}" title="${s.newNote} (C)">${svg(icons.plus, "floating-quick-icon")}<span>${s.newNote}</span><kbd class="floating-quick-kbd">C</kbd></button></div>`;
+  }
   renderCalendar(requireElement("#notes-calendar"), value, date, allNotes);
   if (wasTagPickerOpen) {
     const newTagPicker = document.querySelector<HTMLDetailsElement>("#tag-picker");
@@ -199,7 +211,11 @@ export async function renderToday(content: HTMLElement): Promise<void> {
       }
     }
   }
-  bindCreateEditor(date);
+  if (layout === "two-columns") {
+    bindSplitPanel(date, allNotes, allFolders);
+  } else {
+    bindCreateEditor(date);
+  }
   bindNoteActions();
   const createTitle = new URLSearchParams(location.search).get("create");
   if (createTitle) {
@@ -242,7 +258,14 @@ export function noteMarkup(
 
   const unfiledMoveControl = !noteFolder ? `<details class="note-action-menu note-move-menu" data-note-move="${note.id}"><summary class="note-quick-action-btn move-btn" aria-label="${s.moveToFolder}" title="${s.moveToFolder}">${svg(icons.folder, "action-icon-svg")}</summary>${moveMenuMarkup}</details>` : "";
 
-  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time>${folderBadge}</div><div class="note-header-actions">${unfiledMoveControl}<button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="prose">${renderMarkdown(note.content, true)}</div>${backlinks.length ? `<div class="note-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
+  const rawLines = note.content.split("\n");
+  const lineCount = rawLines.length;
+  const isLongNote = lineCount > 6 || note.content.length > 280;
+  const clampedFooter = isLongNote
+    ? `<div class="note-fade-overlay" aria-hidden="true"><span class="note-fade-hint">more…</span></div>`
+    : "";
+
+  return `<div class="note-list-item"><article class="note" id="note-${note.id}" data-note-id="${note.id}"><header class="note-header"><div class="note-header-left"><time datetime="${note.createdAt}" class="note-time-text">${formatTime(note.createdAt, note.noteDate)}</time>${folderBadge}</div><div class="note-header-actions">${unfiledMoveControl}<button type="button" class="note-quick-action-btn copy-btn" data-copy-note="${note.id}" aria-label="${s.copyNote}" title="${s.copyNote}">${svg(icons.copy, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn edit-btn" data-edit-note="${note.id}" aria-label="${s.editNote}" title="${s.editNote}">${svg(icons.edit, "action-icon-svg")}</button><button type="button" class="note-quick-action-btn delete-btn" data-delete-note="${note.id}" aria-label="${s.deleteNote}" title="${s.deleteNote}">${svg(icons.trash, "action-icon-svg")}</button></div></header><div class="note-prose-container ${isLongNote ? "is-clampable" : ""}"><div class="prose">${renderMarkdown(note.content, true)}</div>${clampedFooter}</div>${backlinks.length ? `<div class="note-backlinks"><div class="note-backlinks-header">${svg(icons.link, "backlink-icon-svg")}<span>${backlinks.length} ${backlinks.length === 1 ? s.backlinkSingle : s.backlinkPlural}</span></div><ul class="note-backlinks-list">${backlinks.map((bl) => `<li class="note-backlink-item"><a href="${appUrl(`/?date=${bl.sourceNote.noteDate}#note-${bl.sourceNote.id}`)}" data-link class="backlink-date-badge" title="${s.openCalendar}">${formatShortDate(bl.sourceNote.noteDate)}</a><span class="backlink-snippet-rendered prose">${renderInlineMarkdown(bl.snippet)}</span></li>`).join("")}</ul></div>` : ""}${note.tags.length ? `<div class="note-tags">${note.tags.map((tag) => `<a href="/?date=${selectedDate}&tag=${encodeURIComponent(tag)}" data-link class="tag-pill">#${escapeHtml(tag)}</a>`).join("")}</div>` : ""}</article></div>`;
 }
 
 export function renderCalendar(host: HTMLElement, monthDate: Date, selectedDate: string, allNotes: Note[]): void {
@@ -316,6 +339,158 @@ export async function refreshCalendar(): Promise<void> {
 }
 
 setCalendarRefresher(refreshCalendar);
+
+let activeSplitNoteId: string | null = null;
+
+export function getActiveSplitNoteId(): string | null {
+  return activeSplitNoteId;
+}
+
+export function setActiveSplitNoteId(id: string | null): void {
+  activeSplitNoteId = id;
+}
+
+export function renderSplitPanel(
+  note: Note | null,
+  draftContent: string,
+  targetFolderId: string | null,
+  allFolders: Folder[],
+  _date: string,
+  heading: string
+): string {
+  const s = currentStrings();
+  if (note) {
+    const formattedDate = formatDateHeading(note.noteDate);
+    const timeStr = formatTime(note.createdAt, note.noteDate);
+    return `<header class="notes-split-panel-header" id="notes-split-header"><div class="notes-split-panel-kicker"><span class="notes-split-kicker-dot" aria-hidden="true"></span><h2 class="notes-split-panel-title" id="split-editor-heading">${s.editNoteTitle}</h2><span class="notes-split-panel-meta" id="split-editor-submeta">${formattedDate} · ${timeStr}</span></div><div class="notes-split-panel-actions"><button type="button" class="notes-split-btn split-new-btn" id="split-new-note-btn" data-split-action="new-note" title="${s.newNote}">${svg(icons.plus, "action-icon-svg")}<span>${s.newNote}</span></button><button type="button" class="notes-split-btn split-cancel-btn" data-split-action="cancel" title="${s.cancel} (Esc)">${svg(icons.close, "action-icon-svg")}<span>${s.cancel}</span></button></div></header><div class="notes-split-panel-body" id="split-pane-editor-form-host">${editorMarkup("edit-note-form", note.content, s.saveChanges, true, note.folderId, allFolders)}</div>`;
+  }
+  return `<header class="notes-split-panel-header" id="notes-split-header"><div class="notes-split-panel-kicker"><span class="notes-split-kicker-dot" aria-hidden="true"></span><h2 class="notes-split-panel-title" id="split-editor-heading">${s.newNote}</h2><span class="notes-split-panel-meta" id="split-editor-submeta">${heading}</span></div><div class="notes-split-panel-actions"><button type="button" class="notes-split-btn split-new-btn" id="split-new-note-btn" data-split-action="new-note" style="display: none;" title="${s.newNote}">${svg(icons.plus, "action-icon-svg")}<span>${s.newNote}</span></button></div></header><div class="notes-split-panel-body" id="split-pane-editor-form-host">${editorMarkup("new-note-form", draftContent, s.finishNote, false, targetFolderId, allFolders, false)}</div>`;
+}
+
+export function bindSplitPanel(date: string, allNotes: Note[], _allFolders: Folder[]): void {
+  const panel = document.getElementById("notes-split-panel");
+  if (!panel) return;
+  const s = currentStrings();
+
+  if (activeSplitNoteId) {
+    const note = allNotes.find((n) => n.id === activeSplitNoteId);
+    if (!note) return;
+    const form = panel.querySelector<HTMLFormElement>("#edit-note-form");
+    const textarea = panel.querySelector<HTMLTextAreaElement>("#edit-note-form textarea");
+    if (!form || !textarea) return;
+
+    bindFormatting(form, textarea);
+    bindEditorPreview(form);
+    updateEditorWordCount(form);
+    textarea.addEventListener("input", () => updateEditorWordCount(form));
+    textarea.focus();
+    textarea.addEventListener("keydown", (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+    attachTagAutocomplete(textarea, async () => tagCounts(await notes.listAll()));
+    textarea.addEventListener("input", () => {
+      const cursor = textarea.selectionStart;
+      if (cursor >= 2 && textarea.value.slice(cursor - 2, cursor) === "[[") {
+        textarea.setRangeText("", cursor - 2, cursor, "end");
+        void showLinkPickerModal(textarea);
+      }
+    });
+
+    const cancelEdit = () => {
+      activeSplitNoteId = null;
+      void updateSplitPanel(date);
+    };
+
+    panel.querySelectorAll<HTMLButtonElement>("[data-split-action='cancel'], [data-split-action='new-note'], [data-close-dialog]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        cancelEdit();
+      });
+    });
+
+    const onKeydown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (document.querySelector(".link-picker-dialog, .lite-confirm-dialog")) return;
+        window.removeEventListener("keydown", onKeydown);
+        cancelEdit();
+      }
+    };
+    window.addEventListener("keydown", onKeydown);
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!textarea.value.trim()) {
+        showConfirm(s.deleteConfirmTitle, s.deleteConfirmMessage, s.deleteNote, async () => {
+          await notes.delete(note.id);
+          void track("note_deleted");
+          window.removeEventListener("keydown", onKeydown);
+          activeSplitNoteId = null;
+          await refreshCalendar();
+          await renderRoute();
+        });
+        return;
+      }
+      setBusy(form, true);
+      try {
+        const folderInput = form.querySelector<HTMLInputElement | HTMLSelectElement>("input[name='folderId'], select[name='folderId']");
+        const folderId = folderInput ? (folderInput.value || null) : undefined;
+        await notes.update(note.id, textarea.value, folderId);
+        note.content = textarea.value;
+        if (folderId !== undefined) note.folderId = folderId;
+        setBusy(form, false);
+        status(form, s.draftSaved);
+        const noteEl = document.getElementById(`note-${note.id}`);
+        if (noteEl) {
+          const prose = noteEl.querySelector(".prose");
+          if (prose) prose.innerHTML = renderMarkdown(note.content, true);
+        }
+        await refreshCalendar();
+      } catch (error) {
+        status(form, errorMessage(error), true);
+        setBusy(form, false);
+      }
+    });
+  } else {
+    bindCreateEditor(date);
+  }
+}
+
+export async function updateSplitPanel(date: string): Promise<void> {
+  const panel = document.getElementById("notes-split-panel");
+  if (!panel) return;
+  const [allNotes, allFolders, draft] = await Promise.all([
+    notes.listAll(),
+    folders.listAll(),
+    notes.getDraft(date)
+  ]);
+  const activeNote = activeSplitNoteId ? allNotes.find((n) => n.id === activeSplitNoteId && !n.archived) ?? null : null;
+  if (!activeNote && activeSplitNoteId) {
+    activeSplitNoteId = null;
+  }
+
+  // Update selected class in left stream
+  document.querySelectorAll<HTMLElement>(".notes-stream-pane .note").forEach((el) => {
+    const isThis = activeSplitNoteId !== null && el.dataset.noteId === activeSplitNoteId;
+    el.classList.toggle("is-selected", isThis);
+  });
+
+  const heading = formatDateHeading(date);
+  panel.innerHTML = renderSplitPanel(activeNote, draft?.content ?? "", null, allFolders, date, heading);
+  bindSplitPanel(date, allNotes, allFolders);
+}
+
+setSplitNoteSelector((noteId, date) => {
+  activeSplitNoteId = noteId;
+  void updateSplitPanel(date);
+});
+
+setSplitEditorRestorer((date) => {
+  activeSplitNoteId = null;
+  void updateSplitPanel(date);
+});
 
 export function bindCreateEditor(date: string): void {
   const s = currentStrings();
@@ -443,10 +618,73 @@ export function bindNoteActions(): void {
       })
     )
   );
-  document.querySelectorAll<HTMLButtonElement>("[data-edit-note]").forEach((button) =>
-    button.addEventListener("click", async () => {
+  document.querySelectorAll<HTMLButtonElement>("[data-action='toggle-notes-layout']").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const nextLayout = getNotesPageLayout() === "one-column" ? "two-columns" : "one-column";
+      setNotesPageLayout(nextLayout);
+      void renderRoute();
+    });
+  });
+
+  const quickNoteBtn = document.querySelector<HTMLButtonElement>("[data-action='open-compose-drawer']");
+  quickNoteBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const allF = await folders.listAll();
+    const currentUrl = new URL(location.href);
+    const curDate = currentUrl.searchParams.get("date") ?? isoDate(new Date());
+    void showComposeDrawer(curDate, allF);
+  });
+
+  const onQuickKey = (event: KeyboardEvent) => {
+    if ((event.key === "c" || event.key === "C") && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      const active = document.activeElement;
+      if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || (active as HTMLElement).isContentEditable)) {
+        return;
+      }
+      if (document.querySelector("#edit-note-backdrop, .command-palette, #search-modal, .lite-confirm-dialog")) return;
+      event.preventDefault();
+      const currentUrl = new URL(location.href);
+      const curDate = currentUrl.searchParams.get("date") ?? isoDate(new Date());
+      void folders.listAll().then((allF) => showComposeDrawer(curDate, allF));
+    }
+  };
+  window.addEventListener("keydown", onQuickKey);
+
+  if (getNotesPageLayout() === "two-columns") {
+    document.querySelectorAll<HTMLElement>(".notes-stream-pane .note, .notes-left-column .note").forEach((noteEl) => {
+      noteEl.addEventListener("click", (event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest("button, a, input, details, summary")) return;
+        if (window.getSelection()?.toString().trim()) return;
+        const noteId = noteEl.dataset.noteId ?? noteEl.id.replace(/^note-/, "");
+        if (!noteId) return;
+        activeSplitNoteId = noteId;
+        const currentUrl = new URL(location.href);
+        const curDate = currentUrl.searchParams.get("date") ?? isoDate(new Date());
+        void updateSplitPanel(curDate);
+      });
+    });
+  } else {
+    document.querySelectorAll<HTMLElement>(".day-notes .note").forEach((noteEl) => {
+      noteEl.addEventListener("click", async (event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest("button, a, input, details, summary")) return;
+        if (window.getSelection()?.toString().trim()) return;
+        const noteId = noteEl.dataset.noteId ?? noteEl.id.replace(/^note-/, "");
+        if (!noteId) return;
+        const [allN, allF] = await Promise.all([notes.listAll(), folders.listAll()]);
+        const note = allN.find((item) => item.id === noteId);
+        if (note) showEditDialog(note, allF);
+      });
+    });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>("[data-edit-note], [data-open-drawer]").forEach((button) =>
+    button.addEventListener("click", async (event) => {
+      event.stopPropagation();
       const [allN, allF] = await Promise.all([notes.listAll(), folders.listAll()]);
-      const note = allN.find((item) => item.id === button.dataset.editNote);
+      const noteId = button.dataset.editNote ?? button.dataset.openDrawer;
+      const note = allN.find((item) => item.id === noteId);
       if (note) showEditDialog(note, allF);
     })
   );
