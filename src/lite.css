@@ -4951,90 +4951,326 @@ textarea.simple-editor-textarea.is-hidden,
   margin-left: auto;
 }
 
-.editor-modal-actions .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.1rem;
-  height: 2.1rem;
-  padding: 0 0.85rem;
-  border: 1px solid var(--color-border-subtle, var(--border));
-  border-radius: 5px;
-  background: var(--color-bg-surface, var(--surface));
-  color: var(--color-text-secondary, var(--text-soft));
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 120ms ease;
-}
+/* ==========================================================================
+   UNIFIED BUTTON DESIGN SYSTEM
+   Standardized Geometry, Motion, and Contrast across All Tiers
+   ========================================================================== */
 
-.editor-modal-actions .btn-secondary:hover {
-  background: var(--btn-hover-bg) !important;
-  border-color: var(--btn-hover-border) !important;
-  color: var(--btn-hover-text) !important;
-  box-shadow: var(--btn-hover-shadow) !important;
-}
-
-:root[data-theme="dark"] .editor-modal-actions .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
+/* 1. Primary Buttons */
+.btn-primary,
+.save-btn-rect,
+.folder-modal-btn.btn-save,
+#generate-summary,
+button.primary-button,
+button.btn-primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 0.95rem !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--color-brand, #5B5BD6) !important;
   color: #FFFFFF !important;
-  box-shadow: var(--btn-hover-shadow) !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
 }
 
-.editor-modal-actions .save-btn-rect {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  min-height: 2.1rem;
-  height: 2.1rem;
-  padding: 0 0.95rem;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-  font-size: 0.78rem;
-  font-weight: 600;
-  box-shadow: none;
-  cursor: pointer;
-  transition: all 120ms ease;
-}
-
-.editor-modal-actions .save-btn-rect:hover:not(:disabled) {
+.btn-primary:hover:not(:disabled),
+.save-btn-rect:hover:not(:disabled),
+.folder-modal-btn.btn-save:hover:not(:disabled),
+#generate-summary:hover:not(:disabled),
+button.primary-button:hover:not(:disabled),
+button.btn-primary:hover:not(:disabled) {
   background: var(--color-brand-hover, #4B4BC3) !important;
   color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(91, 91, 214, 0.25) !important;
 }
 
-.editor-modal-actions .save-btn-rect:hover:not(:disabled) span,
-.editor-modal-actions .save-btn-rect:hover:not(:disabled) svg {
+.btn-primary:hover:not(:disabled) span,
+.btn-primary:hover:not(:disabled) svg,
+.save-btn-rect:hover:not(:disabled) span,
+.save-btn-rect:hover:not(:disabled) svg {
   color: #FFFFFF !important;
   stroke: #FFFFFF !important;
 }
 
-:root[data-theme="dark"] .editor-modal-actions .save-btn-rect {
+.btn-primary:active:not(:disabled),
+.save-btn-rect:active:not(:disabled),
+.folder-modal-btn.btn-save:active:not(:disabled),
+#generate-summary:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+:root[data-theme="dark"] .btn-primary,
+:root[data-theme="dark"] .save-btn-rect,
+:root[data-theme="dark"] .folder-modal-btn.btn-save,
+:root[data-theme="dark"] #generate-summary {
   background: #FFFFFF !important;
   color: #09090b !important;
 }
 
-:root[data-theme="dark"] .editor-modal-actions .save-btn-rect:hover:not(:disabled) {
+:root[data-theme="dark"] .btn-primary:hover:not(:disabled),
+:root[data-theme="dark"] .save-btn-rect:hover:not(:disabled),
+:root[data-theme="dark"] .folder-modal-btn.btn-save:hover:not(:disabled),
+:root[data-theme="dark"] #generate-summary:hover:not(:disabled) {
   background: #E4E4E7 !important;
   color: #09090b !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15) !important;
 }
 
-:root[data-theme="dark"] .editor-modal-actions .save-btn-rect:hover:not(:disabled) span,
-:root[data-theme="dark"] .editor-modal-actions .save-btn-rect:hover:not(:disabled) svg {
+:root[data-theme="dark"] .btn-primary:hover:not(:disabled) span,
+:root[data-theme="dark"] .btn-primary:hover:not(:disabled) svg,
+:root[data-theme="dark"] .save-btn-rect:hover:not(:disabled) span,
+:root[data-theme="dark"] .save-btn-rect:hover:not(:disabled) svg {
   color: #09090b !important;
   stroke: #09090b !important;
 }
 
-.editor-modal-actions .save-btn-rect:active:not(:disabled) {
-  transform: scale(0.98);
+/* 2. Secondary & Surface Buttons */
+.btn-secondary,
+.secondary-button,
+.notes-split-btn,
+.split-new-note-btn,
+.folder-modal-btn.btn-ghost,
+.privacy-toast-btn,
+.summary-document-actions .secondary-button,
+.ai-actions-row .secondary-button,
+.editor-modal-actions .btn-secondary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 0.85rem !important;
+  border: 1px solid var(--color-border-subtle, var(--border)) !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--color-bg-surface, var(--surface)) !important;
+  color: var(--color-text-secondary, var(--text-soft)) !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
 }
 
-.save-btn-rect:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
+.btn-secondary:hover:not(:disabled),
+.secondary-button:hover:not(:disabled),
+.notes-split-btn:hover:not(:disabled),
+.split-new-note-btn:hover:not(:disabled),
+.folder-modal-btn.btn-ghost:hover:not(:disabled),
+.privacy-toast-btn:hover:not(:disabled),
+.summary-document-actions .secondary-button:hover:not(:disabled),
+.ai-actions-row .secondary-button:hover:not(:disabled),
+.editor-modal-actions .btn-secondary:hover:not(:disabled) {
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.btn-secondary:hover:not(:disabled) span,
+.btn-secondary:hover:not(:disabled) svg,
+.secondary-button:hover:not(:disabled) span,
+.secondary-button:hover:not(:disabled) svg,
+.notes-split-btn:hover:not(:disabled) span,
+.notes-split-btn:hover:not(:disabled) svg,
+.split-new-note-btn:hover:not(:disabled) span,
+.split-new-note-btn:hover:not(:disabled) svg,
+.privacy-toast-btn:hover:not(:disabled) span,
+.privacy-toast-btn:hover:not(:disabled) svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+.btn-secondary:active:not(:disabled),
+.secondary-button:active:not(:disabled),
+.notes-split-btn:active:not(:disabled),
+.split-new-note-btn:active:not(:disabled),
+.privacy-toast-btn:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+:root[data-theme="dark"] .btn-secondary,
+:root[data-theme="dark"] .secondary-button,
+:root[data-theme="dark"] .notes-split-btn,
+:root[data-theme="dark"] .split-new-note-btn,
+:root[data-theme="dark"] .folder-modal-btn.btn-ghost,
+:root[data-theme="dark"] .privacy-toast-btn,
+:root[data-theme="dark"] .summary-document-actions .secondary-button,
+:root[data-theme="dark"] .ai-actions-row .secondary-button,
+:root[data-theme="dark"] .editor-modal-actions .btn-secondary {
+  background: var(--color-bg-surface, #1e1e22) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #F4F4F5 !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .btn-secondary:hover:not(:disabled),
+:root[data-theme="dark"] .secondary-button:hover:not(:disabled),
+:root[data-theme="dark"] .notes-split-btn:hover:not(:disabled),
+:root[data-theme="dark"] .split-new-note-btn:hover:not(:disabled),
+:root[data-theme="dark"] .folder-modal-btn.btn-ghost:hover:not(:disabled),
+:root[data-theme="dark"] .privacy-toast-btn:hover:not(:disabled),
+:root[data-theme="dark"] .summary-document-actions .secondary-button:hover:not(:disabled),
+:root[data-theme="dark"] .ai-actions-row .secondary-button:hover:not(:disabled),
+:root[data-theme="dark"] .editor-modal-actions .btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+:root[data-theme="dark"] .btn-secondary:hover:not(:disabled) span,
+:root[data-theme="dark"] .btn-secondary:hover:not(:disabled) svg,
+:root[data-theme="dark"] .secondary-button:hover:not(:disabled) span,
+:root[data-theme="dark"] .secondary-button:hover:not(:disabled) svg,
+:root[data-theme="dark"] .notes-split-btn:hover:not(:disabled) span,
+:root[data-theme="dark"] .notes-split-btn:hover:not(:disabled) svg,
+:root[data-theme="dark"] .split-new-note-btn:hover:not(:disabled) span,
+:root[data-theme="dark"] .split-new-note-btn:hover:not(:disabled) svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+/* 3. Ghost & Icon Buttons */
+.note-quick-action-btn,
+.minimal-nav-btn,
+.minimal-calendar-btn,
+.today-jump-btn,
+.note-edit-close,
+.note-drawer-close,
+.folder-modal-close,
+.privacy-toast-close,
+.todo-panel-btn,
+.copy-code-btn,
+.sidebar-search-btn,
+.sidebar-collapse-button,
+.mobile-sidebar-open,
+.editor-mode-btn,
+.back-to-top-link,
+.simple-editor-toolbar button[data-format] {
+  border-radius: var(--radius-sm, 6px) !important;
+  border: 1px solid transparent !important;
+  background: transparent;
+  color: var(--color-icon-secondary, #667085);
+  cursor: pointer !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.note-quick-action-btn:hover,
+.minimal-nav-btn:hover,
+.minimal-calendar-btn:hover,
+.today-jump-btn:hover,
+.note-edit-close:hover,
+.note-drawer-close:hover,
+.folder-modal-close:hover,
+.privacy-toast-close:hover,
+.todo-panel-btn:hover,
+.copy-code-btn:hover,
+.sidebar-search-btn:hover,
+.sidebar-collapse-button:hover,
+.mobile-sidebar-open:hover,
+.editor-mode-btn:hover,
+.back-to-top-link:hover,
+.simple-editor-toolbar button[data-format]:hover {
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-hover-border) !important;
+  color: var(--btn-hover-text) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--btn-hover-shadow) !important;
+}
+
+.note-quick-action-btn:hover svg,
+.minimal-nav-btn:hover svg,
+.minimal-calendar-btn:hover svg,
+.note-edit-close:hover svg,
+.note-drawer-close:hover svg,
+.folder-modal-close:hover svg,
+.privacy-toast-close:hover svg,
+.todo-panel-btn:hover svg,
+.copy-code-btn:hover svg,
+.sidebar-search-btn:hover svg,
+.editor-mode-btn:hover svg,
+.back-to-top-link:hover svg,
+.simple-editor-toolbar button[data-format]:hover svg {
+  color: var(--btn-hover-text) !important;
+  stroke: var(--btn-hover-text) !important;
+}
+
+.note-quick-action-btn:active,
+.minimal-nav-btn:active,
+.minimal-calendar-btn:active,
+.note-edit-close:active,
+.note-drawer-close:active,
+.todo-panel-btn:active,
+.copy-code-btn:active {
+  transform: scale(0.96) !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn:hover,
+:root[data-theme="dark"] .minimal-nav-btn:hover,
+:root[data-theme="dark"] .minimal-calendar-btn:hover,
+:root[data-theme="dark"] .today-jump-btn:hover,
+:root[data-theme="dark"] .note-edit-close:hover,
+:root[data-theme="dark"] .note-drawer-close:hover,
+:root[data-theme="dark"] .folder-modal-close:hover,
+:root[data-theme="dark"] .privacy-toast-close:hover,
+:root[data-theme="dark"] .todo-panel-btn:hover,
+:root[data-theme="dark"] .copy-code-btn:hover,
+:root[data-theme="dark"] .sidebar-search-btn:hover,
+:root[data-theme="dark"] .sidebar-collapse-button:hover,
+:root[data-theme="dark"] .mobile-sidebar-open:hover,
+:root[data-theme="dark"] .editor-mode-btn:hover,
+:root[data-theme="dark"] .back-to-top-link:hover,
+:root[data-theme="dark"] .simple-editor-toolbar button[data-format]:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+:root[data-theme="dark"] .note-quick-action-btn:hover svg,
+:root[data-theme="dark"] .minimal-nav-btn:hover svg,
+:root[data-theme="dark"] .minimal-calendar-btn:hover svg,
+:root[data-theme="dark"] .note-edit-close:hover svg,
+:root[data-theme="dark"] .note-drawer-close:hover svg,
+:root[data-theme="dark"] .folder-modal-close:hover svg,
+:root[data-theme="dark"] .privacy-toast-close:hover svg,
+:root[data-theme="dark"] .todo-panel-btn:hover svg,
+:root[data-theme="dark"] .copy-code-btn:hover svg,
+:root[data-theme="dark"] .sidebar-search-btn:hover svg,
+:root[data-theme="dark"] .editor-mode-btn:hover svg,
+:root[data-theme="dark"] .back-to-top-link:hover svg,
+:root[data-theme="dark"] .simple-editor-toolbar button[data-format]:hover svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.save-btn-rect:disabled,
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .save-icon-svg {
@@ -8544,34 +8780,36 @@ mark.palette-highlight {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-height: 2.2rem !important;
-  padding: 0.45rem 1.15rem !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 1.15rem !important;
   border: 1px solid transparent !important;
   border-radius: var(--radius-sm, 6px) !important;
   background: var(--color-danger, #E25555) !important;
   color: #ffffff !important;
-  font-family: var(--font-ui) !important;
-  font-size: 0.85rem !important;
+  font-family: var(--font-app) !important;
+  font-size: 0.8rem !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   box-shadow: none !important;
-  transition: all 120ms ease !important;
+  transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.btn-danger-confirm:hover {
+.btn-danger-confirm:hover:not(:disabled) {
   background: var(--color-danger-hover, #c93b3b) !important;
   color: #ffffff !important;
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(226, 85, 85, 0.28) !important;
 }
 
-.btn-danger-confirm:active {
-  transform: scale(0.98) !important;
+.btn-danger-confirm:active:not(:disabled) {
+  transform: scale(0.97) !important;
 }
 
 .btn-danger-confirm:disabled {
-  opacity: 0.6 !important;
+  opacity: 0.5 !important;
   pointer-events: none !important;
+  transform: none !important;
 }
 
 :root[data-theme="dark"] .btn-danger-confirm {
@@ -8579,9 +8817,11 @@ mark.palette-highlight {
   color: #ffffff !important;
 }
 
-:root[data-theme="dark"] .btn-danger-confirm:hover {
+:root[data-theme="dark"] .btn-danger-confirm:hover:not(:disabled) {
   background: #f87171 !important;
-  color: #09090b !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(248, 113, 113, 0.35) !important;
 }
 
 .todo-group-tabs {
